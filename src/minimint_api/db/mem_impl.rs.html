@@ -110,6 +110,8 @@
 <span id="110">110</span>
 <span id="111">111</span>
 <span id="112">112</span>
+<span id="113">113</span>
+<span id="114">114</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::batch</span>::{<span class="ident">BatchItem</span>, <span class="ident">DbBatch</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::Database</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::db::PrefixIter</span>;
@@ -133,7 +135,9 @@
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">dump_db</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
-        <span class="kw">for</span> (<span class="ident">key</span>, <span class="ident">value</span>) <span class="kw">in</span> <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">lock</span>().<span class="ident">unwrap</span>().<span class="ident">iter</span>() {
+        <span class="kw">let</span> <span class="ident">data</span> = <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">lock</span>().<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">data_iter</span> = <span class="ident">data</span>.<span class="ident">iter</span>();
+        <span class="kw">for</span> (<span class="ident">key</span>, <span class="ident">value</span>) <span class="kw">in</span> <span class="ident">data_iter</span> {
             <span class="macro">eprintln!</span>(<span class="string">&quot;{}: {}&quot;</span>, <span class="ident">hex::encode</span>(<span class="ident">key</span>), <span class="ident">hex::encode</span>(<span class="ident">value</span>));
         }
     }
@@ -223,4 +227,4 @@
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="minimint_api" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (f22819bcc 2022-08-12)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="minimint_api" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (75b7e52e9 2022-08-13)" ></div></body></html>

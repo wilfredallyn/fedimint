@@ -911,7 +911,13 @@
 <span id="911">911</span>
 <span id="912">912</span>
 <span id="913">913</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::config::MintConfig</span>;
+<span id="914">914</span>
+<span id="915">915</span>
+<span id="916">916</span>
+</pre><pre class="rust"><code><span class="comment">// TODO: unclear if people prefer this</span>
+<span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::assertions_on_result_states</span>)]</span>
+
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::config::MintConfig</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::db</span>::{
     <span class="ident">MintAuditItemKey</span>, <span class="ident">MintAuditItemKeyPrefix</span>, <span class="ident">NonceKey</span>, <span class="ident">OutputOutcomeKey</span>,
     <span class="ident">ProposedPartialSignatureKey</span>, <span class="ident">ProposedPartialSignaturesKeyPrefix</span>, <span class="ident">ReceivedPartialSignatureKey</span>,
@@ -1825,4 +1831,4 @@
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="minimint_mint" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (f22819bcc 2022-08-12)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="minimint_mint" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (75b7e52e9 2022-08-13)" ></div></body></html>
