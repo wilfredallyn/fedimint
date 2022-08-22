@@ -417,13 +417,7 @@
 <span id="417">417</span>
 <span id="418">418</span>
 <span id="419">419</span>
-<span id="420">420</span>
-<span id="421">421</span>
-<span id="422">422</span>
-</pre><pre class="rust"><code><span class="comment">// TODO: unclear if people prefer this
-</span><span class="attribute">#![allow(clippy::assertions_on_result_states)]</span>
-
-<span class="comment">// TODO: once user and mint client are merged, make this private again
+</pre><pre class="rust"><code><span class="comment">// TODO: once user and mint client are merged, make this private again
 </span><span class="kw">pub mod </span>db;
 <span class="kw">pub mod </span>incoming;
 <span class="kw">pub mod </span>outgoing;
@@ -434,18 +428,18 @@
 <span class="kw">use </span><span class="kw">crate</span>::ln::outgoing::{OutgoingContractAccount, OutgoingContractData};
 <span class="kw">use </span><span class="kw">crate</span>::utils::BorrowedClientContext;
 <span class="kw">use </span>bitcoin_hashes::sha256::Hash <span class="kw">as </span>Sha256Hash;
-<span class="kw">use </span>lightning_invoice::Invoice;
-<span class="kw">use </span>minimint_api::db::batch::BatchTx;
-<span class="kw">use </span>minimint_api::Amount;
-<span class="kw">use </span>minimint_core::modules::ln::config::LightningModuleClientConfig;
-<span class="kw">use </span>minimint_core::modules::ln::contracts::incoming::{EncryptedPreimage, IncomingContractOffer};
-<span class="kw">use </span>minimint_core::modules::ln::contracts::outgoing::OutgoingContract;
-<span class="kw">use </span>minimint_core::modules::ln::contracts::{
+<span class="kw">use </span>fedimint_api::db::batch::BatchTx;
+<span class="kw">use </span>fedimint_api::Amount;
+<span class="kw">use </span>fedimint_core::modules::ln::config::LightningModuleClientConfig;
+<span class="kw">use </span>fedimint_core::modules::ln::contracts::incoming::{EncryptedPreimage, IncomingContractOffer};
+<span class="kw">use </span>fedimint_core::modules::ln::contracts::outgoing::OutgoingContract;
+<span class="kw">use </span>fedimint_core::modules::ln::contracts::{
     Contract, ContractId, FundedContract, IdentifyableContract,
 };
-<span class="kw">use </span>minimint_core::modules::ln::{
+<span class="kw">use </span>fedimint_core::modules::ln::{
     ContractAccount, ContractInput, ContractOrOfferOutput, ContractOutput, LightningGateway,
 };
+<span class="kw">use </span>lightning_invoice::Invoice;
 <span class="kw">use </span>rand::{CryptoRng, RngCore};
 <span class="kw">use </span>std::time::Duration;
 <span class="kw">use </span>thiserror::Error;
@@ -457,8 +451,8 @@
     <span class="kw">pub </span>context: BorrowedClientContext&lt;<span class="lifetime">&#39;c</span>, LightningModuleClientConfig&gt;,
 }
 
-<span class="attribute">#[allow(dead_code)]</span>
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;c</span>&gt; LnClient&lt;<span class="lifetime">&#39;c</span>&gt; {
+<span class="attribute">#[allow(dead_code)]
+</span><span class="kw">impl</span>&lt;<span class="lifetime">&#39;c</span>&gt; LnClient&lt;<span class="lifetime">&#39;c</span>&gt; {
     <span class="doccomment">/// Create an output that incentivizes a Lighning gateway to pay an invoice for us. It has time
     /// till the block height defined by `timelock`, after that we can claim our money back.
     </span><span class="kw">pub fn </span>create_outgoing_output&lt;<span class="lifetime">&#39;a</span>&gt;(
@@ -605,39 +599,39 @@
 
 <span class="kw">pub type </span><span class="prelude-ty">Result</span>&lt;T&gt; = std::result::Result&lt;T, LnClientError&gt;;
 
-<span class="attribute">#[derive(Debug, Error)]</span>
-<span class="kw">pub enum </span>LnClientError {
-    <span class="attribute">#[error(<span class="string">&quot;We can&#39;t pay an amountless invoice&quot;</span>)]</span>
-    MissingInvoiceAmount,
-    <span class="attribute">#[error(<span class="string">&quot;Mint API error: {0}&quot;</span>)]</span>
-    ApiError(ApiError),
-    <span class="attribute">#[error(<span class="string">&quot;Mint returned unexpected account type&quot;</span>)]</span>
-    WrongAccountType,
-    <span class="attribute">#[error(<span class="string">&quot;No ConfirmedOffer found for contract ID {0}&quot;</span>)]</span>
-    NoConfirmedInvoice(ContractId),
+<span class="attribute">#[derive(Debug, Error)]
+</span><span class="kw">pub enum </span>LnClientError {
+    <span class="attribute">#[error(<span class="string">&quot;We can&#39;t pay an amountless invoice&quot;</span>)]
+    </span>MissingInvoiceAmount,
+    <span class="attribute">#[error(<span class="string">&quot;Mint API error: {0}&quot;</span>)]
+    </span>ApiError(ApiError),
+    <span class="attribute">#[error(<span class="string">&quot;Mint returned unexpected account type&quot;</span>)]
+    </span>WrongAccountType,
+    <span class="attribute">#[error(<span class="string">&quot;No ConfirmedOffer found for contract ID {0}&quot;</span>)]
+    </span>NoConfirmedInvoice(ContractId),
 }
 
-<span class="attribute">#[cfg(test)]</span>
-<span class="kw">mod </span>tests {
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
     <span class="kw">use </span><span class="kw">crate</span>::api::FederationApi;
     <span class="kw">use </span><span class="kw">crate</span>::ln::LnClient;
     <span class="kw">use </span><span class="kw">crate</span>::OwnedClientContext;
     <span class="kw">use </span>async_trait::async_trait;
     <span class="kw">use </span>bitcoin::Address;
+    <span class="kw">use </span>fedimint_api::db::batch::DbBatch;
+    <span class="kw">use </span>fedimint_api::db::mem_impl::MemDatabase;
+    <span class="kw">use </span>fedimint_api::module::testing::FakeFed;
+    <span class="kw">use </span>fedimint_api::{Amount, OutPoint, TransactionId};
+    <span class="kw">use </span>fedimint_core::epoch::EpochHistory;
+    <span class="kw">use </span>fedimint_core::modules::ln::config::LightningModuleClientConfig;
+    <span class="kw">use </span>fedimint_core::modules::ln::contracts::incoming::IncomingContractOffer;
+    <span class="kw">use </span>fedimint_core::modules::ln::contracts::{ContractId, IdentifyableContract};
+    <span class="kw">use </span>fedimint_core::modules::ln::{ContractAccount, LightningModule};
+    <span class="kw">use </span>fedimint_core::modules::ln::{ContractOrOfferOutput, LightningGateway};
+    <span class="kw">use </span>fedimint_core::modules::wallet::PegOutFees;
+    <span class="kw">use </span>fedimint_core::outcome::{OutputOutcome, TransactionStatus};
+    <span class="kw">use </span>fedimint_core::transaction::Transaction;
     <span class="kw">use </span>lightning_invoice::Invoice;
-    <span class="kw">use </span>minimint_api::db::batch::DbBatch;
-    <span class="kw">use </span>minimint_api::db::mem_impl::MemDatabase;
-    <span class="kw">use </span>minimint_api::module::testing::FakeFed;
-    <span class="kw">use </span>minimint_api::{Amount, OutPoint, TransactionId};
-    <span class="kw">use </span>minimint_core::epoch::EpochHistory;
-    <span class="kw">use </span>minimint_core::modules::ln::config::LightningModuleClientConfig;
-    <span class="kw">use </span>minimint_core::modules::ln::contracts::incoming::IncomingContractOffer;
-    <span class="kw">use </span>minimint_core::modules::ln::contracts::{ContractId, IdentifyableContract};
-    <span class="kw">use </span>minimint_core::modules::ln::{ContractAccount, LightningModule};
-    <span class="kw">use </span>minimint_core::modules::ln::{ContractOrOfferOutput, LightningGateway};
-    <span class="kw">use </span>minimint_core::modules::wallet::PegOutFees;
-    <span class="kw">use </span>minimint_core::outcome::{OutputOutcome, TransactionStatus};
-    <span class="kw">use </span>minimint_core::transaction::Transaction;
     <span class="kw">use </span>std::sync::Arc;
 
     <span class="kw">type </span>Fed = FakeFed&lt;LightningModule, LightningModuleClientConfig&gt;;
@@ -646,8 +640,8 @@
         mint: Arc&lt;tokio::sync::Mutex&lt;Fed&gt;&gt;,
     }
 
-    <span class="attribute">#[async_trait]</span>
-    <span class="kw">impl </span>FederationApi <span class="kw">for </span>FakeApi {
+    <span class="attribute">#[async_trait]
+    </span><span class="kw">impl </span>FederationApi <span class="kw">for </span>FakeApi {
         <span class="kw">async fn </span>fetch_tx_outcome(
             <span class="kw-2">&amp;</span><span class="self">self</span>,
             tx: TransactionId,
@@ -738,8 +732,8 @@
         (fed, client_context)
     }
 
-    <span class="attribute">#[test_log::test(tokio::test)]</span>
-    <span class="kw">async fn </span>test_outgoing() {
+    <span class="attribute">#[test_log::test(tokio::test)]
+    </span><span class="kw">async fn </span>test_outgoing() {
         <span class="kw">let </span><span class="kw-2">mut </span>rng = rand::thread_rng();
         <span class="kw">let </span>(fed, client_context) = new_mint_and_client().<span class="kw">await</span>;
 
@@ -843,4 +837,4 @@
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="mint_client" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (40336865f 2022-08-15)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="mint_client" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (c0941dfb5 2022-08-21)" ></div></body></html>

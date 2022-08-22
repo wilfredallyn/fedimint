@@ -937,6 +937,16 @@
 <span id="937">937</span>
 <span id="938">938</span>
 <span id="939">939</span>
+<span id="940">940</span>
+<span id="941">941</span>
+<span id="942">942</span>
+<span id="943">943</span>
+<span id="944">944</span>
+<span id="945">945</span>
+<span id="946">946</span>
+<span id="947">947</span>
+<span id="948">948</span>
+<span id="949">949</span>
 </pre><pre class="rust"><code><span class="kw">pub mod </span>api;
 <span class="kw">pub mod </span>ln;
 <span class="kw">pub mod </span>mint;
@@ -944,6 +954,7 @@
 <span class="kw">pub mod </span>utils;
 <span class="kw">pub mod </span>wallet;
 
+<span class="kw">use </span>std::time::SystemTime;
 <span class="kw">use </span>std::{sync::Arc, time::Duration};
 
 <span class="kw">use </span>futures::StreamExt;
@@ -954,29 +965,24 @@
 <span class="kw">use </span>bitcoin_hashes::Hash;
 <span class="kw">use </span>futures::stream::FuturesUnordered;
 
-<span class="kw">use </span>lightning::ln::PaymentSecret;
-<span class="kw">use </span>lightning::routing::gossip::RoutingFees;
-<span class="kw">use </span>lightning::routing::router::{RouteHint, RouteHintHop};
-<span class="kw">use </span>lightning_invoice::{CreationError, Invoice, InvoiceBuilder};
-<span class="kw">use </span>ln::db::LightningGatewayKey;
-<span class="kw">use </span>minimint_api::task::sleep;
-<span class="kw">use </span>minimint_api::{
+<span class="kw">use </span>fedimint_api::task::sleep;
+<span class="kw">use </span>fedimint_api::{
     db::{
         batch::{Accumulator, BatchItem, DbBatch},
         Database,
     },
     Amount, OutPoint, PeerId, TransactionId,
 };
-<span class="kw">use </span>minimint_core::epoch::EpochHistory;
-<span class="kw">use </span>minimint_core::modules::ln::contracts::incoming::{
+<span class="kw">use </span>fedimint_core::epoch::EpochHistory;
+<span class="kw">use </span>fedimint_core::modules::ln::contracts::incoming::{
     DecryptedPreimage, IncomingContract, IncomingContractOffer, OfferId, Preimage,
 };
-<span class="kw">use </span>minimint_core::modules::ln::contracts::{outgoing, Contract, IdentifyableContract};
-<span class="kw">use </span>minimint_core::modules::ln::{ContractOutput, LightningGateway};
-<span class="kw">use </span>minimint_core::modules::wallet::PegOut;
-<span class="kw">use </span>minimint_core::outcome::TransactionStatus;
-<span class="kw">use </span>minimint_core::transaction::TransactionItem;
-<span class="kw">use </span>minimint_core::{
+<span class="kw">use </span>fedimint_core::modules::ln::contracts::{outgoing, Contract, IdentifyableContract};
+<span class="kw">use </span>fedimint_core::modules::ln::{ContractOutput, LightningGateway};
+<span class="kw">use </span>fedimint_core::modules::wallet::PegOut;
+<span class="kw">use </span>fedimint_core::outcome::TransactionStatus;
+<span class="kw">use </span>fedimint_core::transaction::TransactionItem;
+<span class="kw">use </span>fedimint_core::{
     config::ClientConfig,
     modules::{
         ln::{
@@ -988,6 +994,11 @@
     },
     transaction::{Input, Output},
 };
+<span class="kw">use </span>lightning::ln::PaymentSecret;
+<span class="kw">use </span>lightning::routing::gossip::RoutingFees;
+<span class="kw">use </span>lightning::routing::router::{RouteHint, RouteHintHop};
+<span class="kw">use </span>lightning_invoice::{CreationError, Invoice, InvoiceBuilder};
+<span class="kw">use </span>ln::db::LightningGatewayKey;
 <span class="kw">use </span>rand::{CryptoRng, RngCore};
 <span class="kw">use </span>secp256k1_zkp::{All, Secp256k1};
 <span class="kw">use </span>serde::{Deserialize, Serialize};
@@ -1017,21 +1028,21 @@
 <span class="kw">pub type </span>GatewayClient = Client&lt;GatewayClientConfig&gt;;
 <span class="kw">pub type </span>UserClient = Client&lt;UserClientConfig&gt;;
 
-<span class="attribute">#[derive(Debug)]</span>
-<span class="kw">pub struct </span>PaymentParameters {
+<span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub struct </span>PaymentParameters {
     <span class="kw">pub </span>max_delay: u64,
     <span class="comment">// FIXME: change to absolute fee to avoid rounding errors
     </span><span class="kw">pub </span>max_fee_percent: f64,
 }
 
-<span class="attribute">#[derive(Clone, Debug, Serialize, Deserialize)]</span>
-<span class="kw">pub struct </span>UserClientConfig(<span class="kw">pub </span>ClientConfig);
+<span class="attribute">#[derive(Clone, Debug, Serialize, Deserialize)]
+</span><span class="kw">pub struct </span>UserClientConfig(<span class="kw">pub </span>ClientConfig);
 
-<span class="attribute">#[derive(Clone, Debug, Serialize, Deserialize)]</span>
-<span class="kw">pub struct </span>GatewayClientConfig {
+<span class="attribute">#[derive(Clone, Debug, Serialize, Deserialize)]
+</span><span class="kw">pub struct </span>GatewayClientConfig {
     <span class="kw">pub </span>client_config: ClientConfig,
-    <span class="attribute">#[serde(with = <span class="string">&quot;serde_keypair&quot;</span>)]</span>
-    <span class="kw">pub </span>redeem_key: bitcoin::KeyPair,
+    <span class="attribute">#[serde(with = <span class="string">&quot;serde_keypair&quot;</span>)]
+    </span><span class="kw">pub </span>redeem_key: bitcoin::KeyPair,
     <span class="kw">pub </span>timelock_delta: u64,
     <span class="kw">pub </span>api: String,
     <span class="kw">pub </span>node_pub_key: bitcoin::secp256k1::PublicKey,
@@ -1263,7 +1274,7 @@
     /// public descriptor by tweaking it.
     /// - this function will write to the clients DB
     ///
-    /// read more on fedimints address derivation: &lt;https://fedimint.org/MiniMint/wallet/&gt;
+    /// read more on fedimints address derivation: &lt;https://fedimint.org/Fedimint/wallet/&gt;
     </span><span class="kw">pub fn </span>get_new_pegin_address&lt;R: RngCore + CryptoRng&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, rng: R) -&gt; Address {
         <span class="kw">let </span><span class="kw-2">mut </span>batch = DbBatch::new();
         <span class="kw">let </span>address = <span class="self">self
@@ -1471,13 +1482,22 @@
             htlc_maximum_msat: <span class="prelude-val">None</span>,
         }]);
 
+        <span class="attribute">#[cfg(not(target_family = <span class="string">&quot;wasm&quot;</span>))]
+        </span><span class="kw">let </span>duration_since_epoch = SystemTime::now()
+            .duration_since(SystemTime::UNIX_EPOCH)
+            .unwrap();
+
+        <span class="attribute">#[cfg(target_family = <span class="string">&quot;wasm&quot;</span>)]
+        </span><span class="kw">let </span>duration_since_epoch =
+            Duration::from_secs_f64(js_sys::Date::new_0().get_time() / <span class="number">1000.</span>);
+
         <span class="kw">let </span>invoice =
             InvoiceBuilder::new(network_to_currency(<span class="self">self</span>.context.config.<span class="number">0</span>.wallet.network))
                 .amount_milli_satoshis(amount.milli_sat)
                 .description(description)
                 .payment_hash(payment_hash)
                 .payment_secret(payment_secret)
-                .current_timestamp()
+                .duration_since_epoch(duration_since_epoch)
                 .min_final_cltv_expiry(<span class="number">18</span>)
                 .payee_pub_key(node_public_key)
                 .private_route(gateway_route_hint)
@@ -1546,7 +1566,7 @@
             .post(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{}/pay_invoice&quot;</span>, gateway.api))
             .json(<span class="kw-2">&amp;</span>contract_id)
             .send();
-        minimint_api::task::timeout(Duration::from_secs(<span class="number">15</span>), future)
+        fedimint_api::task::timeout(Duration::from_secs(<span class="number">15</span>), future)
             .<span class="kw">await
             </span>.map_err(|<span class="kw">_</span>| ClientError::OutgoingPaymentTimeout)<span class="question-mark">??</span>;
         <span class="prelude-val">Ok</span>(())
@@ -1702,7 +1722,7 @@
             decrypted_preimage: DecryptedPreimage::Pending,
             gateway_key: our_pub_key,
         });
-        <span class="kw">let </span>incoming_output = minimint_core::transaction::Output::LN(
+        <span class="kw">let </span>incoming_output = fedimint_core::transaction::Output::LN(
             ContractOrOfferOutput::Contract(ContractOutput {
                 amount: <span class="kw-2">*</span>amount,
                 contract: contract.clone(),
@@ -1805,16 +1825,16 @@
     <span class="kw">use </span>secp256k1_zkp::SecretKey;
     <span class="kw">use </span>serde::{Deserialize, Deserializer, Serialize, Serializer};
 
-    <span class="attribute">#[allow(missing_docs)]</span>
-    <span class="kw">pub fn </span>serialize&lt;S&gt;(key: <span class="kw-2">&amp;</span>KeyPair, serializer: S) -&gt; <span class="prelude-ty">Result</span>&lt;S::Ok, S::Error&gt;
+    <span class="attribute">#[allow(missing_docs)]
+    </span><span class="kw">pub fn </span>serialize&lt;S&gt;(key: <span class="kw-2">&amp;</span>KeyPair, serializer: S) -&gt; <span class="prelude-ty">Result</span>&lt;S::Ok, S::Error&gt;
     <span class="kw">where
         </span>S: Serializer,
     {
         SecretKey::from_keypair(key).serialize(serializer)
     }
 
-    <span class="attribute">#[allow(missing_docs)]</span>
-    <span class="kw">pub fn </span>deserialize&lt;<span class="lifetime">&#39;de</span>, D&gt;(deserializer: D) -&gt; <span class="prelude-ty">Result</span>&lt;KeyPair, D::Error&gt;
+    <span class="attribute">#[allow(missing_docs)]
+    </span><span class="kw">pub fn </span>deserialize&lt;<span class="lifetime">&#39;de</span>, D&gt;(deserializer: D) -&gt; <span class="prelude-ty">Result</span>&lt;KeyPair, D::Error&gt;
     <span class="kw">where
         </span>D: Deserializer&lt;<span class="lifetime">&#39;de</span>&gt;,
     {
@@ -1827,54 +1847,54 @@
     }
 }
 
-<span class="attribute">#[derive(Error, Debug)]</span>
-<span class="kw">pub enum </span>ClientError {
-    <span class="attribute">#[error(<span class="string">&quot;Error querying federation: {0}&quot;</span>)]</span>
-    MintApiError(<span class="attribute">#[from]</span> ApiError),
-    <span class="attribute">#[error(<span class="string">&quot;Wallet client error: {0}&quot;</span>)]</span>
-    WalletClientError(<span class="attribute">#[from]</span> WalletClientError),
-    <span class="attribute">#[error(<span class="string">&quot;Mint client error: {0}&quot;</span>)]</span>
-    MintClientError(<span class="attribute">#[from]</span> MintClientError),
-    <span class="attribute">#[error(<span class="string">&quot;Lightning client error: {0}&quot;</span>)]</span>
-    LnClientError(<span class="attribute">#[from]</span> LnClientError),
-    <span class="attribute">#[error(<span class="string">&quot;Peg-in amount must be greater than peg-in fee&quot;</span>)]</span>
-    PegInAmountTooSmall,
-    <span class="attribute">#[error(<span class="string">&quot;Peg-out waiting for UTXOs&quot;</span>)]</span>
-    PegOutWaitingForUTXOs,
-    <span class="attribute">#[error(<span class="string">&quot;Timed out while waiting for contract to be accepted&quot;</span>)]</span>
-    WaitContractTimeout,
-    <span class="attribute">#[error(<span class="string">&quot;Error fetching offer&quot;</span>)]</span>
-    FetchOfferError,
-    <span class="attribute">#[error(<span class="string">&quot;Failed to create lightning invoice: {0}&quot;</span>)]</span>
-    InvoiceError(<span class="attribute">#[from]</span> CreationError),
-    <span class="attribute">#[error(<span class="string">&quot;The Account or offer is keyed to another gateway&quot;</span>)]</span>
-    NotOurKey,
-    <span class="attribute">#[error(<span class="string">&quot;Can&#39;t parse contract&#39;s invoice: {0:?}&quot;</span>)]</span>
-    InvalidInvoice(lightning_invoice::ParseOrSemanticError),
-    <span class="attribute">#[error(<span class="string">&quot;Invoice is missing amount&quot;</span>)]</span>
-    InvoiceMissingAmount,
-    <span class="attribute">#[error(<span class="string">&quot;Outgoing contract is underfunded, wants us to pay {0}, but only contains {1}&quot;</span>)]</span>
-    Underfunded(Amount, Amount),
-    <span class="attribute">#[error(<span class="string">&quot;The contract&#39;s timeout is in the past or does not allow for a safety margin&quot;</span>)]</span>
-    TimeoutTooClose,
-    <span class="attribute">#[error(<span class="string">&quot;No offer&quot;</span>)]</span>
-    NoOffer,
-    <span class="attribute">#[error(<span class="string">&quot;Invalid offer&quot;</span>)]</span>
-    InvalidOffer,
-    <span class="attribute">#[error(<span class="string">&quot;Wrong contract type&quot;</span>)]</span>
-    WrongContractType,
-    <span class="attribute">#[error(<span class="string">&quot;Wrong transaction type&quot;</span>)]</span>
-    WrongTransactionType,
-    <span class="attribute">#[error(<span class="string">&quot;Invalid transaction {0}&quot;</span>)]</span>
-    InvalidTransaction(String),
-    <span class="attribute">#[error(<span class="string">&quot;Invalid preimage&quot;</span>)]</span>
-    InvalidPreimage,
-    <span class="attribute">#[error(<span class="string">&quot;Federation has no lightning gateways&quot;</span>)]</span>
-    NoGateways,
-    <span class="attribute">#[error(<span class="string">&quot;HTTP Error {0}&quot;</span>)]</span>
-    HttpError(<span class="attribute">#[from]</span> reqwest::Error),
-    <span class="attribute">#[error(<span class="string">&quot;Outgoing payment timeout&quot;</span>)]</span>
-    OutgoingPaymentTimeout,
+<span class="attribute">#[derive(Error, Debug)]
+</span><span class="kw">pub enum </span>ClientError {
+    <span class="attribute">#[error(<span class="string">&quot;Error querying federation: {0}&quot;</span>)]
+    </span>MintApiError(<span class="attribute">#[from] </span>ApiError),
+    <span class="attribute">#[error(<span class="string">&quot;Wallet client error: {0}&quot;</span>)]
+    </span>WalletClientError(<span class="attribute">#[from] </span>WalletClientError),
+    <span class="attribute">#[error(<span class="string">&quot;Mint client error: {0}&quot;</span>)]
+    </span>MintClientError(<span class="attribute">#[from] </span>MintClientError),
+    <span class="attribute">#[error(<span class="string">&quot;Lightning client error: {0}&quot;</span>)]
+    </span>LnClientError(<span class="attribute">#[from] </span>LnClientError),
+    <span class="attribute">#[error(<span class="string">&quot;Peg-in amount must be greater than peg-in fee&quot;</span>)]
+    </span>PegInAmountTooSmall,
+    <span class="attribute">#[error(<span class="string">&quot;Peg-out waiting for UTXOs&quot;</span>)]
+    </span>PegOutWaitingForUTXOs,
+    <span class="attribute">#[error(<span class="string">&quot;Timed out while waiting for contract to be accepted&quot;</span>)]
+    </span>WaitContractTimeout,
+    <span class="attribute">#[error(<span class="string">&quot;Error fetching offer&quot;</span>)]
+    </span>FetchOfferError,
+    <span class="attribute">#[error(<span class="string">&quot;Failed to create lightning invoice: {0}&quot;</span>)]
+    </span>InvoiceError(<span class="attribute">#[from] </span>CreationError),
+    <span class="attribute">#[error(<span class="string">&quot;The Account or offer is keyed to another gateway&quot;</span>)]
+    </span>NotOurKey,
+    <span class="attribute">#[error(<span class="string">&quot;Can&#39;t parse contract&#39;s invoice: {0:?}&quot;</span>)]
+    </span>InvalidInvoice(lightning_invoice::ParseOrSemanticError),
+    <span class="attribute">#[error(<span class="string">&quot;Invoice is missing amount&quot;</span>)]
+    </span>InvoiceMissingAmount,
+    <span class="attribute">#[error(<span class="string">&quot;Outgoing contract is underfunded, wants us to pay {0}, but only contains {1}&quot;</span>)]
+    </span>Underfunded(Amount, Amount),
+    <span class="attribute">#[error(<span class="string">&quot;The contract&#39;s timeout is in the past or does not allow for a safety margin&quot;</span>)]
+    </span>TimeoutTooClose,
+    <span class="attribute">#[error(<span class="string">&quot;No offer&quot;</span>)]
+    </span>NoOffer,
+    <span class="attribute">#[error(<span class="string">&quot;Invalid offer&quot;</span>)]
+    </span>InvalidOffer,
+    <span class="attribute">#[error(<span class="string">&quot;Wrong contract type&quot;</span>)]
+    </span>WrongContractType,
+    <span class="attribute">#[error(<span class="string">&quot;Wrong transaction type&quot;</span>)]
+    </span>WrongTransactionType,
+    <span class="attribute">#[error(<span class="string">&quot;Invalid transaction {0}&quot;</span>)]
+    </span>InvalidTransaction(String),
+    <span class="attribute">#[error(<span class="string">&quot;Invalid preimage&quot;</span>)]
+    </span>InvalidPreimage,
+    <span class="attribute">#[error(<span class="string">&quot;Federation has no lightning gateways&quot;</span>)]
+    </span>NoGateways,
+    <span class="attribute">#[error(<span class="string">&quot;HTTP Error {0}&quot;</span>)]
+    </span>HttpError(<span class="attribute">#[from] </span>reqwest::Error),
+    <span class="attribute">#[error(<span class="string">&quot;Outgoing payment timeout&quot;</span>)]
+    </span>OutgoingPaymentTimeout,
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="mint_client" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (40336865f 2022-08-15)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="mint_client" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (c0941dfb5 2022-08-21)" ></div></body></html>
