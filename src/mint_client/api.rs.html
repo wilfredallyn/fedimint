@@ -609,7 +609,6 @@
 <span id="609">609</span>
 <span id="610">610</span>
 <span id="611">611</span>
-<span id="612">612</span>
 </pre><pre class="rust"><code><span class="kw">use </span>async_trait::async_trait;
 <span class="kw">use </span>bitcoin_hashes::sha256::Hash <span class="kw">as </span>Sha256Hash;
 <span class="kw">use </span>fedimint_api::task::{RwLock, RwLockWriteGuard};
@@ -980,10 +979,9 @@
         <span class="kw">for </span>request <span class="kw">in </span>requests {
             <span class="kw">match </span>request.<span class="kw">await </span>{
                 <span class="prelude-val">Ok</span>(res) =&gt; {
-                    <span class="kw">if </span>successes == <span class="self">self</span>.max_evil {
+                    successes += <span class="number">1</span>;
+                    <span class="kw">if </span>successes == <span class="number">2 </span>* <span class="self">self</span>.max_evil + <span class="number">1 </span>{
                         <span class="kw">return </span><span class="prelude-val">Ok</span>(res);
-                    } <span class="kw">else </span>{
-                        successes += <span class="number">1</span>;
                     }
                 }
                 <span class="prelude-val">Err</span>(e) =&gt; error = <span class="prelude-val">Some</span>(e),
@@ -1223,4 +1221,4 @@
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="mint_client" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (015a824f2 2022-08-22)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="mint_client" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (748038961 2022-08-25)" ></div></body></html>

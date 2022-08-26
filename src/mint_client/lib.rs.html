@@ -928,19 +928,6 @@
 <span id="928">928</span>
 <span id="929">929</span>
 <span id="930">930</span>
-<span id="931">931</span>
-<span id="932">932</span>
-<span id="933">933</span>
-<span id="934">934</span>
-<span id="935">935</span>
-<span id="936">936</span>
-<span id="937">937</span>
-<span id="938">938</span>
-<span id="939">939</span>
-<span id="940">940</span>
-<span id="941">941</span>
-<span id="942">942</span>
-<span id="943">943</span>
 </pre><pre class="rust"><code><span class="kw">pub mod </span>api;
 <span class="kw">pub mod </span>ln;
 <span class="kw">pub mod </span>mint;
@@ -948,8 +935,9 @@
 <span class="kw">pub mod </span>utils;
 <span class="kw">pub mod </span>wallet;
 
-<span class="kw">use </span>std::time::SystemTime;
-<span class="kw">use </span>std::{sync::Arc, time::Duration};
+<span class="kw">use </span>std::time::Duration;
+<span class="attribute">#[cfg(not(target_family = <span class="string">&quot;wasm&quot;</span>))]
+</span><span class="kw">use </span>std::time::SystemTime;
 
 <span class="kw">use </span>futures::StreamExt;
 
@@ -1007,7 +995,7 @@
 <span class="kw">use </span><span class="kw">crate</span>::mint::db::{CoinKey, PendingCoinsKeyPrefix};
 <span class="kw">use </span><span class="kw">crate</span>::mint::{CoinFinalizationData, MintClientError};
 <span class="kw">use </span><span class="kw">crate</span>::transaction::TransactionBuilder;
-<span class="kw">use </span><span class="kw">crate</span>::utils::{network_to_currency, OwnedClientContext};
+<span class="kw">use </span><span class="kw">crate</span>::utils::{network_to_currency, ClientContext};
 <span class="kw">use </span><span class="kw">crate</span>::wallet::WalletClientError;
 <span class="kw">use crate</span>::{
     api::{ApiError, FederationApi},
@@ -1053,7 +1041,8 @@
 }
 
 <span class="kw">pub struct </span>Client&lt;C&gt; {
-    context: Arc&lt;OwnedClientContext&lt;C&gt;&gt;,
+    config: C,
+    context: ClientContext,
 }
 
 <span class="kw">impl </span>AsRef&lt;ClientConfig&gt; <span class="kw">for </span>GatewayClientConfig {
@@ -1071,30 +1060,27 @@
 <span class="kw">impl</span>&lt;T: AsRef&lt;ClientConfig&gt; + Clone&gt; Client&lt;T&gt; {
     <span class="kw">pub fn </span>ln_client(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; LnClient {
         LnClient {
-            context: <span class="self">self
-                </span>.context
-                .borrow_with_module_config(|cfg| <span class="kw-2">&amp;</span>cfg.as_ref().ln),
+            config: <span class="kw-2">&amp;</span><span class="self">self</span>.config.as_ref().ln,
+            context: <span class="kw-2">&amp;</span><span class="self">self</span>.context,
         }
     }
 
     <span class="kw">pub fn </span>mint_client(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; MintClient {
         MintClient {
-            context: <span class="self">self
-                </span>.context
-                .borrow_with_module_config(|cfg| <span class="kw-2">&amp;</span>cfg.as_ref().mint),
+            config: <span class="kw-2">&amp;</span><span class="self">self</span>.config.as_ref().mint,
+            context: <span class="kw-2">&amp;</span><span class="self">self</span>.context,
         }
     }
 
     <span class="kw">pub fn </span>wallet_client(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; WalletClient {
         WalletClient {
-            context: <span class="self">self
-                </span>.context
-                .borrow_with_module_config(|cfg| <span class="kw-2">&amp;</span>cfg.as_ref().wallet),
+            config: <span class="kw-2">&amp;</span><span class="self">self</span>.config.as_ref().wallet,
+            context: <span class="kw-2">&amp;</span><span class="self">self</span>.context,
         }
     }
 
     <span class="kw">pub fn </span>config(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; T {
-        <span class="self">self</span>.context.config.clone()
+        <span class="self">self</span>.config.clone()
     }
 
     <span class="kw">pub fn </span>new(config: T, db: Box&lt;<span class="kw">dyn </span>Database&gt;, secp: Secp256k1&lt;All&gt;) -&gt; <span class="self">Self </span>{
@@ -1121,13 +1107,10 @@
         api: Box&lt;<span class="kw">dyn </span>FederationApi&gt;,
         secp: Secp256k1&lt;All&gt;,
     ) -&gt; Client&lt;T&gt; {
-        <span class="kw">let </span>context = Arc::new(OwnedClientContext {
+        <span class="self">Self </span>{
             config,
-            db,
-            api,
-            secp,
-        });
-        <span class="self">Self </span>{ context }
+            context: ClientContext { db, api, secp },
+        }
     }
 
     <span class="kw">pub async fn </span>peg_in&lt;R: RngCore + CryptoRng&gt;(
@@ -1156,12 +1139,7 @@
     ) -&gt; <span class="prelude-ty">Result</span>&lt;TransactionId&gt; {
         <span class="prelude-val">Ok</span>(<span class="self">self
             </span>.mint_client()
-            .submit_tx_with_change(
-                <span class="kw-2">&amp;</span><span class="self">self</span>.context.config.as_ref().fee_consensus(),
-                tx,
-                batch,
-                rng,
-            )
+            .submit_tx_with_change(<span class="kw-2">&amp;</span><span class="self">self</span>.config.as_ref().fee_consensus(), tx, batch, rng)
             .<span class="kw">await</span><span class="question-mark">?</span>)
     }
 
@@ -1236,24 +1214,23 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         peg_out: PegOut,
         <span class="kw-2">mut </span>rng: R,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;TransactionId&gt; {
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;OutPoint&gt; {
         <span class="kw">let </span>batch = DbBatch::new();
         <span class="kw">let </span><span class="kw-2">mut </span>tx = TransactionBuilder::default();
 
-        <span class="kw">let </span>funding_amount = <span class="self">self
-            </span>.context
-            .config
-            .as_ref()
-            .wallet
-            .fee_consensus
-            .peg_out_abs
+        <span class="kw">let </span>funding_amount = <span class="self">self</span>.config.as_ref().wallet.fee_consensus.peg_out_abs
             + (peg_out.amount + peg_out.fees.amount()).into();
         <span class="kw">let </span>coins = <span class="self">self</span>.mint_client().select_coins(funding_amount)<span class="question-mark">?</span>;
         tx.input_coins(coins, <span class="kw-2">&amp;</span><span class="self">self</span>.context.secp)<span class="question-mark">?</span>;
-        tx.output(Output::Wallet(peg_out));
+        <span class="kw">let </span>peg_out_idx = tx.output(Output::Wallet(peg_out));
 
-        <span class="self">self</span>.submit_tx_with_change(tx, batch, <span class="kw-2">&amp;mut </span>rng).<span class="kw">await
-    </span>}
+        <span class="kw">let </span>fedimint_tx_id = <span class="self">self</span>.submit_tx_with_change(tx, batch, <span class="kw-2">&amp;mut </span>rng).<span class="kw">await</span><span class="question-mark">?</span>;
+
+        <span class="prelude-val">Ok</span>(OutPoint {
+            txid: fedimint_tx_id,
+            out_idx: peg_out_idx,
+        })
+    }
 
     <span class="doccomment">/// Returns a bitcoin address suited to perform a fedimint [peg-in](Self::peg_in)
     ///
@@ -1479,21 +1456,20 @@
         </span><span class="kw">let </span>duration_since_epoch =
             Duration::from_secs_f64(js_sys::Date::new_0().get_time() / <span class="number">1000.</span>);
 
-        <span class="kw">let </span>invoice =
-            InvoiceBuilder::new(network_to_currency(<span class="self">self</span>.context.config.<span class="number">0</span>.wallet.network))
-                .amount_milli_satoshis(amount.milli_sat)
-                .description(description)
-                .payment_hash(payment_hash)
-                .payment_secret(payment_secret)
-                .duration_since_epoch(duration_since_epoch)
-                .min_final_cltv_expiry(<span class="number">18</span>)
-                .payee_pub_key(node_public_key)
-                .private_route(gateway_route_hint)
-                .build_signed(|hash| {
-                    <span class="self">self</span>.context
-                        .secp
-                        .sign_ecdsa_recoverable(hash, <span class="kw-2">&amp;</span>node_secret_key)
-                })<span class="question-mark">?</span>;
+        <span class="kw">let </span>invoice = InvoiceBuilder::new(network_to_currency(<span class="self">self</span>.config.<span class="number">0</span>.wallet.network))
+            .amount_milli_satoshis(amount.milli_sat)
+            .description(description)
+            .payment_hash(payment_hash)
+            .payment_secret(payment_secret)
+            .duration_since_epoch(duration_since_epoch)
+            .min_final_cltv_expiry(<span class="number">18</span>)
+            .payee_pub_key(node_public_key)
+            .private_route(gateway_route_hint)
+            .build_signed(|hash| {
+                <span class="self">self</span>.context
+                    .secp
+                    .sign_ecdsa_recoverable(hash, <span class="kw-2">&amp;</span>node_secret_key)
+            })<span class="question-mark">?</span>;
 
         <span class="kw">let </span>offer_output =
             <span class="self">self</span>.ln_client()
@@ -1579,8 +1555,7 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         account: <span class="kw-2">&amp;</span>OutgoingContractAccount,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;PaymentParameters&gt; {
-        <span class="kw">let </span>our_pub_key =
-            secp256k1_zkp::XOnlyPublicKey::from_keypair(<span class="kw-2">&amp;</span><span class="self">self</span>.context.config.redeem_key);
+        <span class="kw">let </span>our_pub_key = secp256k1_zkp::XOnlyPublicKey::from_keypair(<span class="kw-2">&amp;</span><span class="self">self</span>.config.redeem_key);
 
         <span class="kw">if </span>account.contract.gateway_key != our_pub_key {
             <span class="kw">return </span><span class="prelude-val">Err</span>(ClientError::NotOurKey);
@@ -1610,7 +1585,7 @@
         // margin.
         </span><span class="kw">let </span>max_delay = (account.contract.timelock <span class="kw">as </span>u64)
             .checked_sub(consensus_block_height)
-            .and_then(|delta| delta.checked_sub(<span class="self">self</span>.context.config.timelock_delta))
+            .and_then(|delta| delta.checked_sub(<span class="self">self</span>.config.timelock_delta))
             .ok_or(ClientError::TimeoutTooClose)<span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(PaymentParameters {
@@ -1676,7 +1651,7 @@
             batch.append_insert(OutgoingPaymentClaimKey(contract_id), ());
         });
 
-        tx.input(<span class="kw-2">&amp;mut </span><span class="macro">vec!</span>[<span class="self">self</span>.context.config.redeem_key], input);
+        tx.input(<span class="kw-2">&amp;mut </span><span class="macro">vec!</span>[<span class="self">self</span>.config.redeem_key], input);
         <span class="kw">let </span>txid = <span class="self">self</span>.submit_tx_with_change(tx, batch, rng).<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(OutPoint { txid, out_idx: <span class="number">0 </span>})
@@ -1702,8 +1677,7 @@
         builder.input_coins(coins, <span class="kw-2">&amp;</span><span class="self">self</span>.context.secp)<span class="question-mark">?</span>;
 
         <span class="comment">// Outputs
-        </span><span class="kw">let </span>our_pub_key =
-            secp256k1_zkp::XOnlyPublicKey::from_keypair(<span class="kw-2">&amp;</span><span class="self">self</span>.context.config.redeem_key);
+        </span><span class="kw">let </span>our_pub_key = secp256k1_zkp::XOnlyPublicKey::from_keypair(<span class="kw-2">&amp;</span><span class="self">self</span>.config.redeem_key);
         <span class="kw">let </span>contract = Contract::Incoming(IncomingContract {
             hash: offer.hash,
             encrypted_preimage: offer.encrypted_preimage.clone(),
@@ -1739,7 +1713,7 @@
 
         <span class="comment">// Input claims this contract
         </span>builder.input(
-            <span class="kw-2">&amp;mut </span><span class="macro">vec!</span>[<span class="self">self</span>.context.config.redeem_key],
+            <span class="kw-2">&amp;mut </span><span class="macro">vec!</span>[<span class="self">self</span>.config.redeem_key],
             Input::LN(contract_account.claim()),
         );
         <span class="kw">let </span>mint_tx_id = <span class="self">self</span>.submit_tx_with_change(builder, batch, rng).<span class="kw">await</span><span class="question-mark">?</span>;
@@ -1885,4 +1859,4 @@
     </span>OutgoingPaymentTimeout,
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="mint_client" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (015a824f2 2022-08-22)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="mint_client" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (748038961 2022-08-25)" ></div></body></html>
