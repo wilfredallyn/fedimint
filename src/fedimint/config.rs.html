@@ -269,6 +269,49 @@
 <span id="269">269</span>
 <span id="270">270</span>
 <span id="271">271</span>
+<span id="272">272</span>
+<span id="273">273</span>
+<span id="274">274</span>
+<span id="275">275</span>
+<span id="276">276</span>
+<span id="277">277</span>
+<span id="278">278</span>
+<span id="279">279</span>
+<span id="280">280</span>
+<span id="281">281</span>
+<span id="282">282</span>
+<span id="283">283</span>
+<span id="284">284</span>
+<span id="285">285</span>
+<span id="286">286</span>
+<span id="287">287</span>
+<span id="288">288</span>
+<span id="289">289</span>
+<span id="290">290</span>
+<span id="291">291</span>
+<span id="292">292</span>
+<span id="293">293</span>
+<span id="294">294</span>
+<span id="295">295</span>
+<span id="296">296</span>
+<span id="297">297</span>
+<span id="298">298</span>
+<span id="299">299</span>
+<span id="300">300</span>
+<span id="301">301</span>
+<span id="302">302</span>
+<span id="303">303</span>
+<span id="304">304</span>
+<span id="305">305</span>
+<span id="306">306</span>
+<span id="307">307</span>
+<span id="308">308</span>
+<span id="309">309</span>
+<span id="310">310</span>
+<span id="311">311</span>
+<span id="312">312</span>
+<span id="313">313</span>
+<span id="314">314</span>
 </pre><pre class="rust"><code><span class="kw">use </span>fedimint_api::rand::Rand07Compat;
 <span class="kw">pub use </span>fedimint_core::config::<span class="kw-2">*</span>;
 
@@ -280,6 +323,7 @@
 <span class="kw">use </span>fedimint_core::modules::wallet::config::WalletConfig;
 <span class="kw">use </span>hbbft::crypto::serde_impl::SerdeSecret;
 <span class="kw">use </span>rand::{CryptoRng, RngCore};
+<span class="kw">use </span>url::Url;
 
 <span class="kw">use </span>serde::{Deserialize, Serialize};
 <span class="kw">use </span>std::collections::{BTreeMap, HashMap};
@@ -358,7 +402,10 @@
                 <span class="kw">let </span>peer = Peer {
                     connection: ConnectionConfig {
                         hbbft_addr: <span class="macro">format!</span>(<span class="string">&quot;127.0.0.1:{}&quot;</span>, params.hbbft_base_port + id_u16),
-                        api_addr: <span class="macro">format!</span>(<span class="string">&quot;ws://127.0.0.1:{}&quot;</span>, params.api_base_port + id_u16),
+                        api_addr: Url::parse(
+                            <span class="macro">format!</span>(<span class="string">&quot;ws://127.0.0.1:{}&quot;</span>, params.api_base_port + id_u16).as_str(),
+                        )
+                        .expect(<span class="string">&quot;Could not parse URL&quot;</span>),
                     },
                     tls_cert: tls_keys[<span class="kw-2">&amp;</span>id].<span class="number">0</span>.clone(),
                 };
@@ -402,7 +449,13 @@
             max_evil,
             api_endpoints: peers
                 .iter()
-                .map(|<span class="kw-2">&amp;</span>peer| <span class="macro">format!</span>(<span class="string">&quot;ws://127.0.0.1:{}&quot;</span>, params.api_base_port + u16::from(peer)))
+                .map(|<span class="kw-2">&amp;</span>peer| {
+                    Url::parse(
+                        <span class="macro">format!</span>(<span class="string">&quot;ws://127.0.0.1:{}&quot;</span>, params.api_base_port + u16::from(peer))
+                            .as_str(),
+                    )
+                    .expect(<span class="string">&quot;Could not parse Url&quot;</span>)
+                })
                 .collect(),
             mint: mint_client_cfg,
             wallet: wallet_client_cfg,
@@ -413,7 +466,7 @@
     }
 
     <span class="kw">fn </span>to_client_config(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span>::ClientConfig {
-        <span class="kw">let </span>api_endpoints: Vec&lt;String&gt; = <span class="self">self
+        <span class="kw">let </span>api_endpoints: Vec&lt;Url&gt; = <span class="self">self
             </span>.peers
             .iter()
             .map(|(<span class="kw">_</span>, peer)| peer.connection.api_addr.clone())
@@ -426,6 +479,33 @@
             wallet: <span class="self">self</span>.wallet.to_client_config(),
             ln: <span class="self">self</span>.ln.to_client_config(),
         }
+    }
+
+    <span class="kw">fn </span>validate_config(<span class="kw-2">&amp;</span><span class="self">self</span>, identity: <span class="kw-2">&amp;</span>PeerId) {
+        <span class="macro">assert_eq!</span>(
+            <span class="self">self</span>.epoch_sks.public_key_share(),
+            <span class="self">self</span>.epoch_pk_set.public_key_share(identity.to_usize()),
+            <span class="string">&quot;Epoch private key doesn&#39;t match pubkey share&quot;
+        </span>);
+        <span class="macro">assert_eq!</span>(
+            <span class="self">self</span>.hbbft_sks.public_key_share(),
+            <span class="self">self</span>.hbbft_pk_set.public_key_share(identity.to_usize()),
+            <span class="string">&quot;HBBFT private key doesn&#39;t match pubkey share&quot;
+        </span>);
+        <span class="macro">assert_eq!</span>(
+            <span class="self">self</span>.peers.keys().max().copied().map(|id| id.to_usize()),
+            <span class="prelude-val">Some</span>(<span class="self">self</span>.peers.len() - <span class="number">1</span>),
+            <span class="string">&quot;Peer ids are not indexed from 0&quot;
+        </span>);
+        <span class="macro">assert_eq!</span>(
+            <span class="self">self</span>.peers.keys().min().copied(),
+            <span class="prelude-val">Some</span>(PeerId::from(<span class="number">0</span>)),
+            <span class="string">&quot;Peer ids are not indexed from 0&quot;
+        </span>);
+
+        <span class="self">self</span>.mint.validate_config(identity);
+        <span class="self">self</span>.ln.validate_config(identity);
+        <span class="self">self</span>.wallet.validate_config(identity);
     }
 }
 
@@ -458,9 +538,15 @@
         <span class="self">self</span>.identity.into()
     }
 
-    <span class="kw">pub fn </span>max_faulty(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+    <span class="doccomment">/// how many peers can be evil without breaking consensus
+    </span><span class="kw">pub fn </span>max_faulty(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
         hbbft::util::max_faulty(<span class="self">self</span>.peers.len())
     }
+
+    <span class="doccomment">/// how many peers are required for consensus
+    </span><span class="kw">pub fn </span>threshold(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        hbbft::util::max_faulty(<span class="self">self</span>.peers.len()) * <span class="number">2 </span>+ <span class="number">1
+    </span>}
 
     <span class="kw">pub fn </span>fee_consensus(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; fedimint_core::config::FeeConsensus {
         fedimint_core::config::FeeConsensus {
@@ -541,4 +627,4 @@
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="fedimint" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (289279de1 2022-09-04)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="fedimint" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (98ad6a551 2022-09-17)" ></div></body></html>

@@ -7,10 +7,10 @@ var sourcesIndex = JSON.parse('{\
 "fedimint_core":["",[],["config.rs","epoch.rs","lib.rs","outcome.rs","transaction.rs"]],\
 "fedimint_derive":["",[],["lib.rs"]],\
 "fedimint_ln":["",[["contracts",[],["account.rs","incoming.rs","mod.rs","outgoing.rs"]]],["config.rs","db.rs","lib.rs"]],\
-"fedimint_mint":["",[["tiered",[],["coins.rs","keys.rs","mod.rs"]]],["config.rs","db.rs","lib.rs"]],\
+"fedimint_mint":["",[["tiered",[],["tiered_multi.rs"]]],["config.rs","db.rs","lib.rs","tiered.rs"]],\
 "fedimint_wallet":["",[],["bitcoincore_rpc.rs","bitcoind.rs","config.rs","db.rs","keys.rs","lib.rs","tweakable.rs","txoproof.rs"]],\
 "fedimintd":["",[],["fedimintd.rs"]],\
-"ln_gateway":["",[],["cln.rs","lib.rs","ln.rs","webserver.rs"]],\
+"ln_gateway":["",[],["cln.rs","lib.rs","ln.rs","util.rs","webserver.rs"]],\
 "mint_client":["",[["ln",[],["db.rs","incoming.rs","mod.rs","outgoing.rs"]],["mint",[],["db.rs","mod.rs"]],["wallet",[],["db.rs","mod.rs"]]],["api.rs","lib.rs","transaction.rs","utils.rs"]],\
 "mint_client_cli":["",[],["main.rs"]],\
 "mint_rpc_client":["",[],["mint-rpc-client.rs"]],\
