@@ -604,6 +604,15 @@
 <span id="604">604</span>
 <span id="605">605</span>
 <span id="606">606</span>
+<span id="607">607</span>
+<span id="608">608</span>
+<span id="609">609</span>
+<span id="610">610</span>
+<span id="611">611</span>
+<span id="612">612</span>
+<span id="613">613</span>
+<span id="614">614</span>
+<span id="615">615</span>
 </pre><pre class="rust"><code><span class="kw">pub mod </span>db;
 
 <span class="kw">use </span><span class="kw">crate</span>::api::ApiError;
@@ -638,10 +647,12 @@
     <span class="kw">pub </span>context: <span class="kw-2">&amp;</span><span class="lifetime">&#39;c </span>ClientContext,
 }
 
-<span class="doccomment">/// Client side representation of one coin in an issuance request that keeps all necessary
-/// information to generate one spendable coin once the blind signature arrives.
+<span class="doccomment">/// Single [`Note`] issuance request to the mint.
+///
+/// Keeps the data to generate [`SpendableNote`] once the
+/// mint successfully processed the transaction signing the corresponding [`BlindNonce`].
 </span><span class="attribute">#[derive(Debug, Clone, Deserialize, Serialize, Encodable, Decodable)]
-</span><span class="kw">pub struct </span>CoinRequest {
+</span><span class="kw">pub struct </span>NoteIssuanceRequest {
     <span class="doccomment">/// Spend key from which the coin nonce (corresponding public key) is derived
     </span>spend_key: [u8; <span class="number">32</span>], <span class="comment">// FIXME: either make KeyPair Serializable or add secret key newtype
     </span><span class="doccomment">/// Nonce belonging to the secret key
@@ -650,18 +661,20 @@
     </span>blinding_key: BlindingKey,
 }
 
-<span class="doccomment">/// Client side representation of a coin reissuance that keeps all necessary information to
-/// generate spendable coins once the blind signatures arrive.
+<span class="doccomment">/// Multiple [`Note`] issuance requests
+///
+/// Keeps all the data to generate [`SpendableNote`]s once the
+/// mint successfully processed corresponding [`NoteIssuanceRequest`]s.
 </span><span class="attribute">#[derive(Debug, Clone, Deserialize, Serialize, Encodable, Decodable)]
-</span><span class="kw">pub struct </span>CoinFinalizationData {
+</span><span class="kw">pub struct </span>NoteIssuanceRequests {
     <span class="doccomment">/// Finalization data for all coin outputs in this request
-    </span>coins: TieredMulti&lt;CoinRequest&gt;,
+    </span>coins: TieredMulti&lt;NoteIssuanceRequest&gt;,
 }
 
 <span class="doccomment">/// A [`Note`] with associated secret key that allows to proof ownership (spend it)
 </span><span class="attribute">#[derive(Debug, Clone, PartialEq, Eq, Hash, Deserialize, Serialize, Encodable, Decodable)]
 </span><span class="kw">pub struct </span>SpendableNote {
-    <span class="kw">pub </span>coin: Note,
+    <span class="kw">pub </span>note: Note,
     <span class="kw">pub </span>spend_key: [u8; <span class="number">32</span>],
 }
 
@@ -716,7 +729,7 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         amount: Amount,
         <span class="kw-2">mut </span>tx: BatchTx,
-        rng: R,
+        rng: <span class="kw-2">&amp;mut </span>R,
         <span class="kw-2">mut </span>create_tx: <span class="kw">impl </span>FnMut(TieredMulti&lt;BlindNonce&gt;) -&gt; OutPoint,
     ) {
         <span class="kw">let </span><span class="kw-2">mut </span>builder = TransactionBuilder::default();
@@ -753,7 +766,7 @@
                 .map(|(amount, coin): (Amount, SpendableNote)| {
                     <span class="kw">let </span>key = CoinKey {
                         amount,
-                        nonce: coin.coin.<span class="number">0</span>.clone(),
+                        nonce: coin.note.<span class="number">0</span>.clone(),
                     };
                     <span class="kw">let </span>value = coin;
                     BatchItem::insert_new(key, value)
@@ -765,7 +778,7 @@
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">pub fn </span>list_active_issuances(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;(OutPoint, CoinFinalizationData)&gt; {
+    <span class="kw">pub fn </span>list_active_issuances(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;(OutPoint, NoteIssuanceRequests)&gt; {
         <span class="self">self</span>.context
             .db
             .find_by_prefix(<span class="kw-2">&amp;</span>OutputFinalizationKeyPrefix)
@@ -809,14 +822,14 @@
     </span>}
 }
 
-<span class="kw">impl </span>CoinFinalizationData {
+<span class="kw">impl </span>NoteIssuanceRequests {
     <span class="doccomment">/// Generate a new `IssuanceRequest` and the associates [`SignRequest`]
     </span><span class="kw">pub fn </span>new&lt;K, C&gt;(
         amount: Amount,
         amount_tiers: <span class="kw-2">&amp;</span>Tiered&lt;K&gt;,
         ctx: <span class="kw-2">&amp;</span>Secp256k1&lt;C&gt;,
-        <span class="kw-2">mut </span>rng: <span class="kw">impl </span>RngCore + CryptoRng,
-    ) -&gt; (CoinFinalizationData, SignRequest)
+        rng: <span class="kw-2">&amp;mut </span>(<span class="kw">impl </span>RngCore + CryptoRng),
+    ) -&gt; (NoteIssuanceRequests, SignRequest)
     <span class="kw">where
         </span>C: Signing,
     {
@@ -824,7 +837,7 @@
             TieredMulti::represent_amount(amount, amount_tiers)
                 .into_iter()
                 .map(|(amt, ())| {
-                    <span class="kw">let </span>(request, blind_msg) = CoinRequest::new(ctx, <span class="kw-2">&amp;mut </span>rng);
+                    <span class="kw">let </span>(request, blind_msg) = NoteIssuanceRequest::new(ctx, rng);
                     ((amt, request), (amt, blind_msg))
                 })
                 .unzip();
@@ -837,7 +850,7 @@
         </span>);
 
         <span class="kw">let </span>sig_req = SignRequest(blinded_nonces);
-        <span class="kw">let </span>issuance_req = CoinFinalizationData { coins: requests };
+        <span class="kw">let </span>issuance_req = NoteIssuanceRequests { coins: requests };
 
         (issuance_req, sig_req)
     }
@@ -863,7 +876,7 @@
                 <span class="kw">let </span>coin = Note(coin_req.nonce.clone(), sig);
                 <span class="kw">if </span>coin.verify(<span class="kw-2">*</span>mint_pub_key.tier(<span class="kw-2">&amp;</span>amt)<span class="question-mark">?</span>) {
                     <span class="kw">let </span>coin = SpendableNote {
-                        coin,
+                        note: coin,
                         spend_key: coin_req.spend_key,
                     };
 
@@ -884,21 +897,21 @@
     }
 }
 
-<span class="kw">impl </span>CoinRequest {
+<span class="kw">impl </span>NoteIssuanceRequest {
     <span class="doccomment">/// Generate a request session for a single coin and returns it plus the corresponding blinded
     /// message
     </span><span class="kw">fn </span>new&lt;C&gt;(
         ctx: <span class="kw-2">&amp;</span>Secp256k1&lt;C&gt;,
-        <span class="kw-2">mut </span>rng: <span class="kw">impl </span>RngCore + CryptoRng,
-    ) -&gt; (CoinRequest, BlindedMessage)
+        rng: <span class="kw-2">&amp;mut </span>(<span class="kw">impl </span>RngCore + CryptoRng),
+    ) -&gt; (NoteIssuanceRequest, BlindedMessage)
     <span class="kw">where
         </span>C: Signing,
     {
-        <span class="kw">let </span>spend_key = bitcoin::KeyPair::new(ctx, <span class="kw-2">&amp;mut </span>rng);
+        <span class="kw">let </span>spend_key = bitcoin::KeyPair::new(ctx, rng);
         <span class="kw">let </span>nonce = Nonce(spend_key.public_key());
         <span class="kw">let </span>(blinding_key, blinded_nonce) = blind_message(nonce.to_message());
 
-        <span class="kw">let </span>cr = CoinRequest {
+        <span class="kw">let </span>cr = NoteIssuanceRequest {
             spend_key: spend_key.secret_bytes(),
             nonce,
             blinding_key,
@@ -984,6 +997,7 @@
     <span class="kw">use </span>fedimint_core::transaction::Transaction;
     <span class="kw">use </span>futures::executor::block_on;
     <span class="kw">use </span>std::sync::Arc;
+    <span class="kw">use </span>threshold_crypto::PublicKey;
 
     <span class="kw">type </span>Fed = FakeFed&lt;Mint, MintClientConfig&gt;;
 
@@ -1048,7 +1062,18 @@
             <span class="macro">unimplemented!</span>()
         }
 
-        <span class="kw">async fn </span>fetch_epoch_history(<span class="kw-2">&amp;</span><span class="self">self</span>, _epoch: u64) -&gt; <span class="kw">crate</span>::api::Result&lt;EpochHistory&gt; {
+        <span class="kw">async fn </span>fetch_epoch_history(
+            <span class="kw-2">&amp;</span><span class="self">self</span>,
+            _epoch: u64,
+            _pk: PublicKey,
+        ) -&gt; <span class="kw">crate</span>::api::Result&lt;EpochHistory&gt; {
+            <span class="macro">unimplemented!</span>()
+        }
+
+        <span class="kw">async fn </span>offer_exists(
+            <span class="kw-2">&amp;</span><span class="self">self</span>,
+            _payment_hash: bitcoin::hashes::sha256::Hash,
+        ) -&gt; <span class="kw">crate</span>::api::Result&lt;bool&gt; {
             <span class="macro">unimplemented!</span>()
         }
     }
@@ -1062,7 +1087,7 @@
             FakeFed::&lt;Mint, MintClientConfig&gt;::new(
                 <span class="number">4</span>,
                 <span class="number">1</span>,
-                |cfg, db| <span class="kw">async </span>{ Mint::new(cfg, Arc::new(db)) },
+                |cfg, db| <span class="kw">async </span>{ Mint::new(cfg, db) },
                 <span class="kw-2">&amp;</span>[Amount::from_sat(<span class="number">1</span>), Amount::from_sat(<span class="number">10</span>)][..],
             )
             .<span class="kw">await</span>,
@@ -1072,7 +1097,7 @@
         <span class="kw">let </span>client_config = fed.lock().<span class="kw">await</span>.client_cfg().clone();
 
         <span class="kw">let </span>client_context = ClientContext {
-            db: Box::new(MemDatabase::new()),
+            db: MemDatabase::new().into(),
             api: Box::new(api),
             secp: secp256k1_zkp::Secp256k1::new(),
         };
@@ -1083,7 +1108,7 @@
     <span class="kw">async fn </span>issue_tokens&lt;<span class="lifetime">&#39;a</span>, R: rand::RngCore + rand::CryptoRng&gt;(
         fed: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>tokio::sync::Mutex&lt;Fed&gt;,
         client: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>MintClient&lt;<span class="lifetime">&#39;a</span>&gt;,
-        client_db: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw">dyn </span>Database,
+        client_db: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Database,
         amt: Amount,
         rng: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>R,
     ) {
@@ -1116,14 +1141,7 @@
         };
 
         <span class="kw">const </span>ISSUE_AMOUNT: Amount = Amount::from_sat(<span class="number">12</span>);
-        issue_tokens(
-            <span class="kw-2">&amp;</span>fed,
-            <span class="kw-2">&amp;</span>client,
-            client_context.db.as_ref(),
-            ISSUE_AMOUNT,
-            <span class="kw-2">&amp;mut </span>rng,
-        )
-        .<span class="kw">await</span>;
+        issue_tokens(<span class="kw-2">&amp;</span>fed, <span class="kw-2">&amp;</span>client, <span class="kw-2">&amp;</span>client_context.db, ISSUE_AMOUNT, <span class="kw-2">&amp;mut </span>rng).<span class="kw">await</span>;
 
         <span class="macro">assert_eq!</span>(client.coins().total_amount(), ISSUE_AMOUNT)
     }
@@ -1143,7 +1161,7 @@
         issue_tokens(
             <span class="kw-2">&amp;</span>fed,
             <span class="kw-2">&amp;</span>client,
-            client_context.db.as_ref(),
+            <span class="kw-2">&amp;</span>client_context.db,
             SPEND_AMOUNT * <span class="number">2</span>,
             <span class="kw-2">&amp;mut </span>rng,
         )
@@ -1211,4 +1229,4 @@
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="mint_client" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (98ad6a551 2022-09-17)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="mint_client" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (f5193a9fc 2022-09-25)" ></div></body></html>

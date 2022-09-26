@@ -641,6 +641,11 @@
 <span id="641">641</span>
 <span id="642">642</span>
 <span id="643">643</span>
+<span id="644">644</span>
+<span id="645">645</span>
+<span id="646">646</span>
+<span id="647">647</span>
+<span id="648">648</span>
 </pre><pre class="rust"><code><span class="attribute">#![allow(clippy::let_unit_value)]
 
 </span><span class="kw">mod </span>conflictfilter;
@@ -722,7 +727,7 @@
     <span class="kw">pub </span>ln: LightningModule,
 
     <span class="doccomment">/// KV Database into which all state is persisted to recover from in case of a crash
-    </span><span class="kw">pub </span>db: Arc&lt;<span class="kw">dyn </span>Database&gt;,
+    </span><span class="kw">pub </span>db: Database,
 
     <span class="comment">// Notifies tasks when there is a new transaction
     </span><span class="kw">pub </span>transaction_notify: Arc&lt;Notify&gt;,
@@ -749,6 +754,11 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         transaction: Transaction,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;(), TransactionSubmissionError&gt; {
+        <span class="comment">// we already processed the transaction before the request was received
+        </span><span class="kw">if </span><span class="self">self</span>.transaction_status(transaction.tx_hash()).is_some() {
+            <span class="kw">return </span><span class="prelude-val">Ok</span>(());
+        }
+
         <span class="kw">let </span>tx_hash = transaction.tx_hash();
         <span class="macro">debug!</span>(%tx_hash, <span class="string">&quot;Received mint transaction&quot;</span>);
 
@@ -1285,4 +1295,4 @@
     </span>TransactionConflictError,
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="fedimint" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (98ad6a551 2022-09-17)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="fedimint" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (f5193a9fc 2022-09-25)" ></div></body></html>

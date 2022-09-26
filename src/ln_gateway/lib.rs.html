@@ -422,13 +422,24 @@
 <span id="422">422</span>
 <span id="423">423</span>
 <span id="424">424</span>
+<span id="425">425</span>
+<span id="426">426</span>
+<span id="427">427</span>
+<span id="428">428</span>
+<span id="429">429</span>
+<span id="430">430</span>
+<span id="431">431</span>
+<span id="432">432</span>
+<span id="433">433</span>
+<span id="434">434</span>
+<span id="435">435</span>
+<span id="436">436</span>
+<span id="437">437</span>
 </pre><pre class="rust"><code><span class="kw">pub mod </span>cln;
 <span class="kw">pub mod </span>ln;
-<span class="kw">mod </span>util;
 <span class="kw">pub mod </span>webserver;
 
 <span class="kw">use </span><span class="kw">crate</span>::ln::{LightningError, LnRpc};
-<span class="kw">use </span><span class="kw">crate</span>::util::{ThenAsync, UnwrapOrElseAsync};
 <span class="kw">use </span>axum::http::StatusCode;
 <span class="kw">use </span>axum::response::{IntoResponse, Response};
 <span class="kw">use </span>bitcoin::{Address, Transaction};
@@ -441,6 +452,7 @@
 <span class="kw">use </span>mint_client::mint::MintClientError;
 <span class="kw">use </span>mint_client::{ClientError, GatewayClient, PaymentParameters};
 <span class="kw">use </span>rand::{CryptoRng, RngCore};
+<span class="kw">use </span>secp256k1::XOnlyPublicKey;
 <span class="kw">use </span>serde::{Deserialize, Deserializer};
 <span class="kw">use </span>std::borrow::Cow;
 <span class="kw">use </span>std::net::SocketAddr;
@@ -607,22 +619,25 @@
         <span class="self">self</span>.federation_client
             .save_outgoing_payment(contract_account.clone());
 
-        <span class="comment">// If this could be an internal payment try to buy the preimage directly. Otherwise or if
-        // this fails try to route the payment via our attached LN node.
-        </span><span class="kw">let </span>preimage_res = payment_params
-            .maybe_internal
-            .then_async(<span class="kw">async </span>{
-                <span class="self">self</span>.buy_preimage_internal(<span class="kw-2">&amp;</span>payment_params, <span class="kw-2">&amp;mut </span>rng)
-                    .<span class="kw">await
-                    </span>.ok()
-            })
-            .<span class="kw">await
-            </span>.flatten()
-            .map(Result::Ok)
-            .unwrap_or_else_async(
-                <span class="self">self</span>.buy_preimage_external(<span class="kw-2">&amp;</span>contract_account.contract.invoice, <span class="kw-2">&amp;</span>payment_params),
+        <span class="kw">let </span>is_internal_payment = payment_params.maybe_internal
+            &amp;&amp; <span class="self">self
+                </span>.federation_client
+                .ln_client()
+                .offer_exists(payment_params.payment_hash)
+                .<span class="kw">await
+                </span>.unwrap_or(<span class="bool-val">false</span>);
+
+        <span class="kw">let </span>preimage_res = <span class="kw">if </span>is_internal_payment {
+            <span class="self">self</span>.buy_preimage_internal(
+                <span class="kw-2">&amp;</span>payment_params.payment_hash,
+                <span class="kw-2">&amp;</span>payment_params.invoice_amount,
+                <span class="kw-2">&amp;mut </span>rng,
             )
-            .<span class="kw">await</span>;
+            .<span class="kw">await
+        </span>} <span class="kw">else </span>{
+            <span class="self">self</span>.buy_preimage_external(<span class="kw-2">&amp;</span>contract_account.contract.invoice, <span class="kw-2">&amp;</span>payment_params)
+                .<span class="kw">await
+        </span>};
 
         <span class="kw">match </span>preimage_res {
             <span class="prelude-val">Ok</span>(preimage) =&gt; {
@@ -634,7 +649,7 @@
                 <span class="prelude-val">Ok</span>(outpoint)
             }
             <span class="prelude-val">Err</span>(e) =&gt; {
-                <span class="macro">warn!</span>(<span class="string">&quot;LN payment failed, aborting&quot;</span>);
+                <span class="macro">warn!</span>(<span class="string">&quot;Invoice payment failed: {}. Aborting&quot;</span>, e);
                 <span class="self">self</span>.federation_client.abort_outgoing_payment(contract_id);
                 <span class="prelude-val">Err</span>(e)
             }
@@ -643,22 +658,33 @@
 
     <span class="kw">async fn </span>buy_preimage_internal(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        payment_params: <span class="kw-2">&amp;</span>PaymentParameters,
+        payment_hash: <span class="kw-2">&amp;</span>sha256::Hash,
+        invoice_amount: <span class="kw-2">&amp;</span>Amount,
         <span class="kw-2">mut </span>rng: <span class="kw">impl </span>RngCore + CryptoRng,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;[u8; <span class="number">32</span>]&gt; {
-        <span class="kw">let </span>(out_point, <span class="kw">_</span>) = <span class="self">self
+        <span class="kw">let </span>(out_point, contract_id) = <span class="self">self
             </span>.federation_client
-            .buy_preimage_offer(
-                <span class="kw-2">&amp;</span>payment_params.payment_hash,
-                <span class="kw-2">&amp;</span>payment_params.invoice_amount,
-                <span class="kw-2">&amp;mut </span>rng,
-            )
+            .buy_preimage_offer(payment_hash, invoice_amount, <span class="kw-2">&amp;mut </span>rng)
             .<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="kw">let </span>preimage = <span class="self">self
+
+        <span class="macro">debug!</span>(<span class="string">&quot;Awaiting decryption of preimage of hash {}&quot;</span>, payment_hash);
+        <span class="kw">match </span><span class="self">self
             </span>.federation_client
             .await_preimage_decryption(out_point)
-            .<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>(preimage.<span class="number">0</span>.serialize())
+            .<span class="kw">await
+        </span>{
+            <span class="prelude-val">Ok</span>(preimage) =&gt; {
+                <span class="macro">debug!</span>(<span class="string">&quot;Decrypted preimage {:?}&quot;</span>, preimage);
+                <span class="prelude-val">Ok</span>(preimage.<span class="number">0</span>.serialize())
+            }
+            <span class="prelude-val">Err</span>(e) =&gt; {
+                <span class="macro">warn!</span>(<span class="string">&quot;Failed to decrypt preimage. Now requesting a refund: {}&quot;</span>, e);
+                <span class="self">self</span>.federation_client
+                    .refund_incoming_contract(contract_id, rng)
+                    .<span class="kw">await</span><span class="question-mark">?</span>;
+                <span class="prelude-val">Err</span>(LnGatewayError::ClientError(e))
+            }
+        }
     }
 
     <span class="kw">async fn </span>buy_preimage_external(
@@ -706,17 +732,17 @@
     }
 
     <span class="kw">async fn </span>handle_htlc_incoming_msg(<span class="kw-2">&amp;</span><span class="self">self</span>, htlc_accepted: HtlcAccepted) -&gt; <span class="prelude-ty">Result</span>&lt;Preimage&gt; {
-        <span class="kw">let </span>amount = htlc_accepted.htlc.amount;
+        <span class="kw">let </span>invoice_amount = htlc_accepted.htlc.amount;
         <span class="kw">let </span>payment_hash = htlc_accepted.htlc.payment_hash;
-        <span class="kw">let </span>rng = rand::rngs::OsRng::new().unwrap();
+        <span class="kw">let </span><span class="kw-2">mut </span>rng =
+            rand::rngs::OsRng::new().expect(<span class="string">&quot;only systems with a randomness source are supported&quot;</span>);
 
-        <span class="macro">tracing::debug!</span>(<span class="string">&quot;Incoming htlc for payment hash {}&quot;</span>, payment_hash);
-        <span class="kw">let </span>(outpoint, <span class="kw">_</span>) = <span class="self">self</span>.buy_preimage_offer(<span class="kw-2">&amp;</span>payment_hash, <span class="kw-2">&amp;</span>amount, rng).<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="macro">tracing::debug!</span>(<span class="string">&quot;Decrypting preimage {}&quot;</span>, payment_hash);
-        <span class="kw">let </span>preimage = <span class="self">self</span>.await_preimage_decryption(outpoint).<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="macro">tracing::debug!</span>(<span class="string">&quot;Decrypted preimage {:?}&quot;</span>, payment_hash);
-
-        <span class="prelude-val">Ok</span>(preimage)
+        <span class="macro">debug!</span>(<span class="string">&quot;Incoming htlc for payment hash {}&quot;</span>, payment_hash);
+        <span class="kw">let </span>pk_slice = <span class="self">self
+            </span>.buy_preimage_internal(<span class="kw-2">&amp;</span>payment_hash, <span class="kw-2">&amp;</span>invoice_amount, <span class="kw-2">&amp;mut </span>rng)
+            .<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let </span>pk = XOnlyPublicKey::from_slice(<span class="kw-2">&amp;</span>pk_slice).expect(<span class="string">&quot;Invalid preimage&quot;</span>);
+        <span class="prelude-val">Ok</span>(Preimage(pk))
     }
 
     <span class="kw">async fn </span>handle_balance_msg(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;Amount&gt; {
@@ -847,4 +873,4 @@
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="ln_gateway" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (98ad6a551 2022-09-17)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="ln_gateway" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (f5193a9fc 2022-09-25)" ></div></body></html>

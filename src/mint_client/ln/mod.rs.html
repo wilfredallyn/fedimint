@@ -422,6 +422,28 @@
 <span id="422">422</span>
 <span id="423">423</span>
 <span id="424">424</span>
+<span id="425">425</span>
+<span id="426">426</span>
+<span id="427">427</span>
+<span id="428">428</span>
+<span id="429">429</span>
+<span id="430">430</span>
+<span id="431">431</span>
+<span id="432">432</span>
+<span id="433">433</span>
+<span id="434">434</span>
+<span id="435">435</span>
+<span id="436">436</span>
+<span id="437">437</span>
+<span id="438">438</span>
+<span id="439">439</span>
+<span id="440">440</span>
+<span id="441">441</span>
+<span id="442">442</span>
+<span id="443">443</span>
+<span id="444">444</span>
+<span id="445">445</span>
+<span id="446">446</span>
 </pre><pre class="rust"><code><span class="comment">// TODO: once user and mint client are merged, make this private again
 </span><span class="kw">pub mod </span>db;
 <span class="kw">pub mod </span>incoming;
@@ -434,6 +456,7 @@
 <span class="kw">use </span><span class="kw">crate</span>::utils::ClientContext;
 <span class="kw">use </span>bitcoin_hashes::sha256::Hash <span class="kw">as </span>Sha256Hash;
 <span class="kw">use </span>fedimint_api::db::batch::BatchTx;
+<span class="kw">use </span>fedimint_api::task::timeout;
 <span class="kw">use </span>fedimint_api::Amount;
 <span class="kw">use </span>fedimint_core::modules::ln::config::LightningModuleClientConfig;
 <span class="kw">use </span>fedimint_core::modules::ln::contracts::incoming::{EncryptedPreimage, IncomingContractOffer};
@@ -507,11 +530,10 @@
     }
 
     <span class="kw">pub async fn </span>get_contract_account(<span class="kw-2">&amp;</span><span class="self">self</span>, id: ContractId) -&gt; <span class="prelude-ty">Result</span>&lt;ContractAccount&gt; {
-        <span class="self">self</span>.context
-            .api
-            .await_contract(id, Duration::from_secs(<span class="number">10</span>))
+        timeout(Duration::from_secs(<span class="number">10</span>), <span class="self">self</span>.context.api.fetch_contract(id))
             .<span class="kw">await
-            </span>.map_err(LnClientError::ApiError)
+            </span>.unwrap_or(<span class="prelude-val">Err</span>(ApiError::Timeout))
+            .map_err(LnClientError::ApiError)
     }
 
     <span class="kw">pub async fn </span>get_outgoing_contract(<span class="kw-2">&amp;</span><span class="self">self</span>, id: ContractId) -&gt; <span class="prelude-ty">Result</span>&lt;OutgoingContractAccount&gt; {
@@ -578,9 +600,19 @@
     }
 
     <span class="kw">pub async fn </span>get_offer(<span class="kw-2">&amp;</span><span class="self">self</span>, payment_hash: Sha256Hash) -&gt; <span class="prelude-ty">Result</span>&lt;IncomingContractOffer&gt; {
+        timeout(
+            Duration::from_secs(<span class="number">10</span>),
+            <span class="self">self</span>.context.api.fetch_offer(payment_hash),
+        )
+        .<span class="kw">await
+        </span>.unwrap_or(<span class="prelude-val">Err</span>(ApiError::Timeout))
+        .map_err(LnClientError::ApiError)
+    }
+
+    <span class="kw">pub async fn </span>offer_exists(<span class="kw-2">&amp;</span><span class="self">self</span>, payment_hash: Sha256Hash) -&gt; <span class="prelude-ty">Result</span>&lt;bool&gt; {
         <span class="self">self</span>.context
             .api
-            .await_offer(payment_hash, Duration::from_secs(<span class="number">10</span>))
+            .offer_exists(payment_hash)
             .<span class="kw">await
             </span>.map_err(LnClientError::ApiError)
     }
@@ -639,6 +671,7 @@
     <span class="kw">use </span>fedimint_core::transaction::Transaction;
     <span class="kw">use </span>lightning_invoice::Invoice;
     <span class="kw">use </span>std::sync::Arc;
+    <span class="kw">use </span>threshold_crypto::PublicKey;
     <span class="kw">use </span>url::Url;
 
     <span class="kw">type </span>Fed = FakeFed&lt;LightningModule, LightningModuleClientConfig&gt;;
@@ -709,7 +742,18 @@
             <span class="macro">unimplemented!</span>()
         }
 
-        <span class="kw">async fn </span>fetch_epoch_history(<span class="kw-2">&amp;</span><span class="self">self</span>, _epoch: u64) -&gt; <span class="kw">crate</span>::api::Result&lt;EpochHistory&gt; {
+        <span class="kw">async fn </span>fetch_epoch_history(
+            <span class="kw-2">&amp;</span><span class="self">self</span>,
+            _epoch: u64,
+            _pk: PublicKey,
+        ) -&gt; <span class="kw">crate</span>::api::Result&lt;EpochHistory&gt; {
+            <span class="macro">unimplemented!</span>()
+        }
+
+        <span class="kw">async fn </span>offer_exists(
+            <span class="kw-2">&amp;</span><span class="self">self</span>,
+            _payment_hash: bitcoin::hashes::sha256::Hash,
+        ) -&gt; <span class="kw">crate</span>::api::Result&lt;bool&gt; {
             <span class="macro">unimplemented!</span>()
         }
     }
@@ -723,7 +767,7 @@
             FakeFed::&lt;LightningModule, LightningModuleClientConfig&gt;::new(
                 <span class="number">4</span>,
                 <span class="number">1</span>,
-                |cfg, db| <span class="kw">async </span>{ LightningModule::new(cfg, Arc::new(db)) },
+                |cfg, db| <span class="kw">async </span>{ LightningModule::new(cfg, db) },
                 <span class="kw-2">&amp;</span>(),
             )
             .<span class="kw">await</span>,
@@ -732,7 +776,7 @@
         <span class="kw">let </span>client_config = fed.lock().<span class="kw">await</span>.client_cfg().clone();
 
         <span class="kw">let </span>client_context = ClientContext {
-            db: Box::new(MemDatabase::new()),
+            db: MemDatabase::new().into(),
             api: Box::new(api),
             secp: secp256k1_zkp::Secp256k1::new(),
         };
@@ -847,4 +891,4 @@
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="mint_client" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (98ad6a551 2022-09-17)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="mint_client" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (f5193a9fc 2022-09-25)" ></div></body></html>
