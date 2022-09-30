@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `client/cli/src/main.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>main.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../mint_client_cli/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../mint_client_cli/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../mint_client_cli/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `client/cli/src/main.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>main.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../mint_client_cli/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../mint_client_cli/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../mint_client_cli/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -613,12 +613,18 @@
 <span id="613">613</span>
 <span id="614">614</span>
 <span id="615">615</span>
+<span id="616">616</span>
+<span id="617">617</span>
+<span id="618">618</span>
+<span id="619">619</span>
+<span id="620">620</span>
+<span id="621">621</span>
+<span id="622">622</span>
 </pre><pre class="rust"><code><span class="kw">use </span>bitcoin::{secp256k1, Address, Transaction};
 <span class="kw">use </span>clap::{Parser, Subcommand};
-<span class="kw">use </span>fedimint_api::{Amount, OutPoint, TransactionId};
+<span class="kw">use </span>fedimint_api::{Amount, NumPeers, OutPoint, TieredMulti, TransactionId};
 <span class="kw">use </span>fedimint_core::config::{load_from_file, ClientConfig};
 <span class="kw">use </span>fedimint_core::modules::ln::contracts::ContractId;
-<span class="kw">use </span>fedimint_core::modules::mint::tiered::TieredMulti;
 <span class="kw">use </span>fedimint_core::modules::wallet::txoproof::TxOutProof;
 
 <span class="kw">use </span>core::fmt;
@@ -632,7 +638,7 @@
 <span class="kw">use </span>mint_client::{Client, UserClientConfig};
 <span class="kw">use </span>serde::{Deserialize, Serialize};
 <span class="kw">use </span>serde_json::{json, Value};
-<span class="kw">use </span>std::collections::HashMap;
+<span class="kw">use </span>std::collections::BTreeMap;
 <span class="kw">use </span>std::error::Error;
 <span class="kw">use </span>std::fmt::Debug;
 <span class="kw">use </span>std::path::PathBuf;
@@ -659,7 +665,7 @@
 
     Validate {
         all_valid: bool,
-        details: HashMap&lt;SpendableNote, bool&gt;,
+        details: BTreeMap&lt;Amount, usize&gt;,
     },
 
     Spend {
@@ -681,7 +687,7 @@
     Info {
         total_amount: Amount,
         total_num_notes: usize,
-        details: HashMap&lt;Amount, usize&gt;,
+        details: BTreeMap&lt;Amount, usize&gt;,
     },
 
     LnInvoice {
@@ -776,7 +782,7 @@
 <span class="kw">impl </span>Error <span class="kw">for </span>CliError {}
 
 <span class="attribute">#[derive(Parser)]
-#[clap(version)]
+#[command(version)]
 </span><span class="kw">struct </span>Cli {
     <span class="doccomment">/// The working directory of the client containing the config and db
     </span>workdir: PathBuf,
@@ -785,7 +791,7 @@
 }
 
 <span class="attribute">#[derive(Parser)]
-#[clap(version)]
+#[command(version)]
 </span><span class="kw">struct </span>CliNoWorkdir {
     <span class="attribute">#[clap(subcommand)]
     </span>command: CommandNoWorkdir,
@@ -805,34 +811,34 @@
 
     <span class="doccomment">/// Issue tokens in exchange for a peg-in proof (not yet implemented, just creates notes)
     </span>PegIn {
-        <span class="attribute">#[clap(parse(try_from_str = from_hex))]
+        <span class="attribute">#[clap(value_parser = from_hex::&lt;TxOutProof&gt;)]
         </span>txout_proof: TxOutProof,
-        <span class="attribute">#[clap(parse(try_from_str = from_hex))]
+        <span class="attribute">#[clap(value_parser = from_hex::&lt;Transaction&gt;)]
         </span>transaction: Transaction,
     },
 
     <span class="doccomment">/// Reissue tokens received from a third party to avoid double spends
     </span>Reissue {
-        <span class="attribute">#[clap(parse(from_str = parse_coins))]
+        <span class="attribute">#[clap(value_parser = parse_coins)]
         </span>coins: TieredMulti&lt;SpendableNote&gt;,
     },
 
     <span class="doccomment">/// Validate tokens without claiming them (only checks if signatures valid, does not check if nonce unspent)
     </span>Validate {
-        <span class="attribute">#[clap(parse(from_str = parse_coins))]
+        <span class="attribute">#[clap(value_parser = parse_coins)]
         </span>coins: TieredMulti&lt;SpendableNote&gt;,
     },
 
     <span class="doccomment">/// Prepare notes to send to a third party as a payment
     </span>Spend {
-        <span class="attribute">#[clap(parse(try_from_str = parse_fedimint_amount))]
+        <span class="attribute">#[clap(value_parser = parse_fedimint_amount)]
         </span>amount: Amount,
     },
 
     <span class="doccomment">/// Withdraw funds from the federation
     </span>PegOut {
         address: Address,
-        <span class="attribute">#[clap(parse(try_from_str = parse_bitcoin_amount))]
+        <span class="attribute">#[clap(value_parser = parse_bitcoin_amount)]
         </span>satoshis: bitcoin::Amount,
     },
 
@@ -847,7 +853,7 @@
 
     <span class="doccomment">/// Create a lightning invoice to receive payment via gateway
     </span>LnInvoice {
-        <span class="attribute">#[clap(parse(try_from_str = parse_fedimint_amount))]
+        <span class="attribute">#[clap(value_parser = parse_fedimint_amount)]
         </span>amount: Amount,
         description: String,
     },
@@ -870,7 +876,7 @@
     <span class="doccomment">/// Switch active gateway
     </span>SwitchGateway {
         <span class="doccomment">/// node public key for a gateway
-        </span><span class="attribute">#[clap(parse(try_from_str = parse_node_pub_key))]
+        </span><span class="attribute">#[clap(value_parser = parse_node_pub_key)]
         </span>pubkey: secp256k1::PublicKey,
     },
 }
@@ -925,9 +931,13 @@
         <span class="kw">if let </span>Command::JoinFederation { connect } = cli.command {
             <span class="kw">let </span>connect_obj: WsFederationConnect = serde_json::from_str(<span class="kw-2">&amp;</span>connect)
                 .or_terminate(CliErrorKind::InvalidValue, <span class="string">&quot;invalid connect info&quot;</span>);
-            <span class="kw">let </span>api = WsFederationApi::new(connect_obj.max_evil, connect_obj.members);
+            <span class="kw">let </span>api = WsFederationApi::new(connect_obj.members);
             <span class="kw">let </span>cfg: ClientConfig = api
-                .request(<span class="string">&quot;/config&quot;</span>, (), CurrentConsensus::new(connect_obj.max_evil))
+                .request(
+                    <span class="string">&quot;/config&quot;</span>,
+                    (),
+                    CurrentConsensus::new(api.peers().one_honest()),
+                )
                 .<span class="kw">await
                 </span>.or_terminate(
                     CliErrorKind::NetworkError,
@@ -1023,15 +1033,19 @@
         }
         Command::Validate { coins } =&gt; {
             <span class="kw">let </span>validate_result = client.validate_note_signatures(<span class="kw-2">&amp;</span>coins).<span class="kw">await</span>;
+            <span class="kw">let </span>details_vec = coins
+                .iter_tiers()
+                .map(|(amount, coins)| (amount.to_owned(), coins.len()))
+                .collect();
 
             <span class="kw">match </span>validate_result {
                 <span class="prelude-val">Ok</span>(()) =&gt; <span class="prelude-val">Ok</span>(CliOutput::Validate {
                     all_valid: <span class="bool-val">true</span>,
-                    details: ([].iter().cloned().collect()),
+                    details: (details_vec),
                 }),
                 <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Ok</span>(CliOutput::Validate {
                     all_valid: <span class="bool-val">false</span>,
-                    details: ([].iter().cloned().collect()),
+                    details: (details_vec),
                 }),
             }
         }
@@ -1105,7 +1119,7 @@
                 <span class="prelude-val">Ok</span>((contract_id, outpoint)) =&gt; {
                     <span class="kw">match </span>client.await_outgoing_contract_acceptance(outpoint).<span class="kw">await </span>{
                         <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; client
-                            .await_outgoing_contract_execution(contract_id)
+                            .await_outgoing_contract_execution(contract_id, <span class="kw-2">&amp;mut </span>rng)
                             .<span class="kw">await
                             </span>.transform(
                                 |<span class="kw">_</span>| CliOutput::LnPay {
@@ -1229,4 +1243,4 @@
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="mint_client_cli" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (f5193a9fc 2022-09-25)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="mint_client_cli" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (9c56d9d6f 2022-09-29)" ></div></body></html>
