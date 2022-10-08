@@ -310,13 +310,17 @@
 <span id="310">310</span>
 <span id="311">311</span>
 <span id="312">312</span>
+<span id="313">313</span>
 </pre><pre class="rust"><code><span class="doccomment">//! # Threshold Blind Signatures
 //!
 //! This library implements an ad-hoc threshold blind signature scheme based on BLS signatures using
 //! the (unrelated) BLS12-381 curve.
 
-</span><span class="kw">use </span><span class="kw">crate</span>::hash::{hash_bytes_to_curve, hash_to_curve};
-<span class="kw">use </span><span class="kw">crate</span>::poly::Poly;
+</span><span class="kw">use </span>std::hash::Hasher;
+
+<span class="kw">pub use </span>bls12_381::G1Affine <span class="kw">as </span>MessagePoint;
+<span class="kw">pub use </span>bls12_381::G2Affine <span class="kw">as </span>PubKeyPoint;
+<span class="kw">pub use </span>bls12_381::Scalar;
 <span class="kw">use </span>bls12_381::{pairing, G1Affine, G1Projective, G2Affine, G2Projective};
 <span class="kw">use </span>ff::Field;
 <span class="kw">use </span>group::Curve;
@@ -325,15 +329,13 @@
 <span class="kw">use </span>serde::{Deserialize, Serialize};
 <span class="kw">use </span>sha3::digest::generic_array::typenum::U32;
 <span class="kw">use </span>sha3::Digest;
-<span class="kw">use </span>std::hash::Hasher;
 
-<span class="kw">pub use </span>bls12_381::G1Affine <span class="kw">as </span>MessagePoint;
-<span class="kw">pub use </span>bls12_381::G2Affine <span class="kw">as </span>PubKeyPoint;
-<span class="kw">pub use </span>bls12_381::Scalar;
+<span class="kw">use </span><span class="kw">crate</span>::hash::{hash_bytes_to_curve, hash_to_curve};
+<span class="kw">use </span><span class="kw">crate</span>::poly::Poly;
 
 <span class="kw">pub mod </span>hash;
 <span class="kw">pub mod </span>poly;
-<span class="kw">mod </span>serde_impl;
+<span class="kw">pub mod </span>serde_impl;
 
 <span class="attribute">#[derive(Copy, Clone, Debug, Eq, PartialEq, Serialize, Deserialize)]
 </span><span class="kw">pub struct </span>PublicKeyShare(<span class="attribute">#[serde(with = <span class="string">&quot;serde_impl::g2&quot;</span>)] </span><span class="kw">pub </span>G2Affine);
@@ -623,4 +625,4 @@
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="tbs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (57f097ea2 2022-10-01)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="tbs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (8b0c05d9a 2022-10-07)" ></div></body></html>

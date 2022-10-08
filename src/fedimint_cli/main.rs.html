@@ -620,14 +620,20 @@
 <span id="620">620</span>
 <span id="621">621</span>
 <span id="622">622</span>
-</pre><pre class="rust"><code><span class="kw">use </span>bitcoin::{secp256k1, Address, Transaction};
+<span id="623">623</span>
+</pre><pre class="rust"><code><span class="kw">use </span>core::fmt;
+<span class="kw">use </span>std::collections::BTreeMap;
+<span class="kw">use </span>std::error::Error;
+<span class="kw">use </span>std::fmt::Debug;
+<span class="kw">use </span>std::path::PathBuf;
+<span class="kw">use </span>std::process::exit;
+
+<span class="kw">use </span>bitcoin::{secp256k1, Address, Transaction};
 <span class="kw">use </span>clap::{Parser, Subcommand};
 <span class="kw">use </span>fedimint_api::{Amount, NumPeers, OutPoint, TieredMulti, TransactionId};
 <span class="kw">use </span>fedimint_core::config::{load_from_file, ClientConfig};
 <span class="kw">use </span>fedimint_core::modules::ln::contracts::ContractId;
 <span class="kw">use </span>fedimint_core::modules::wallet::txoproof::TxOutProof;
-
-<span class="kw">use </span>core::fmt;
 <span class="kw">use </span>mint_client::api::{WsFederationApi, WsFederationConnect};
 <span class="kw">use </span>mint_client::mint::SpendableNote;
 <span class="kw">use </span>mint_client::query::CurrentConsensus;
@@ -638,15 +644,11 @@
 <span class="kw">use </span>mint_client::{Client, UserClientConfig};
 <span class="kw">use </span>serde::{Deserialize, Serialize};
 <span class="kw">use </span>serde_json::{json, Value};
-<span class="kw">use </span>std::collections::BTreeMap;
-<span class="kw">use </span>std::error::Error;
-<span class="kw">use </span>std::fmt::Debug;
-<span class="kw">use </span>std::path::PathBuf;
-<span class="kw">use </span>std::process::exit;
 <span class="kw">use </span>tracing_subscriber::EnvFilter;
 
 <span class="attribute">#[derive(Serialize)]
 #[serde(rename_all(serialize = <span class="string">&quot;snake_case&quot;</span>))]
+#[serde(untagged)]
 </span><span class="kw">enum </span>CliOutput {
     VersionHash {
         hash: String,
@@ -785,6 +787,7 @@
 #[command(version)]
 </span><span class="kw">struct </span>Cli {
     <span class="doccomment">/// The working directory of the client containing the config and db
+    </span><span class="attribute">#[arg(long = <span class="string">&quot;workdir&quot;</span>)]
     </span>workdir: PathBuf,
     <span class="attribute">#[clap(subcommand)]
     </span>command: Command,
@@ -856,6 +859,7 @@
         <span class="attribute">#[clap(value_parser = parse_fedimint_amount)]
         </span>amount: Amount,
         description: String,
+        expiry_time: <span class="prelude-ty">Option</span>&lt;u64&gt;,
     },
 
     <span class="doccomment">/// Wait for incoming invoice to be paid
@@ -977,10 +981,7 @@
             .or_terminate(CliErrorKind::IOError, <span class="string">&quot;could not open transaction db&quot;</span>)
             .into();
 
-        <span class="kw">let </span>rng = rand::rngs::OsRng::new().or_terminate(
-            CliErrorKind::OSError,
-            <span class="string">&quot;failed to acquire random number generator from OS&quot;</span>,
-        );
+        <span class="kw">let </span>rng = rand::rngs::OsRng;
 
         <span class="kw">let </span>client = Client::new(cfg.clone(), db, Default::default());
 
@@ -1145,8 +1146,9 @@
         Command::LnInvoice {
             amount,
             description,
+            expiry_time,
         } =&gt; client
-            .generate_invoice(amount, description, <span class="kw-2">&amp;mut </span>rng)
+            .generate_invoice(amount, description, <span class="kw-2">&amp;mut </span>rng, expiry_time)
             .<span class="kw">await
             </span>.transform(
                 |confirmed_invoice| CliOutput::LnInvoice {
@@ -1243,4 +1245,4 @@
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="fedimint_cli" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (57f097ea2 2022-10-01)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="fedimint_cli" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (8b0c05d9a 2022-10-07)" ></div></body></html>

@@ -432,24 +432,6 @@
 <span id="432">432</span>
 <span id="433">433</span>
 <span id="434">434</span>
-<span id="435">435</span>
-<span id="436">436</span>
-<span id="437">437</span>
-<span id="438">438</span>
-<span id="439">439</span>
-<span id="440">440</span>
-<span id="441">441</span>
-<span id="442">442</span>
-<span id="443">443</span>
-<span id="444">444</span>
-<span id="445">445</span>
-<span id="446">446</span>
-<span id="447">447</span>
-<span id="448">448</span>
-<span id="449">449</span>
-<span id="450">450</span>
-<span id="451">451</span>
-<span id="452">452</span>
 </pre><pre class="rust"><code><span class="kw">extern crate </span>fedimint_api;
 
 <span class="kw">use </span>std::collections::{BTreeMap, BTreeSet};
@@ -457,37 +439,29 @@
 <span class="kw">use </span>std::sync::Arc;
 <span class="kw">use </span>std::time::Duration;
 
-<span class="kw">use </span>fedimint_api::rand::Rand07Compat;
-<span class="kw">use </span>hbbft::honey_badger::{HoneyBadger, Message};
-<span class="kw">use </span>hbbft::{Epoched, NetworkInfo, Target};
-
-<span class="kw">use </span>rand::rngs::OsRng;
-<span class="kw">use </span>rand::{CryptoRng, RngCore};
-<span class="kw">use </span>tokio::sync::Notify;
-<span class="kw">use </span>tokio::task::spawn;
-<span class="kw">use </span>tracing::{info, warn};
-
 <span class="kw">use </span>config::ServerConfig;
-<span class="kw">use </span>fedimint_api::db::Database;
-<span class="kw">use </span>fedimint_api::{NumPeers, PeerId};
-<span class="kw">use </span>fedimint_core::modules::ln::LightningModule;
-<span class="kw">use </span>fedimint_core::modules::wallet::bitcoind::BitcoindRpc;
-<span class="kw">use </span>fedimint_core::modules::wallet::Wallet;
-
 <span class="kw">use </span>fedimint_api::config::GenerateConfig;
+<span class="kw">use </span>fedimint_api::net::peers::AnyPeerConnections;
+<span class="kw">use </span>fedimint_api::{NumPeers, PeerId};
 <span class="kw">use </span>fedimint_core::epoch::{ConsensusItem, EpochHistory, EpochVerifyError};
 <span class="kw">pub use </span>fedimint_core::<span class="kw-2">*</span>;
+<span class="kw">use </span>hbbft::honey_badger::{HoneyBadger, Message};
+<span class="kw">use </span>hbbft::{Epoched, NetworkInfo, Target};
 <span class="kw">use </span>mint_client::api::{IFederationApi, WsFederationApi};
+<span class="kw">use </span>rand::rngs::OsRng;
+<span class="kw">use </span>rand::{CryptoRng, RngCore};
 <span class="kw">use </span>serde::{Deserialize, Serialize};
+<span class="kw">use </span>tokio::task::spawn;
+<span class="kw">use </span>tracing::{info, warn};
 
 <span class="kw">use </span><span class="kw">crate</span>::consensus::{
     ConsensusOutcome, ConsensusOutcomeConversion, ConsensusProposal, FedimintConsensus,
 };
 <span class="kw">use </span><span class="kw">crate</span>::db::{EpochHistoryKey, LastEpochKey};
+<span class="kw">use </span><span class="kw">crate</span>::fedimint_api::net::peers::PeerConnections;
 <span class="kw">use </span><span class="kw">crate</span>::net::connect::{Connector, TlsTcpConnector};
-<span class="kw">use </span><span class="kw">crate</span>::net::peers::{
-    AnyPeerConnections, PeerConnections, PeerConnector, ReconnectPeerConnections,
-};
+<span class="kw">use </span><span class="kw">crate</span>::net::peers::PeerSlice;
+<span class="kw">use </span><span class="kw">crate</span>::net::peers::{PeerConnector, ReconnectPeerConnections};
 <span class="kw">use </span><span class="kw">crate</span>::rng::RngGenerator;
 
 <span class="doccomment">/// The actual implementation of the federated mint
@@ -501,6 +475,9 @@
 
 <span class="doccomment">/// Fedimint toplevel config
 </span><span class="kw">pub mod </span>config;
+
+<span class="doccomment">/// Admin UI
+</span><span class="kw">pub mod </span>ui;
 
 <span class="doccomment">/// Some abstractions to handle randomness
 </span><span class="kw">mod </span>rng;
@@ -516,52 +493,34 @@
 }
 
 <span class="kw">pub struct </span>FedimintServer {
-    <span class="kw">pub </span>consensus: Arc&lt;FedimintConsensus&lt;OsRng&gt;&gt;,
+    <span class="kw">pub </span>consensus: Arc&lt;FedimintConsensus&gt;,
     <span class="kw">pub </span>connections: AnyPeerConnections&lt;EpochMessage&gt;,
     <span class="kw">pub </span>cfg: ServerConfig,
     <span class="kw">pub </span>hbbft: HoneyBadger&lt;Vec&lt;ConsensusItem&gt;, PeerId&gt;,
     <span class="kw">pub </span>api: Arc&lt;<span class="kw">dyn </span>IFederationApi&gt;,
+    <span class="kw">pub </span>peers: BTreeSet&lt;PeerId&gt;,
 }
 
 <span class="kw">impl </span>FedimintServer {
     <span class="doccomment">/// Start all the components of the mint and plug them together
-    </span><span class="kw">pub async fn </span>run(cfg: ServerConfig, db: Database, bitcoincore_rpc: BitcoindRpc) {
-        <span class="kw">let </span>server = FedimintServer::new(cfg.clone(), db, bitcoincore_rpc).<span class="kw">await</span>;
+    </span><span class="kw">pub async fn </span>run(cfg: ServerConfig, consensus: FedimintConsensus) {
+        <span class="kw">let </span>server = FedimintServer::new(cfg.clone(), consensus).<span class="kw">await</span>;
         spawn(net::api::run_server(cfg, server.consensus.clone()));
         server.run_consensus().<span class="kw">await</span>;
     }
-    <span class="kw">pub async fn </span>new(cfg: ServerConfig, db: Database, bitcoincore_rpc: BitcoindRpc) -&gt; <span class="self">Self </span>{
+    <span class="kw">pub async fn </span>new(cfg: ServerConfig, consensus: FedimintConsensus) -&gt; <span class="self">Self </span>{
         <span class="kw">let </span>connector: PeerConnector&lt;EpochMessage&gt; =
             TlsTcpConnector::new(cfg.tls_config()).into_dyn();
 
-        <span class="self">Self</span>::new_with(cfg.clone(), db, bitcoincore_rpc, connector).<span class="kw">await
+        <span class="self">Self</span>::new_with(cfg.clone(), consensus, connector).<span class="kw">await
     </span>}
 
     <span class="kw">pub async fn </span>new_with(
         cfg: ServerConfig,
-        database: Database,
-        bitcoind: BitcoindRpc,
+        consensus: FedimintConsensus,
         connector: PeerConnector&lt;EpochMessage&gt;,
     ) -&gt; <span class="self">Self </span>{
         cfg.validate_config(<span class="kw-2">&amp;</span>cfg.identity);
-
-        <span class="kw">let </span>mint = fedimint_core::modules::mint::Mint::new(cfg.mint.clone(), database.clone());
-
-        <span class="kw">let </span>wallet = Wallet::new_with_bitcoind(cfg.wallet.clone(), database.clone(), bitcoind)
-            .<span class="kw">await
-            </span>.expect(<span class="string">&quot;Couldn&#39;t create wallet&quot;</span>);
-
-        <span class="kw">let </span>ln = LightningModule::new(cfg.ln.clone(), database.clone());
-
-        <span class="kw">let </span>consensus = Arc::new(FedimintConsensus {
-            rng_gen: Box::new(OsRngGen),
-            cfg: cfg.clone(),
-            mint,
-            wallet,
-            ln,
-            db: database,
-            transaction_notify: Arc::new(Notify::new()),
-        });
 
         <span class="kw">let </span>connections = ReconnectPeerConnections::new(cfg.network_config(), connector)
             .<span class="kw">await
@@ -581,22 +540,23 @@
             .peers
             .clone()
             .into_iter()
-            .map(|(id, peer)| (id, peer.connection.api_addr));
+            .map(|(id, peer)| (id, peer.api_addr));
         <span class="kw">let </span>api = Arc::new(WsFederationApi::new(api_endpoints.collect()));
 
         FedimintServer {
             connections,
             hbbft,
-            consensus,
+            consensus: Arc::new(consensus),
             cfg: cfg.clone(),
             api,
+            peers: cfg.peers.keys().cloned().collect(),
         }
     }
 
     <span class="doccomment">/// Loop `run_conensus_epoch` forever
     </span><span class="kw">async fn </span>run_consensus(<span class="kw-2">mut </span><span class="self">self</span>) {
         <span class="comment">// FIXME: reusing the wallet CI leads to duplicate randomness beacons, not a problem for change, but maybe later for other use cases
-        </span><span class="kw">let </span><span class="kw-2">mut </span>rng = OsRng::new().unwrap();
+        </span><span class="kw">let </span><span class="kw-2">mut </span>rng = OsRng;
         <span class="kw">let </span>consensus = <span class="self">self</span>.consensus.clone();
 
         <span class="comment">// Rejoin consensus and catch up to the most recent epoch
@@ -704,7 +664,7 @@
 
         <span class="self">self</span>.connections
             .send(
-                Target::AllExcept(BTreeSet::new()),
+                <span class="kw-2">&amp;</span>Target::AllExcept(BTreeSet::new()).peers(<span class="kw-2">&amp;</span><span class="self">self</span>.peers),
                 EpochMessage::RejoinRequest,
             )
             .<span class="kw">await</span>;
@@ -749,9 +709,8 @@
                     }
                 }
                 <span class="prelude-val">Ok</span>((peer, EpochMessage::RejoinRequest)) =&gt; {
-                    <span class="kw">let </span>target = Target::Nodes(BTreeSet::from([peer]));
                     <span class="kw">let </span>msg = EpochMessage::Rejoin(<span class="self">self</span>.last_signed_epoch(next_epoch), next_epoch);
-                    <span class="self">self</span>.connections.send(target, msg).<span class="kw">await</span>;
+                    <span class="self">self</span>.connections.send(<span class="kw-2">&amp;</span>[peer], msg).<span class="kw">await</span>;
                 }
                 <span class="prelude-val">Ok</span>(msg) =&gt; msg_buffer.push(msg),
                 <span class="comment">// if peers had an opportunity to reply take max(next_epoch) from a peer threshold
@@ -819,12 +778,15 @@
     ) -&gt; Vec&lt;ConsensusOutcome&gt; {
         <span class="kw">let </span>step = <span class="self">self
             </span>.hbbft
-            .propose(<span class="kw-2">&amp;</span>proposal.items, <span class="kw-2">&amp;mut </span>Rand07Compat(rng))
+            .propose(<span class="kw-2">&amp;</span>proposal.items, rng)
             .expect(<span class="string">&quot;HBBFT propose failed&quot;</span>);
 
         <span class="kw">for </span>msg <span class="kw">in </span>step.messages {
             <span class="self">self</span>.connections
-                .send(msg.target, EpochMessage::Continue(msg.message))
+                .send(
+                    <span class="kw-2">&amp;</span>msg.target.peers(<span class="kw-2">&amp;</span><span class="self">self</span>.peers),
+                    EpochMessage::Continue(msg.message),
+                )
                 .<span class="kw">await</span>;
         }
 
@@ -852,11 +814,10 @@
         <span class="kw">match </span>msg {
             (<span class="kw">_</span>, EpochMessage::Rejoin(<span class="kw">_</span>, <span class="kw">_</span>)) =&gt; <span class="macro">vec!</span>[],
             (peer, EpochMessage::RejoinRequest) =&gt; {
-                <span class="kw">let </span>target = Target::Nodes(BTreeSet::from([peer]));
                 <span class="kw">let </span>last_signed = <span class="self">self</span>.last_signed_epoch(<span class="self">self</span>.hbbft.epoch());
 
                 <span class="kw">let </span>msg = EpochMessage::Rejoin(last_signed, <span class="self">self</span>.hbbft.next_epoch());
-                <span class="self">self</span>.connections.send(target, msg).<span class="kw">await</span>;
+                <span class="self">self</span>.connections.send(<span class="kw-2">&amp;</span>[peer], msg).<span class="kw">await</span>;
                 <span class="macro">vec!</span>[]
             }
             (peer, EpochMessage::Continue(peer_msg)) =&gt; {
@@ -871,7 +832,10 @@
 
                 <span class="kw">for </span>msg <span class="kw">in </span>step.messages {
                     <span class="self">self</span>.connections
-                        .send(msg.target, EpochMessage::Continue(msg.message))
+                        .send(
+                            <span class="kw-2">&amp;</span>msg.target.peers(<span class="kw-2">&amp;</span><span class="self">self</span>.peers),
+                            EpochMessage::Continue(msg.message),
+                        )
                         .<span class="kw">await</span>;
                 }
 
@@ -894,13 +858,13 @@
     }
 }
 
-<span class="kw">struct </span>OsRngGen;
+<span class="kw">pub struct </span>OsRngGen;
 <span class="kw">impl </span>RngGenerator <span class="kw">for </span>OsRngGen {
     <span class="kw">type </span>Rng = OsRng;
 
     <span class="kw">fn </span>get_rng(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span>::Rng {
-        OsRng::new().unwrap()
+        OsRng
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="fedimint_server" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (57f097ea2 2022-10-01)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="fedimint_server" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (8b0c05d9a 2022-10-07)" ></div></body></html>

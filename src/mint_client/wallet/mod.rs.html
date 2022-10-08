@@ -376,8 +376,7 @@
 <span id="376">376</span>
 <span id="377">377</span>
 <span id="378">378</span>
-</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::utils::ClientContext;
-<span class="kw">use </span>bitcoin::Address;
+</pre><pre class="rust"><code><span class="kw">use </span>bitcoin::Address;
 <span class="kw">use </span>bitcoin::KeyPair;
 <span class="kw">use </span>db::PegInKey;
 <span class="kw">use </span>fedimint_api::db::batch::BatchTx;
@@ -385,13 +384,13 @@
 <span class="kw">use </span>fedimint_core::modules::wallet::config::WalletClientConfig;
 <span class="kw">use </span>fedimint_core::modules::wallet::tweakable::Tweakable;
 <span class="kw">use </span>fedimint_core::modules::wallet::txoproof::{PegInProof, PegInProofError, TxOutProof};
-
-<span class="kw">use </span><span class="kw">crate</span>::ApiError;
 <span class="kw">use </span>fedimint_core::modules::wallet::PegOutOutcome;
-<span class="kw">use </span>miniscript::descriptor::DescriptorTrait;
 <span class="kw">use </span>rand::{CryptoRng, RngCore};
 <span class="kw">use </span>thiserror::Error;
 <span class="kw">use </span>tracing::debug;
+
+<span class="kw">use </span><span class="kw">crate</span>::utils::ClientContext;
+<span class="kw">use </span><span class="kw">crate</span>::ApiError;
 
 <span class="kw">mod </span>db;
 
@@ -418,7 +417,7 @@
         <span class="kw-2">mut </span>rng: R,
     ) -&gt; Address {
         <span class="kw">let </span>peg_in_keypair = bitcoin::KeyPair::new(<span class="kw-2">&amp;</span><span class="self">self</span>.context.secp, <span class="kw-2">&amp;mut </span>rng);
-        <span class="kw">let </span>peg_in_pub_key = secp256k1_zkp::XOnlyPublicKey::from_keypair(<span class="kw-2">&amp;</span>peg_in_keypair);
+        <span class="kw">let </span>peg_in_pub_key = secp256k1_zkp::XOnlyPublicKey::from_keypair(<span class="kw-2">&amp;</span>peg_in_keypair).<span class="number">0</span>;
 
         <span class="comment">// TODO: check at startup that no bare descriptor is used in config
         // TODO: check if there are other failure cases
@@ -470,7 +469,7 @@
             txout_proof,
             btc_transaction,
             output_idx <span class="kw">as </span>u32,
-            secret_tweak_key.public_key(),
+            secret_tweak_key.x_only_public_key().<span class="number">0</span>,
         )
         .map_err(WalletClientError::PegInProofError)<span class="question-mark">?</span>;
 
@@ -520,18 +519,18 @@
 
 <span class="attribute">#[cfg(test)]
 </span><span class="kw">mod </span>tests {
-    <span class="kw">use </span><span class="kw">crate</span>::api::IFederationApi;
-    <span class="kw">use </span><span class="kw">crate</span>::wallet::WalletClient;
-    <span class="kw">use </span><span class="kw">crate</span>::ClientContext;
-    <span class="kw">use </span>async_trait::async_trait;
-    <span class="kw">use </span>bitcoin::{Address, Txid};
+    <span class="kw">use </span>std::str::FromStr;
+    <span class="kw">use </span>std::sync::Arc;
+    <span class="kw">use </span>std::time::Duration;
 
+    <span class="kw">use </span>async_trait::async_trait;
+    <span class="kw">use </span>bitcoin::hashes::sha256;
+    <span class="kw">use </span>bitcoin::{Address, Txid};
+    <span class="kw">use </span>bitcoin_hashes::Hash;
     <span class="kw">use </span>fedimint_api::config::BitcoindRpcCfg;
     <span class="kw">use </span>fedimint_api::db::mem_impl::MemDatabase;
     <span class="kw">use </span>fedimint_api::module::testing::FakeFed;
     <span class="kw">use </span>fedimint_api::{OutPoint, TransactionId};
-
-    <span class="kw">use </span>bitcoin_hashes::Hash;
     <span class="kw">use </span>fedimint_core::epoch::EpochHistory;
     <span class="kw">use </span>fedimint_core::modules::ln::contracts::incoming::IncomingContractOffer;
     <span class="kw">use </span>fedimint_core::modules::ln::contracts::ContractId;
@@ -546,10 +545,11 @@
     };
     <span class="kw">use </span>fedimint_core::outcome::{OutputOutcome, TransactionStatus};
     <span class="kw">use </span>fedimint_core::transaction::Transaction;
-    <span class="kw">use </span>std::str::FromStr;
-    <span class="kw">use </span>std::sync::Arc;
-    <span class="kw">use </span>std::time::Duration;
     <span class="kw">use </span>threshold_crypto::PublicKey;
+
+    <span class="kw">use </span><span class="kw">crate</span>::api::IFederationApi;
+    <span class="kw">use </span><span class="kw">crate</span>::wallet::WalletClient;
+    <span class="kw">use </span><span class="kw">crate</span>::ClientContext;
 
     <span class="kw">type </span>Fed = FakeFed&lt;Wallet, WalletClientConfig&gt;;
     <span class="kw">type </span>SharedFed = Arc&lt;tokio::sync::Mutex&lt;Fed&gt;&gt;;
@@ -702,7 +702,7 @@
         <span class="kw">let </span>amount = bitcoin::Amount::from_sat(<span class="number">42000</span>);
 
         <span class="kw">let </span>out_point = OutPoint {
-            txid: Default::default(),
+            txid: sha256::Hash::hash(<span class="string">b&quot;txid&quot;</span>).into(),
             out_idx: <span class="number">0</span>,
         };
         <span class="kw">let </span>output = PegOut {
@@ -755,4 +755,4 @@
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="mint_client" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (57f097ea2 2022-10-01)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="mint_client" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (8b0c05d9a 2022-10-07)" ></div></body></html>

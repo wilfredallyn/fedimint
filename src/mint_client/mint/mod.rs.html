@@ -610,11 +610,10 @@
 <span id="610">610</span>
 <span id="611">611</span>
 <span id="612">612</span>
+<span id="613">613</span>
 </pre><pre class="rust"><code><span class="kw">pub mod </span>db;
 
-<span class="kw">use </span><span class="kw">crate</span>::api::ApiError;
-<span class="kw">use </span><span class="kw">crate</span>::transaction::TransactionBuilder;
-<span class="kw">use </span><span class="kw">crate</span>::utils::ClientContext;
+<span class="kw">use </span>std::time::Duration;
 
 <span class="kw">use </span>db::{CoinKey, CoinKeyPrefix, OutputFinalizationKey, OutputFinalizationKeyPrefix};
 <span class="kw">use </span>fedimint_api::db::batch::{Accumulator, BatchItem, BatchTx, DbBatch};
@@ -626,14 +625,16 @@
 <span class="kw">use </span>fedimint_core::modules::mint::{BlindNonce, Nonce, Note, SigResponse, SignRequest};
 <span class="kw">use </span>futures::stream::FuturesUnordered;
 <span class="kw">use </span>futures::StreamExt;
-
 <span class="kw">use </span>rand::{CryptoRng, RngCore};
 <span class="kw">use </span>secp256k1_zkp::{Secp256k1, Signing};
 <span class="kw">use </span>serde::{Deserialize, Serialize};
-<span class="kw">use </span>std::time::Duration;
 <span class="kw">use </span>tbs::{blind_message, unblind_signature, AggregatePublicKey, BlindedMessage, BlindingKey};
 <span class="kw">use </span>thiserror::Error;
 <span class="kw">use </span>tracing::{debug, trace, warn};
+
+<span class="kw">use </span><span class="kw">crate</span>::api::ApiError;
+<span class="kw">use </span><span class="kw">crate</span>::transaction::TransactionBuilder;
+<span class="kw">use </span><span class="kw">crate</span>::utils::ClientContext;
 
 <span class="doccomment">/// Federation module client for the Mint module. It can both create transaction inputs and outputs
 /// of the mint type.
@@ -903,7 +904,7 @@
         </span>C: Signing,
     {
         <span class="kw">let </span>spend_key = bitcoin::KeyPair::new(ctx, rng);
-        <span class="kw">let </span>nonce = Nonce(spend_key.public_key());
+        <span class="kw">let </span>nonce = Nonce(spend_key.x_only_public_key().<span class="number">0</span>);
         <span class="kw">let </span>(blinding_key, blinded_nonce) = blind_message(nonce.to_message());
 
         <span class="kw">let </span>cr = NoteIssuanceRequest {
@@ -969,10 +970,8 @@
 
 <span class="attribute">#[cfg(test)]
 </span><span class="kw">mod </span>tests {
-    <span class="kw">use </span><span class="kw">crate</span>::api::IFederationApi;
+    <span class="kw">use </span>std::sync::Arc;
 
-    <span class="kw">use </span><span class="kw">crate</span>::mint::MintClient;
-    <span class="kw">use crate</span>::{ClientContext, TransactionBuilder};
     <span class="kw">use </span>async_trait::async_trait;
     <span class="kw">use </span>bitcoin::hashes::Hash;
     <span class="kw">use </span>bitcoin::Address;
@@ -991,8 +990,11 @@
     <span class="kw">use </span>fedimint_core::outcome::{OutputOutcome, TransactionStatus};
     <span class="kw">use </span>fedimint_core::transaction::Transaction;
     <span class="kw">use </span>futures::executor::block_on;
-    <span class="kw">use </span>std::sync::Arc;
     <span class="kw">use </span>threshold_crypto::PublicKey;
+
+    <span class="kw">use </span><span class="kw">crate</span>::api::IFederationApi;
+    <span class="kw">use </span><span class="kw">crate</span>::mint::MintClient;
+    <span class="kw">use crate</span>::{ClientContext, TransactionBuilder};
 
     <span class="kw">type </span>Fed = FakeFed&lt;Mint, MintClientConfig&gt;;
 
@@ -1126,7 +1128,7 @@
 
     <span class="attribute">#[test_log::test(tokio::test)]
     </span><span class="kw">async fn </span>create_output() {
-        <span class="kw">let </span><span class="kw-2">mut </span>rng = rand::rngs::OsRng::new().unwrap();
+        <span class="kw">let </span><span class="kw-2">mut </span>rng = rand::rngs::OsRng;
         <span class="kw">let </span>(fed, client_config, client_context) = new_mint_and_client().<span class="kw">await</span>;
 
         <span class="kw">let </span>client = MintClient {
@@ -1142,7 +1144,7 @@
 
     <span class="attribute">#[test_log::test(tokio::test)]
     </span><span class="kw">async fn </span>create_input() {
-        <span class="kw">let </span><span class="kw-2">mut </span>rng = rand::rngs::OsRng::new().unwrap();
+        <span class="kw">let </span><span class="kw-2">mut </span>rng = rand::rngs::OsRng;
 
         <span class="kw">const </span>SPEND_AMOUNT: Amount = Amount::from_sat(<span class="number">21</span>);
 
@@ -1166,7 +1168,7 @@
         <span class="kw">let </span><span class="kw-2">mut </span>builder = TransactionBuilder::default();
         <span class="kw">let </span>secp = <span class="kw-2">&amp;</span>client.context.secp;
         <span class="kw">let </span>tbs_pks = <span class="kw-2">&amp;</span>client.config.tbs_pks;
-        <span class="kw">let </span>rng = rand::rngs::OsRng::new().unwrap();
+        <span class="kw">let </span>rng = rand::rngs::OsRng;
         <span class="kw">let </span>coins = client.select_coins(SPEND_AMOUNT).unwrap();
         <span class="kw">let </span>(spend_keys, input) = builder
             .create_input_from_coins(coins.clone(), secp)
@@ -1181,7 +1183,7 @@
             meta.keys,
             spend_keys
                 .into_iter()
-                .map(|key| secp256k1_zkp::XOnlyPublicKey::from_keypair(<span class="kw-2">&amp;</span>key))
+                .map(|key| secp256k1_zkp::XOnlyPublicKey::from_keypair(<span class="kw-2">&amp;</span>key).<span class="number">0</span>)
                 .collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;()
         );
 
@@ -1200,7 +1202,7 @@
         </span><span class="kw">let </span><span class="kw-2">mut </span>batch = DbBatch::new();
         <span class="kw">let </span><span class="kw-2">mut </span>builder = TransactionBuilder::default();
         <span class="kw">let </span>coins = client.select_coins(SPEND_AMOUNT).unwrap();
-        <span class="kw">let </span>rng = rand::rngs::OsRng::new().unwrap();
+        <span class="kw">let </span>rng = rand::rngs::OsRng;
         <span class="kw">let </span>(spend_keys, input) = builder
             .create_input_from_coins(coins.clone(), secp)
             .unwrap();
@@ -1214,7 +1216,7 @@
             meta.keys,
             spend_keys
                 .into_iter()
-                .map(|key| secp256k1_zkp::XOnlyPublicKey::from_keypair(<span class="kw-2">&amp;</span>key))
+                .map(|key| secp256k1_zkp::XOnlyPublicKey::from_keypair(<span class="kw-2">&amp;</span>key).<span class="number">0</span>)
                 .collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;()
         );
 
@@ -1223,4 +1225,4 @@
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="mint_client" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (57f097ea2 2022-10-01)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="mint_client" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (8b0c05d9a 2022-10-07)" ></div></body></html>

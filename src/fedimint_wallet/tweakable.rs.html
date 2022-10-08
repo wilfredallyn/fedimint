@@ -49,11 +49,10 @@
 <span id="49">49</span>
 <span id="50">50</span>
 <span id="51">51</span>
-<span id="52">52</span>
-<span id="53">53</span>
-</pre><pre class="rust"><code><span class="kw">use </span>bitcoin::hashes::{sha256, Hash <span class="kw">as </span>BitcoinHash, Hmac, HmacEngine};
-<span class="kw">use </span>secp256k1::{Secp256k1, Verification};
-<span class="kw">use </span>std::io::Write;
+</pre><pre class="rust"><code><span class="kw">use </span>std::io::Write;
+
+<span class="kw">use </span>bitcoin::hashes::{sha256, Hash <span class="kw">as </span>BitcoinHash, Hmac, HmacEngine};
+<span class="kw">use </span>secp256k1::{Scalar, Secp256k1, Verification};
 
 <span class="doccomment">/// An object that can be used as a ricardian contract to tweak a key
 </span><span class="kw">pub trait </span>Contract {
@@ -73,11 +72,8 @@
         tweak.encode(<span class="kw-2">&amp;mut </span>hasher).expect(<span class="string">&quot;hashing is infallible&quot;</span>);
         <span class="kw">let </span>tweak = Hmac::from_engine(hasher).into_inner();
 
-        <span class="kw">let </span><span class="kw-2">mut </span>key = <span class="kw-2">*</span><span class="self">self</span>;
-        key.add_exp_assign(secp, <span class="kw-2">&amp;</span>tweak[..])
-            .expect(<span class="string">&quot;tweak is always 32 bytes, other failure modes are negligible&quot;</span>);
-
-        key
+        <span class="self">self</span>.add_exp_tweak(secp, <span class="kw-2">&amp;</span>Scalar::from_be_bytes(tweak).expect(<span class="string">&quot;can&#39;t fail&quot;</span>))
+            .expect(<span class="string">&quot;tweak is always 32 bytes, other failure modes are negligible&quot;</span>)
     }
 }
 
@@ -105,4 +101,4 @@
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="fedimint_wallet" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (57f097ea2 2022-10-01)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="fedimint_wallet" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (8b0c05d9a 2022-10-07)" ></div></body></html>

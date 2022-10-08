@@ -222,22 +222,22 @@
 <span id="222">222</span>
 <span id="223">223</span>
 <span id="224">224</span>
-</pre><pre class="rust"><code><span class="kw">use </span>async_trait::async_trait;
-
-<span class="kw">use </span><span class="kw">crate</span>::config::GenerateConfig;
-<span class="kw">use </span><span class="kw">crate</span>::db::batch::DbBatch;
-<span class="kw">use </span><span class="kw">crate</span>::db::mem_impl::MemDatabase;
-<span class="kw">use </span><span class="kw">crate</span>::db::Database;
-
-<span class="kw">use </span><span class="kw">crate</span>::module::interconnect::ModuleInterconect;
-<span class="kw">use crate</span>::{Amount, FederationModule, InputMeta, OutPoint, PeerId};
-<span class="kw">use </span>std::collections::HashSet;
+<span id="225">225</span>
+</pre><pre class="rust"><code><span class="kw">use </span>std::collections::HashSet;
 <span class="kw">use </span>std::fmt::Debug;
 <span class="kw">use </span>std::future::Future;
 <span class="kw">use </span>std::sync::atomic::{AtomicU64, Ordering};
 <span class="kw">use </span>std::sync::Arc;
 
+<span class="kw">use </span>async_trait::async_trait;
+
 <span class="kw">use </span><span class="kw">super</span>::ApiError;
+<span class="kw">use </span><span class="kw">crate</span>::config::GenerateConfig;
+<span class="kw">use </span><span class="kw">crate</span>::db::batch::DbBatch;
+<span class="kw">use </span><span class="kw">crate</span>::db::mem_impl::MemDatabase;
+<span class="kw">use </span><span class="kw">crate</span>::db::Database;
+<span class="kw">use </span><span class="kw">crate</span>::module::interconnect::ModuleInterconect;
+<span class="kw">use crate</span>::{Amount, FederationModule, InputMeta, OutPoint, PeerId};
 
 <span class="kw">pub struct </span>FakeFed&lt;M, CC&gt; {
     members: Vec&lt;(PeerId, M, Database)&gt;,
@@ -271,8 +271,7 @@
         <span class="kw">let </span>peers = (<span class="number">0</span>..members)
             .map(|idx| PeerId::from(idx <span class="kw">as </span>u16))
             .collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;();
-        <span class="kw">let </span>(server_cfg, client_cfg) =
-            C::trusted_dealer_gen(<span class="kw-2">&amp;</span>peers, params, rand::rngs::OsRng::new().unwrap());
+        <span class="kw">let </span>(server_cfg, client_cfg) = C::trusted_dealer_gen(<span class="kw-2">&amp;</span>peers, params, rand::rngs::OsRng);
 
         <span class="kw">let </span><span class="kw-2">mut </span>members = <span class="macro">vec!</span>[];
         <span class="kw">for </span>(peer, cfg) <span class="kw">in </span>server_cfg {
@@ -322,7 +321,7 @@
     ) <span class="kw">where
         </span>&lt;M <span class="kw">as </span>FederationModule&gt;::TxInput: Send + Sync,
     {
-        <span class="kw">let </span><span class="kw-2">mut </span>rng = rand::rngs::OsRng::new().unwrap();
+        <span class="kw">let </span><span class="kw-2">mut </span>rng = rand::rngs::OsRng;
         <span class="kw">let </span>fake_ic = FakeInterconnect::new_block_height_responder(<span class="self">self</span>.block_height.clone());
 
         <span class="comment">// TODO: only include some of the proposals for realism
@@ -340,9 +339,11 @@
         <span class="kw">let </span>peers: HashSet&lt;PeerId&gt; = <span class="self">self</span>.members.iter().map(|p| p.<span class="number">0</span>).collect();
         <span class="kw">for </span>(_peer, member, db) <span class="kw">in </span><span class="kw-2">&amp;mut </span><span class="self">self</span>.members {
             <span class="kw">let </span><span class="kw-2">mut </span>batch = DbBatch::new();
+            <span class="kw">let </span>database = db <span class="kw">as </span><span class="kw-2">&amp;mut </span>Database;
+            <span class="kw">let </span><span class="kw-2">mut </span>dbtx = database.begin_transaction();
 
             member
-                .begin_consensus_epoch(batch.transaction(), consensus.clone(), <span class="kw-2">&amp;mut </span>rng)
+                .begin_consensus_epoch(<span class="kw-2">&amp;mut </span>dbtx, consensus.clone(), <span class="kw-2">&amp;mut </span>rng)
                 .<span class="kw">await</span>;
 
             <span class="kw">let </span>cache = member.build_verification_cache(inputs.iter());
@@ -358,14 +359,15 @@
                     .expect(<span class="string">&quot;Faulty output&quot;</span>);
             }
 
-            db.apply_batch(batch).expect(<span class="string">&quot;DB error&quot;</span>);
+            dbtx.commit_tx().expect(<span class="string">&quot;DB Error&quot;</span>);
+            database.apply_batch(batch).expect(<span class="string">&quot;DB error&quot;</span>);
 
             <span class="kw">let </span><span class="kw-2">mut </span>batch = DbBatch::new();
             member
                 .end_consensus_epoch(<span class="kw-2">&amp;</span>peers, batch.transaction(), <span class="kw-2">&amp;mut </span>rng)
                 .<span class="kw">await</span>;
 
-            db.apply_batch(batch).expect(<span class="string">&quot;DB error&quot;</span>);
+            database.apply_batch(batch).expect(<span class="string">&quot;DB error&quot;</span>);
         }
     }
 
@@ -447,4 +449,4 @@
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="fedimint_api" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (57f097ea2 2022-10-01)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="fedimint_api" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (8b0c05d9a 2022-10-07)" ></div></body></html>

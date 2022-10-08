@@ -921,15 +921,14 @@
 <span id="921">921</span>
 <span id="922">922</span>
 <span id="923">923</span>
-</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::config::MintConfig;
-<span class="kw">use </span><span class="kw">crate</span>::db::{
-    MintAuditItemKey, MintAuditItemKeyPrefix, NonceKey, OutputOutcomeKey,
-    ProposedPartialSignatureKey, ProposedPartialSignaturesKeyPrefix, ReceivedPartialSignatureKey,
-    ReceivedPartialSignatureKeyOutputPrefix, ReceivedPartialSignaturesKeyPrefix,
-};
+</pre><pre class="rust"><code><span class="kw">use </span>std::collections::{BTreeMap, HashMap, HashSet};
+<span class="kw">use </span>std::hash::Hash;
+<span class="kw">use </span>std::iter::FromIterator;
+<span class="kw">use </span>std::ops::Sub;
+
 <span class="kw">use </span>async_trait::async_trait;
 <span class="kw">use </span>fedimint_api::db::batch::{BatchItem, BatchTx, DbBatch};
-<span class="kw">use </span>fedimint_api::db::Database;
+<span class="kw">use </span>fedimint_api::db::{Database, DatabaseTransaction};
 <span class="kw">use </span>fedimint_api::encoding::{Decodable, Encodable};
 <span class="kw">use </span>fedimint_api::module::audit::Audit;
 <span class="kw">use </span>fedimint_api::module::interconnect::ModuleInterconect;
@@ -942,17 +941,19 @@
 <span class="kw">use </span>rand::{CryptoRng, RngCore};
 <span class="kw">use </span>rayon::iter::{IntoParallelIterator, ParallelBridge, ParallelIterator};
 <span class="kw">use </span>serde::{Deserialize, Serialize};
-<span class="kw">use </span>std::collections::{BTreeMap, HashMap, HashSet};
-
-<span class="kw">use </span>std::hash::Hash;
-<span class="kw">use </span>std::iter::FromIterator;
-<span class="kw">use </span>std::ops::Sub;
 <span class="kw">use </span>tbs::{
     combine_valid_shares, sign_blinded_msg, verify_blind_share, Aggregatable, AggregatePublicKey,
     PublicKeyShare, SecretKeyShare,
 };
 <span class="kw">use </span>thiserror::Error;
 <span class="kw">use </span>tracing::{debug, error, warn};
+
+<span class="kw">use </span><span class="kw">crate</span>::config::MintConfig;
+<span class="kw">use </span><span class="kw">crate</span>::db::{
+    MintAuditItemKey, MintAuditItemKeyPrefix, NonceKey, OutputOutcomeKey,
+    ProposedPartialSignatureKey, ProposedPartialSignaturesKeyPrefix, ReceivedPartialSignatureKey,
+    ReceivedPartialSignatureKeyOutputPrefix, ReceivedPartialSignaturesKeyPrefix,
+};
 
 <span class="kw">pub mod </span>config;
 
@@ -1058,19 +1059,18 @@
 
     <span class="kw">async fn </span>begin_consensus_epoch&lt;<span class="lifetime">&#39;a</span>&gt;(
         <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>,
-        <span class="kw-2">mut </span>batch: BatchTx&lt;<span class="lifetime">&#39;a</span>&gt;,
+        dbtx: <span class="kw-2">&amp;mut </span>DatabaseTransaction&lt;<span class="lifetime">&#39;a</span>&gt;,
         consensus_items: Vec&lt;(PeerId, <span class="self">Self</span>::ConsensusItem)&gt;,
         _rng: <span class="kw">impl </span>RngCore + CryptoRng + <span class="lifetime">&#39;a</span>,
     ) {
         <span class="kw">for </span>(peer, partial_sig) <span class="kw">in </span>consensus_items {
             <span class="self">self</span>.process_partial_signature(
-                batch.subtransaction(),
+                dbtx,
                 peer,
                 partial_sig.out_point,
                 partial_sig.partial_signature,
             )
         }
-        batch.commit();
     }
 
     <span class="kw">fn </span>build_verification_cache&lt;<span class="lifetime">&#39;a</span>&gt;(
@@ -1530,9 +1530,9 @@
         (<span class="prelude-val">Ok</span>(SigResponse(bsigs)), MintShareErrors(peer_errors))
     }
 
-    <span class="kw">fn </span>process_partial_signature(
+    <span class="kw">fn </span>process_partial_signature&lt;<span class="lifetime">&#39;a</span>&gt;(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="kw-2">mut </span>batch: BatchTx,
+        dbtx: <span class="kw-2">&amp;mut </span>DatabaseTransaction&lt;<span class="lifetime">&#39;a</span>&gt;,
         peer: PeerId,
         output_id: OutPoint,
         partial_sig: PartialSigResponse,
@@ -1555,15 +1555,14 @@
             issuance = %output_id,
             <span class="string">&quot;Received sig share&quot;
         </span>);
-        batch.append_insert_new(
-            ReceivedPartialSignatureKey {
+        dbtx.insert_new_entry(
+            <span class="kw-2">&amp;</span>ReceivedPartialSignatureKey {
                 request_id: output_id,
                 peer_id: peer,
             },
-            partial_sig,
-        );
-
-        batch.commit();
+            <span class="kw-2">&amp;</span>partial_sig,
+        )
+        .expect(<span class="string">&quot;DB Error&quot;</span>);
     }
 }
 
@@ -1654,13 +1653,14 @@
 
 <span class="attribute">#[cfg(test)]
 </span><span class="kw">mod </span>test {
-    <span class="kw">use </span><span class="kw">crate</span>::config::{FeeConsensus, MintClientConfig};
-    <span class="kw">use crate</span>::{BlindNonce, CombineError, Mint, MintConfig, PeerErrorType};
     <span class="kw">use </span>fedimint_api::config::GenerateConfig;
     <span class="kw">use </span>fedimint_api::db::mem_impl::MemDatabase;
     <span class="kw">use </span>fedimint_api::{Amount, PeerId, TieredMulti};
     <span class="kw">use </span>rand::rngs::OsRng;
     <span class="kw">use </span>tbs::{blind_message, unblind_signature, verify, AggregatePublicKey, Message};
+
+    <span class="kw">use </span><span class="kw">crate</span>::config::{FeeConsensus, MintClientConfig};
+    <span class="kw">use crate</span>::{BlindNonce, CombineError, Mint, MintConfig, PeerErrorType};
 
     <span class="kw">const </span>THRESHOLD: usize = <span class="number">1</span>;
     <span class="kw">const </span>MINTS: usize = <span class="number">5</span>;
@@ -1668,7 +1668,7 @@
     <span class="kw">fn </span>build_configs() -&gt; (Vec&lt;MintConfig&gt;, MintClientConfig) {
         <span class="kw">let </span>peers = (<span class="number">0</span>..MINTS <span class="kw">as </span>u16).map(PeerId::from).collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;();
         <span class="kw">let </span>(mint_cfg, client_cfg) =
-            MintConfig::trusted_dealer_gen(<span class="kw-2">&amp;</span>peers, <span class="kw-2">&amp;</span>[Amount::from_sat(<span class="number">1</span>)], OsRng::new().unwrap());
+            MintConfig::trusted_dealer_gen(<span class="kw-2">&amp;</span>peers, <span class="kw-2">&amp;</span>[Amount::from_sat(<span class="number">1</span>)], OsRng);
 
         (mint_cfg.into_iter().map(|(<span class="kw">_</span>, c)| c).collect(), client_cfg)
     }
@@ -1845,4 +1845,4 @@
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="fedimint_mint" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (57f097ea2 2022-10-01)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="fedimint_mint" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (8b0c05d9a 2022-10-07)" ></div></body></html>

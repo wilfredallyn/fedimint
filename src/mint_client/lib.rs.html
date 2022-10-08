@@ -1151,6 +1151,9 @@
 <span id="1151">1151</span>
 <span id="1152">1152</span>
 <span id="1153">1153</span>
+<span id="1154">1154</span>
+<span id="1155">1155</span>
+<span id="1156">1156</span>
 </pre><pre class="rust"><code><span class="kw">pub mod </span>api;
 <span class="kw">pub mod </span>ln;
 <span class="kw">pub mod </span>mint;
@@ -1164,18 +1167,13 @@
 </span><span class="kw">use </span>std::time::SystemTime;
 
 <span class="kw">use </span>api::FederationApi;
-<span class="kw">use </span>fedimint_api::db::Database;
-<span class="kw">use </span>fedimint_api::tiered::InvalidAmountTierError;
-<span class="kw">use </span>fedimint_api::TieredMulti;
-<span class="kw">use </span>futures::StreamExt;
-
 <span class="kw">use </span>bitcoin::util::key::KeyPair;
 <span class="kw">use </span>bitcoin::{secp256k1, Address, Transaction <span class="kw">as </span>BitcoinTransaction};
-
 <span class="kw">use </span>bitcoin_hashes::{sha256, Hash};
-<span class="kw">use </span>futures::stream::FuturesUnordered;
-
+<span class="kw">use </span>fedimint_api::db::Database;
 <span class="kw">use </span>fedimint_api::task::sleep;
+<span class="kw">use </span>fedimint_api::tiered::InvalidAmountTierError;
+<span class="kw">use </span>fedimint_api::TieredMulti;
 <span class="kw">use </span>fedimint_api::{
     db::batch::{Accumulator, BatchItem, DbBatch},
     Amount, FederationModule, OutPoint, PeerId, TransactionId,
@@ -1200,10 +1198,12 @@
     },
     transaction::{Input, Output},
 };
+<span class="kw">use </span>futures::stream::FuturesUnordered;
+<span class="kw">use </span>futures::StreamExt;
 <span class="kw">use </span>lightning::ln::PaymentSecret;
 <span class="kw">use </span>lightning::routing::gossip::RoutingFees;
 <span class="kw">use </span>lightning::routing::router::{RouteHint, RouteHintHop};
-<span class="kw">use </span>lightning_invoice::{CreationError, Invoice, InvoiceBuilder};
+<span class="kw">use </span>lightning_invoice::{CreationError, Invoice, InvoiceBuilder, DEFAULT_EXPIRY_TIME};
 <span class="kw">use </span>ln::db::LightningGatewayKey;
 <span class="kw">use </span>mint::NoteIssuanceRequests;
 <span class="kw">use </span>rand::{CryptoRng, RngCore};
@@ -1263,7 +1263,7 @@
 <span class="kw">impl </span>From&lt;GatewayClientConfig&gt; <span class="kw">for </span>LightningGateway {
     <span class="kw">fn </span>from(config: GatewayClientConfig) -&gt; <span class="self">Self </span>{
         LightningGateway {
-            mint_pub_key: config.redeem_key.public_key(),
+            mint_pub_key: config.redeem_key.x_only_public_key().<span class="number">0</span>,
             node_pub_key: config.node_pub_key,
             api: config.api,
         }
@@ -1776,10 +1776,11 @@
         amount: Amount,
         description: String,
         <span class="kw-2">mut </span>rng: R,
+        expiry_time: <span class="prelude-ty">Option</span>&lt;u64&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;ConfirmedInvoice&gt; {
         <span class="kw">let </span>gateway = <span class="self">self</span>.fetch_active_gateway().<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="kw">let </span>payment_keypair = KeyPair::new(<span class="kw-2">&amp;</span><span class="self">self</span>.context.secp, <span class="kw-2">&amp;mut </span>rng);
-        <span class="kw">let </span>raw_payment_secret: [u8; <span class="number">32</span>] = payment_keypair.public_key().serialize();
+        <span class="kw">let </span>raw_payment_secret: [u8; <span class="number">32</span>] = payment_keypair.x_only_public_key().<span class="number">0</span>.serialize();
         <span class="kw">let </span>payment_hash = bitcoin::secp256k1::hashes::sha256::Hash::hash(<span class="kw-2">&amp;</span>raw_payment_secret);
         <span class="kw">let </span>payment_secret = PaymentSecret(raw_payment_secret);
 
@@ -1817,6 +1818,9 @@
             .min_final_cltv_expiry(<span class="number">18</span>)
             .payee_pub_key(node_public_key)
             .private_route(gateway_route_hint)
+            .expiry_time(Duration::from_secs(
+                expiry_time.unwrap_or(DEFAULT_EXPIRY_TIME),
+            ))
             .build_signed(|hash| {
                 <span class="self">self</span>.context
                     .secp
@@ -1827,6 +1831,7 @@
             amount,
             payment_hash,
             Preimage(raw_payment_secret),
+            expiry_time,
         );
         <span class="kw">let </span>ln_output = Output::LN(offer_output);
 
@@ -1898,23 +1903,24 @@
             </span>.map_err(|<span class="kw">_</span>| ClientError::OutgoingPaymentTimeout)<span class="question-mark">?
             </span>.map_err(ClientError::HttpError);
 
-        <span class="kw">if let </span><span class="prelude-val">Ok</span>(response) = result {
-            <span class="kw">if </span>response.status().is_success() {
-                <span class="kw">return </span><span class="prelude-val">Ok</span>(());
+        <span class="kw">match </span>result {
+            <span class="prelude-val">Ok</span>(response) =&gt; {
+                <span class="kw">if </span>response.status().is_success() {
+                    <span class="kw">return </span><span class="prelude-val">Ok</span>(());
+                }
+
+                fedimint_api::task::timeout(
+                    Duration::from_secs(<span class="number">10</span>),
+                    <span class="self">self</span>.ln_client().await_outgoing_refundable(contract_id),
+                )
+                .<span class="kw">await
+                </span>.map_err(|<span class="kw">_</span>| ClientError::FailedPaymentNoRefund)<span class="question-mark">??</span>;
+
+                <span class="self">self</span>.try_refund_outgoing_contract(contract_id, rng).<span class="kw">await</span><span class="question-mark">?</span>;
+                <span class="prelude-val">Err</span>(ClientError::RefundedFailedPayment)
             }
-
-            fedimint_api::task::timeout(
-                Duration::from_secs(<span class="number">10</span>),
-                <span class="self">self</span>.ln_client().await_outgoing_refundable(contract_id),
-            )
-            .<span class="kw">await
-            </span>.map_err(|<span class="kw">_</span>| ClientError::FailedPaymentNoRefund)<span class="question-mark">??</span>;
-
-            <span class="self">self</span>.try_refund_outgoing_contract(contract_id, rng).<span class="kw">await</span><span class="question-mark">?</span>;
-            <span class="kw">return </span><span class="prelude-val">Err</span>(ClientError::RefundedFailedPayment);
-        };
-
-        <span class="prelude-val">Ok</span>(())
+            <span class="prelude-val">Err</span>(e) =&gt; <span class="prelude-val">Err</span>(e),
+        }
     }
 }
 
@@ -1936,7 +1942,7 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         account: <span class="kw-2">&amp;</span>OutgoingContractAccount,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;PaymentParameters&gt; {
-        <span class="kw">let </span>our_pub_key = secp256k1_zkp::XOnlyPublicKey::from_keypair(<span class="kw-2">&amp;</span><span class="self">self</span>.config.redeem_key);
+        <span class="kw">let </span>our_pub_key = secp256k1_zkp::XOnlyPublicKey::from_keypair(<span class="kw-2">&amp;</span><span class="self">self</span>.config.redeem_key).<span class="number">0</span>;
 
         <span class="kw">if </span>account.contract.gateway_key != our_pub_key {
             <span class="kw">return </span><span class="prelude-val">Err</span>(ClientError::NotOurKey);
@@ -2099,7 +2105,7 @@
         builder.input_coins(coins, <span class="kw-2">&amp;</span><span class="self">self</span>.context.secp)<span class="question-mark">?</span>;
 
         <span class="comment">// Outputs
-        </span><span class="kw">let </span>our_pub_key = secp256k1_zkp::XOnlyPublicKey::from_keypair(<span class="kw-2">&amp;</span><span class="self">self</span>.config.redeem_key);
+        </span><span class="kw">let </span>our_pub_key = secp256k1_zkp::XOnlyPublicKey::from_keypair(<span class="kw-2">&amp;</span><span class="self">self</span>.config.redeem_key).<span class="number">0</span>;
         <span class="kw">let </span>contract = Contract::Incoming(IncomingContract {
             hash: offer.hash,
             encrypted_preimage: offer.encrypted_preimage.clone(),
@@ -2226,7 +2232,7 @@
 
         <span class="prelude-val">Ok</span>(KeyPair::from_secret_key(
             secp256k1_zkp::SECP256K1,
-            secret_key,
+            <span class="kw-2">&amp;</span>secret_key,
         ))
     }
 }
@@ -2305,4 +2311,4 @@
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="mint_client" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (57f097ea2 2022-10-01)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="mint_client" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (8b0c05d9a 2022-10-07)" ></div></body></html>

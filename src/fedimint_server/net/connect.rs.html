@@ -578,22 +578,36 @@
 <span id="578">578</span>
 <span id="579">579</span>
 <span id="580">580</span>
+<span id="581">581</span>
+<span id="582">582</span>
+<span id="583">583</span>
+<span id="584">584</span>
+<span id="585">585</span>
+<span id="586">586</span>
+<span id="587">587</span>
+<span id="588">588</span>
+<span id="589">589</span>
+<span id="590">590</span>
+<span id="591">591</span>
+<span id="592">592</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Provides an abstract network connection interface and multiple implementations
 
-</span><span class="kw">use </span><span class="kw">crate</span>::net::framed::{AnyFramedTransport, BidiFramed, FramedTransport};
-<span class="kw">use </span>async_trait::async_trait;
-<span class="kw">use </span>fedimint_api::PeerId;
-<span class="kw">use </span>futures::Stream;
-<span class="kw">use </span>std::collections::HashMap;
+</span><span class="kw">use </span>std::collections::HashMap;
 <span class="kw">use </span>std::convert::TryFrom;
 <span class="kw">use </span>std::fmt::Debug;
 <span class="kw">use </span>std::pin::Pin;
 <span class="kw">use </span>std::sync::Arc;
+
+<span class="kw">use </span>async_trait::async_trait;
+<span class="kw">use </span>fedimint_api::PeerId;
+<span class="kw">use </span>futures::Stream;
 <span class="kw">use </span>tokio::io::{ReadHalf, WriteHalf};
 <span class="kw">use </span>tokio::net::{TcpListener, TcpStream};
 <span class="kw">use </span>tokio_rustls::rustls::server::AllowAnyAuthenticatedClient;
 <span class="kw">use </span>tokio_rustls::rustls::RootCertStore;
 <span class="kw">use </span>tokio_rustls::{rustls, TlsAcceptor, TlsConnector, TlsStream};
+
+<span class="kw">use </span><span class="kw">crate</span>::net::framed::{AnyFramedTransport, BidiFramed, FramedTransport};
 
 <span class="doccomment">/// Shared [`Connector`] trait object
 </span><span class="kw">pub type </span>SharedAnyConnector&lt;M&gt; = Arc&lt;<span class="kw">dyn </span>Connector&lt;M&gt; + Send + Sync + Unpin + <span class="lifetime">&#39;static</span>&gt;;
@@ -637,6 +651,7 @@
     peer_certs: Arc&lt;PeerCertStore&gt;,
     <span class="doccomment">/// Copy of the certs from `peer_certs`, but in a format that `tokio_rustls` understands
     </span>cert_store: RootCertStore,
+    peer_names: HashMap&lt;PeerId, String&gt;,
 }
 
 <span class="attribute">#[derive(Debug, Clone)]
@@ -644,6 +659,7 @@
     <span class="kw">pub </span>our_certificate: rustls::Certificate,
     <span class="kw">pub </span>our_private_key: rustls::PrivateKey,
     <span class="kw">pub </span>peer_certs: HashMap&lt;PeerId, rustls::Certificate&gt;,
+    <span class="kw">pub </span>peer_names: HashMap&lt;PeerId, String&gt;,
 }
 
 <span class="attribute">#[derive(Debug, Clone)]
@@ -665,6 +681,7 @@
             our_private_key: cfg.our_private_key,
             peer_certs: Arc::new(PeerCertStore::new(cfg.peer_certs)),
             cert_store,
+            peer_names: cfg.peer_names,
         }
     }
 }
@@ -740,9 +757,8 @@
             )
             .expect(<span class="string">&quot;Failed to create TLS config&quot;</span>);
 
-        <span class="kw">let </span>fake_domain =
-            rustls::ServerName::try_from(<span class="macro">format!</span>(<span class="string">&quot;peer-{}&quot;</span>, peer.to_usize()).as_str())
-                .expect(<span class="string">&quot;Always a valid DNS name&quot;</span>);
+        <span class="kw">let </span>fake_domain = rustls::ServerName::try_from(<span class="self">self</span>.peer_names[<span class="kw-2">&amp;</span>peer].as_str())
+            .expect(<span class="string">&quot;Always a valid DNS name&quot;</span>);
 
         <span class="kw">let </span>connector = TlsConnector::from(Arc::new(cfg));
         <span class="kw">let </span>tls_conn = connector
@@ -796,22 +812,24 @@
 <span class="doccomment">/// Fake network stack used in tests
 </span><span class="attribute">#[allow(unused_imports)]
 </span><span class="kw">pub mod </span>mock {
-    <span class="kw">use </span><span class="kw">crate</span>::net::connect::{ConnectResult, Connector};
-    <span class="kw">use </span><span class="kw">crate</span>::net::framed::{BidiFramed, FramedTransport};
-    <span class="kw">use </span>anyhow::Error;
-    <span class="kw">use </span>fedimint_api::PeerId;
-    <span class="kw">use </span>futures::{FutureExt, SinkExt, Stream, StreamExt};
     <span class="kw">use </span>std::collections::HashMap;
     <span class="kw">use </span>std::fmt::Debug;
     <span class="kw">use </span>std::future::Future;
     <span class="kw">use </span>std::pin::Pin;
     <span class="kw">use </span>std::sync::Arc;
     <span class="kw">use </span>std::time::Duration;
+
+    <span class="kw">use </span>anyhow::Error;
+    <span class="kw">use </span>fedimint_api::PeerId;
+    <span class="kw">use </span>futures::{FutureExt, SinkExt, Stream, StreamExt};
     <span class="kw">use </span>tokio::io::{
         AsyncRead, AsyncReadExt, AsyncWrite, AsyncWriteExt, DuplexStream, ReadHalf, WriteHalf,
     };
     <span class="kw">use </span>tokio::sync::mpsc::Sender;
     <span class="kw">use </span>tokio::sync::Mutex;
+
+    <span class="kw">use </span><span class="kw">crate</span>::net::connect::{ConnectResult, Connector};
+    <span class="kw">use </span><span class="kw">crate</span>::net::framed::{BidiFramed, FramedTransport};
 
     <span class="kw">pub struct </span>MockNetwork {
         clients: Arc&lt;Mutex&lt;HashMap&lt;String, Sender&lt;DuplexStream&gt;&gt;&gt;&gt;,
@@ -979,12 +997,13 @@
 
 <span class="attribute">#[cfg(test)]
 </span><span class="kw">mod </span>tests {
+    <span class="kw">use </span>fedimint_api::PeerId;
+    <span class="kw">use </span>futures::{SinkExt, StreamExt};
+
     <span class="kw">use </span><span class="kw">crate</span>::config::gen_cert_and_key;
     <span class="kw">use </span><span class="kw">crate</span>::net::connect::{ConnectionListener, TlsConfig};
     <span class="kw">use </span><span class="kw">crate</span>::net::framed::AnyFramedTransport;
     <span class="kw">use crate</span>::{Connector, TlsTcpConnector};
-    <span class="kw">use </span>fedimint_api::PeerId;
-    <span class="kw">use </span>futures::{SinkExt, StreamExt};
 
     <span class="kw">fn </span>gen_connector_config(count: usize) -&gt; Vec&lt;TlsConfig&gt; {
         <span class="kw">let </span>peer_keys = (<span class="number">0</span>..count)
@@ -1003,6 +1022,11 @@
                     .iter()
                     .enumerate()
                     .map(|(peer, (cert, <span class="kw">_</span>))| (PeerId::from(peer <span class="kw">as </span>u16), cert.clone()))
+                    .collect(),
+                peer_names: peer_keys
+                    .iter()
+                    .enumerate()
+                    .map(|(peer, (<span class="kw">_</span>, <span class="kw">_</span>))| (PeerId::from(peer <span class="kw">as </span>u16), <span class="macro">format!</span>(<span class="string">&quot;peer-{}&quot;</span>, peer)))
                     .collect(),
             })
             .collect()
@@ -1159,4 +1183,4 @@
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="fedimint_server" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (57f097ea2 2022-10-01)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="fedimint_server" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (8b0c05d9a 2022-10-07)" ></div></body></html>
