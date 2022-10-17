@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `core/api/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../fedimint_core_api/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../fedimint_core_api/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../fedimint_core_api/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `core/api/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><a class="sidebar-logo" href="../../fedimint_core_api/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../fedimint_core_api/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -325,7 +325,6 @@
 <span id="325">325</span>
 <span id="326">326</span>
 <span id="327">327</span>
-<span id="328">328</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Fedimint Core API (common) module interface
 //!
 //! Fedimint supports externally implemented modules.
@@ -342,7 +341,6 @@
     Amount,
 };
 
-<span class="kw">use </span><span class="kw">crate</span>::encode::ModuleDecodable;
 <span class="kw">pub mod </span>encode;
 
 <span class="kw">pub mod </span>client;
@@ -373,7 +371,7 @@
             }
         }
 
-        <span class="kw">impl </span>ModuleDecodable&lt;<span class="macro-nonterminal">$crate::server::ServerModule</span>&gt; <span class="kw">for </span><span class="macro-nonterminal">$name </span>{
+        <span class="kw">impl </span>Decodable&lt;<span class="macro-nonterminal">$crate::server::ServerModule</span>&gt; <span class="kw">for </span><span class="macro-nonterminal">$name </span>{
             <span class="kw">fn </span>consensus_decode&lt;R: std::io::Read&gt;(
                 r: <span class="kw-2">&amp;mut </span>R,
                 modules: <span class="kw-2">&amp;</span>BTreeMap&lt;ModuleKey, <span class="macro-nonterminal">$crate::server::ServerModule</span>&gt;,
@@ -384,7 +382,7 @@
             }
         }
 
-        <span class="kw">impl </span>ModuleDecodable&lt;<span class="macro-nonterminal">$crate::client::ClientModule</span>&gt; <span class="kw">for </span><span class="macro-nonterminal">$name </span>{
+        <span class="kw">impl </span>Decodable&lt;<span class="macro-nonterminal">$crate::client::ClientModule</span>&gt; <span class="kw">for </span><span class="macro-nonterminal">$name </span>{
             <span class="kw">fn </span>consensus_decode&lt;R: std::io::Read&gt;(
                 r: <span class="kw-2">&amp;mut </span>R,
                 modules: <span class="kw-2">&amp;</span>BTreeMap&lt;ModuleKey, <span class="macro-nonterminal">$crate::client::ClientModule</span>&gt;,
@@ -413,7 +411,7 @@
         <span class="macro-nonterminal">$newtype_ty</span>:ident, <span class="macro-nonterminal">$plugin_ty</span>:ident, <span class="macro-nonterminal">$module_ty</span>:ident, { $(<span class="macro-nonterminal">$extra_methods</span>:tt)*  } { $(<span class="macro-nonterminal">$extra_impls</span>:tt)* }
     ) =&gt; {
         <span class="kw">pub trait </span><span class="macro-nonterminal">$plugin_ty</span>:
-            DynEncodable + Decodable + Encodable + Clone + Send + Sync + <span class="lifetime">&#39;static
+            DynEncodable + Decodable&lt;()&gt; + Encodable + Clone + Send + Sync + <span class="lifetime">&#39;static
         </span>{
             <span class="kw">fn </span>module_key(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ModuleKey;
 
@@ -488,7 +486,7 @@
 
 <span class="macro">dyn_newtype_define! </span>{
     <span class="doccomment">/// An owned, immutable input to a [`Transaction`]
-    </span>Input(Box&lt;ModuleInput&gt;)
+    </span><span class="kw">pub </span>Input(Box&lt;ModuleInput&gt;)
 }
 <span class="macro">module_dyn_newtype_impl_encode_decode! </span>{
     Input, decode_input
@@ -508,7 +506,7 @@
 
 <span class="macro">dyn_newtype_define! </span>{
     <span class="doccomment">/// An owned, immutable output of a [`Transaction`]
-    </span>Output(Box&lt;ModuleOutput&gt;)
+    </span><span class="kw">pub </span>Output(Box&lt;ModuleOutput&gt;)
 }
 <span class="macro">module_plugin_trait_define! </span>{
     Output, PluginOutput, ModuleOutput,
@@ -546,7 +544,7 @@
 
 <span class="macro">dyn_newtype_define! </span>{
     <span class="doccomment">/// An owned, immutable output of a [`Transaction`] after it was finalized (so it&#39;s spendable)
-    </span>SpendableOutput(Box&lt;ModuleSpendableOutput&gt;)
+    </span><span class="kw">pub </span>SpendableOutput(Box&lt;ModuleSpendableOutput&gt;)
 }
 <span class="macro">module_plugin_trait_define! </span>{
     SpendableOutput, PluginSpendableOutput, ModuleSpendableOutput,
@@ -588,7 +586,7 @@
 
 <span class="macro">dyn_newtype_define! </span>{
     <span class="doccomment">/// An owned, immutable output of a [`Transaction`] before it was finalized
-    </span>PendingOutput(Box&lt;ModulePendingOutput&gt;)
+    </span><span class="kw">pub </span>PendingOutput(Box&lt;ModulePendingOutput&gt;)
 }
 <span class="macro">module_plugin_trait_define! </span>{
     PendingOutput, PluginPendingOutput, ModulePendingOutput,
@@ -615,7 +613,7 @@
 
 <span class="macro">dyn_newtype_define! </span>{
     <span class="doccomment">/// An owned, immutable output of a [`Transaction`] before it was finalized
-    </span>OutputOutcome(Box&lt;ModuleOutputOutcome&gt;)
+    </span><span class="kw">pub </span>OutputOutcome(Box&lt;ModuleOutputOutcome&gt;)
 }
 <span class="macro">module_plugin_trait_define! </span>{
     OutputOutcome, PluginOutputOutcome, ModuleOutputOutcome,
@@ -638,21 +636,21 @@
     signature: Signature,
 }
 
-<span class="kw">impl</span>&lt;M&gt; ModuleDecodable&lt;M&gt; <span class="kw">for </span>Transaction
+<span class="kw">impl</span>&lt;M&gt; Decodable&lt;M&gt; <span class="kw">for </span>Transaction
 <span class="kw">where
-    </span>Input: ModuleDecodable&lt;M&gt;,
-    Output: ModuleDecodable&lt;M&gt;,
+    </span>Input: Decodable&lt;M&gt;,
+    Output: Decodable&lt;M&gt;,
 {
     <span class="kw">fn </span>consensus_decode&lt;R: std::io::Read&gt;(
         r: <span class="kw-2">&amp;mut </span>R,
         modules: <span class="kw-2">&amp;</span>BTreeMap&lt;ModuleKey, M&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, DecodeError&gt; {
         <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
-            inputs: ModuleDecodable::consensus_decode(r, modules)<span class="question-mark">?</span>,
-            outputs: ModuleDecodable::consensus_decode(r, modules)<span class="question-mark">?</span>,
-            signature: Decodable::consensus_decode(r)<span class="question-mark">?</span>,
+            inputs: Decodable::consensus_decode(r, modules)<span class="question-mark">?</span>,
+            outputs: Decodable::consensus_decode(r, modules)<span class="question-mark">?</span>,
+            signature: Decodable::consensus_decode(r, modules)<span class="question-mark">?</span>,
         })
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="fedimint_core_api" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (8b0c05d9a 2022-10-07)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="fedimint_core_api" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (b8b5caee0 2022-10-16)" ></div></body></html>
