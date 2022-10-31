@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `client/client-lib/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><a class="sidebar-logo" href="../../mint_client/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../mint_client/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `client/client-lib/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><div class="width-limiter"><nav class="sub"><a class="sub-logo-container" href="../../mint_client/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -1183,6 +1183,18 @@
 <span id="1183">1183</span>
 <span id="1184">1184</span>
 <span id="1185">1185</span>
+<span id="1186">1186</span>
+<span id="1187">1187</span>
+<span id="1188">1188</span>
+<span id="1189">1189</span>
+<span id="1190">1190</span>
+<span id="1191">1191</span>
+<span id="1192">1192</span>
+<span id="1193">1193</span>
+<span id="1194">1194</span>
+<span id="1195">1195</span>
+<span id="1196">1196</span>
+<span id="1197">1197</span>
 </pre><pre class="rust"><code><span class="kw">pub mod </span>api;
 <span class="kw">pub mod </span>ln;
 <span class="kw">pub mod </span>mint;
@@ -1191,6 +1203,7 @@
 <span class="kw">pub mod </span>utils;
 <span class="kw">pub mod </span>wallet;
 
+<span class="kw">use </span>std::str::FromStr;
 <span class="kw">use </span>std::time::Duration;
 <span class="attribute">#[cfg(not(target_family = <span class="string">&quot;wasm&quot;</span>))]
 </span><span class="kw">use </span>std::time::SystemTime;
@@ -1202,13 +1215,10 @@
 <span class="kw">use </span>bitcoin_hashes::{sha256, Hash};
 <span class="kw">use </span>fedimint_api::db::Database;
 <span class="kw">use </span>fedimint_api::module::TransactionItemAmount;
-<span class="kw">use </span>fedimint_api::task::sleep;
+<span class="kw">use </span>fedimint_api::task::{<span class="self">self</span>, sleep};
 <span class="kw">use </span>fedimint_api::tiered::InvalidAmountTierError;
 <span class="kw">use </span>fedimint_api::TieredMulti;
-<span class="kw">use </span>fedimint_api::{
-    db::batch::{Accumulator, BatchItem, DbBatch},
-    Amount, FederationModule, OutPoint, PeerId, TransactionId,
-};
+<span class="kw">use </span>fedimint_api::{Amount, FederationModule, OutPoint, PeerId, TransactionId};
 <span class="kw">use </span>fedimint_core::epoch::EpochHistory;
 <span class="kw">use </span>fedimint_core::modules::wallet::PegOut;
 <span class="kw">use </span>fedimint_core::outcome::TransactionStatus;
@@ -1235,7 +1245,7 @@
 <span class="kw">use </span>lightning::routing::gossip::RoutingFees;
 <span class="kw">use </span>lightning::routing::router::{RouteHint, RouteHintHop};
 <span class="kw">use </span>lightning_invoice::{CreationError, Invoice, InvoiceBuilder, DEFAULT_EXPIRY_TIME};
-<span class="kw">use </span>ln::db::LightningGatewayKey;
+<span class="kw">use </span>ln::{db::LightningGatewayKey, PayInvoicePayload};
 <span class="kw">use </span>mint::NoteIssuanceRequests;
 <span class="kw">use </span>rand::{CryptoRng, RngCore};
 <span class="kw">use </span>secp256k1_zkp::{All, Secp256k1};
@@ -1276,6 +1286,18 @@
     <span class="kw">pub </span>max_send_amount: Amount,
     <span class="kw">pub </span>payment_hash: sha256::Hash,
     <span class="kw">pub </span>maybe_internal: bool,
+}
+
+<span class="comment">// Placeholder struct for identifying federations across clients
+</span><span class="attribute">#[derive(Debug, Serialize, Deserialize, Clone, Eq, Hash, PartialEq)]
+</span><span class="kw">pub struct </span>FederationId(<span class="kw">pub </span>String);
+
+<span class="kw">impl </span>FromStr <span class="kw">for </span>FederationId {
+    <span class="kw">type </span><span class="prelude-val">Err </span>= anyhow::Error;
+
+    <span class="kw">fn </span>from_str(s: <span class="kw-2">&amp;</span>str) -&gt; std::result::Result&lt;<span class="self">Self</span>, <span class="self">Self</span>::Err&gt; {
+        <span class="prelude-val">Ok</span>(FederationId(s.to_string()))
+    }
 }
 
 <span class="attribute">#[derive(Clone, Debug, Serialize, Deserialize)]
@@ -1412,19 +1434,17 @@
 
         tx.input(<span class="kw-2">&amp;mut </span><span class="macro">vec!</span>[peg_in_key], Input::Wallet(Box::new(peg_in_proof)));
 
-        <span class="self">self</span>.submit_tx_with_change(tx, DbBatch::new(), <span class="kw-2">&amp;mut </span>rng)
-            .<span class="kw">await
+        <span class="self">self</span>.submit_tx_with_change(tx, <span class="kw-2">&amp;mut </span>rng).<span class="kw">await
     </span>}
 
     <span class="kw">async fn </span>submit_tx_with_change&lt;R: RngCore + CryptoRng&gt;(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         tx: TransactionBuilder,
-        batch: Accumulator&lt;BatchItem&gt;,
         rng: R,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;TransactionId&gt; {
         <span class="prelude-val">Ok</span>(<span class="self">self
             </span>.mint_client()
-            .submit_tx_with_change(<span class="self">self</span>, tx, batch, rng)
+            .submit_tx_with_change(<span class="self">self</span>, tx, rng)
             .<span class="kw">await</span><span class="question-mark">?</span>)
     }
 
@@ -1443,10 +1463,8 @@
         <span class="kw-2">mut </span>rng: R,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;OutPoint&gt; {
         <span class="kw">let </span><span class="kw-2">mut </span>tx = TransactionBuilder::default();
-        tx.input_coins(notes, <span class="kw-2">&amp;</span><span class="self">self</span>.context.secp)<span class="question-mark">?</span>;
-        <span class="kw">let </span>txid = <span class="self">self
-            </span>.submit_tx_with_change(tx, DbBatch::new(), <span class="kw-2">&amp;mut </span>rng)
-            .<span class="kw">await</span><span class="question-mark">?</span>;
+        tx.input_coins(notes)<span class="question-mark">?</span>;
+        <span class="kw">let </span>txid = <span class="self">self</span>.submit_tx_with_change(tx, <span class="kw-2">&amp;mut </span>rng).<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(OutPoint { txid, out_idx: <span class="number">0 </span>})
     }
@@ -1480,15 +1498,14 @@
         blind_nonces: TieredMulti&lt;BlindNonce&gt;,
         <span class="kw-2">mut </span>rng: R,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;OutPoint&gt; {
-        <span class="kw">let </span>batch = DbBatch::new();
         <span class="kw">let </span><span class="kw-2">mut </span>tx = TransactionBuilder::default();
 
         <span class="kw">let </span>input_coins = <span class="self">self
             </span>.mint_client()
             .select_coins(blind_nonces.total_amount())<span class="question-mark">?</span>;
-        tx.input_coins(input_coins, <span class="kw-2">&amp;</span><span class="self">self</span>.context.secp)<span class="question-mark">?</span>;
+        tx.input_coins(input_coins)<span class="question-mark">?</span>;
         tx.output(Output::Mint(blind_nonces));
-        <span class="kw">let </span>txid = <span class="self">self</span>.submit_tx_with_change(tx, batch, <span class="kw-2">&amp;mut </span>rng).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let </span>txid = <span class="self">self</span>.submit_tx_with_change(tx, <span class="kw-2">&amp;mut </span>rng).<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(OutPoint { txid, out_idx: <span class="number">0 </span>})
     }
@@ -1499,10 +1516,10 @@
         <span class="kw-2">mut </span>rng: R,
         create_tx: <span class="kw">impl </span>FnMut(TieredMulti&lt;BlindNonce&gt;) -&gt; OutPoint,
     ) {
-        <span class="kw">let </span><span class="kw-2">mut </span>batch = DbBatch::new();
+        <span class="kw">let </span><span class="kw-2">mut </span>dbtx = <span class="self">self</span>.context.db.begin_transaction();
         <span class="self">self</span>.mint_client()
-            .receive_coins(amount, batch.transaction(), <span class="kw-2">&amp;mut </span>rng, create_tx);
-        <span class="self">self</span>.context.db.apply_batch(batch).expect(<span class="string">&quot;DB error&quot;</span>);
+            .receive_coins(amount, <span class="kw-2">&amp;mut </span>dbtx, <span class="kw-2">&amp;mut </span>rng, create_tx);
+        dbtx.commit_tx().expect(<span class="string">&quot;DB Error&quot;</span>);
     }
 
     <span class="kw">pub async fn </span>new_peg_out_with_fees(
@@ -1528,16 +1545,15 @@
         peg_out: PegOut,
         <span class="kw-2">mut </span>rng: R,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;OutPoint&gt; {
-        <span class="kw">let </span>batch = DbBatch::new();
         <span class="kw">let </span><span class="kw-2">mut </span>tx = TransactionBuilder::default();
 
         <span class="kw">let </span>funding_amount = <span class="self">self</span>.config.as_ref().wallet.fee_consensus.peg_out_abs
             + (peg_out.amount + peg_out.fees.amount()).into();
         <span class="kw">let </span>coins = <span class="self">self</span>.mint_client().select_coins(funding_amount)<span class="question-mark">?</span>;
-        tx.input_coins(coins, <span class="kw-2">&amp;</span><span class="self">self</span>.context.secp)<span class="question-mark">?</span>;
+        tx.input_coins(coins)<span class="question-mark">?</span>;
         <span class="kw">let </span>peg_out_idx = tx.output(Output::Wallet(peg_out));
 
-        <span class="kw">let </span>fedimint_tx_id = <span class="self">self</span>.submit_tx_with_change(tx, batch, <span class="kw-2">&amp;mut </span>rng).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let </span>fedimint_tx_id = <span class="self">self</span>.submit_tx_with_change(tx, <span class="kw-2">&amp;mut </span>rng).<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(OutPoint {
             txid: fedimint_tx_id,
@@ -1554,11 +1570,9 @@
     ///
     /// read more on fedimints address derivation: &lt;https://fedimint.org/Fedimint/wallet/&gt;
     </span><span class="kw">pub fn </span>get_new_pegin_address&lt;R: RngCore + CryptoRng&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, rng: R) -&gt; Address {
-        <span class="kw">let </span><span class="kw-2">mut </span>batch = DbBatch::new();
-        <span class="kw">let </span>address = <span class="self">self
-            </span>.wallet_client()
-            .get_new_pegin_address(batch.transaction(), rng);
-        <span class="self">self</span>.context.db.apply_batch(batch).expect(<span class="string">&quot;DB error&quot;</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>dbtx = <span class="self">self</span>.context.db.begin_transaction();
+        <span class="kw">let </span>address = <span class="self">self</span>.wallet_client().get_new_pegin_address(<span class="kw-2">&amp;mut </span>dbtx, rng);
+        dbtx.commit_tx().expect(<span class="string">&quot;DB Error&quot;</span>);
         address
     }
 
@@ -1577,14 +1591,14 @@
             coins
         } <span class="kw">else </span>{
             <span class="kw">let </span><span class="kw-2">mut </span>tx = TransactionBuilder::default();
-            tx.input_coins(coins, <span class="kw-2">&amp;</span><span class="self">self</span>.context.secp)<span class="question-mark">?</span>;
+            tx.input_coins(coins)<span class="question-mark">?</span>;
             tx.output_coins(
                 amount,
                 <span class="kw-2">&amp;</span><span class="self">self</span>.mint_client().context.secp,
                 <span class="kw-2">&amp;</span><span class="self">self</span>.mint_client().config.tbs_pks,
                 <span class="kw-2">&amp;mut </span>rng,
             );
-            <span class="self">self</span>.submit_tx_with_change(tx, DbBatch::new(), rng).<span class="kw">await</span><span class="question-mark">?</span>;
+            <span class="self">self</span>.submit_tx_with_change(tx, rng).<span class="kw">await</span><span class="question-mark">?</span>;
             <span class="self">self</span>.fetch_all_coins().<span class="kw">await</span>;
             <span class="self">self</span>.mint_client().select_coins(amount)<span class="question-mark">?
         </span>};
@@ -1594,16 +1608,15 @@
             <span class="string">&quot;should have exact change&quot;
         </span>);
 
-        <span class="kw">let </span><span class="kw-2">mut </span>batch = DbBatch::new();
-        <span class="kw">let </span><span class="kw-2">mut </span>batch_tx = batch.transaction();
-        batch_tx.append_from_iter(final_coins.iter_items().map(|(amount, coin)| {
-            BatchItem::maybe_delete(CoinKey {
+        <span class="kw">let </span><span class="kw-2">mut </span>dbtx = <span class="self">self</span>.context.db.begin_transaction();
+        final_coins.iter_items().for_each(|(amount, coin)| {
+            dbtx.remove_entry(<span class="kw-2">&amp;</span>CoinKey {
                 amount,
                 nonce: coin.note.<span class="number">0</span>.clone(),
             })
-        }));
-        batch_tx.commit();
-        <span class="self">self</span>.context.db.apply_batch(batch).expect(<span class="string">&quot;DB error&quot;</span>);
+            .expect(<span class="string">&quot;DB Error&quot;</span>);
+        });
+        dbtx.commit_tx().expect(<span class="string">&quot;DB Error&quot;</span>);
 
         <span class="prelude-val">Ok</span>(final_coins)
     }
@@ -1612,20 +1625,17 @@
     /// the federation too early. Use [`MintClientError::is_retryable`] to determine
     /// if the operation should be retried at a later time.
     </span><span class="kw">pub async fn </span>fetch_coins&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, outpoint: OutPoint) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="kw">let </span><span class="kw-2">mut </span>batch = DbBatch::new();
-        <span class="self">self</span>.mint_client()
-            .fetch_coins(batch.transaction(), outpoint)
-            .<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="self">self</span>.context.db.apply_batch(batch).expect(<span class="string">&quot;DB error&quot;</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>dbtx = <span class="self">self</span>.context.db.begin_transaction();
+        <span class="self">self</span>.mint_client().fetch_coins(<span class="kw-2">&amp;mut </span>dbtx, outpoint).<span class="kw">await</span><span class="question-mark">?</span>;
+        dbtx.commit_tx().expect(<span class="string">&quot;DB Error&quot;</span>);
         <span class="prelude-val">Ok</span>(())
     }
 
     <span class="doccomment">/// Should be called after any transaction that might have failed in order to get any coin
     /// inputs back.
     </span><span class="kw">pub async fn </span>reissue_pending_coins&lt;R: RngCore + CryptoRng&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, rng: R) -&gt; <span class="prelude-ty">Result</span>&lt;OutPoint&gt; {
-        <span class="kw">let </span>pending = <span class="self">self
-            </span>.context
-            .db
+        <span class="kw">let </span>dbtx = <span class="self">self</span>.context.db.begin_transaction();
+        <span class="kw">let </span>pending = dbtx
             .find_by_prefix(<span class="kw-2">&amp;</span>PendingCoinsKeyPrefix)
             .map(|res| res.expect(<span class="string">&quot;DB error&quot;</span>));
 
@@ -1641,21 +1651,29 @@
             })
             .collect::&lt;FuturesUnordered&lt;<span class="kw">_</span>&gt;&gt;();
 
-        <span class="kw">let </span><span class="kw-2">mut </span>batch = DbBatch::new();
-        <span class="kw">let </span><span class="kw-2">mut </span>tx = batch.transaction();
+        <span class="kw">let </span><span class="kw-2">mut </span>dbtx = <span class="self">self</span>.context.db.begin_transaction();
         <span class="kw">let </span><span class="kw-2">mut </span>all_coins = TieredMulti::&lt;SpendableNote&gt;::default();
         <span class="kw">for </span>result <span class="kw">in </span>stream.collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;().<span class="kw">await </span>{
             <span class="kw">let </span>(key, coins) = result<span class="question-mark">?</span>;
             all_coins.extend(coins);
-            tx.append_delete(key);
+            dbtx.remove_entry(<span class="kw-2">&amp;</span>key).expect(<span class="string">&quot;DB Error&quot;</span>);
         }
-        tx.commit();
-        <span class="self">self</span>.context.db.apply_batch(batch).unwrap();
+        dbtx.commit_tx().expect(<span class="string">&quot;DB Error&quot;</span>);
 
         <span class="self">self</span>.reissue(all_coins, rng).<span class="kw">await
     </span>}
 
-    <span class="kw">pub async fn </span>await_consensus_block_height(<span class="kw-2">&amp;</span><span class="self">self</span>, block_height: u64) -&gt; u64 {
+    <span class="kw">pub async fn </span>await_consensus_block_height(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        block_height: u64,
+    ) -&gt; std::result::Result&lt;u64, task::Elapsed&gt; {
+        task::timeout(Duration::from_secs(<span class="number">30</span>), <span class="kw">async </span>{
+            <span class="self">self</span>.await_consensus_block_height_inner(block_height).<span class="kw">await
+        </span>})
+        .<span class="kw">await
+    </span>}
+
+    <span class="kw">async fn </span>await_consensus_block_height_inner(<span class="kw-2">&amp;</span><span class="self">self</span>, block_height: u64) -&gt; u64 {
         <span class="kw">loop </span>{
             <span class="kw">match </span><span class="self">self</span>.context.api.fetch_consensus_block_height().<span class="kw">await </span>{
                 <span class="prelude-val">Ok</span>(height) <span class="kw">if </span>height &gt;= block_height =&gt; <span class="kw">return </span>height,
@@ -1702,6 +1720,7 @@
         <span class="kw">if let </span><span class="prelude-val">Some</span>(gateway) = <span class="self">self
             </span>.context
             .db
+            .begin_transaction()
             .get_value(<span class="kw-2">&amp;</span>LightningGatewayKey)
             .expect(<span class="string">&quot;DB error&quot;</span>)
         {
@@ -1737,10 +1756,10 @@
                 gateways[<span class="number">0</span>].clone()
             }
         };
-        <span class="self">self</span>.context
-            .db
-            .insert_entry(<span class="kw-2">&amp;</span>LightningGatewayKey, <span class="kw-2">&amp;</span>gateway)
+        <span class="kw">let </span><span class="kw-2">mut </span>dbtx = <span class="self">self</span>.context.db.begin_transaction();
+        dbtx.insert_entry(<span class="kw-2">&amp;</span>LightningGatewayKey, <span class="kw-2">&amp;</span>gateway)
             .expect(<span class="string">&quot;DB error&quot;</span>);
+        dbtx.commit_tx().expect(<span class="string">&quot;DB Error&quot;</span>);
         <span class="prelude-val">Ok</span>(gateway)
     }
 
@@ -1750,19 +1769,21 @@
         <span class="kw-2">mut </span>rng: R,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;(ContractId, OutPoint)&gt; {
         <span class="kw">let </span>gateway = <span class="self">self</span>.fetch_active_gateway().<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="kw">let </span><span class="kw-2">mut </span>batch = DbBatch::new();
+        <span class="kw">let </span><span class="kw-2">mut </span>dbtx = <span class="self">self</span>.context.db.begin_transaction();
         <span class="kw">let </span><span class="kw-2">mut </span>tx = TransactionBuilder::default();
 
         <span class="kw">let </span>consensus_height = <span class="self">self</span>.context.api.fetch_consensus_block_height().<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="kw">let </span>absolute_timelock = consensus_height + TIMELOCK;
 
         <span class="kw">let </span>contract = <span class="self">self</span>.ln_client().create_outgoing_output(
-            batch.transaction(),
+            <span class="kw-2">&amp;mut </span>dbtx,
             invoice,
             <span class="kw-2">&amp;</span>gateway,
             absolute_timelock <span class="kw">as </span>u32,
             <span class="kw-2">&amp;mut </span>rng,
         )<span class="question-mark">?</span>;
+
+        dbtx.commit_tx().expect(<span class="string">&quot;DB Error&quot;</span>);
 
         <span class="kw">let </span>(contract_id, amount) = <span class="kw">match </span><span class="kw-2">&amp;</span>contract {
             ContractOrOfferOutput::Contract(c) =&gt; {
@@ -1776,9 +1797,9 @@
         </span>};
 
         <span class="kw">let </span>coins = <span class="self">self</span>.mint_client().select_coins(amount)<span class="question-mark">?</span>;
-        tx.input_coins(coins, <span class="kw-2">&amp;</span><span class="self">self</span>.context.secp)<span class="question-mark">?</span>;
+        tx.input_coins(coins)<span class="question-mark">?</span>;
         tx.output(Output::LN(contract));
-        <span class="kw">let </span>txid = <span class="self">self</span>.submit_tx_with_change(tx, batch, <span class="kw-2">&amp;mut </span>rng).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let </span>txid = <span class="self">self</span>.submit_tx_with_change(tx, <span class="kw-2">&amp;mut </span>rng).<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="kw">let </span>outpoint = OutPoint { txid, out_idx: <span class="number">0 </span>};
 
         <span class="macro">debug!</span>(<span class="string">&quot;Funded outgoing contract {} in {}&quot;</span>, contract_id, outpoint);
@@ -1797,6 +1818,7 @@
         <span class="kw">let </span>contract_data = <span class="self">self
             </span>.context
             .db
+            .begin_transaction()
             .get_value(<span class="kw-2">&amp;</span>OutgoingPaymentKey(contract_id))
             .expect(<span class="string">&quot;DB error&quot;</span>)
             .ok_or(ClientError::RefundUnknownOutgoingContract)<span class="question-mark">?</span>;
@@ -1808,14 +1830,14 @@
         tx.input(<span class="kw-2">&amp;mut </span><span class="macro">vec!</span>[<span class="kw-2">*</span>refund_key], Input::LN(refund_input));
         <span class="kw">let </span>txid = <span class="self">self
             </span>.mint_client()
-            .submit_tx_with_change(<span class="self">self</span>, tx, DbBatch::new(), rng)
+            .submit_tx_with_change(<span class="self">self</span>, tx, rng)
             .<span class="kw">await</span><span class="question-mark">?</span>;
 
-        <span class="self">self</span>.context
-            .db
-            .remove_entry(<span class="kw-2">&amp;</span>OutgoingPaymentKey(contract_id))
+        <span class="kw">let </span><span class="kw-2">mut </span>dbtx = <span class="self">self</span>.context.db.begin_transaction();
+        dbtx.remove_entry(<span class="kw-2">&amp;</span>OutgoingPaymentKey(contract_id))
             .expect(<span class="string">&quot;DB error&quot;</span>)
             .ok_or(ClientError::DeleteUnknownOutgoingContract)<span class="question-mark">?</span>;
+        dbtx.commit_tx().expect(<span class="string">&quot;DB Error&quot;</span>);
 
         <span class="prelude-val">Ok</span>(OutPoint { txid, out_idx: <span class="number">0 </span>})
     }
@@ -1896,9 +1918,7 @@
         <span class="comment">// There is no input here because this is just an announcement
         </span><span class="kw">let </span><span class="kw-2">mut </span>tx = TransactionBuilder::default();
         tx.output(ln_output);
-        <span class="kw">let </span>txid = <span class="self">self
-            </span>.submit_tx_with_change(tx, DbBatch::new(), <span class="kw-2">&amp;mut </span>rng)
-            .<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let </span>txid = <span class="self">self</span>.submit_tx_with_change(tx, <span class="kw-2">&amp;mut </span>rng).<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="comment">// Await acceptance by the federation
         </span><span class="kw">let </span>timeout = std::time::Duration::from_secs(<span class="number">15</span>);
@@ -1929,9 +1949,7 @@
         <span class="comment">// Input claims this contract
         </span><span class="kw">let </span><span class="kw-2">mut </span>tx = TransactionBuilder::default();
         tx.input(<span class="kw-2">&amp;mut </span><span class="macro">vec!</span>[ci.keypair], Input::LN(contract.claim()));
-        <span class="kw">let </span>txid = <span class="self">self
-            </span>.submit_tx_with_change(tx, DbBatch::new(), <span class="kw-2">&amp;mut </span>rng)
-            .<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let </span>txid = <span class="self">self</span>.submit_tx_with_change(tx, <span class="kw-2">&amp;mut </span>rng).<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="comment">// TODO: Update database if invoice is paid or expired
 
@@ -1946,6 +1964,10 @@
         rng: <span class="kw">impl </span>RngCore + CryptoRng,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="kw">let </span>gateway = <span class="self">self</span>.fetch_active_gateway().<span class="kw">await</span><span class="question-mark">?</span>;
+
+        <span class="kw">let </span>federation_name = <span class="self">self</span>.config().<span class="number">0</span>.federation_name;
+        <span class="kw">let </span>payload = PayInvoicePayload::new(FederationId(federation_name), contract_id);
+
         <span class="kw">let </span>future = reqwest::Client::new()
             .post(
                 gateway
@@ -1954,7 +1976,7 @@
                     .expect(<span class="string">&quot;&#39;pay_invoice&#39; contains no invalid characters for a URL&quot;</span>)
                     .as_str(),
             )
-            .json(<span class="kw-2">&amp;</span>contract_id)
+            .json(<span class="kw-2">&amp;</span>payload)
             .send();
         <span class="kw">let </span>result = fedimint_api::task::timeout(Duration::from_secs(<span class="number">120</span>), future)
             .<span class="kw">await
@@ -2056,19 +2078,20 @@
     /// Note though that extended periods of staying offline will result in loss of funds anyway if
     /// the client can not claim the respective contract in time.
     </span><span class="kw">pub fn </span>save_outgoing_payment(<span class="kw-2">&amp;</span><span class="self">self</span>, contract: OutgoingContractAccount) {
-        <span class="self">self</span>.context
-            .db
-            .insert_entry(
-                <span class="kw-2">&amp;</span>OutgoingContractAccountKey(contract.contract.contract_id()),
-                <span class="kw-2">&amp;</span>contract,
-            )
-            .expect(<span class="string">&quot;DB error&quot;</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>dbtx = <span class="self">self</span>.context.db.begin_transaction();
+        dbtx.insert_entry(
+            <span class="kw-2">&amp;</span>OutgoingContractAccountKey(contract.contract.contract_id()),
+            <span class="kw-2">&amp;</span>contract,
+        )
+        .expect(<span class="string">&quot;DB error&quot;</span>);
+        dbtx.commit_tx().expect(<span class="string">&quot;DB Error&quot;</span>);
     }
 
     <span class="doccomment">/// Lists all previously saved transactions that have not been driven to completion so far
     </span><span class="kw">pub fn </span>list_pending_outgoing(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;OutgoingContractAccount&gt; {
         <span class="self">self</span>.context
             .db
+            .begin_transaction()
             .find_by_prefix(<span class="kw-2">&amp;</span>OutgoingContractAccountKeyPrefix)
             .map(|res| res.expect(<span class="string">&quot;DB error&quot;</span>).<span class="number">1</span>)
             .collect()
@@ -2076,12 +2099,12 @@
 
     <span class="doccomment">/// Abort payment if our node can&#39;t route it and give money back to user
     </span><span class="kw">pub async fn </span>abort_outgoing_payment(<span class="kw-2">&amp;</span><span class="self">self</span>, contract_id: ContractId) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="kw">let </span>contract_account = <span class="self">self
-            </span>.context
-            .db
+        <span class="kw">let </span><span class="kw-2">mut </span>dbtx = <span class="self">self</span>.context.db.begin_transaction();
+        <span class="kw">let </span>contract_account = dbtx
             .remove_entry(<span class="kw-2">&amp;</span>OutgoingContractAccountKey(contract_id))
             .expect(<span class="string">&quot;DB error&quot;</span>)
             .ok_or(ClientError::CancelUnknownOutgoingContract)<span class="question-mark">?</span>;
+        dbtx.commit_tx().expect(<span class="string">&quot;DB Error&quot;</span>);
 
         <span class="kw">let </span>cancel_signature = <span class="self">self</span>.context.secp.sign_schnorr(
             <span class="kw-2">&amp;</span>contract_account.contract.cancellation_message().into(),
@@ -2114,19 +2137,20 @@
         preimage: Preimage,
         rng: <span class="kw">impl </span>RngCore + CryptoRng,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;OutPoint&gt; {
-        <span class="kw">let </span><span class="kw-2">mut </span>batch = DbBatch::new();
+        <span class="kw">let </span><span class="kw-2">mut </span>dbtx = <span class="self">self</span>.context.db.begin_transaction();
         <span class="kw">let </span><span class="kw-2">mut </span>tx = TransactionBuilder::default();
 
         <span class="kw">let </span>contract = <span class="self">self</span>.ln_client().get_outgoing_contract(contract_id).<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="kw">let </span>input = Input::LN(contract.claim(preimage));
 
-        batch.autocommit(|batch| {
-            batch.append_delete(OutgoingContractAccountKey(contract_id));
-            batch.append_insert(OutgoingPaymentClaimKey(contract_id), ());
-        });
+        dbtx.remove_entry(<span class="kw-2">&amp;</span>OutgoingContractAccountKey(contract_id))
+            .expect(<span class="string">&quot;DB Error&quot;</span>);
+        dbtx.insert_entry(<span class="kw-2">&amp;</span>OutgoingPaymentClaimKey(contract_id), <span class="kw-2">&amp;</span>())
+            .expect(<span class="string">&quot;DB Error&quot;</span>);
+        dbtx.commit_tx().expect(<span class="string">&quot;DB Error&quot;</span>);
 
         tx.input(<span class="kw-2">&amp;mut </span><span class="macro">vec!</span>[<span class="self">self</span>.config.redeem_key], input);
-        <span class="kw">let </span>txid = <span class="self">self</span>.submit_tx_with_change(tx, batch, rng).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let </span>txid = <span class="self">self</span>.submit_tx_with_change(tx, rng).<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(OutPoint { txid, out_idx: <span class="number">0 </span>})
     }
@@ -2145,8 +2169,6 @@
         htlc_amount: <span class="kw-2">&amp;</span>Amount,
         rng: <span class="kw">impl </span>RngCore + CryptoRng,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;(OutPoint, ContractId)&gt; {
-        <span class="kw">let </span>batch = DbBatch::new();
-
         <span class="comment">// Fetch offer for this payment hash
         </span><span class="kw">let </span>offer: IncomingContractOffer = <span class="self">self</span>.ln_client().get_offer(<span class="kw-2">*</span>payment_hash).<span class="kw">await</span><span class="question-mark">?</span>;
 
@@ -2160,7 +2182,7 @@
         <span class="comment">// Inputs
         </span><span class="kw">let </span><span class="kw-2">mut </span>builder = TransactionBuilder::default();
         <span class="kw">let </span>coins = <span class="self">self</span>.mint_client().select_coins(offer.amount)<span class="question-mark">?</span>;
-        builder.input_coins(coins, <span class="kw-2">&amp;</span><span class="self">self</span>.context.secp)<span class="question-mark">?</span>;
+        builder.input_coins(coins)<span class="question-mark">?</span>;
 
         <span class="comment">// Outputs
         </span><span class="kw">let </span>our_pub_key = secp256k1_zkp::XOnlyPublicKey::from_keypair(<span class="kw-2">&amp;</span><span class="self">self</span>.config.redeem_key).<span class="number">0</span>;
@@ -2179,7 +2201,7 @@
 
         <span class="comment">// Submit transaction
         </span>builder.output(incoming_output);
-        <span class="kw">let </span>txid = <span class="self">self</span>.submit_tx_with_change(builder, batch, rng).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let </span>txid = <span class="self">self</span>.submit_tx_with_change(builder, rng).<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="kw">let </span>outpoint = OutPoint { txid, out_idx: <span class="number">0 </span>};
 
         <span class="comment">// FIXME: Save this contract in DB
@@ -2192,7 +2214,6 @@
         contract_id: ContractId,
         rng: <span class="kw">impl </span>RngCore + CryptoRng,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;TransactionId&gt; {
-        <span class="kw">let </span>batch = DbBatch::new();
         <span class="kw">let </span>contract_account = <span class="self">self</span>.ln_client().get_incoming_contract(contract_id).<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="kw">let </span><span class="kw-2">mut </span>builder = TransactionBuilder::default();
@@ -2202,7 +2223,7 @@
             <span class="kw-2">&amp;mut </span><span class="macro">vec!</span>[<span class="self">self</span>.config.redeem_key],
             Input::LN(contract_account.claim()),
         );
-        <span class="kw">let </span>mint_tx_id = <span class="self">self</span>.submit_tx_with_change(builder, batch, rng).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let </span>mint_tx_id = <span class="self">self</span>.submit_tx_with_change(builder, rng).<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(mint_tx_id)
     }
 
@@ -2211,6 +2232,7 @@
     </span><span class="kw">pub fn </span>list_pending_claimed_outgoing(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;ContractId&gt; {
         <span class="self">self</span>.context
             .db
+            .begin_transaction()
             .find_by_prefix(<span class="kw-2">&amp;</span>OutgoingPaymentClaimKeyPrefix)
             .map(|res| res.expect(<span class="string">&quot;DB error&quot;</span>).<span class="number">0 </span>.<span class="number">0</span>)
             .collect()
@@ -2242,10 +2264,10 @@
         // to fetch the blind signatures for the newly issued tokens, but as long as the
         // federation is honest as a whole they will produce the signatures, so we don&#39;t
         // have to worry
-        </span><span class="self">self</span>.context
-            .db
-            .remove_entry(<span class="kw-2">&amp;</span>OutgoingPaymentClaimKey(contract_id))
+        </span><span class="kw">let </span><span class="kw-2">mut </span>dbtx = <span class="self">self</span>.context.db.begin_transaction();
+        dbtx.remove_entry(<span class="kw-2">&amp;</span>OutgoingPaymentClaimKey(contract_id))
             .expect(<span class="string">&quot;DB error&quot;</span>);
+        dbtx.commit_tx().expect(<span class="string">&quot;DB Error&quot;</span>);
         <span class="prelude-val">Ok</span>(())
     }
 
@@ -2361,6 +2383,8 @@
     </span>FailedPaymentNoRefund,
     <span class="attribute">#[error(<span class="string">&quot;Failed to delete unknown outgoing contract&quot;</span>)]
     </span>DeleteUnknownOutgoingContract,
+    <span class="attribute">#[error(<span class="string">&quot;Timeout&quot;</span>)]
+    </span>Timeout,
 }
 
 <span class="kw">impl </span>From&lt;InvalidAmountTierError&gt; <span class="kw">for </span>ClientError {
@@ -2369,4 +2393,4 @@
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="mint_client" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (b8b5caee0 2022-10-16)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="mint_client" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (77e57db38 2022-10-30)" ></div></body></html>

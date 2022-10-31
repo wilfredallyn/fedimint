@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `ln-gateway/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><a class="sidebar-logo" href="../../ln_gateway/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../ln_gateway/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `gateway/ln-gateway/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><div class="width-limiter"><nav class="sub"><a class="sub-logo-container" href="../../ln_gateway/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -437,7 +437,51 @@
 <span id="437">437</span>
 <span id="438">438</span>
 <span id="439">439</span>
+<span id="440">440</span>
+<span id="441">441</span>
+<span id="442">442</span>
+<span id="443">443</span>
+<span id="444">444</span>
+<span id="445">445</span>
+<span id="446">446</span>
+<span id="447">447</span>
+<span id="448">448</span>
+<span id="449">449</span>
+<span id="450">450</span>
+<span id="451">451</span>
+<span id="452">452</span>
+<span id="453">453</span>
+<span id="454">454</span>
+<span id="455">455</span>
+<span id="456">456</span>
+<span id="457">457</span>
+<span id="458">458</span>
+<span id="459">459</span>
+<span id="460">460</span>
+<span id="461">461</span>
+<span id="462">462</span>
+<span id="463">463</span>
+<span id="464">464</span>
+<span id="465">465</span>
+<span id="466">466</span>
+<span id="467">467</span>
+<span id="468">468</span>
+<span id="469">469</span>
+<span id="470">470</span>
+<span id="471">471</span>
+<span id="472">472</span>
+<span id="473">473</span>
+<span id="474">474</span>
+<span id="475">475</span>
+<span id="476">476</span>
+<span id="477">477</span>
+<span id="478">478</span>
+<span id="479">479</span>
+<span id="480">480</span>
+<span id="481">481</span>
+<span id="482">482</span>
 </pre><pre class="rust"><code><span class="kw">pub mod </span>cln;
+<span class="kw">pub mod </span>config;
 <span class="kw">pub mod </span>ln;
 <span class="kw">pub mod </span>rpc;
 <span class="kw">pub mod </span>webserver;
@@ -455,14 +499,17 @@
 <span class="kw">use </span>bitcoin::{Address, Transaction};
 <span class="kw">use </span>bitcoin_hashes::sha256;
 <span class="kw">use </span>cln::HtlcAccepted;
+<span class="kw">use </span>config::GatewayConfig;
 <span class="kw">use </span>fedimint_api::{Amount, OutPoint, TransactionId};
 <span class="kw">use </span>fedimint_server::modules::ln::contracts::{ContractId, Preimage};
 <span class="kw">use </span>fedimint_server::modules::wallet::txoproof::TxOutProof;
 <span class="kw">use </span>futures::Future;
-<span class="kw">use </span>mint_client::mint::MintClientError;
-<span class="kw">use </span>mint_client::{ClientError, GatewayClient, PaymentParameters};
+<span class="kw">use </span>mint_client::{
+    ln::PayInvoicePayload, mint::MintClientError, ClientError, FederationId, GatewayClient,
+    PaymentParameters,
+};
 <span class="kw">use </span>rand::{CryptoRng, RngCore};
-<span class="kw">use </span>serde::{Deserialize, Deserializer};
+<span class="kw">use </span>serde::{Deserialize, Deserializer, Serialize, Serializer};
 <span class="kw">use </span>thiserror::Error;
 <span class="kw">use </span>tokio::sync::{mpsc, oneshot};
 <span class="kw">use </span>tracing::{debug, error, instrument, warn};
@@ -472,28 +519,45 @@
 
 <span class="kw">pub type </span><span class="prelude-ty">Result</span>&lt;T&gt; = std::result::Result&lt;T, LnGatewayError&gt;;
 
-<span class="attribute">#[derive(Debug)]
-</span><span class="kw">pub struct </span>BalancePayload;
+<span class="attribute">#[derive(Debug, Serialize, Deserialize)]
+</span><span class="kw">pub struct </span>ReceiveInvoicePayload {
+    <span class="comment">// NOTE: On ReceiveInvoice, we extract the relevant federation id from the accepted htlc
+    </span><span class="kw">pub </span>htlc_accepted: HtlcAccepted,
+}
 
-<span class="attribute">#[derive(Debug)]
-</span><span class="kw">pub struct </span>DepositAddressPayload;
+<span class="attribute">#[derive(Debug, Serialize, Deserialize)]
+</span><span class="kw">pub struct </span>BalancePayload {
+    <span class="kw">pub </span>federation_id: FederationId,
+}
 
-<span class="attribute">#[derive(Debug, Deserialize)]
-</span><span class="kw">pub struct </span>DepositPayload(
-    TxOutProof,
-    <span class="attribute">#[serde(deserialize_with = <span class="string">&quot;serde_hex_deserialize&quot;</span>)] </span>Transaction,
-);
+<span class="attribute">#[derive(Debug, Serialize, Deserialize)]
+</span><span class="kw">pub struct </span>DepositAddressPayload {
+    <span class="kw">pub </span>federation_id: FederationId,
+}
 
-<span class="attribute">#[derive(Debug, Deserialize)]
-</span><span class="kw">pub struct </span>WithdrawPayload(
-    Address,
-    <span class="attribute">#[serde(with = <span class="string">&quot;bitcoin::util::amount::serde::as_sat&quot;</span>)] </span>bitcoin::Amount,
-);
+<span class="attribute">#[derive(Debug, Serialize, Deserialize)]
+</span><span class="kw">pub struct </span>DepositPayload {
+    <span class="kw">pub </span>federation_id: FederationId,
+    <span class="kw">pub </span>txout_proof: TxOutProof,
+    <span class="attribute">#[serde(
+        deserialize_with = <span class="string">&quot;serde_hex_deserialize&quot;</span>,
+        serialize_with = <span class="string">&quot;serde_hex_serialize&quot;
+    </span>)]
+    </span><span class="kw">pub </span>transaction: Transaction,
+}
+
+<span class="attribute">#[derive(Debug, Serialize, Deserialize)]
+</span><span class="kw">pub struct </span>WithdrawPayload {
+    <span class="kw">pub </span>federation_id: FederationId,
+    <span class="attribute">#[serde(with = <span class="string">&quot;bitcoin::util::amount::serde::as_sat&quot;</span>)]
+    </span><span class="kw">pub </span>amount: bitcoin::Amount,
+    <span class="kw">pub </span>address: Address,
+}
 
 <span class="attribute">#[derive(Debug)]
 </span><span class="kw">pub enum </span>GatewayRequest {
-    HtlcAccepted(GatewayRequestInner&lt;HtlcAccepted&gt;),
-    PayInvoice(GatewayRequestInner&lt;ContractId&gt;),
+    ReceiveInvoice(GatewayRequestInner&lt;ReceiveInvoicePayload&gt;),
+    PayInvoice(GatewayRequestInner&lt;PayInvoicePayload&gt;),
     Balance(GatewayRequestInner&lt;BalancePayload&gt;),
     DepositAddress(GatewayRequestInner&lt;DepositAddressPayload&gt;),
     Deposit(GatewayRequestInner&lt;DepositPayload&gt;),
@@ -525,8 +589,12 @@
         }
     };
 }
-<span class="macro">impl_gateway_request_trait!</span>(HtlcAccepted, Preimage, GatewayRequest::HtlcAccepted);
-<span class="macro">impl_gateway_request_trait!</span>(ContractId, (), GatewayRequest::PayInvoice);
+<span class="macro">impl_gateway_request_trait!</span>(
+    ReceiveInvoicePayload,
+    Preimage,
+    GatewayRequest::ReceiveInvoice
+);
+<span class="macro">impl_gateway_request_trait!</span>(PayInvoicePayload, (), GatewayRequest::PayInvoice);
 <span class="macro">impl_gateway_request_trait!</span>(BalancePayload, Amount, GatewayRequest::Balance);
 <span class="macro">impl_gateway_request_trait!</span>(
     DepositAddressPayload,
@@ -559,6 +627,7 @@
 
 <span class="kw">impl </span>LnGateway {
     <span class="kw">pub fn </span>new(
+        cfg: GatewayConfig,
         federation_client: Arc&lt;GatewayClient&gt;,
         ln_client: Arc&lt;<span class="kw">dyn </span>LnRpc&gt;,
         sender: mpsc::Sender&lt;GatewayRequest&gt;,
@@ -566,7 +635,7 @@
         bind_addr: SocketAddr,
     ) -&gt; <span class="self">Self </span>{
         <span class="comment">// Run webserver asynchronously in tokio
-        </span><span class="kw">let </span>webserver = tokio::spawn(run_webserver(bind_addr, sender));
+        </span><span class="kw">let </span>webserver = tokio::spawn(run_webserver(cfg.password, bind_addr, sender));
 
         <span class="self">Self </span>{
             federation_client,
@@ -762,7 +831,7 @@
     <span class="kw">async fn </span>handle_deposit_msg(<span class="kw-2">&amp;</span><span class="self">self</span>, deposit: DepositPayload) -&gt; <span class="prelude-ty">Result</span>&lt;TransactionId&gt; {
         <span class="kw">let </span>rng = rand::rngs::OsRng;
         <span class="self">self</span>.federation_client
-            .peg_in(deposit.<span class="number">0</span>, deposit.<span class="number">1</span>, rng)
+            .peg_in(deposit.txout_proof, deposit.transaction, rng)
             .<span class="kw">await
             </span>.map_err(LnGatewayError::ClientError)
     }
@@ -771,7 +840,7 @@
         <span class="kw">let </span>rng = rand::rngs::OsRng;
         <span class="kw">let </span>peg_out = <span class="self">self
             </span>.federation_client
-            .new_peg_out_with_fees(withdraw.<span class="number">1</span>, withdraw.<span class="number">0</span>)
+            .new_peg_out_with_fees(withdraw.amount, withdraw.address)
             .<span class="kw">await
             </span>.unwrap();
         <span class="self">self</span>.federation_client
@@ -783,6 +852,9 @@
 
     <span class="kw">pub async fn </span>run(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="comment">// Regster gateway with federation
+        // FIXME: This call is critically dependent on the federation being up and running.
+        // We should either use a retry strategy, OR register federations on the gateway at runtime
+        // as proposed in https://github.com/fedimint/fedimint/issues/699
         </span><span class="self">self</span>.federation_client
             .register_with_federation(<span class="self">self</span>.federation_client.config().into())
             .<span class="kw">await
@@ -801,14 +873,14 @@
             </span><span class="kw">while let </span><span class="prelude-val">Ok</span>(msg) = <span class="self">self</span>.receiver.try_recv() {
                 <span class="macro">tracing::trace!</span>(<span class="string">&quot;Gateway received message {:?}&quot;</span>, msg);
                 <span class="kw">match </span>msg {
-                    GatewayRequest::HtlcAccepted(inner) =&gt; {
+                    GatewayRequest::ReceiveInvoice(inner) =&gt; {
                         inner
-                            .handle(|htlc_accepted| <span class="self">self</span>.handle_htlc_incoming_msg(htlc_accepted))
+                            .handle(|inner| <span class="self">self</span>.handle_htlc_incoming_msg(inner.htlc_accepted))
                             .<span class="kw">await</span>;
                     }
                     GatewayRequest::PayInvoice(inner) =&gt; {
                         inner
-                            .handle(|contract_id| <span class="self">self</span>.handle_pay_invoice_msg(contract_id))
+                            .handle(|inner| <span class="self">self</span>.handle_pay_invoice_msg(inner.contract_id))
                             .<span class="kw">await</span>;
                     }
                     GatewayRequest::Balance(inner) =&gt; {
@@ -869,6 +941,20 @@
     }
 }
 
+<span class="kw">pub fn </span>serde_hex_serialize&lt;T: bitcoin::consensus::Encodable, S: Serializer&gt;(
+    t: <span class="kw-2">&amp;</span>T,
+    s: S,
+) -&gt; std::result::Result&lt;S::Ok, S::Error&gt; {
+    <span class="kw">let </span><span class="kw-2">mut </span>bytes = <span class="macro">vec!</span>[];
+    T::consensus_encode(t, <span class="kw-2">&amp;mut </span>bytes).map_err(serde::ser::Error::custom)<span class="question-mark">?</span>;
+
+    <span class="kw">if </span>s.is_human_readable() {
+        s.serialize_str(<span class="kw-2">&amp;</span>hex::encode(bytes))
+    } <span class="kw">else </span>{
+        s.serialize_bytes(<span class="kw-2">&amp;</span>bytes)
+    }
+}
+
 <span class="kw">impl </span>IntoResponse <span class="kw">for </span>LnGatewayError {
     <span class="kw">fn </span>into_response(<span class="self">self</span>) -&gt; Response {
         <span class="kw">let </span><span class="kw-2">mut </span>err = Cow::&lt;<span class="lifetime">&#39;static</span>, str&gt;::Owned(<span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="self">self</span>)).into_response();
@@ -877,4 +963,4 @@
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="ln_gateway" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (b8b5caee0 2022-10-16)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="ln_gateway" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (77e57db38 2022-10-30)" ></div></body></html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `modules/fedimint-ln/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><a class="sidebar-logo" href="../../fedimint_ln/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../fedimint_ln/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `modules/fedimint-ln/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><div class="width-limiter"><nav class="sub"><a class="sub-logo-container" href="../../fedimint_ln/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -756,6 +756,36 @@
 <span id="756">756</span>
 <span id="757">757</span>
 <span id="758">758</span>
+<span id="759">759</span>
+<span id="760">760</span>
+<span id="761">761</span>
+<span id="762">762</span>
+<span id="763">763</span>
+<span id="764">764</span>
+<span id="765">765</span>
+<span id="766">766</span>
+<span id="767">767</span>
+<span id="768">768</span>
+<span id="769">769</span>
+<span id="770">770</span>
+<span id="771">771</span>
+<span id="772">772</span>
+<span id="773">773</span>
+<span id="774">774</span>
+<span id="775">775</span>
+<span id="776">776</span>
+<span id="777">777</span>
+<span id="778">778</span>
+<span id="779">779</span>
+<span id="780">780</span>
+<span id="781">781</span>
+<span id="782">782</span>
+<span id="783">783</span>
+<span id="784">784</span>
+<span id="785">785</span>
+<span id="786">786</span>
+<span id="787">787</span>
+<span id="788">788</span>
 </pre><pre class="rust"><code><span class="doccomment">//! # Lightning Module
 //!
 //! This module allows to atomically and trustlessly (in the federated trust model) interact with
@@ -778,16 +808,16 @@
 <span class="kw">use </span>async_trait::async_trait;
 <span class="kw">use </span>bitcoin_hashes::Hash <span class="kw">as </span>BitcoinHash;
 <span class="kw">use </span>db::{LightningGatewayKey, LightningGatewayKeyPrefix};
-<span class="kw">use </span>fedimint_api::db::batch::BatchTx;
 <span class="kw">use </span>fedimint_api::db::{Database, DatabaseTransaction};
 <span class="kw">use </span>fedimint_api::encoding::{Decodable, Encodable};
 <span class="kw">use </span>fedimint_api::module::audit::Audit;
 <span class="kw">use </span>fedimint_api::module::interconnect::ModuleInterconect;
-<span class="kw">use </span>fedimint_api::module::{api_endpoint, ApiEndpoint, ApiError, TransactionItemAmount};
+<span class="kw">use </span>fedimint_api::module::{
+    api_endpoint, ApiEndpoint, ApiError, IntoModuleError, ModuleError, TransactionItemAmount,
+};
 <span class="kw">use </span>fedimint_api::{Amount, FederationModule, PeerId};
 <span class="kw">use </span>fedimint_api::{InputMeta, OutPoint};
 <span class="kw">use </span>itertools::Itertools;
-<span class="kw">use </span>secp256k1::rand::{CryptoRng, RngCore};
 <span class="kw">use </span>serde::{Deserialize, Serialize};
 <span class="kw">use </span>thiserror::Error;
 <span class="kw">use </span>tracing::{debug, error, info_span, instrument, trace, warn};
@@ -904,24 +934,21 @@
 
 <span class="attribute">#[async_trait(<span class="question-mark">?</span>Send)]
 </span><span class="kw">impl </span>FederationModule <span class="kw">for </span>LightningModule {
-    <span class="kw">type </span>Error = LightningModuleError;
     <span class="kw">type </span>TxInput = ContractInput;
     <span class="kw">type </span>TxOutput = ContractOrOfferOutput;
     <span class="kw">type </span>TxOutputOutcome = OutputOutcome;
     <span class="kw">type </span>ConsensusItem = DecryptionShareCI;
     <span class="kw">type </span>VerificationCache = ();
 
-    <span class="kw">async fn </span>await_consensus_proposal&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>, rng: <span class="kw">impl </span>RngCore + CryptoRng + <span class="lifetime">&#39;a</span>) {
-        <span class="kw">if </span><span class="self">self</span>.consensus_proposal(rng).<span class="kw">await</span>.is_empty() {
+    <span class="kw">async fn </span>await_consensus_proposal(<span class="kw-2">&amp;</span><span class="self">self</span>) {
+        <span class="kw">if </span><span class="self">self</span>.consensus_proposal().<span class="kw">await</span>.is_empty() {
             std::future::pending().<span class="kw">await
         </span>}
     }
 
-    <span class="kw">async fn </span>consensus_proposal&lt;<span class="lifetime">&#39;a</span>&gt;(
-        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>,
-        _rng: <span class="kw">impl </span>RngCore + CryptoRng + <span class="lifetime">&#39;a</span>,
-    ) -&gt; Vec&lt;<span class="self">Self</span>::ConsensusItem&gt; {
+    <span class="kw">async fn </span>consensus_proposal(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;<span class="self">Self</span>::ConsensusItem&gt; {
         <span class="self">self</span>.db
+            .begin_transaction()
             .find_by_prefix(<span class="kw-2">&amp;</span>ProposeDecryptionShareKeyPrefix)
             .map(|res| {
                 <span class="kw">let </span>(ProposeDecryptionShareKey(contract_id), share) = res.expect(<span class="string">&quot;DB error&quot;</span>);
@@ -934,7 +961,6 @@
         <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>,
         dbtx: <span class="kw-2">&amp;mut </span>DatabaseTransaction&lt;<span class="lifetime">&#39;a</span>&gt;,
         consensus_items: Vec&lt;(PeerId, <span class="self">Self</span>::ConsensusItem)&gt;,
-        _rng: <span class="kw">impl </span>RngCore + CryptoRng + <span class="lifetime">&#39;a</span>,
     ) {
         consensus_items
             .into_iter()
@@ -961,16 +987,18 @@
         interconnect: <span class="kw-2">&amp;</span><span class="kw">dyn </span>ModuleInterconect,
         _cache: <span class="kw-2">&amp;</span><span class="self">Self</span>::VerificationCache,
         input: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">Self</span>::TxInput,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;InputMeta&lt;<span class="lifetime">&#39;a</span>&gt;, <span class="self">Self</span>::Error&gt; {
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;InputMeta&lt;<span class="lifetime">&#39;a</span>&gt;, ModuleError&gt; {
         <span class="kw">let </span>account: ContractAccount = <span class="self">self
             </span>.get_contract_account(input.contract_id)
-            .ok_or(LightningModuleError::UnknownContract(input.contract_id))<span class="question-mark">?</span>;
+            .ok_or(LightningModuleError::UnknownContract(input.contract_id))
+            .into_module_error_other()<span class="question-mark">?</span>;
 
         <span class="kw">if </span>account.amount &lt; input.amount {
             <span class="kw">return </span><span class="prelude-val">Err</span>(LightningModuleError::InsufficientFunds(
                 account.amount,
                 input.amount,
-            ));
+            ))
+            .into_module_error_other();
         }
 
         <span class="kw">let </span>pub_key = <span class="kw">match </span>account.contract {
@@ -981,13 +1009,15 @@
                         <span class="kw-2">&amp;</span>input
                             .witness
                             .as_ref()
-                            .ok_or(LightningModuleError::MissingPreimage)<span class="question-mark">?
+                            .ok_or(LightningModuleError::MissingPreimage)
+                            .into_module_error_other()<span class="question-mark">?
                             </span>.<span class="number">0</span>,
                     );
 
                     <span class="comment">// … and the spender provides a valid preimage …
                     </span><span class="kw">if </span>preimage_hash != outgoing.hash {
-                        <span class="kw">return </span><span class="prelude-val">Err</span>(LightningModuleError::InvalidPreimage);
+                        <span class="kw">return </span><span class="prelude-val">Err</span>(LightningModuleError::InvalidPreimage)
+                            .into_module_error_other();
                     }
 
                     <span class="comment">// … then the contract account can be spent using the gateway key,
@@ -1001,12 +1031,14 @@
             FundedContract::Incoming(incoming) =&gt; <span class="kw">match </span>incoming.contract.decrypted_preimage {
                 <span class="comment">// Once the preimage has been decrypted …
                 </span>DecryptedPreimage::Pending =&gt; {
-                    <span class="kw">return </span><span class="prelude-val">Err</span>(LightningModuleError::ContractNotReady);
+                    <span class="kw">return </span><span class="prelude-val">Err</span>(LightningModuleError::ContractNotReady).into_module_error_other();
                 }
                 <span class="comment">// … either the user may spend the funds since they sold a valid preimage …
                 </span>DecryptedPreimage::Some(preimage) =&gt; <span class="kw">match </span>preimage.to_public_key() {
                     <span class="prelude-val">Ok</span>(pub_key) =&gt; pub_key,
-                    <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(LightningModuleError::InvalidPreimage),
+                    <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; {
+                        <span class="kw">return </span><span class="prelude-val">Err</span>(LightningModuleError::InvalidPreimage).into_module_error_other()
+                    }
                 },
                 <span class="comment">// … or the gateway may claim back funds for not receiving the advertised preimage.
                 </span>DecryptedPreimage::Invalid =&gt; incoming.contract.gateway_key,
@@ -1022,53 +1054,57 @@
         })
     }
 
-    <span class="kw">fn </span>apply_input&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt;(
+    <span class="kw">fn </span>apply_input&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>, <span class="lifetime">&#39;c</span>&gt;(
         <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>,
         interconnect: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw">dyn </span>ModuleInterconect,
-        <span class="kw-2">mut </span>batch: BatchTx&lt;<span class="lifetime">&#39;a</span>&gt;,
+        dbtx: <span class="kw-2">&amp;mut </span>DatabaseTransaction&lt;<span class="lifetime">&#39;c</span>&gt;,
         input: <span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span><span class="self">Self</span>::TxInput,
         cache: <span class="kw-2">&amp;</span><span class="self">Self</span>::VerificationCache,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;InputMeta&lt;<span class="lifetime">&#39;b</span>&gt;, <span class="self">Self</span>::Error&gt; {
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;InputMeta&lt;<span class="lifetime">&#39;b</span>&gt;, ModuleError&gt; {
         <span class="kw">let </span>meta = <span class="self">self</span>.validate_input(interconnect, cache, input)<span class="question-mark">?</span>;
 
         <span class="kw">let </span>account_db_key = ContractKey(input.contract_id);
         <span class="kw">let </span><span class="kw-2">mut </span>contract_account = <span class="self">self
             </span>.db
+            .begin_transaction()
             .get_value(<span class="kw-2">&amp;</span>account_db_key)
             .expect(<span class="string">&quot;DB error&quot;</span>)
             .expect(<span class="string">&quot;Should fail validation if contract account doesn&#39;t exist&quot;</span>);
         contract_account.amount -= meta.amount.amount;
-        batch.append_insert(account_db_key, contract_account);
+        dbtx.insert_entry(<span class="kw-2">&amp;</span>account_db_key, <span class="kw-2">&amp;</span>contract_account)
+            .expect(<span class="string">&quot;DB Error&quot;</span>);
 
-        batch.commit();
         <span class="prelude-val">Ok</span>(meta)
     }
 
     <span class="kw">fn </span>validate_output(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         output: <span class="kw-2">&amp;</span><span class="self">Self</span>::TxOutput,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;TransactionItemAmount, <span class="self">Self</span>::Error&gt; {
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;TransactionItemAmount, ModuleError&gt; {
         <span class="kw">match </span>output {
             ContractOrOfferOutput::Contract(contract) =&gt; {
                 <span class="comment">// Incoming contracts are special, they need to match an offer
                 </span><span class="kw">if let </span>Contract::Incoming(incoming) = <span class="kw-2">&amp;</span>contract.contract {
                     <span class="kw">let </span>offer = <span class="self">self
                         </span>.db
+                        .begin_transaction()
                         .get_value(<span class="kw-2">&amp;</span>OfferKey(incoming.hash))
                         .expect(<span class="string">&quot;DB error&quot;</span>)
-                        .ok_or(LightningModuleError::NoOffer(incoming.hash))<span class="question-mark">?</span>;
+                        .ok_or(LightningModuleError::NoOffer(incoming.hash))
+                        .into_module_error_other()<span class="question-mark">?</span>;
 
                     <span class="kw">if </span>contract.amount &lt; offer.amount {
                         <span class="comment">// If the account is not sufficiently funded fail the output
                         </span><span class="kw">return </span><span class="prelude-val">Err</span>(LightningModuleError::InsufficientIncomingFunding(
                             offer.amount,
                             contract.amount,
-                        ));
+                        ))
+                        .into_module_error_other();
                     }
                 }
 
                 <span class="kw">if </span>contract.amount == Amount::ZERO {
-                    <span class="prelude-val">Err</span>(LightningModuleError::ZeroOutput)
+                    <span class="prelude-val">Err</span>(LightningModuleError::ZeroOutput).into_module_error_other()
                 } <span class="kw">else </span>{
                     <span class="prelude-val">Ok</span>(TransactionItemAmount {
                         amount: contract.amount,
@@ -1078,7 +1114,7 @@
             }
             ContractOrOfferOutput::Offer(offer) =&gt; {
                 <span class="kw">if </span>!offer.encrypted_preimage.<span class="number">0</span>.verify() {
-                    <span class="prelude-val">Err</span>(LightningModuleError::InvalidEncryptedPreimage)
+                    <span class="prelude-val">Err</span>(LightningModuleError::InvalidEncryptedPreimage).into_module_error_other()
                 } <span class="kw">else </span>{
                     <span class="prelude-val">Ok</span>(TransactionItemAmount::ZERO)
                 }
@@ -1089,14 +1125,17 @@
             } =&gt; {
                 <span class="kw">let </span>contract_account = <span class="self">self
                     </span>.db
+                    .begin_transaction()
                     .get_value(<span class="kw-2">&amp;</span>ContractKey(<span class="kw-2">*</span>contract))
                     .expect(<span class="string">&quot;DB error&quot;</span>)
-                    .ok_or(LightningModuleError::UnknownContract(<span class="kw-2">*</span>contract))<span class="question-mark">?</span>;
+                    .ok_or(LightningModuleError::UnknownContract(<span class="kw-2">*</span>contract))
+                    .into_module_error_other()<span class="question-mark">?</span>;
 
                 <span class="kw">let </span>outgoing_contract = <span class="kw">match </span><span class="kw-2">&amp;</span>contract_account.contract {
                     FundedContract::Outgoing(contract) =&gt; contract,
                     <span class="kw">_ </span>=&gt; {
-                        <span class="kw">return </span><span class="prelude-val">Err</span>(LightningModuleError::NotOutgoingContract);
+                        <span class="kw">return </span><span class="prelude-val">Err</span>(LightningModuleError::NotOutgoingContract)
+                            .into_module_error_other();
                     }
                 };
 
@@ -1106,19 +1145,20 @@
                         <span class="kw-2">&amp;</span>outgoing_contract.cancellation_message().into(),
                         <span class="kw-2">&amp;</span>outgoing_contract.gateway_key,
                     )
-                    .map_err(|<span class="kw">_</span>| LightningModuleError::InvalidCancellationSignature)<span class="question-mark">?</span>;
+                    .map_err(|<span class="kw">_</span>| LightningModuleError::InvalidCancellationSignature)
+                    .into_module_error_other()<span class="question-mark">?</span>;
 
                 <span class="prelude-val">Ok</span>(TransactionItemAmount::ZERO)
             }
         }
     }
 
-    <span class="kw">fn </span>apply_output&lt;<span class="lifetime">&#39;a</span>&gt;(
+    <span class="kw">fn </span>apply_output&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt;(
         <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>,
-        <span class="kw-2">mut </span>batch: BatchTx&lt;<span class="lifetime">&#39;a</span>&gt;,
+        dbtx: <span class="kw-2">&amp;mut </span>DatabaseTransaction&lt;<span class="lifetime">&#39;b</span>&gt;,
         output: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">Self</span>::TxOutput,
         out_point: OutPoint,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;TransactionItemAmount, <span class="self">Self</span>::Error&gt; {
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;TransactionItemAmount, ModuleError&gt; {
         <span class="kw">let </span>amount = <span class="self">self</span>.validate_output(output)<span class="question-mark">?</span>;
 
         <span class="kw">match </span>output {
@@ -1126,6 +1166,7 @@
                 <span class="kw">let </span>contract_db_key = ContractKey(contract.contract.contract_id());
                 <span class="kw">let </span>updated_contract_account = <span class="self">self
                     </span>.db
+                    .begin_transaction()
                     .get_value(<span class="kw-2">&amp;</span>contract_db_key)
                     .expect(<span class="string">&quot;DB error&quot;</span>)
                     .map(|<span class="kw-2">mut </span>value: ContractAccount| {
@@ -1136,19 +1177,22 @@
                         amount: amount.amount,
                         contract: contract.contract.clone().to_funded(out_point),
                     });
-                batch.append_insert(contract_db_key, updated_contract_account);
+                dbtx.insert_entry(<span class="kw-2">&amp;</span>contract_db_key, <span class="kw-2">&amp;</span>updated_contract_account)
+                    .expect(<span class="string">&quot;DB Error&quot;</span>);
 
-                batch.append_insert_new(
-                    ContractUpdateKey(out_point),
-                    OutputOutcome::Contract {
+                dbtx.insert_new_entry(
+                    <span class="kw-2">&amp;</span>ContractUpdateKey(out_point),
+                    <span class="kw-2">&amp;</span>OutputOutcome::Contract {
                         id: contract.contract.contract_id(),
                         outcome: contract.contract.to_outcome(),
                     },
-                );
+                )
+                .expect(<span class="string">&quot;DB Error&quot;</span>);
 
                 <span class="kw">if let </span>Contract::Incoming(incoming) = <span class="kw-2">&amp;</span>contract.contract {
                     <span class="kw">let </span>offer = <span class="self">self
                         </span>.db
+                        .begin_transaction()
                         .get_value(<span class="kw-2">&amp;</span>OfferKey(incoming.hash))
                         .expect(<span class="string">&quot;DB error&quot;</span>)
                         .expect(<span class="string">&quot;offer exists if output is valid&quot;</span>);
@@ -1158,25 +1202,29 @@
                         .threshold_sec_key
                         .decrypt_share(<span class="kw-2">&amp;</span>incoming.encrypted_preimage.<span class="number">0</span>)
                         .expect(<span class="string">&quot;We checked for decryption share validity on contract creation&quot;</span>);
-                    batch.append_insert_new(
-                        ProposeDecryptionShareKey(contract.contract.contract_id()),
-                        PreimageDecryptionShare(decryption_share),
-                    );
-                    batch.append_delete(OfferKey(offer.hash));
+                    dbtx.insert_new_entry(
+                        <span class="kw-2">&amp;</span>ProposeDecryptionShareKey(contract.contract.contract_id()),
+                        <span class="kw-2">&amp;</span>PreimageDecryptionShare(decryption_share),
+                    )
+                    .expect(<span class="string">&quot;DB Error&quot;</span>);
+                    dbtx.remove_entry(<span class="kw-2">&amp;</span>OfferKey(offer.hash)).expect(<span class="string">&quot;DB Error&quot;</span>);
                 }
             }
             ContractOrOfferOutput::Offer(offer) =&gt; {
-                batch.append_insert_new(
-                    ContractUpdateKey(out_point),
-                    OutputOutcome::Offer { id: offer.id() },
-                );
+                dbtx.insert_new_entry(
+                    <span class="kw-2">&amp;</span>ContractUpdateKey(out_point),
+                    <span class="kw-2">&amp;</span>OutputOutcome::Offer { id: offer.id() },
+                )
+                .expect(<span class="string">&quot;DB Error&quot;</span>);
                 <span class="comment">// TODO: sanity-check encrypted preimage size
-                </span>batch.append_insert_new(OfferKey(offer.hash), (<span class="kw-2">*</span>offer).clone());
+                </span>dbtx.insert_new_entry(<span class="kw-2">&amp;</span>OfferKey(offer.hash), <span class="kw-2">&amp;</span>(<span class="kw-2">*</span>offer).clone())
+                    .expect(<span class="string">&quot;DB Error&quot;</span>);
             }
             ContractOrOfferOutput::CancelOutgoing { contract, .. } =&gt; {
                 <span class="kw">let </span>updated_contract_account = {
                     <span class="kw">let </span><span class="kw-2">mut </span>contract_account = <span class="self">self
                         </span>.db
+                        .begin_transaction()
                         .get_value(<span class="kw-2">&amp;</span>ContractKey(<span class="kw-2">*</span>contract))
                         .expect(<span class="string">&quot;DB error&quot;</span>)
                         .expect(<span class="string">&quot;Contract exists if output is valid&quot;</span>);
@@ -1193,11 +1241,11 @@
                     contract_account
                 };
 
-                batch.append_insert(ContractKey(<span class="kw-2">*</span>contract), updated_contract_account);
+                dbtx.insert_entry(<span class="kw-2">&amp;</span>ContractKey(<span class="kw-2">*</span>contract), <span class="kw-2">&amp;</span>updated_contract_account)
+                    .expect(<span class="string">&quot;DB Error&quot;</span>);
             }
         }
 
-        batch.commit();
         <span class="prelude-val">Ok</span>(amount)
     }
 
@@ -1205,12 +1253,12 @@
     </span><span class="kw">async fn </span>end_consensus_epoch&lt;<span class="lifetime">&#39;a</span>&gt;(
         <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>,
         consensus_peers: <span class="kw-2">&amp;</span>HashSet&lt;PeerId&gt;,
-        <span class="kw-2">mut </span>batch: BatchTx&lt;<span class="lifetime">&#39;a</span>&gt;,
-        _rng: <span class="kw">impl </span>RngCore + CryptoRng + <span class="lifetime">&#39;a</span>,
+        dbtx: <span class="kw-2">&amp;mut </span>DatabaseTransaction&lt;<span class="lifetime">&#39;a</span>&gt;,
     ) -&gt; Vec&lt;PeerId&gt; {
         <span class="comment">// Decrypt preimages
         </span><span class="kw">let </span>preimage_decryption_shares = <span class="self">self
             </span>.db
+            .begin_transaction()
             .find_by_prefix(<span class="kw-2">&amp;</span>AgreedDecryptionShareKeyPrefix)
             .map(|res| {
                 <span class="kw">let </span>(key, value) = res.expect(<span class="string">&quot;DB error&quot;</span>);
@@ -1232,7 +1280,8 @@
                 <span class="kw">_ </span>=&gt; {
                     <span class="macro">warn!</span>(<span class="string">&quot;Received decryption share for non-existent incoming contract&quot;</span>);
                     <span class="kw">for </span>peer <span class="kw">in </span>peers {
-                        batch.append_delete(AgreedDecryptionShareKey(contract_id, peer));
+                        dbtx.remove_entry(<span class="kw-2">&amp;</span>AgreedDecryptionShareKey(contract_id, peer))
+                            .expect(<span class="string">&quot;DB Error&quot;</span>);
                     }
                     <span class="kw">continue</span>;
                 }
@@ -1298,9 +1347,11 @@
             };
 
             <span class="comment">// Delete decryption shares once we&#39;ve decrypted the preimage
-            </span>batch.append_delete(ProposeDecryptionShareKey(contract_id));
+            </span>dbtx.remove_entry(<span class="kw-2">&amp;</span>ProposeDecryptionShareKey(contract_id))
+                .expect(<span class="string">&quot;DB Error&quot;</span>);
             <span class="kw">for </span>peer <span class="kw">in </span>peers {
-                batch.append_delete(AgreedDecryptionShareKey(contract_id, peer));
+                dbtx.remove_entry(<span class="kw-2">&amp;</span>AgreedDecryptionShareKey(contract_id, peer))
+                    .expect(<span class="string">&quot;DB Error&quot;</span>);
             }
 
             <span class="kw">let </span>decrypted_preimage = <span class="kw">if </span>preimage_vec.len() == <span class="number">32
@@ -1327,6 +1378,7 @@
             </span><span class="kw">let </span>contract_db_key = ContractKey(contract_id);
             <span class="kw">let </span><span class="kw-2">mut </span>contract_account = <span class="self">self
                 </span>.db
+                .begin_transaction()
                 .get_value(<span class="kw-2">&amp;</span>contract_db_key)
                 .expect(<span class="string">&quot;DB error&quot;</span>)
                 .expect(<span class="string">&quot;checked before that it exists&quot;</span>);
@@ -1336,12 +1388,14 @@
             };
             incoming.contract.decrypted_preimage = decrypted_preimage.clone();
             <span class="macro">trace!</span>(<span class="question-mark">?</span>contract_account, <span class="string">&quot;Updating contract account&quot;</span>);
-            batch.append_insert(contract_db_key, contract_account);
+            dbtx.insert_entry(<span class="kw-2">&amp;</span>contract_db_key, <span class="kw-2">&amp;</span>contract_account)
+                .expect(<span class="string">&quot;DB Error&quot;</span>);
 
             <span class="comment">// Update output outcome
             </span><span class="kw">let </span>outcome_db_key = ContractUpdateKey(out_point);
             <span class="kw">let </span><span class="kw-2">mut </span>outcome = <span class="self">self
                 </span>.db
+                .begin_transaction()
                 .get_value(<span class="kw-2">&amp;</span>outcome_db_key)
                 .expect(<span class="string">&quot;DB error&quot;</span>)
                 .expect(<span class="string">&quot;outcome was created on funding&quot;</span>);
@@ -1353,15 +1407,16 @@
                 <span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(<span class="string">&quot;We are expeccting an incoming contract&quot;</span>),
             };
             <span class="kw-2">*</span>incoming_contract_outcome_preimage = decrypted_preimage.clone();
-            batch.append_insert(outcome_db_key, outcome);
+            dbtx.insert_entry(<span class="kw-2">&amp;</span>outcome_db_key, <span class="kw-2">&amp;</span>outcome)
+                .expect(<span class="string">&quot;DB Error&quot;</span>);
         }
-        batch.commit();
 
         bad_peers
     }
 
     <span class="kw">fn </span>output_status(<span class="kw-2">&amp;</span><span class="self">self</span>, out_point: OutPoint) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::TxOutputOutcome&gt; {
         <span class="self">self</span>.db
+            .begin_transaction()
             .get_value(<span class="kw-2">&amp;</span>ContractUpdateKey(out_point))
             .expect(<span class="string">&quot;DB error&quot;</span>)
     }
@@ -1443,12 +1498,14 @@
         payment_hash: bitcoin_hashes::sha256::Hash,
     ) -&gt; <span class="prelude-ty">Option</span>&lt;IncomingContractOffer&gt; {
         <span class="self">self</span>.db
+            .begin_transaction()
             .get_value(<span class="kw-2">&amp;</span>OfferKey(payment_hash))
             .expect(<span class="string">&quot;DB error&quot;</span>)
     }
 
     <span class="kw">pub fn </span>get_offers(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;IncomingContractOffer&gt; {
         <span class="self">self</span>.db
+            .begin_transaction()
             .find_by_prefix(<span class="kw-2">&amp;</span>OfferKeyPrefix)
             .map(|res| res.expect(<span class="string">&quot;DB error&quot;</span>).<span class="number">1</span>)
             .collect()
@@ -1456,21 +1513,24 @@
 
     <span class="kw">pub fn </span>get_contract_account(<span class="kw-2">&amp;</span><span class="self">self</span>, contract_id: ContractId) -&gt; <span class="prelude-ty">Option</span>&lt;ContractAccount&gt; {
         <span class="self">self</span>.db
+            .begin_transaction()
             .get_value(<span class="kw-2">&amp;</span>ContractKey(contract_id))
             .expect(<span class="string">&quot;DB error&quot;</span>)
     }
 
     <span class="kw">pub fn </span>list_gateways(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;LightningGateway&gt; {
         <span class="self">self</span>.db
+            .begin_transaction()
             .find_by_prefix(<span class="kw-2">&amp;</span>LightningGatewayKeyPrefix)
             .map(|res| res.expect(<span class="string">&quot;DB error&quot;</span>).<span class="number">1</span>)
             .collect()
     }
 
     <span class="kw">pub fn </span>register_gateway(<span class="kw-2">&amp;</span><span class="self">self</span>, gateway: LightningGateway) {
-        <span class="self">self</span>.db
-            .insert_entry(<span class="kw-2">&amp;</span>LightningGatewayKey(gateway.node_pub_key), <span class="kw-2">&amp;</span>gateway)
+        <span class="kw">let </span><span class="kw-2">mut </span>dbtx = <span class="self">self</span>.db.begin_transaction();
+        dbtx.insert_entry(<span class="kw-2">&amp;</span>LightningGatewayKey(gateway.node_pub_key), <span class="kw-2">&amp;</span>gateway)
             .expect(<span class="string">&quot;DB error&quot;</span>);
+        dbtx.commit_tx().expect(<span class="string">&quot;DB Error&quot;</span>);
     }
 }
 
@@ -1515,4 +1575,4 @@
     </span>InvalidCancellationSignature,
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="fedimint_ln" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (b8b5caee0 2022-10-16)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="fedimint_ln" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (77e57db38 2022-10-30)" ></div></body></html>

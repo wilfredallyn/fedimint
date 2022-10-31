@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `modules/fedimint-wallet/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><a class="sidebar-logo" href="../../fedimint_wallet/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../fedimint_wallet/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `modules/fedimint-wallet/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><div class="width-limiter"><nav class="sub"><a class="sub-logo-container" href="../../fedimint_wallet/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -1277,21 +1277,6 @@
 <span id="1277">1277</span>
 <span id="1278">1278</span>
 <span id="1279">1279</span>
-<span id="1280">1280</span>
-<span id="1281">1281</span>
-<span id="1282">1282</span>
-<span id="1283">1283</span>
-<span id="1284">1284</span>
-<span id="1285">1285</span>
-<span id="1286">1286</span>
-<span id="1287">1287</span>
-<span id="1288">1288</span>
-<span id="1289">1289</span>
-<span id="1290">1290</span>
-<span id="1291">1291</span>
-<span id="1292">1292</span>
-<span id="1293">1293</span>
-<span id="1294">1294</span>
 </pre><pre class="rust"><code><span class="kw">use </span>std::collections::{BTreeMap, HashMap, HashSet};
 <span class="kw">use </span>std::convert::{Infallible, TryInto};
 <span class="kw">use </span>std::hash::Hasher;
@@ -1309,24 +1294,24 @@
     Transaction, TxIn, TxOut, Txid,
 };
 <span class="kw">use </span>bitcoin::{PackedLockTime, Sequence};
-<span class="kw">use </span>fedimint_api::db::batch::{BatchItem, BatchTx};
 <span class="kw">use </span>fedimint_api::db::{Database, DatabaseTransaction};
 <span class="kw">use </span>fedimint_api::encoding::{Decodable, Encodable, UnzipConsensus};
 <span class="kw">use </span>fedimint_api::module::audit::Audit;
 <span class="kw">use </span>fedimint_api::module::interconnect::ModuleInterconect;
-<span class="kw">use </span>fedimint_api::module::ApiEndpoint;
-<span class="kw">use </span>fedimint_api::module::{api_endpoint, TransactionItemAmount};
-<span class="kw">use </span>fedimint_api::task::sleep;
-<span class="kw">use </span>fedimint_api::{FederationModule, InputMeta, OutPoint, PeerId};
+<span class="kw">use </span>fedimint_api::module::{api_endpoint, IntoModuleError, TransactionItemAmount};
+<span class="kw">use </span>fedimint_api::module::{ApiEndpoint, ModuleError};
+<span class="kw">use </span>fedimint_api::task::{sleep, TaskGroup, TaskHandle};
+<span class="kw">use </span>fedimint_api::{FederationModule, Feerate, InputMeta, OutPoint, PeerId};
+<span class="kw">use </span>fedimint_bitcoind::BitcoindRpc;
 <span class="kw">use </span>miniscript::psbt::PsbtExt;
 <span class="kw">use </span>miniscript::{Descriptor, TranslatePk};
-<span class="kw">use </span>rand::{CryptoRng, Rng, RngCore};
+<span class="kw">use </span>rand::rngs::OsRng;
+<span class="kw">use </span>rand::Rng;
 <span class="kw">use </span>secp256k1::{Message, Scalar};
 <span class="kw">use </span>serde::{Deserialize, Serialize};
 <span class="kw">use </span>thiserror::Error;
 <span class="kw">use </span>tracing::{debug, error, info, instrument, trace, warn};
 
-<span class="kw">use </span><span class="kw">crate</span>::bitcoind::BitcoindRpc;
 <span class="kw">use </span><span class="kw">crate</span>::config::WalletConfig;
 <span class="kw">use </span><span class="kw">crate</span>::db::{
     BlockHashKey, PegOutBitcoinTransaction, PegOutTxSignatureCI, PegOutTxSignatureCIPrefix,
@@ -1337,15 +1322,11 @@
 <span class="kw">use </span><span class="kw">crate</span>::tweakable::Tweakable;
 <span class="kw">use </span><span class="kw">crate</span>::txoproof::{PegInProof, PegInProofError};
 
-<span class="kw">pub mod </span>bitcoind;
 <span class="kw">pub mod </span>config;
 <span class="kw">pub mod </span>db;
 <span class="kw">pub mod </span>keys;
 <span class="kw">pub mod </span>tweakable;
 <span class="kw">pub mod </span>txoproof;
-
-<span class="attribute">#[cfg(feature = <span class="string">&quot;native&quot;</span>)]
-</span><span class="kw">pub mod </span>bitcoincore_rpc;
 
 <span class="kw">pub const </span>CONFIRMATION_TARGET: u16 = <span class="number">10</span>;
 
@@ -1418,24 +1399,6 @@
     secp: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>secp256k1::Secp256k1&lt;secp256k1::All&gt;,
 }
 
-<span class="attribute">#[derive(
-    Copy,
-    Clone,
-    Debug,
-    PartialEq,
-    Ord,
-    PartialOrd,
-    Eq,
-    Hash,
-    Serialize,
-    Deserialize,
-    Encodable,
-    Decodable,
-)]
-</span><span class="kw">pub struct </span>Feerate {
-    <span class="kw">pub </span>sats_per_kvb: u64,
-}
-
 <span class="attribute">#[derive(Debug, Clone, Eq, PartialEq, Hash, Deserialize, Serialize, Encodable, Decodable)]
 </span><span class="kw">pub struct </span>PegOutFees {
     <span class="kw">pub </span>fee_rate: Feerate,
@@ -1462,7 +1425,6 @@
 
 <span class="attribute">#[async_trait(<span class="question-mark">?</span>Send)]
 </span><span class="kw">impl </span>FederationModule <span class="kw">for </span>Wallet {
-    <span class="kw">type </span>Error = WalletError;
     <span class="kw">type </span>TxInput = Box&lt;PegInProof&gt;;
     <span class="kw">type </span>TxOutput = PegOut;
     <span class="comment">// TODO: implement outcome
@@ -1470,11 +1432,11 @@
     <span class="kw">type </span>ConsensusItem = WalletConsensusItem;
     <span class="kw">type </span>VerificationCache = ();
 
-    <span class="kw">async fn </span>await_consensus_proposal&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>, rng: <span class="kw">impl </span>RngCore + CryptoRng + <span class="lifetime">&#39;a</span>) {
+    <span class="kw">async fn </span>await_consensus_proposal(<span class="kw-2">&amp;</span><span class="self">self</span>) {
         <span class="kw">let </span><span class="kw-2">mut </span>our_target_height = <span class="self">self</span>.target_height().<span class="kw">await</span>;
         <span class="kw">let </span>last_consensus_height = <span class="self">self</span>.consensus_height().unwrap_or(<span class="number">0</span>);
 
-        <span class="kw">if </span><span class="self">self</span>.consensus_proposal(rng).<span class="kw">await</span>.len() == <span class="number">1 </span>{
+        <span class="kw">if </span><span class="self">self</span>.consensus_proposal().<span class="kw">await</span>.len() == <span class="number">1 </span>{
             <span class="kw">while </span>our_target_height &lt;= last_consensus_height {
                 our_target_height = <span class="self">self</span>.target_height().<span class="kw">await</span>;
                 sleep(Duration::from_millis(<span class="number">1000</span>)).<span class="kw">await</span>;
@@ -1482,10 +1444,7 @@
         }
     }
 
-    <span class="kw">async fn </span>consensus_proposal&lt;<span class="lifetime">&#39;a</span>&gt;(
-        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>,
-        <span class="kw-2">mut </span>rng: <span class="kw">impl </span>RngCore + CryptoRng + <span class="lifetime">&#39;a</span>,
-    ) -&gt; Vec&lt;<span class="self">Self</span>::ConsensusItem&gt; {
+    <span class="kw">async fn </span>consensus_proposal&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>) -&gt; Vec&lt;<span class="self">Self</span>::ConsensusItem&gt; {
         <span class="comment">// TODO: implement retry logic in case bitcoind is temporarily unreachable
         </span><span class="kw">let </span>our_target_height = <span class="self">self</span>.target_height().<span class="kw">await</span>;
 
@@ -1514,10 +1473,11 @@
         <span class="kw">let </span>round_ci = WalletConsensusItem::RoundConsensus(RoundConsensusItem {
             block_height: proposed_height,
             fee_rate,
-            randomness: rng.gen(),
+            randomness: OsRng.gen(),
         });
 
         <span class="self">self</span>.db
+            .begin_transaction()
             .find_by_prefix(<span class="kw-2">&amp;</span>PegOutTxSignatureCIPrefix)
             .map(|res| {
                 <span class="kw">let </span>(key, val) = res.expect(<span class="string">&quot;FB error&quot;</span>);
@@ -1534,7 +1494,6 @@
         <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>,
         dbtx: <span class="kw-2">&amp;mut </span>DatabaseTransaction&lt;<span class="lifetime">&#39;a</span>&gt;,
         consensus_items: Vec&lt;(PeerId, <span class="self">Self</span>::ConsensusItem)&gt;,
-        _rng: <span class="kw">impl </span>RngCore + CryptoRng + <span class="lifetime">&#39;a</span>,
     ) {
         <span class="macro">trace!</span>(<span class="question-mark">?</span>consensus_items, <span class="string">&quot;Received consensus proposals&quot;</span>);
 
@@ -1592,20 +1551,24 @@
         _interconnect: <span class="kw-2">&amp;</span><span class="kw">dyn </span>ModuleInterconect,
         _cache: <span class="kw-2">&amp;</span><span class="self">Self</span>::VerificationCache,
         input: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">Self</span>::TxInput,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;InputMeta&lt;<span class="lifetime">&#39;a</span>&gt;, <span class="self">Self</span>::Error&gt; {
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;InputMeta&lt;<span class="lifetime">&#39;a</span>&gt;, ModuleError&gt; {
         <span class="kw">if </span>!<span class="self">self</span>.block_is_known(input.proof_block()) {
-            <span class="kw">return </span><span class="prelude-val">Err</span>(WalletError::UnknownPegInProofBlock(input.proof_block()));
+            <span class="kw">return </span><span class="prelude-val">Err</span>(WalletError::UnknownPegInProofBlock(input.proof_block()))
+                .into_module_error_other();
         }
 
-        input.verify(<span class="kw-2">&amp;</span><span class="self">self</span>.secp, <span class="kw-2">&amp;</span><span class="self">self</span>.cfg.peg_in_descriptor)<span class="question-mark">?</span>;
+        input
+            .verify(<span class="kw-2">&amp;</span><span class="self">self</span>.secp, <span class="kw-2">&amp;</span><span class="self">self</span>.cfg.peg_in_descriptor)
+            .into_module_error_other()<span class="question-mark">?</span>;
 
         <span class="kw">if </span><span class="self">self
             </span>.db
+            .begin_transaction()
             .get_value(<span class="kw-2">&amp;</span>UTXOKey(input.outpoint()))
             .expect(<span class="string">&quot;DB error&quot;</span>)
             .is_some()
         {
-            <span class="kw">return </span><span class="prelude-val">Err</span>(WalletError::PegInAlreadyClaimed);
+            <span class="kw">return </span><span class="prelude-val">Err</span>(WalletError::PegInAlreadyClaimed).into_module_error_other();
         }
 
         <span class="prelude-val">Ok</span>(InputMeta {
@@ -1617,47 +1580,49 @@
         })
     }
 
-    <span class="kw">fn </span>apply_input&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt;(
+    <span class="kw">fn </span>apply_input&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>, <span class="lifetime">&#39;c</span>&gt;(
         <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>,
         interconnect: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw">dyn </span>ModuleInterconect,
-        <span class="kw-2">mut </span>batch: BatchTx&lt;<span class="lifetime">&#39;a</span>&gt;,
+        dbtx: <span class="kw-2">&amp;mut </span>DatabaseTransaction&lt;<span class="lifetime">&#39;c</span>&gt;,
         input: <span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span><span class="self">Self</span>::TxInput,
         cache: <span class="kw-2">&amp;</span><span class="self">Self</span>::VerificationCache,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;InputMeta&lt;<span class="lifetime">&#39;b</span>&gt;, <span class="self">Self</span>::Error&gt; {
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;InputMeta&lt;<span class="lifetime">&#39;b</span>&gt;, ModuleError&gt; {
         <span class="kw">let </span>meta = <span class="self">self</span>.validate_input(interconnect, cache, input)<span class="question-mark">?</span>;
         <span class="macro">debug!</span>(outpoint = %input.outpoint(), amount = %meta.amount.amount, <span class="string">&quot;Claiming peg-in&quot;</span>);
 
-        batch.append_insert_new(
-            UTXOKey(input.outpoint()),
-            SpendableUTXO {
+        dbtx.insert_new_entry(
+            <span class="kw-2">&amp;</span>UTXOKey(input.outpoint()),
+            <span class="kw-2">&amp;</span>SpendableUTXO {
                 tweak: input.tweak_contract_key().serialize(),
                 amount: bitcoin::Amount::from_sat(input.tx_output().value),
             },
-        );
+        )
+        .expect(<span class="string">&quot;DB Error&quot;</span>);
 
-        batch.commit();
         <span class="prelude-val">Ok</span>(meta)
     }
 
     <span class="kw">fn </span>validate_output(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         output: <span class="kw-2">&amp;</span><span class="self">Self</span>::TxOutput,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;TransactionItemAmount, <span class="self">Self</span>::Error&gt; {
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;TransactionItemAmount, ModuleError&gt; {
         <span class="kw">if </span>!is_address_valid_for_network(<span class="kw-2">&amp;</span>output.recipient, <span class="self">self</span>.cfg.network) {
             <span class="kw">return </span><span class="prelude-val">Err</span>(WalletError::WrongNetwork(
                 <span class="self">self</span>.cfg.network,
                 output.recipient.network,
-            ));
+            ))
+            .into_module_error_other();
         }
         <span class="kw">let </span>consensus_fee_rate = <span class="self">self</span>.current_round_consensus().unwrap().fee_rate;
         <span class="kw">if </span>output.fees.fee_rate &lt; consensus_fee_rate {
             <span class="kw">return </span><span class="prelude-val">Err</span>(WalletError::PegOutFeeRate(
                 output.fees.fee_rate,
                 consensus_fee_rate,
-            ));
+            ))
+            .into_module_error_other();
         }
         <span class="kw">if </span><span class="self">self</span>.create_peg_out_tx(output).is_none() {
-            <span class="kw">return </span><span class="prelude-val">Err</span>(WalletError::NotEnoughSpendableUTXO);
+            <span class="kw">return </span><span class="prelude-val">Err</span>(WalletError::NotEnoughSpendableUTXO).into_module_error_other();
         }
         <span class="prelude-val">Ok</span>(TransactionItemAmount {
             amount: (output.amount + output.fees.amount()).into(),
@@ -1665,12 +1630,12 @@
         })
     }
 
-    <span class="kw">fn </span>apply_output&lt;<span class="lifetime">&#39;a</span>&gt;(
+    <span class="kw">fn </span>apply_output&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt;(
         <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>,
-        <span class="kw-2">mut </span>batch: BatchTx&lt;<span class="lifetime">&#39;a</span>&gt;,
+        dbtx: <span class="kw-2">&amp;mut </span>DatabaseTransaction&lt;<span class="lifetime">&#39;b</span>&gt;,
         output: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">Self</span>::TxOutput,
         out_point: fedimint_api::OutPoint,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;TransactionItemAmount, <span class="self">Self</span>::Error&gt; {
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;TransactionItemAmount, ModuleError&gt; {
         <span class="kw">let </span>amount = <span class="self">self</span>.validate_output(output)<span class="question-mark">?</span>;
         <span class="macro">debug!</span>(
             amount = %output.amount, recipient = %output.recipient,
@@ -1714,30 +1679,29 @@
             .collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;();
 
         <span class="comment">// Delete used UTXOs
-        </span>batch.append_from_iter(
-            tx.psbt
-                .unsigned_tx
-                .input
-                .iter()
-                .map(|input| BatchItem::delete(UTXOKey(input.previous_output))),
-        );
+        </span>tx.psbt.unsigned_tx.input.iter().for_each(|input| {
+            dbtx.remove_entry(<span class="kw-2">&amp;</span>UTXOKey(input.previous_output))
+                .expect(<span class="string">&quot;DB Error&quot;</span>);
+        });
 
-        batch.append_insert_new(UnsignedTransactionKey(txid), tx);
-        batch.append_insert_new(PegOutTxSignatureCI(txid), sigs);
-        batch.append_insert_new(PegOutBitcoinTransaction(out_point), PegOutOutcome(txid));
-        batch.commit();
+        dbtx.insert_new_entry(<span class="kw-2">&amp;</span>UnsignedTransactionKey(txid), <span class="kw-2">&amp;</span>tx)
+            .expect(<span class="string">&quot;DB Error&quot;</span>);
+        dbtx.insert_new_entry(<span class="kw-2">&amp;</span>PegOutTxSignatureCI(txid), <span class="kw-2">&amp;</span>sigs)
+            .expect(<span class="string">&quot;DB Error&quot;</span>);
+        dbtx.insert_new_entry(<span class="kw-2">&amp;</span>PegOutBitcoinTransaction(out_point), <span class="kw-2">&amp;</span>PegOutOutcome(txid))
+            .expect(<span class="string">&quot;DB Error&quot;</span>);
         <span class="prelude-val">Ok</span>(amount)
     }
 
     <span class="kw">async fn </span>end_consensus_epoch&lt;<span class="lifetime">&#39;a</span>&gt;(
         <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>,
         consensus_peers: <span class="kw-2">&amp;</span>HashSet&lt;PeerId&gt;,
-        <span class="kw-2">mut </span>batch: BatchTx&lt;<span class="lifetime">&#39;a</span>&gt;,
-        _rng: <span class="kw">impl </span>RngCore + CryptoRng + <span class="lifetime">&#39;a</span>,
+        dbtx: <span class="kw-2">&amp;mut </span>DatabaseTransaction&lt;<span class="lifetime">&#39;a</span>&gt;,
     ) -&gt; Vec&lt;PeerId&gt; {
         <span class="comment">// Sign and finalize any unsigned transactions that have signatures
         </span><span class="kw">let </span>unsigned_txs: Vec&lt;(UnsignedTransactionKey, UnsignedTransaction)&gt; = <span class="self">self
             </span>.db
+            .begin_transaction()
             .find_by_prefix(<span class="kw-2">&amp;</span>UnsignedTransactionPrefixKey)
             .map(|res| res.expect(<span class="string">&quot;DB error&quot;</span>))
             .filter(|(<span class="kw">_</span>, unsigned)| !unsigned.signatures.is_empty())
@@ -1775,21 +1739,23 @@
                     <span class="comment">// We were able to finalize the transaction, so we will delete the PSBT and instead keep the
                     // extracted tx for periodic transmission and to accept the change into our wallet
                     // eventually once it confirms.
-                    </span>batch.append_insert_new(PendingTransactionKey(key.<span class="number">0</span>), pending_tx);
-                    batch.append_delete(PegOutTxSignatureCI(key.<span class="number">0</span>));
-                    batch.append_delete(key);
+                    </span>dbtx.insert_new_entry(<span class="kw-2">&amp;</span>PendingTransactionKey(key.<span class="number">0</span>), <span class="kw-2">&amp;</span>pending_tx)
+                        .expect(<span class="string">&quot;DB Error&quot;</span>);
+                    dbtx.remove_entry(<span class="kw-2">&amp;</span>PegOutTxSignatureCI(key.<span class="number">0</span>))
+                        .expect(<span class="string">&quot;DB Error&quot;</span>);
+                    dbtx.remove_entry(<span class="kw-2">&amp;</span>key).expect(<span class="string">&quot;DB Error&quot;</span>);
                 }
                 <span class="prelude-val">Err</span>(e) =&gt; {
                     <span class="macro">warn!</span>(<span class="string">&quot;Unable to finalize PSBT due to {:?}&quot;</span>, e)
                 }
             }
         }
-        batch.commit();
         drop_peers
     }
 
     <span class="kw">fn </span>output_status(<span class="kw-2">&amp;</span><span class="self">self</span>, out_point: OutPoint) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::TxOutputOutcome&gt; {
         <span class="self">self</span>.db
+            .begin_transaction()
             .get_value(<span class="kw-2">&amp;</span>PegOutBitcoinTransaction(out_point))
             .expect(<span class="string">&quot;DB error&quot;</span>)
     }
@@ -1845,12 +1811,15 @@
         cfg: WalletConfig,
         db: Database,
         bitcoind: BitcoindRpc,
+        task_group: <span class="kw-2">&amp;mut </span>TaskGroup,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Wallet, WalletError&gt; {
         <span class="kw">let </span>broadcaster_bitcoind_rpc = bitcoind.clone();
         <span class="kw">let </span>broadcaster_db = db.clone();
-        fedimint_api::task::spawn(<span class="kw">async move </span>{
-            run_broadcast_pending_tx(broadcaster_db, broadcaster_bitcoind_rpc).<span class="kw">await</span>;
-        });
+        task_group
+            .spawn(<span class="string">&quot;broadcast pending&quot;</span>, |handle| <span class="kw">async move </span>{
+                run_broadcast_pending_tx(broadcaster_db, broadcaster_bitcoind_rpc, <span class="kw-2">&amp;</span>handle).<span class="kw">await</span>;
+            })
+            .<span class="kw">await</span>;
 
         <span class="kw">let </span>bitcoind_rpc = bitcoind;
 
@@ -1888,6 +1857,7 @@
     ) {
         <span class="kw">let </span><span class="kw-2">mut </span>cache: BTreeMap&lt;Txid, UnsignedTransaction&gt; = <span class="self">self
             </span>.db
+            .begin_transaction()
             .find_by_prefix(<span class="kw-2">&amp;</span>UnsignedTransactionPrefixKey)
             .map(|res| {
                 <span class="kw">let </span>(key, val) = res.expect(<span class="string">&quot;DB error&quot;</span>);
@@ -2047,7 +2017,10 @@
     }
 
     <span class="kw">pub fn </span>current_round_consensus(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;RoundConsensus&gt; {
-        <span class="self">self</span>.db.get_value(<span class="kw-2">&amp;</span>RoundConsensusKey).expect(<span class="string">&quot;DB error&quot;</span>)
+        <span class="self">self</span>.db
+            .begin_transaction()
+            .get_value(<span class="kw-2">&amp;</span>RoundConsensusKey)
+            .expect(<span class="string">&quot;DB error&quot;</span>)
     }
 
     <span class="kw">pub async fn </span>target_height(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u32 {
@@ -2103,6 +2076,7 @@
 
             </span><span class="kw">let </span>pending_transactions = <span class="self">self
                 </span>.db
+                .begin_transaction()
                 .find_by_prefix(<span class="kw-2">&amp;</span>PendingTransactionPrefixKey)
                 .map(|res| {
                     <span class="kw">let </span>(key, transaction) = res.expect(<span class="string">&quot;DB error&quot;</span>);
@@ -2162,6 +2136,7 @@
 
     <span class="kw">fn </span>block_is_known(<span class="kw-2">&amp;</span><span class="self">self</span>, block_hash: BlockHash) -&gt; bool {
         <span class="self">self</span>.db
+            .begin_transaction()
             .get_value(<span class="kw-2">&amp;</span>BlockHashKey(block_hash))
             .expect(<span class="string">&quot;DB error&quot;</span>)
             .is_some()
@@ -2180,6 +2155,7 @@
 
     <span class="kw">fn </span>available_utxos(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;(UTXOKey, SpendableUTXO)&gt; {
         <span class="self">self</span>.db
+            .begin_transaction()
             .find_by_prefix(<span class="kw-2">&amp;</span>UTXOPrefixKey)
             .collect::&lt;<span class="prelude-ty">Result</span>&lt;<span class="kw">_</span>, <span class="kw">_</span>&gt;&gt;()
             .expect(<span class="string">&quot;DB error&quot;</span>)
@@ -2488,8 +2464,8 @@
 }
 
 <span class="attribute">#[instrument(level = <span class="string">&quot;debug&quot;</span>, skip_all)]
-</span><span class="kw">pub async fn </span>run_broadcast_pending_tx(db: Database, rpc: BitcoindRpc) {
-    <span class="kw">loop </span>{
+</span><span class="kw">pub async fn </span>run_broadcast_pending_tx(db: Database, rpc: BitcoindRpc, tg_handle: <span class="kw-2">&amp;</span>TaskHandle) {
+    <span class="kw">while </span>!tg_handle.is_shutting_down() {
         broadcast_pending_tx(<span class="kw-2">&amp;</span>db, <span class="kw-2">&amp;</span>rpc).<span class="kw">await</span>;
         fedimint_api::task::sleep(Duration::from_secs(<span class="number">10</span>)).<span class="kw">await</span>;
     }
@@ -2497,6 +2473,7 @@
 
 <span class="kw">pub async fn </span>broadcast_pending_tx(db: <span class="kw-2">&amp;</span>Database, rpc: <span class="kw-2">&amp;</span>BitcoindRpc) {
     <span class="kw">let </span>pending_tx = db
+        .begin_transaction()
         .find_by_prefix(<span class="kw-2">&amp;</span>PendingTransactionPrefixKey)
         .collect::&lt;<span class="prelude-ty">Result</span>&lt;Vec&lt;<span class="kw">_</span>&gt;, <span class="kw">_</span>&gt;&gt;()
         .expect(<span class="string">&quot;DB error&quot;</span>);
@@ -2509,13 +2486,6 @@
         );
         <span class="macro">trace!</span>(transaction = <span class="question-mark">?</span>tx);
         <span class="kw">let _ </span>= rpc.submit_transaction(tx).<span class="kw">await</span>;
-    }
-}
-
-<span class="kw">impl </span>Feerate {
-    <span class="kw">pub fn </span>calculate_fee(<span class="kw-2">&amp;</span><span class="self">self</span>, weight: u64) -&gt; bitcoin::Amount {
-        <span class="kw">let </span>sats = <span class="self">self</span>.sats_per_kvb * weight / <span class="number">1000</span>;
-        bitcoin::Amount::from_sat(sats)
     }
 }
 
@@ -2587,4 +2557,4 @@
 <span class="doccomment">/// **WARNING**: this is only intended to be used for testing
 </span><span class="kw">impl </span>Eq <span class="kw">for </span>WalletError {}
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="fedimint_wallet" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (b8b5caee0 2022-10-16)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="fedimint_wallet" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (77e57db38 2022-10-30)" ></div></body></html>

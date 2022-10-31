@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"fn":[["main",""]],"struct":[["ServerOpts",""]]};
+window.SIDEBAR_ITEMS = {"mod":[["encrypt",""],["ui",""]]};
