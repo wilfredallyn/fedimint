@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `modules/fedimint-ln/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-bfda650e0f1b8d97.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../static.files/light-73ec76ce6fb6d670.css"><link rel="stylesheet" disabled href="../../static.files/dark-505cdfdf9d48c666.css"><link rel="stylesheet" disabled href="../../static.files/ayu-de5a1c2641418e5f.css"><script id="default-settings" ></script><script src="../../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../../static.files/source-script-5cf2e01a42cc9858.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-2da75ee0e1909b3a.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><div class="width-limiter"><nav class="sub"><a class="sub-logo-container" href="../../fedimint_ln/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `modules/fedimint-ln/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-ee9f86babca44bc2.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../static.files/light-3bcdcab5f4113412.css"><link rel="stylesheet" disabled href="../../static.files/dark-091ecdca18d5df85.css"><link rel="stylesheet" disabled href="../../static.files/ayu-45445754dcd01ab2.css"><script id="default-settings" ></script><script src="../../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../../static.files/source-script-5cf2e01a42cc9858.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-287cecec4dbb45b0.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><div class="width-limiter"><nav class="sub"><a class="sub-logo-container" href="../../fedimint_ln/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -909,6 +909,23 @@
 <a href="#909" id="909">909</a>
 <a href="#910" id="910">910</a>
 <a href="#911" id="911">911</a>
+<a href="#912" id="912">912</a>
+<a href="#913" id="913">913</a>
+<a href="#914" id="914">914</a>
+<a href="#915" id="915">915</a>
+<a href="#916" id="916">916</a>
+<a href="#917" id="917">917</a>
+<a href="#918" id="918">918</a>
+<a href="#919" id="919">919</a>
+<a href="#920" id="920">920</a>
+<a href="#921" id="921">921</a>
+<a href="#922" id="922">922</a>
+<a href="#923" id="923">923</a>
+<a href="#924" id="924">924</a>
+<a href="#925" id="925">925</a>
+<a href="#926" id="926">926</a>
+<a href="#927" id="927">927</a>
+<a href="#928" id="928">928</a>
 </pre><pre class="rust"><code><span class="doccomment">//! # Lightning Module
 //!
 //! This module allows to atomically and trustlessly (in the federated trust model) interact with
@@ -921,10 +938,10 @@
 
 </span><span class="kw">extern crate </span>core;
 
-<span class="kw">mod </span>common;
+<span class="kw">pub mod </span>common;
 <span class="kw">pub mod </span>config;
 <span class="kw">pub mod </span>contracts;
-<span class="kw">mod </span>db;
+<span class="kw">pub mod </span>db;
 
 <span class="kw">use </span>std::collections::{BTreeMap, HashMap, HashSet};
 <span class="kw">use </span>std::ops::Sub;
@@ -938,9 +955,9 @@
     ClientModuleConfig, DkgPeerMsg, DkgRunner, ModuleConfigGenParams, ServerModuleConfig,
     TypedServerModuleConfig,
 };
-<span class="kw">use </span>fedimint_api::core::{ModuleKey, MODULE_KEY_LN};
+<span class="kw">use </span>fedimint_api::core::{Decoder, ModuleKey, MODULE_KEY_LN};
 <span class="kw">use </span>fedimint_api::db::{Database, DatabaseTransaction};
-<span class="kw">use </span>fedimint_api::encoding::{Decodable, Encodable};
+<span class="kw">use </span>fedimint_api::encoding::{Decodable, Encodable, ModuleRegistry};
 <span class="kw">use </span>fedimint_api::module::audit::Audit;
 <span class="kw">use </span>fedimint_api::module::interconnect::ModuleInterconect;
 <span class="kw">use </span>fedimint_api::module::{
@@ -959,7 +976,7 @@
 <span class="kw">use </span>tracing::{debug, error, info_span, instrument, trace, warn};
 <span class="kw">use </span>url::Url;
 
-<span class="kw">use </span><span class="kw">crate</span>::common::{LightningModuleDecoder, LIGHTNING_MODULE_KEY};
+<span class="kw">use </span><span class="kw">crate</span>::common::LightningModuleDecoder;
 <span class="kw">use </span><span class="kw">crate</span>::config::LightningModuleConfig;
 <span class="kw">use </span><span class="kw">crate</span>::contracts::{
     incoming::{IncomingContractOffer, OfferId},
@@ -991,9 +1008,12 @@
 /// [Account]: contracts::account::AccountContract
 /// [Outgoing]: contracts::outgoing::OutgoingContract
 /// [Incoming]: contracts::incoming::IncomingContract
+</span><span class="attr">#[derive(Debug)]
 </span><span class="kw">pub struct </span>LightningModule {
     cfg: LightningModuleConfig,
-    db: Database,
+    <span class="comment">// TODO: remove DB all together
+    </span>non_consensus_db: Database,
+    decoders: ModuleRegistry&lt;Decoder&gt;,
 }
 
 <span class="attr">#[derive(Debug, Clone, Eq, PartialEq, Hash, Deserialize, Serialize, Encodable, Decodable)]
@@ -1175,7 +1195,11 @@
     <span class="kw">type </span>VerificationCache = LightningVerificationCache;
 
     <span class="kw">fn </span>module_key(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; fedimint_api::encoding::ModuleKey {
-        LIGHTNING_MODULE_KEY
+        MODULE_KEY_LN
+    }
+
+    <span class="kw">fn </span>decoder(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span>::Decoder {
+        LightningModuleDecoder
     }
 
     <span class="kw">async fn </span>await_consensus_proposal(<span class="kw-2">&amp;</span><span class="self">self</span>) {
@@ -1185,8 +1209,8 @@
     }
 
     <span class="kw">async fn </span>consensus_proposal(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;<span class="self">Self</span>::ConsensusItem&gt; {
-        <span class="self">self</span>.db
-            .begin_transaction()
+        <span class="self">self</span>.non_consensus_db
+            .begin_transaction(<span class="self">self</span>.decoders.clone())
             .find_by_prefix(<span class="kw-2">&amp;</span>ProposeDecryptionShareKeyPrefix)
             .map(|res| {
                 <span class="kw">let </span>(ProposeDecryptionShareKey(contract_id), share) = res.expect(<span class="string">&quot;DB error&quot;</span>);
@@ -1200,18 +1224,17 @@
         dbtx: <span class="kw-2">&amp;mut </span>DatabaseTransaction&lt;<span class="lifetime">&#39;b</span>&gt;,
         consensus_items: Vec&lt;(PeerId, <span class="self">Self</span>::ConsensusItem)&gt;,
     ) {
-        consensus_items
-            .into_iter()
-            .for_each(|(peer, decryption_share)| {
-                <span class="kw">let </span>span = <span class="macro">info_span!</span>(<span class="string">&quot;process decryption share&quot;</span>, %peer);
-                <span class="kw">let </span>_guard = span.enter();
+        <span class="kw">for </span>(peer, decryption_share) <span class="kw">in </span>consensus_items.into_iter() {
+            <span class="kw">let </span>span = <span class="macro">info_span!</span>(<span class="string">&quot;process decryption share&quot;</span>, %peer);
+            <span class="kw">let </span>_guard = span.enter();
 
-                dbtx.insert_new_entry(
-                    <span class="kw-2">&amp;</span>AgreedDecryptionShareKey(decryption_share.contract_id, peer),
-                    <span class="kw-2">&amp;</span>decryption_share.share,
-                )
-                .expect(<span class="string">&quot;DB Error&quot;</span>);
-            });
+            dbtx.insert_new_entry(
+                <span class="kw-2">&amp;</span>AgreedDecryptionShareKey(decryption_share.contract_id, peer),
+                <span class="kw-2">&amp;</span>decryption_share.share,
+            )
+            .<span class="kw">await
+            </span>.expect(<span class="string">&quot;DB Error&quot;</span>);
+        }
     }
 
     <span class="kw">fn </span>build_verification_cache&lt;<span class="lifetime">&#39;a</span>&gt;(
@@ -1221,14 +1244,15 @@
         LightningVerificationCache
     }
 
-    <span class="kw">fn </span>validate_input&lt;<span class="lifetime">&#39;a</span>&gt;(
+    <span class="kw">fn </span>validate_input&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt;(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         interconnect: <span class="kw-2">&amp;</span><span class="kw">dyn </span>ModuleInterconect,
-        _cache: <span class="kw-2">&amp;</span><span class="self">Self</span>::VerificationCache,
+        dbtx: <span class="kw-2">&amp;</span>DatabaseTransaction&lt;<span class="lifetime">&#39;b</span>&gt;,
+        _verification_cache: <span class="kw-2">&amp;</span><span class="self">Self</span>::VerificationCache,
         input: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">Self</span>::Input,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;InputMeta, ModuleError&gt; {
         <span class="kw">let </span>account: ContractAccount = <span class="self">self
-            </span>.get_contract_account(input.contract_id)
+            </span>.get_contract_account(dbtx, input.contract_id)
             .ok_or(LightningModuleError::UnknownContract(input.contract_id))
             .into_module_error_other()<span class="question-mark">?</span>;
 
@@ -1293,37 +1317,38 @@
         })
     }
 
-    <span class="kw">fn </span>apply_input&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>, <span class="lifetime">&#39;c</span>&gt;(
+    <span class="kw">async fn </span>apply_input&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>, <span class="lifetime">&#39;c</span>&gt;(
         <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>,
         interconnect: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw">dyn </span>ModuleInterconect,
         dbtx: <span class="kw-2">&amp;mut </span>DatabaseTransaction&lt;<span class="lifetime">&#39;c</span>&gt;,
         input: <span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span><span class="self">Self</span>::Input,
         cache: <span class="kw-2">&amp;</span><span class="self">Self</span>::VerificationCache,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;InputMeta, ModuleError&gt; {
-        <span class="kw">let </span>meta = <span class="self">self</span>.validate_input(interconnect, cache, input)<span class="question-mark">?</span>;
+        <span class="kw">let </span>meta = <span class="self">self</span>.validate_input(interconnect, dbtx, cache, input)<span class="question-mark">?</span>;
 
         <span class="kw">let </span>account_db_key = ContractKey(input.contract_id);
-        <span class="kw">let </span><span class="kw-2">mut </span>contract_account = <span class="self">self
-            </span>.db
-            .begin_transaction()
+        <span class="kw">let </span><span class="kw-2">mut </span>contract_account = dbtx
             .get_value(<span class="kw-2">&amp;</span>account_db_key)
             .expect(<span class="string">&quot;DB error&quot;</span>)
             .expect(<span class="string">&quot;Should fail validation if contract account doesn&#39;t exist&quot;</span>);
         contract_account.amount -= meta.amount.amount;
         dbtx.insert_entry(<span class="kw-2">&amp;</span>account_db_key, <span class="kw-2">&amp;</span>contract_account)
-            .expect(<span class="string">&quot;DB Error&quot;</span>);
+            .<span class="kw">await
+            </span>.expect(<span class="string">&quot;DB Error&quot;</span>);
 
         <span class="prelude-val">Ok</span>(meta)
     }
 
-    <span class="kw">fn </span>validate_output(<span class="kw-2">&amp;</span><span class="self">self</span>, output: <span class="kw-2">&amp;</span><span class="self">Self</span>::Output) -&gt; <span class="prelude-ty">Result</span>&lt;TransactionItemAmount, ModuleError&gt; {
+    <span class="kw">fn </span>validate_output(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        dbtx: <span class="kw-2">&amp;</span>DatabaseTransaction,
+        output: <span class="kw-2">&amp;</span><span class="self">Self</span>::Output,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;TransactionItemAmount, ModuleError&gt; {
         <span class="kw">match </span>output {
             LightningOutput::Contract(contract) =&gt; {
                 <span class="comment">// Incoming contracts are special, they need to match an offer
                 </span><span class="kw">if let </span>Contract::Incoming(incoming) = <span class="kw-2">&amp;</span>contract.contract {
-                    <span class="kw">let </span>offer = <span class="self">self
-                        </span>.db
-                        .begin_transaction()
+                    <span class="kw">let </span>offer = dbtx
                         .get_value(<span class="kw-2">&amp;</span>OfferKey(incoming.hash))
                         .expect(<span class="string">&quot;DB error&quot;</span>)
                         .ok_or(LightningModuleError::NoOffer(incoming.hash))
@@ -1359,9 +1384,7 @@
                 contract,
                 gateway_signature,
             } =&gt; {
-                <span class="kw">let </span>contract_account = <span class="self">self
-                    </span>.db
-                    .begin_transaction()
+                <span class="kw">let </span>contract_account = dbtx
                     .get_value(<span class="kw-2">&amp;</span>ContractKey(<span class="kw-2">*</span>contract))
                     .expect(<span class="string">&quot;DB error&quot;</span>)
                     .ok_or(LightningModuleError::UnknownContract(<span class="kw-2">*</span>contract))
@@ -1389,20 +1412,18 @@
         }
     }
 
-    <span class="kw">fn </span>apply_output&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt;(
+    <span class="kw">async fn </span>apply_output&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt;(
         <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>,
         dbtx: <span class="kw-2">&amp;mut </span>DatabaseTransaction&lt;<span class="lifetime">&#39;b</span>&gt;,
         output: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">Self</span>::Output,
         out_point: OutPoint,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;TransactionItemAmount, ModuleError&gt; {
-        <span class="kw">let </span>amount = <span class="self">self</span>.validate_output(output)<span class="question-mark">?</span>;
+        <span class="kw">let </span>amount = <span class="self">self</span>.validate_output(dbtx, output)<span class="question-mark">?</span>;
 
         <span class="kw">match </span>output {
             LightningOutput::Contract(contract) =&gt; {
                 <span class="kw">let </span>contract_db_key = ContractKey(contract.contract.contract_id());
-                <span class="kw">let </span>updated_contract_account = <span class="self">self
-                    </span>.db
-                    .begin_transaction()
+                <span class="kw">let </span>updated_contract_account = dbtx
                     .get_value(<span class="kw-2">&amp;</span>contract_db_key)
                     .expect(<span class="string">&quot;DB error&quot;</span>)
                     .map(|<span class="kw-2">mut </span>value: ContractAccount| {
@@ -1414,7 +1435,8 @@
                         contract: contract.contract.clone().to_funded(out_point),
                     });
                 dbtx.insert_entry(<span class="kw-2">&amp;</span>contract_db_key, <span class="kw-2">&amp;</span>updated_contract_account)
-                    .expect(<span class="string">&quot;DB Error&quot;</span>);
+                    .<span class="kw">await
+                    </span>.expect(<span class="string">&quot;DB Error&quot;</span>);
 
                 dbtx.insert_new_entry(
                     <span class="kw-2">&amp;</span>ContractUpdateKey(out_point),
@@ -1423,12 +1445,11 @@
                         outcome: contract.contract.to_outcome(),
                     },
                 )
-                .expect(<span class="string">&quot;DB Error&quot;</span>);
+                .<span class="kw">await
+                </span>.expect(<span class="string">&quot;DB Error&quot;</span>);
 
                 <span class="kw">if let </span>Contract::Incoming(incoming) = <span class="kw-2">&amp;</span>contract.contract {
-                    <span class="kw">let </span>offer = <span class="self">self
-                        </span>.db
-                        .begin_transaction()
+                    <span class="kw">let </span>offer = dbtx
                         .get_value(<span class="kw-2">&amp;</span>OfferKey(incoming.hash))
                         .expect(<span class="string">&quot;DB error&quot;</span>)
                         .expect(<span class="string">&quot;offer exists if output is valid&quot;</span>);
@@ -1442,8 +1463,11 @@
                         <span class="kw-2">&amp;</span>ProposeDecryptionShareKey(contract.contract.contract_id()),
                         <span class="kw-2">&amp;</span>PreimageDecryptionShare(decryption_share),
                     )
-                    .expect(<span class="string">&quot;DB Error&quot;</span>);
-                    dbtx.remove_entry(<span class="kw-2">&amp;</span>OfferKey(offer.hash)).expect(<span class="string">&quot;DB Error&quot;</span>);
+                    .<span class="kw">await
+                    </span>.expect(<span class="string">&quot;DB Error&quot;</span>);
+                    dbtx.remove_entry(<span class="kw-2">&amp;</span>OfferKey(offer.hash))
+                        .<span class="kw">await
+                        </span>.expect(<span class="string">&quot;DB Error&quot;</span>);
                 }
             }
             LightningOutput::Offer(offer) =&gt; {
@@ -1451,16 +1475,16 @@
                     <span class="kw-2">&amp;</span>ContractUpdateKey(out_point),
                     <span class="kw-2">&amp;</span>LightningOutputOutcome::Offer { id: offer.id() },
                 )
-                .expect(<span class="string">&quot;DB Error&quot;</span>);
+                .<span class="kw">await
+                </span>.expect(<span class="string">&quot;DB Error&quot;</span>);
                 <span class="comment">// TODO: sanity-check encrypted preimage size
                 </span>dbtx.insert_new_entry(<span class="kw-2">&amp;</span>OfferKey(offer.hash), <span class="kw-2">&amp;</span>(<span class="kw-2">*</span>offer).clone())
-                    .expect(<span class="string">&quot;DB Error&quot;</span>);
+                    .<span class="kw">await
+                    </span>.expect(<span class="string">&quot;DB Error&quot;</span>);
             }
             LightningOutput::CancelOutgoing { contract, .. } =&gt; {
                 <span class="kw">let </span>updated_contract_account = {
-                    <span class="kw">let </span><span class="kw-2">mut </span>contract_account = <span class="self">self
-                        </span>.db
-                        .begin_transaction()
+                    <span class="kw">let </span><span class="kw-2">mut </span>contract_account = dbtx
                         .get_value(<span class="kw-2">&amp;</span>ContractKey(<span class="kw-2">*</span>contract))
                         .expect(<span class="string">&quot;DB error&quot;</span>)
                         .expect(<span class="string">&quot;Contract exists if output is valid&quot;</span>);
@@ -1478,7 +1502,8 @@
                 };
 
                 dbtx.insert_entry(<span class="kw-2">&amp;</span>ContractKey(<span class="kw-2">*</span>contract), <span class="kw-2">&amp;</span>updated_contract_account)
-                    .expect(<span class="string">&quot;DB Error&quot;</span>);
+                    .<span class="kw">await
+                    </span>.expect(<span class="string">&quot;DB Error&quot;</span>);
             }
         }
 
@@ -1492,9 +1517,7 @@
         dbtx: <span class="kw-2">&amp;mut </span>DatabaseTransaction&lt;<span class="lifetime">&#39;b</span>&gt;,
     ) -&gt; Vec&lt;PeerId&gt; {
         <span class="comment">// Decrypt preimages
-        </span><span class="kw">let </span>preimage_decryption_shares = <span class="self">self
-            </span>.db
-            .begin_transaction()
+        </span><span class="kw">let </span>preimage_decryption_shares = dbtx
             .find_by_prefix(<span class="kw-2">&amp;</span>AgreedDecryptionShareKeyPrefix)
             .map(|res| {
                 <span class="kw">let </span>(key, value) = res.expect(<span class="string">&quot;DB error&quot;</span>);
@@ -1508,7 +1531,7 @@
             <span class="kw">let </span>span = <span class="macro">info_span!</span>(<span class="string">&quot;decrypt_preimage&quot;</span>, %contract_id);
             <span class="kw">let </span>_gaurd = span.enter();
 
-            <span class="kw">let </span>incoming_contract = <span class="kw">match </span><span class="self">self</span>.get_contract_account(contract_id) {
+            <span class="kw">let </span>incoming_contract = <span class="kw">match </span><span class="self">self</span>.get_contract_account(dbtx, contract_id) {
                 <span class="prelude-val">Some</span>(ContractAccount {
                     contract: FundedContract::Incoming(incoming),
                     ..
@@ -1517,7 +1540,8 @@
                     <span class="macro">warn!</span>(<span class="string">&quot;Received decryption share for non-existent incoming contract&quot;</span>);
                     <span class="kw">for </span>peer <span class="kw">in </span>peers {
                         dbtx.remove_entry(<span class="kw-2">&amp;</span>AgreedDecryptionShareKey(contract_id, peer))
-                            .expect(<span class="string">&quot;DB Error&quot;</span>);
+                            .<span class="kw">await
+                            </span>.expect(<span class="string">&quot;DB Error&quot;</span>);
                     }
                     <span class="kw">continue</span>;
                 }
@@ -1550,7 +1574,7 @@
             <span class="macro">debug!</span>(<span class="string">&quot;Beginning to decrypt preimage&quot;</span>);
 
             <span class="kw">let </span>contract = <span class="self">self
-                </span>.get_contract_account(contract_id)
+                </span>.get_contract_account(dbtx, contract_id)
                 .expect(<span class="string">&quot;decryption shares without contracts should be discarded earlier&quot;</span>); <span class="comment">// FIXME: verify
 
             </span><span class="kw">let </span>(incoming_contract, out_point) = <span class="kw">match </span>contract.contract {
@@ -1584,10 +1608,12 @@
 
             <span class="comment">// Delete decryption shares once we&#39;ve decrypted the preimage
             </span>dbtx.remove_entry(<span class="kw-2">&amp;</span>ProposeDecryptionShareKey(contract_id))
-                .expect(<span class="string">&quot;DB Error&quot;</span>);
+                .<span class="kw">await
+                </span>.expect(<span class="string">&quot;DB Error&quot;</span>);
             <span class="kw">for </span>peer <span class="kw">in </span>peers {
                 dbtx.remove_entry(<span class="kw-2">&amp;</span>AgreedDecryptionShareKey(contract_id, peer))
-                    .expect(<span class="string">&quot;DB Error&quot;</span>);
+                    .<span class="kw">await
+                    </span>.expect(<span class="string">&quot;DB Error&quot;</span>);
             }
 
             <span class="kw">let </span>decrypted_preimage = <span class="kw">if </span>preimage_vec.len() == <span class="number">32
@@ -1612,9 +1638,7 @@
             <span class="comment">// TODO: maybe define update helper fn
             // Update contract
             </span><span class="kw">let </span>contract_db_key = ContractKey(contract_id);
-            <span class="kw">let </span><span class="kw-2">mut </span>contract_account = <span class="self">self
-                </span>.db
-                .begin_transaction()
+            <span class="kw">let </span><span class="kw-2">mut </span>contract_account = dbtx
                 .get_value(<span class="kw-2">&amp;</span>contract_db_key)
                 .expect(<span class="string">&quot;DB error&quot;</span>)
                 .expect(<span class="string">&quot;checked before that it exists&quot;</span>);
@@ -1625,13 +1649,12 @@
             incoming.contract.decrypted_preimage = decrypted_preimage.clone();
             <span class="macro">trace!</span>(<span class="question-mark">?</span>contract_account, <span class="string">&quot;Updating contract account&quot;</span>);
             dbtx.insert_entry(<span class="kw-2">&amp;</span>contract_db_key, <span class="kw-2">&amp;</span>contract_account)
-                .expect(<span class="string">&quot;DB Error&quot;</span>);
+                .<span class="kw">await
+                </span>.expect(<span class="string">&quot;DB Error&quot;</span>);
 
             <span class="comment">// Update output outcome
             </span><span class="kw">let </span>outcome_db_key = ContractUpdateKey(out_point);
-            <span class="kw">let </span><span class="kw-2">mut </span>outcome = <span class="self">self
-                </span>.db
-                .begin_transaction()
+            <span class="kw">let </span><span class="kw-2">mut </span>outcome = dbtx
                 .get_value(<span class="kw-2">&amp;</span>outcome_db_key)
                 .expect(<span class="string">&quot;DB error&quot;</span>)
                 .expect(<span class="string">&quot;outcome was created on funding&quot;</span>);
@@ -1644,23 +1667,28 @@
             };
             <span class="kw-2">*</span>incoming_contract_outcome_preimage = decrypted_preimage.clone();
             dbtx.insert_entry(<span class="kw-2">&amp;</span>outcome_db_key, <span class="kw-2">&amp;</span>outcome)
-                .expect(<span class="string">&quot;DB Error&quot;</span>);
+                .<span class="kw">await
+                </span>.expect(<span class="string">&quot;DB Error&quot;</span>);
         }
 
         bad_peers
     }
 
     <span class="kw">fn </span>output_status(<span class="kw-2">&amp;</span><span class="self">self</span>, out_point: OutPoint) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::OutputOutcome&gt; {
-        <span class="self">self</span>.db
-            .begin_transaction()
+        <span class="self">self</span>.non_consensus_db
+            .begin_transaction(<span class="self">self</span>.decoders.clone())
             .get_value(<span class="kw-2">&amp;</span>ContractUpdateKey(out_point))
             .expect(<span class="string">&quot;DB error&quot;</span>)
     }
 
     <span class="kw">fn </span>audit(<span class="kw-2">&amp;</span><span class="self">self</span>, audit: <span class="kw-2">&amp;mut </span>Audit) {
-        audit.add_items(<span class="kw-2">&amp;</span><span class="self">self</span>.db, <span class="kw-2">&amp;</span>ContractKeyPrefix, |<span class="kw">_</span>, v| {
-            -(v.amount.milli_sat <span class="kw">as </span>i64)
-        });
+        audit.add_items(
+            <span class="kw-2">&amp;</span><span class="self">self
+                </span>.non_consensus_db
+                .begin_transaction(<span class="self">self</span>.decoders.clone()),
+            <span class="kw-2">&amp;</span>ContractKeyPrefix,
+            |<span class="kw">_</span>, v| -(v.amount.milli_sat <span class="kw">as </span>i64),
+        );
     }
 
     <span class="kw">fn </span>api_base_name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str {
@@ -1673,21 +1701,21 @@
                 <span class="string">&quot;/account&quot;</span>,
                 <span class="kw">async </span>|module: <span class="kw-2">&amp;</span>LightningModule, contract_id: ContractId| -&gt; ContractAccount {
                     module
-                        .get_contract_account(contract_id)
+                        .get_contract_account(<span class="kw-2">&amp;</span>module.non_consensus_db.begin_transaction(module.decoders.clone()), contract_id)
                         .ok_or_else(|| ApiError::not_found(String::from(<span class="string">&quot;Contract not found&quot;</span>)))
                 }
             },
             <span class="macro">api_endpoint! </span>{
                 <span class="string">&quot;/offers&quot;</span>,
                 <span class="kw">async </span>|module: <span class="kw-2">&amp;</span>LightningModule, _params: ()| -&gt; Vec&lt;IncomingContractOffer&gt; {
-                    <span class="prelude-val">Ok</span>(module.get_offers())
+                    <span class="prelude-val">Ok</span>(module.get_offers(<span class="kw-2">&amp;</span>module.non_consensus_db.begin_transaction(module.decoders.clone())))
                 }
             },
             <span class="macro">api_endpoint! </span>{
                 <span class="string">&quot;/offer&quot;</span>,
                 <span class="kw">async </span>|module: <span class="kw-2">&amp;</span>LightningModule, payment_hash: bitcoin_hashes::sha256::Hash| -&gt; IncomingContractOffer {
                     <span class="kw">let </span>offer = module
-                        .get_offer(payment_hash)
+                        .get_offer(<span class="kw-2">&amp;</span>module.non_consensus_db.begin_transaction(module.decoders.clone()), payment_hash)
                         .ok_or_else(|| ApiError::not_found(String::from(<span class="string">&quot;Offer not found&quot;</span>)))<span class="question-mark">?</span>;
 
                     <span class="macro">debug!</span>(%payment_hash, <span class="string">&quot;Sending offer info&quot;</span>);
@@ -1697,7 +1725,7 @@
             <span class="macro">api_endpoint! </span>{
                 <span class="string">&quot;/list_gateways&quot;</span>,
                 <span class="kw">async </span>|module: <span class="kw-2">&amp;</span>LightningModule, _v: ()| -&gt; Vec&lt;LightningGateway&gt; {
-                    <span class="prelude-val">Ok</span>(module.list_gateways())
+                    <span class="prelude-val">Ok</span>(module.list_gateways(<span class="kw-2">&amp;</span>module.non_consensus_db.begin_transaction(module.decoders.clone())))
                 }
             },
             <span class="macro">api_endpoint! </span>{
@@ -1714,8 +1742,16 @@
 }
 
 <span class="kw">impl </span>LightningModule {
-    <span class="kw">pub fn </span>new(cfg: LightningModuleConfig, db: Database) -&gt; <span class="self">Self </span>{
-        LightningModule { cfg, db }
+    <span class="kw">pub fn </span>new(
+        cfg: LightningModuleConfig,
+        db: Database,
+        decoders: ModuleRegistry&lt;Decoder&gt;,
+    ) -&gt; <span class="self">Self </span>{
+        LightningModule {
+            cfg,
+            non_consensus_db: db,
+            decoders,
+        }
     }
 
     <span class="kw">fn </span>validate_decryption_share(
@@ -1732,47 +1768,45 @@
 
     <span class="kw">pub fn </span>get_offer(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
+        dbtx: <span class="kw-2">&amp;</span>DatabaseTransaction,
         payment_hash: bitcoin_hashes::sha256::Hash,
     ) -&gt; <span class="prelude-ty">Option</span>&lt;IncomingContractOffer&gt; {
-        <span class="self">self</span>.db
-            .begin_transaction()
-            .get_value(<span class="kw-2">&amp;</span>OfferKey(payment_hash))
-            .expect(<span class="string">&quot;DB error&quot;</span>)
+        dbtx.get_value(<span class="kw-2">&amp;</span>OfferKey(payment_hash)).expect(<span class="string">&quot;DB error&quot;</span>)
     }
 
-    <span class="kw">pub fn </span>get_offers(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;IncomingContractOffer&gt; {
-        <span class="self">self</span>.db
-            .begin_transaction()
-            .find_by_prefix(<span class="kw-2">&amp;</span>OfferKeyPrefix)
+    <span class="kw">pub fn </span>get_offers(<span class="kw-2">&amp;</span><span class="self">self</span>, dbtx: <span class="kw-2">&amp;</span>DatabaseTransaction) -&gt; Vec&lt;IncomingContractOffer&gt; {
+        dbtx.find_by_prefix(<span class="kw-2">&amp;</span>OfferKeyPrefix)
             .map(|res| res.expect(<span class="string">&quot;DB error&quot;</span>).<span class="number">1</span>)
             .collect()
     }
 
-    <span class="kw">pub fn </span>get_contract_account(<span class="kw-2">&amp;</span><span class="self">self</span>, contract_id: ContractId) -&gt; <span class="prelude-ty">Option</span>&lt;ContractAccount&gt; {
-        <span class="self">self</span>.db
-            .begin_transaction()
-            .get_value(<span class="kw-2">&amp;</span>ContractKey(contract_id))
-            .expect(<span class="string">&quot;DB error&quot;</span>)
+    <span class="kw">pub fn </span>get_contract_account(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        dbtx: <span class="kw-2">&amp;</span>DatabaseTransaction,
+        contract_id: ContractId,
+    ) -&gt; <span class="prelude-ty">Option</span>&lt;ContractAccount&gt; {
+        dbtx.get_value(<span class="kw-2">&amp;</span>ContractKey(contract_id)).expect(<span class="string">&quot;DB error&quot;</span>)
     }
 
-    <span class="kw">pub fn </span>list_gateways(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;LightningGateway&gt; {
-        <span class="self">self</span>.db
-            .begin_transaction()
-            .find_by_prefix(<span class="kw-2">&amp;</span>LightningGatewayKeyPrefix)
+    <span class="kw">pub fn </span>list_gateways(<span class="kw-2">&amp;</span><span class="self">self</span>, dbtx: <span class="kw-2">&amp;</span>DatabaseTransaction) -&gt; Vec&lt;LightningGateway&gt; {
+        dbtx.find_by_prefix(<span class="kw-2">&amp;</span>LightningGatewayKeyPrefix)
             .map(|res| res.expect(<span class="string">&quot;DB error&quot;</span>).<span class="number">1</span>)
             .collect()
     }
 
     <span class="kw">pub async fn </span>register_gateway(<span class="kw-2">&amp;</span><span class="self">self</span>, gateway: LightningGateway) {
-        <span class="kw">let </span><span class="kw-2">mut </span>dbtx = <span class="self">self</span>.db.begin_transaction();
+        <span class="kw">let </span><span class="kw-2">mut </span>dbtx = <span class="self">self
+            </span>.non_consensus_db
+            .begin_transaction(<span class="self">self</span>.decoders.clone());
         dbtx.insert_entry(<span class="kw-2">&amp;</span>LightningGatewayKey(gateway.node_pub_key), <span class="kw-2">&amp;</span>gateway)
-            .expect(<span class="string">&quot;DB error&quot;</span>);
+            .<span class="kw">await
+            </span>.expect(<span class="string">&quot;DB error&quot;</span>);
         dbtx.commit_tx().<span class="kw">await</span>.expect(<span class="string">&quot;DB Error&quot;</span>);
     }
 }
 
 <span class="macro">plugin_types_trait_impl!</span>(
-    common::LIGHTNING_MODULE_KEY,
+    fedimint_api::core::MODULE_KEY_LN,
     LightningInput,
     LightningOutput,
     LightningOutputOutcome,
@@ -1821,4 +1855,4 @@
     </span>InvalidCancellationSignature,
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="fedimint_ln" data-themes="" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (b833ad56f 2022-11-18)" data-search-js="search-df80cc3cb87b6482.js" data-settings-js="settings-7e1cf5cc683233f7.js" data-settings-css="settings-af96d9e2fc13e081.css" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="fedimint_ln" data-themes="" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (e0098a5cc 2022-11-29)" data-search-js="search-444266647c4dba98.js" data-settings-js="settings-bebeae96e00e4617.js" data-settings-css="settings-af96d9e2fc13e081.css" ></div></body></html>

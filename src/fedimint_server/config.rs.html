@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `fedimint-server/src/config.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>config.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-bfda650e0f1b8d97.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../static.files/light-73ec76ce6fb6d670.css"><link rel="stylesheet" disabled href="../../static.files/dark-505cdfdf9d48c666.css"><link rel="stylesheet" disabled href="../../static.files/ayu-de5a1c2641418e5f.css"><script id="default-settings" ></script><script src="../../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../../static.files/source-script-5cf2e01a42cc9858.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-2da75ee0e1909b3a.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><div class="width-limiter"><nav class="sub"><a class="sub-logo-container" href="../../fedimint_server/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `fedimint-server/src/config.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>config.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-ee9f86babca44bc2.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../static.files/light-3bcdcab5f4113412.css"><link rel="stylesheet" disabled href="../../static.files/dark-091ecdca18d5df85.css"><link rel="stylesheet" disabled href="../../static.files/ayu-45445754dcd01ab2.css"><script id="default-settings" ></script><script src="../../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../../static.files/source-script-5cf2e01a42cc9858.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-287cecec4dbb45b0.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><div class="width-limiter"><nav class="sub"><a class="sub-logo-container" href="../../fedimint_server/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -623,6 +623,22 @@
 <a href="#623" id="623">623</a>
 <a href="#624" id="624">624</a>
 <a href="#625" id="625">625</a>
+<a href="#626" id="626">626</a>
+<a href="#627" id="627">627</a>
+<a href="#628" id="628">628</a>
+<a href="#629" id="629">629</a>
+<a href="#630" id="630">630</a>
+<a href="#631" id="631">631</a>
+<a href="#632" id="632">632</a>
+<a href="#633" id="633">633</a>
+<a href="#634" id="634">634</a>
+<a href="#635" id="635">635</a>
+<a href="#636" id="636">636</a>
+<a href="#637" id="637">637</a>
+<a href="#638" id="638">638</a>
+<a href="#639" id="639">639</a>
+<a href="#640" id="640">640</a>
+<a href="#641" id="641">641</a>
 </pre><pre class="rust"><code><span class="kw">use </span>std::collections::{BTreeMap, HashMap};
 
 <span class="kw">use </span>anyhow::{bail, format_err};
@@ -657,6 +673,8 @@
 <span class="kw">use </span><span class="kw">crate</span>::net::peers::{ConnectionConfig, NetworkConfig};
 <span class="kw">use crate</span>::{ReconnectPeerConnections, TlsTcpConnector};
 
+<span class="kw">const </span>DEFAULT_MAX_CLIENT_CONNECTIONS: u32 = <span class="number">1000</span>;
+
 <span class="attr">#[derive(Debug, Clone, Serialize, Deserialize)]
 </span><span class="kw">pub struct </span>ServerConfig {
     <span class="kw">pub </span>federation_name: String,
@@ -680,6 +698,7 @@
     </span><span class="kw">pub </span>epoch_pk_set: hbbft::crypto::PublicKeySet,
 
     <span class="kw">pub </span>modules: BTreeMap&lt;String, ServerModuleConfig&gt;,
+    <span class="kw">pub </span>max_connections: u32,
 }
 
 <span class="kw">impl </span>ServerConfig {
@@ -866,6 +885,7 @@
                         .iter()
                         .map(|(name, cfgs)| (name.to_string(), cfgs.<span class="number">0</span>[<span class="kw-2">&amp;</span>id].clone()))
                         .collect(),
+                    max_connections: DEFAULT_MAX_CLIENT_CONNECTIONS,
                 };
                 (id, config)
             })
@@ -973,6 +993,7 @@
                 .iter()
                 .map(|(name, cfgs)| (name.to_string(), cfgs.<span class="number">0</span>.clone()))
                 .collect(),
+            max_connections: DEFAULT_MAX_CLIENT_CONNECTIONS,
         };
 
         <span class="kw">let </span>client = ClientConfig {
@@ -983,6 +1004,8 @@
                 .map(|(name, cfgs)| (name.to_string(), cfgs.<span class="number">1</span>.clone()))
                 .collect(),
         };
+
+        <span class="macro">info!</span>(<span class="string">&quot;Distributed key generation has completed successfully!&quot;</span>);
 
         <span class="prelude-val">Ok</span>(<span class="prelude-val">Ok</span>((server, client)))
     }
@@ -1056,13 +1079,17 @@
             .collect::&lt;BTreeMap&lt;<span class="kw">_</span>, <span class="kw">_</span>&gt;&gt;()
     }
 
-    <span class="kw">pub fn </span>gen_params(
+    <span class="attr">#[allow(clippy::too_many_arguments)]
+    </span><span class="kw">pub fn </span>gen_params(
+        bind_address: String,
         key: rustls::PrivateKey,
         our_id: PeerId,
         amount_tiers: Vec&lt;Amount&gt;,
         peers: <span class="kw-2">&amp;</span>BTreeMap&lt;PeerId, PeerServerParams&gt;,
         federation_name: String,
         bitcoind_rpc: String,
+        network: bitcoin::network::constants::Network,
+        finality_delay: u32,
     ) -&gt; ServerConfigParams {
         <span class="kw">let </span>peer_certs: HashMap&lt;PeerId, rustls::Certificate&gt; = peers
             .iter()
@@ -1083,28 +1110,30 @@
 
         ServerConfigParams {
             tls,
-            hbbft: <span class="self">Self</span>::gen_network(<span class="kw-2">&amp;</span>our_id, <span class="number">0</span>, peers),
-            api: <span class="self">Self</span>::gen_network(<span class="kw-2">&amp;</span>our_id, <span class="number">1</span>, peers),
-            server_dkg: <span class="self">Self</span>::gen_network(<span class="kw-2">&amp;</span>our_id, <span class="number">2</span>, peers),
+            hbbft: <span class="self">Self</span>::gen_network(<span class="kw-2">&amp;</span>bind_address, <span class="kw-2">&amp;</span>our_id, <span class="number">0</span>, peers),
+            api: <span class="self">Self</span>::gen_network(<span class="kw-2">&amp;</span>bind_address, <span class="kw-2">&amp;</span>our_id, <span class="number">1</span>, peers),
+            server_dkg: <span class="self">Self</span>::gen_network(<span class="kw-2">&amp;</span>bind_address, <span class="kw-2">&amp;</span>our_id, <span class="number">2</span>, peers),
             amount_tiers,
             federation_name,
             bitcoind_rpc,
-            other: BTreeMap::new(),
+            other: <span class="macro">vec!</span>[
+                (<span class="string">&quot;network&quot;</span>.into(), network.to_string().into()),
+                (<span class="string">&quot;finality_delay&quot;</span>.into(), finality_delay.into()),
+            ]
+            .into_iter()
+            .collect(),
         }
     }
 
     <span class="kw">fn </span>gen_network(
+        bind_address: <span class="kw-2">&amp;</span>str,
         our_id: <span class="kw-2">&amp;</span>PeerId,
         offset: u16,
         peers: <span class="kw-2">&amp;</span>BTreeMap&lt;PeerId, PeerServerParams&gt;,
     ) -&gt; NetworkConfig {
         NetworkConfig {
             identity: <span class="kw-2">*</span>our_id,
-            bind_addr: <span class="macro">format!</span>(
-                <span class="string">&quot;{}:{}&quot;</span>,
-                peers[our_id].address,
-                peers[our_id].base_port + offset
-            ),
+            bind_addr: <span class="macro">format!</span>(<span class="string">&quot;{}:{}&quot;</span>, bind_address, peers[our_id].base_port + offset),
             peers: peers
                 .iter()
                 .map(|(peer, params)| {
@@ -1150,12 +1179,15 @@
             .iter()
             .map(|peer| {
                 <span class="kw">let </span>params: ServerConfigParams = <span class="self">Self</span>::gen_params(
+                    <span class="string">&quot;127.0.0.1&quot;</span>.to_string(),
                     keys[peer].<span class="number">1</span>.clone(),
                     <span class="kw-2">*</span>peer,
                     amount_tiers.clone(),
                     <span class="kw-2">&amp;</span>peer_params,
                     federation_name.to_string(),
                     bitcoind_rpc.to_string(),
+                    bitcoin::network::constants::Network::Regtest,
+                    <span class="number">10</span>,
                 );
                 (<span class="kw-2">*</span>peer, params)
             })
@@ -1249,4 +1281,4 @@
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="fedimint_server" data-themes="" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (b833ad56f 2022-11-18)" data-search-js="search-df80cc3cb87b6482.js" data-settings-js="settings-7e1cf5cc683233f7.js" data-settings-css="settings-af96d9e2fc13e081.css" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="fedimint_server" data-themes="" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (e0098a5cc 2022-11-29)" data-search-js="search-444266647c4dba98.js" data-settings-js="settings-bebeae96e00e4617.js" data-settings-css="settings-af96d9e2fc13e081.css" ></div></body></html>

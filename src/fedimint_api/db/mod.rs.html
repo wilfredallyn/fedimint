@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `fedimint-api/src/db/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-bfda650e0f1b8d97.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../../static.files/light-73ec76ce6fb6d670.css"><link rel="stylesheet" disabled href="../../../static.files/dark-505cdfdf9d48c666.css"><link rel="stylesheet" disabled href="../../../static.files/ayu-de5a1c2641418e5f.css"><script id="default-settings" ></script><script src="../../../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../../../static.files/source-script-5cf2e01a42cc9858.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-2da75ee0e1909b3a.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><div class="width-limiter"><nav class="sub"><a class="sub-logo-container" href="../../../fedimint_api/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `fedimint-api/src/db/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-ee9f86babca44bc2.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../../static.files/light-3bcdcab5f4113412.css"><link rel="stylesheet" disabled href="../../../static.files/dark-091ecdca18d5df85.css"><link rel="stylesheet" disabled href="../../../static.files/ayu-45445754dcd01ab2.css"><script id="default-settings" ></script><script src="../../../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../../../static.files/source-script-5cf2e01a42cc9858.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-287cecec4dbb45b0.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><div class="width-limiter"><nav class="sub"><a class="sub-logo-container" href="../../../fedimint_api/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -627,6 +627,80 @@
 <a href="#627" id="627">627</a>
 <a href="#628" id="628">628</a>
 <a href="#629" id="629">629</a>
+<a href="#630" id="630">630</a>
+<a href="#631" id="631">631</a>
+<a href="#632" id="632">632</a>
+<a href="#633" id="633">633</a>
+<a href="#634" id="634">634</a>
+<a href="#635" id="635">635</a>
+<a href="#636" id="636">636</a>
+<a href="#637" id="637">637</a>
+<a href="#638" id="638">638</a>
+<a href="#639" id="639">639</a>
+<a href="#640" id="640">640</a>
+<a href="#641" id="641">641</a>
+<a href="#642" id="642">642</a>
+<a href="#643" id="643">643</a>
+<a href="#644" id="644">644</a>
+<a href="#645" id="645">645</a>
+<a href="#646" id="646">646</a>
+<a href="#647" id="647">647</a>
+<a href="#648" id="648">648</a>
+<a href="#649" id="649">649</a>
+<a href="#650" id="650">650</a>
+<a href="#651" id="651">651</a>
+<a href="#652" id="652">652</a>
+<a href="#653" id="653">653</a>
+<a href="#654" id="654">654</a>
+<a href="#655" id="655">655</a>
+<a href="#656" id="656">656</a>
+<a href="#657" id="657">657</a>
+<a href="#658" id="658">658</a>
+<a href="#659" id="659">659</a>
+<a href="#660" id="660">660</a>
+<a href="#661" id="661">661</a>
+<a href="#662" id="662">662</a>
+<a href="#663" id="663">663</a>
+<a href="#664" id="664">664</a>
+<a href="#665" id="665">665</a>
+<a href="#666" id="666">666</a>
+<a href="#667" id="667">667</a>
+<a href="#668" id="668">668</a>
+<a href="#669" id="669">669</a>
+<a href="#670" id="670">670</a>
+<a href="#671" id="671">671</a>
+<a href="#672" id="672">672</a>
+<a href="#673" id="673">673</a>
+<a href="#674" id="674">674</a>
+<a href="#675" id="675">675</a>
+<a href="#676" id="676">676</a>
+<a href="#677" id="677">677</a>
+<a href="#678" id="678">678</a>
+<a href="#679" id="679">679</a>
+<a href="#680" id="680">680</a>
+<a href="#681" id="681">681</a>
+<a href="#682" id="682">682</a>
+<a href="#683" id="683">683</a>
+<a href="#684" id="684">684</a>
+<a href="#685" id="685">685</a>
+<a href="#686" id="686">686</a>
+<a href="#687" id="687">687</a>
+<a href="#688" id="688">688</a>
+<a href="#689" id="689">689</a>
+<a href="#690" id="690">690</a>
+<a href="#691" id="691">691</a>
+<a href="#692" id="692">692</a>
+<a href="#693" id="693">693</a>
+<a href="#694" id="694">694</a>
+<a href="#695" id="695">695</a>
+<a href="#696" id="696">696</a>
+<a href="#697" id="697">697</a>
+<a href="#698" id="698">698</a>
+<a href="#699" id="699">699</a>
+<a href="#700" id="700">700</a>
+<a href="#701" id="701">701</a>
+<a href="#702" id="702">702</a>
+<a href="#703" id="703">703</a>
 </pre><pre class="rust"><code><span class="kw">use </span>std::collections::BTreeMap;
 <span class="kw">use </span>std::error::Error;
 <span class="kw">use </span>std::fmt::Debug;
@@ -637,7 +711,7 @@
 <span class="kw">use </span>thiserror::Error;
 <span class="kw">use </span>tracing::{trace, warn};
 
-<span class="kw">use </span><span class="kw">crate</span>::core::ModuleDecode;
+<span class="kw">use </span><span class="kw">crate</span>::core::{Decoder, ModuleDecode, ModuleKey};
 <span class="kw">use </span><span class="kw">crate</span>::dyn_newtype_define;
 <span class="kw">use </span><span class="kw">crate</span>::encoding::{Decodable, Encodable, ModuleRegistry};
 
@@ -673,7 +747,10 @@
 }
 
 <span class="kw">pub trait </span>DatabaseKey: Sized + DatabaseKeyPrefix {
-    <span class="kw">fn </span>from_bytes(data: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, DecodingError&gt;;
+    <span class="kw">fn </span>from_bytes&lt;M: ModuleDecode&gt;(
+        data: <span class="kw-2">&amp;</span>[u8],
+        modules: <span class="kw-2">&amp;</span>ModuleRegistry&lt;M&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, DecodingError&gt;;
 }
 
 <span class="kw">pub trait </span>SerializableDatabaseValue: Debug {
@@ -688,8 +765,8 @@
 
 <span class="kw">pub type </span>PrefixIter&lt;<span class="lifetime">&#39;a</span>&gt; = Box&lt;<span class="kw">dyn </span>Iterator&lt;Item = <span class="prelude-ty">Result</span>&lt;(Vec&lt;u8&gt;, Vec&lt;u8&gt;)&gt;&gt; + Send + <span class="lifetime">&#39;a</span>&gt;;
 
-<span class="kw">pub trait </span>IDatabase: Send + Sync {
-    <span class="kw">fn </span>begin_transaction(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; DatabaseTransaction;
+<span class="kw">pub trait </span>IDatabase: Debug + Send + Sync {
+    <span class="kw">fn </span>begin_transaction(<span class="kw-2">&amp;</span><span class="self">self</span>, decoders: ModuleRegistry&lt;Decoder&gt;) -&gt; DatabaseTransaction;
 }
 
 <span class="macro">dyn_newtype_define! </span>{
@@ -725,19 +802,19 @@
 /// | MemoryDB | Prevented          | Prevented  | Prevented           | Prevented      | Possible    |
 /// | SledDB   | Prevented          | Prevented  | Possible            | Possible       | Possible    |
 /// | RocksDB  | Prevented          | Prevented  | Prevented           | Prevented      | Prevented   |
-</span><span class="attr">#[async_trait(<span class="question-mark">?</span>Send)]
+</span><span class="attr">#[async_trait]
 </span><span class="kw">pub trait </span>IDatabaseTransaction&lt;<span class="lifetime">&#39;a</span>&gt;: <span class="lifetime">&#39;a </span>+ Send {
-    <span class="kw">fn </span>raw_insert_bytes(<span class="kw-2">&amp;mut </span><span class="self">self</span>, key: <span class="kw-2">&amp;</span>[u8], value: Vec&lt;u8&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;Vec&lt;u8&gt;&gt;&gt;;
+    <span class="kw">async fn </span>raw_insert_bytes(<span class="kw-2">&amp;mut </span><span class="self">self</span>, key: <span class="kw-2">&amp;</span>[u8], value: Vec&lt;u8&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;Vec&lt;u8&gt;&gt;&gt;;
 
     <span class="kw">fn </span>raw_get_bytes(<span class="kw-2">&amp;</span><span class="self">self</span>, key: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;Vec&lt;u8&gt;&gt;&gt;;
 
-    <span class="kw">fn </span>raw_remove_entry(<span class="kw-2">&amp;mut </span><span class="self">self</span>, key: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;Vec&lt;u8&gt;&gt;&gt;;
+    <span class="kw">async fn </span>raw_remove_entry(<span class="kw-2">&amp;mut </span><span class="self">self</span>, key: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;Vec&lt;u8&gt;&gt;&gt;;
 
     <span class="kw">fn </span>raw_find_by_prefix(<span class="kw-2">&amp;</span><span class="self">self</span>, key_prefix: <span class="kw-2">&amp;</span>[u8]) -&gt; PrefixIter&lt;<span class="lifetime">&#39;_</span>&gt;;
 
     <span class="kw">async fn </span>commit_tx(<span class="self">self</span>: Box&lt;<span class="self">Self</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt;;
 
-    <span class="kw">fn </span>rollback_tx_to_savepoint(<span class="kw-2">&amp;mut </span><span class="self">self</span>);
+    <span class="kw">async fn </span>rollback_tx_to_savepoint(<span class="kw-2">&amp;mut </span><span class="self">self</span>);
 
     <span class="doccomment">/// Create a savepoint during the transaction that can be rolled back to using
     /// rollback_tx_to_savepoint. Rolling back to the savepoint will atomically remove the writes
@@ -748,43 +825,74 @@
     </span><span class="kw">fn </span>set_tx_savepoint(<span class="kw-2">&amp;mut </span><span class="self">self</span>);
 }
 
-<span class="macro">dyn_newtype_define! </span>{
-    <span class="doccomment">/// A handle to a type-erased database implementation
-    </span><span class="kw">pub </span>DatabaseTransaction&lt;<span class="lifetime">&#39;a</span>&gt;(Box&lt;IDatabaseTransaction&gt;)
+<span class="comment">// TODO: use macro again
+</span><span class="attr">#[doc = <span class="string">&quot; A handle to a type-erased database implementation&quot;</span>]
+</span><span class="kw">pub struct </span>DatabaseTransaction&lt;<span class="lifetime">&#39;a</span>&gt;(
+    Box&lt;<span class="kw">dyn </span>IDatabaseTransaction&lt;<span class="lifetime">&#39;a</span>&gt; + Send + <span class="lifetime">&#39;a</span>&gt;,
+    BTreeMap&lt;ModuleKey, Decoder&gt;,
+);
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; std::ops::Deref <span class="kw">for </span>DatabaseTransaction&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">type </span>Target = <span class="kw">dyn </span>IDatabaseTransaction&lt;<span class="lifetime">&#39;a</span>&gt; + Send + <span class="lifetime">&#39;a</span>;
+
+    <span class="kw">fn </span>deref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>&lt;<span class="self">Self </span><span class="kw">as </span>std::ops::Deref&gt;::Target {
+        <span class="kw-2">&amp;*</span><span class="self">self</span>.<span class="number">0
+    </span>}
+}
+
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; std::ops::DerefMut <span class="kw">for </span>DatabaseTransaction&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">fn </span>deref_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span>&lt;<span class="self">Self </span><span class="kw">as </span>std::ops::Deref&gt;::Target {
+        <span class="kw-2">&amp;mut *</span><span class="self">self</span>.<span class="number">0
+    </span>}
 }
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; DatabaseTransaction&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">pub fn </span>new&lt;I: IDatabaseTransaction&lt;<span class="lifetime">&#39;a</span>&gt; + Send + <span class="lifetime">&#39;a</span>&gt;(
+        dbtx: I,
+        decoders: ModuleRegistry&lt;Decoder&gt;,
+    ) -&gt; DatabaseTransaction&lt;<span class="lifetime">&#39;a</span>&gt; {
+        DatabaseTransaction(Box::new(dbtx), decoders)
+    }
+
     <span class="kw">pub async fn </span>commit_tx(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="self">self</span>.<span class="number">0</span>.commit_tx().<span class="kw">await
     </span>}
 }
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; DatabaseTransaction&lt;<span class="lifetime">&#39;a</span>&gt; {
-    <span class="kw">pub fn </span>insert_entry&lt;K&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, key: <span class="kw-2">&amp;</span>K, value: <span class="kw-2">&amp;</span>K::Value) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;K::Value&gt;&gt;
+    <span class="kw">pub async fn </span>insert_entry&lt;K&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, key: <span class="kw-2">&amp;</span>K, value: <span class="kw-2">&amp;</span>K::Value) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;K::Value&gt;&gt;
     <span class="kw">where
         </span>K: DatabaseKey + DatabaseKeyPrefixConst,
     {
-        <span class="kw">match </span><span class="self">self</span>.<span class="number">0</span>.raw_insert_bytes(<span class="kw-2">&amp;</span>key.to_bytes(), value.to_bytes())<span class="question-mark">? </span>{
+        <span class="kw">match </span><span class="self">self
+            </span>.<span class="number">0
+            </span>.raw_insert_bytes(<span class="kw-2">&amp;</span>key.to_bytes(), value.to_bytes())
+            .<span class="kw">await</span><span class="question-mark">?
+        </span>{
             <span class="prelude-val">Some</span>(old_val_bytes) =&gt; {
                 <span class="macro">trace!</span>(
                     <span class="string">&quot;insert_bytes: Decoding {} from bytes {:?}&quot;</span>,
                     std::any::type_name::&lt;K::Value&gt;(),
                     old_val_bytes
                 );
-                <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(K::Value::from_bytes(
-                    <span class="kw-2">&amp;</span>old_val_bytes,
-                    <span class="kw-2">&amp;</span>BTreeMap::&lt;<span class="kw">_</span>, ()&gt;::new(),
-                )<span class="question-mark">?</span>))
+                <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(K::Value::from_bytes(<span class="kw-2">&amp;</span>old_val_bytes, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">1</span>)<span class="question-mark">?</span>))
             }
             <span class="prelude-val">None </span>=&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
         }
     }
 
-    <span class="kw">pub fn </span>insert_new_entry&lt;K&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, key: <span class="kw-2">&amp;</span>K, value: <span class="kw-2">&amp;</span>K::Value) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;K::Value&gt;&gt;
+    <span class="kw">pub async fn </span>insert_new_entry&lt;K&gt;(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        key: <span class="kw-2">&amp;</span>K,
+        value: <span class="kw-2">&amp;</span>K::Value,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;K::Value&gt;&gt;
     <span class="kw">where
         </span>K: DatabaseKey + DatabaseKeyPrefixConst,
     {
-        <span class="kw">match </span><span class="self">self</span>.<span class="number">0</span>.raw_insert_bytes(<span class="kw-2">&amp;</span>key.to_bytes(), value.to_bytes())<span class="question-mark">? </span>{
+        <span class="kw">match </span><span class="self">self
+            </span>.<span class="number">0
+            </span>.raw_insert_bytes(<span class="kw-2">&amp;</span>key.to_bytes(), value.to_bytes())
+            .<span class="kw">await</span><span class="question-mark">?
+        </span>{
             <span class="prelude-val">Some</span>(<span class="kw">_</span>) =&gt; {
                 <span class="macro">warn!</span>(
                     <span class="string">&quot;Database overwriting element when expecting insertion of new entry. Key: {:?}&quot;</span>,
@@ -811,26 +919,20 @@
             std::any::type_name::&lt;K::Value&gt;(),
             value_bytes
         );
-        <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(K::Value::from_bytes(
-            <span class="kw-2">&amp;</span>value_bytes,
-            <span class="kw-2">&amp;</span>BTreeMap::&lt;<span class="kw">_</span>, ()&gt;::new(),
-        )<span class="question-mark">?</span>))
+        <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(K::Value::from_bytes(<span class="kw-2">&amp;</span>value_bytes, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">1</span>)<span class="question-mark">?</span>))
     }
 
-    <span class="kw">pub fn </span>remove_entry&lt;K&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, key: <span class="kw-2">&amp;</span>K) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;K::Value&gt;&gt;
+    <span class="kw">pub async fn </span>remove_entry&lt;K&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, key: <span class="kw-2">&amp;</span>K) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;K::Value&gt;&gt;
     <span class="kw">where
         </span>K: DatabaseKey + DatabaseKeyPrefixConst,
     {
         <span class="kw">let </span>key_bytes = key.to_bytes();
-        <span class="kw">let </span>value_bytes = <span class="kw">match </span><span class="self">self</span>.raw_remove_entry(<span class="kw-2">&amp;</span>key_bytes)<span class="question-mark">? </span>{
+        <span class="kw">let </span>value_bytes = <span class="kw">match </span><span class="self">self</span>.raw_remove_entry(<span class="kw-2">&amp;</span>key_bytes).<span class="kw">await</span><span class="question-mark">? </span>{
             <span class="prelude-val">Some</span>(value) =&gt; value,
             <span class="prelude-val">None </span>=&gt; <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
         };
 
-        <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(K::Value::from_bytes(
-            <span class="kw-2">&amp;</span>value_bytes,
-            <span class="kw-2">&amp;</span>BTreeMap::&lt;<span class="kw">_</span>, ()&gt;::new(),
-        )<span class="question-mark">?</span>))
+        <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(K::Value::from_bytes(<span class="kw-2">&amp;</span>value_bytes, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">1</span>)<span class="question-mark">?</span>))
     }
 
     <span class="kw">pub fn </span>find_by_prefix&lt;KP&gt;(
@@ -840,16 +942,17 @@
     </span><span class="kw">where
         </span>KP: DatabaseKeyPrefix + DatabaseKeyPrefixConst,
     {
+        <span class="kw">let </span>decoders = <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">1</span>;
         <span class="kw">let </span>prefix_bytes = key_prefix.to_bytes();
         <span class="self">self</span>.raw_find_by_prefix(<span class="kw-2">&amp;</span>prefix_bytes).map(|res| {
             res.and_then(|(key_bytes, value_bytes)| {
-                <span class="kw">let </span>key = KP::Key::from_bytes(<span class="kw-2">&amp;</span>key_bytes)<span class="question-mark">?</span>;
+                <span class="kw">let </span>key = KP::Key::from_bytes(<span class="kw-2">&amp;</span>key_bytes, decoders)<span class="question-mark">?</span>;
                 <span class="macro">trace!</span>(
                     <span class="string">&quot;find by prefix: Decoding {} from bytes {:?}&quot;</span>,
                     std::any::type_name::&lt;KP::Value&gt;(),
                     value_bytes
                 );
-                <span class="kw">let </span>value = KP::Value::from_bytes(<span class="kw-2">&amp;</span>value_bytes, <span class="kw-2">&amp;</span>BTreeMap::&lt;<span class="kw">_</span>, ()&gt;::new())<span class="question-mark">?</span>;
+                <span class="kw">let </span>value = KP::Value::from_bytes(<span class="kw-2">&amp;</span>value_bytes, decoders)<span class="question-mark">?</span>;
                 <span class="prelude-val">Ok</span>((key, value))
             })
         })
@@ -873,7 +976,10 @@
     </span><span class="comment">// Note: key can only be `T` that can be decoded without modules (even if module type is `()`)
     </span>T: DatabaseKeyPrefix + DatabaseKeyPrefixConst + <span class="kw">crate</span>::encoding::Decodable + Sized,
 {
-    <span class="kw">fn </span>from_bytes(data: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, DecodingError&gt; {
+    <span class="kw">fn </span>from_bytes&lt;M: ModuleDecode&gt;(
+        data: <span class="kw-2">&amp;</span>[u8],
+        modules: <span class="kw-2">&amp;</span>ModuleRegistry&lt;M&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, DecodingError&gt; {
         <span class="kw">if </span>data.is_empty() {
             <span class="comment">// TODO: build better coding errors, pretty useless right now
             </span><span class="kw">return </span><span class="prelude-val">Err</span>(DecodingError::wrong_length(<span class="number">1</span>, <span class="number">0</span>));
@@ -885,7 +991,7 @@
 
         &lt;<span class="self">Self </span><span class="kw">as </span><span class="kw">crate</span>::encoding::Decodable&gt;::consensus_decode(
             <span class="kw-2">&amp;mut </span>std::io::Cursor::new(<span class="kw-2">&amp;</span>data[<span class="number">1</span>..]),
-            <span class="kw-2">&amp;</span>BTreeMap::&lt;<span class="kw">_</span>, ()&gt;::new(),
+            modules,
         )
         .map_err(|decode_error| DecodingError::Other(decode_error.<span class="number">0</span>))
     }
@@ -944,6 +1050,7 @@
     <span class="kw">use </span><span class="kw">super</span>::Database;
     <span class="kw">use </span><span class="kw">crate</span>::db::DatabaseKeyPrefixConst;
     <span class="kw">use </span><span class="kw">crate</span>::encoding::{Decodable, Encodable};
+    <span class="kw">use </span><span class="kw">crate</span>::ModuleRegistry;
 
     <span class="attr">#[repr(u8)]
     #[derive(Clone)]
@@ -992,78 +1099,95 @@
     </span><span class="kw">struct </span>TestVal(u64);
 
     <span class="kw">pub async fn </span>verify_insert_elements(db: Database) {
-        <span class="kw">let </span><span class="kw-2">mut </span>dbtx = db.begin_transaction();
+        <span class="kw">let </span><span class="kw-2">mut </span>dbtx = db.begin_transaction(ModuleRegistry::default());
         <span class="macro">assert!</span>(dbtx
             .insert_entry(<span class="kw-2">&amp;</span>TestKey(<span class="number">1</span>), <span class="kw-2">&amp;</span>TestVal(<span class="number">2</span>))
-            .unwrap()
+            .<span class="kw">await
+            </span>.unwrap()
             .is_none());
 
         <span class="macro">assert!</span>(dbtx
             .insert_entry(<span class="kw-2">&amp;</span>TestKey(<span class="number">2</span>), <span class="kw-2">&amp;</span>TestVal(<span class="number">3</span>))
-            .unwrap()
+            .<span class="kw">await
+            </span>.unwrap()
             .is_none());
 
         dbtx.commit_tx().<span class="kw">await</span>.expect(<span class="string">&quot;DB Error&quot;</span>);
     }
 
-    <span class="kw">pub fn </span>verify_remove_nonexisting(db: Database) {
-        <span class="kw">let </span><span class="kw-2">mut </span>dbtx = db.begin_transaction();
+    <span class="kw">pub async fn </span>verify_remove_nonexisting(db: Database) {
+        <span class="kw">let </span><span class="kw-2">mut </span>dbtx = db.begin_transaction(ModuleRegistry::default());
         <span class="macro">assert_eq!</span>(dbtx.get_value(<span class="kw-2">&amp;</span>TestKey(<span class="number">1</span>)).unwrap(), <span class="prelude-val">None</span>);
-        <span class="kw">let </span>removed = dbtx.remove_entry(<span class="kw-2">&amp;</span>TestKey(<span class="number">1</span>));
+        <span class="kw">let </span>removed = dbtx.remove_entry(<span class="kw-2">&amp;</span>TestKey(<span class="number">1</span>)).<span class="kw">await</span>;
         <span class="macro">assert!</span>(removed.is_ok());
     }
 
-    <span class="kw">pub fn </span>verify_remove_existing(db: Database) {
-        <span class="kw">let </span><span class="kw-2">mut </span>dbtx = db.begin_transaction();
+    <span class="kw">pub async fn </span>verify_remove_existing(db: Database) {
+        <span class="kw">let </span><span class="kw-2">mut </span>dbtx = db.begin_transaction(ModuleRegistry::default());
 
         <span class="macro">assert!</span>(dbtx
             .insert_entry(<span class="kw-2">&amp;</span>TestKey(<span class="number">1</span>), <span class="kw-2">&amp;</span>TestVal(<span class="number">2</span>))
-            .unwrap()
+            .<span class="kw">await
+            </span>.unwrap()
             .is_none());
 
         <span class="macro">assert_eq!</span>(dbtx.get_value(<span class="kw-2">&amp;</span>TestKey(<span class="number">1</span>)).unwrap(), <span class="prelude-val">Some</span>(TestVal(<span class="number">2</span>)));
 
-        <span class="kw">let </span>removed = dbtx.remove_entry(<span class="kw-2">&amp;</span>TestKey(<span class="number">1</span>));
+        <span class="kw">let </span>removed = dbtx.remove_entry(<span class="kw-2">&amp;</span>TestKey(<span class="number">1</span>)).<span class="kw">await</span>;
         <span class="macro">assert!</span>(removed.is_ok());
         <span class="macro">assert_eq!</span>(removed.unwrap(), <span class="prelude-val">Some</span>(TestVal(<span class="number">2</span>)));
         <span class="macro">assert_eq!</span>(dbtx.get_value(<span class="kw-2">&amp;</span>TestKey(<span class="number">1</span>)).unwrap(), <span class="prelude-val">None</span>);
     }
 
-    <span class="kw">pub fn </span>verify_read_own_writes(db: Database) {
-        <span class="kw">let </span><span class="kw-2">mut </span>dbtx = db.begin_transaction();
+    <span class="kw">pub async fn </span>verify_read_own_writes(db: Database) {
+        <span class="kw">let </span><span class="kw-2">mut </span>dbtx = db.begin_transaction(ModuleRegistry::default());
 
         <span class="macro">assert!</span>(dbtx
             .insert_entry(<span class="kw-2">&amp;</span>TestKey(<span class="number">1</span>), <span class="kw-2">&amp;</span>TestVal(<span class="number">2</span>))
-            .unwrap()
+            .<span class="kw">await
+            </span>.unwrap()
             .is_none());
 
         <span class="macro">assert_eq!</span>(dbtx.get_value(<span class="kw-2">&amp;</span>TestKey(<span class="number">1</span>)).unwrap(), <span class="prelude-val">Some</span>(TestVal(<span class="number">2</span>)));
     }
 
-    <span class="kw">pub fn </span>verify_prevent_dirty_reads(db: Database) {
-        <span class="kw">let </span><span class="kw-2">mut </span>dbtx = db.begin_transaction();
+    <span class="kw">pub async fn </span>verify_prevent_dirty_reads(db: Database) {
+        <span class="kw">let </span><span class="kw-2">mut </span>dbtx = db.begin_transaction(ModuleRegistry::default());
 
         <span class="macro">assert!</span>(dbtx
             .insert_entry(<span class="kw-2">&amp;</span>TestKey(<span class="number">1</span>), <span class="kw-2">&amp;</span>TestVal(<span class="number">2</span>))
-            .unwrap()
+            .<span class="kw">await
+            </span>.unwrap()
             .is_none());
 
         <span class="comment">// dbtx2 should not be able to see uncommitted changes
-        </span><span class="kw">let </span>dbtx2 = db.begin_transaction();
+        </span><span class="kw">let </span>dbtx2 = db.begin_transaction(ModuleRegistry::default());
         <span class="macro">assert_eq!</span>(dbtx2.get_value(<span class="kw-2">&amp;</span>TestKey(<span class="number">1</span>)).unwrap(), <span class="prelude-val">None</span>);
     }
 
     <span class="kw">pub async fn </span>verify_find_by_prefix(db: Database) {
-        <span class="kw">let </span><span class="kw-2">mut </span>dbtx = db.begin_transaction();
-        <span class="macro">assert!</span>(dbtx.insert_entry(<span class="kw-2">&amp;</span>TestKey(<span class="number">55</span>), <span class="kw-2">&amp;</span>TestVal(<span class="number">9999</span>)).is_ok());
-        <span class="macro">assert!</span>(dbtx.insert_entry(<span class="kw-2">&amp;</span>TestKey(<span class="number">54</span>), <span class="kw-2">&amp;</span>TestVal(<span class="number">8888</span>)).is_ok());
+        <span class="kw">let </span><span class="kw-2">mut </span>dbtx = db.begin_transaction(ModuleRegistry::default());
+        <span class="macro">assert!</span>(dbtx
+            .insert_entry(<span class="kw-2">&amp;</span>TestKey(<span class="number">55</span>), <span class="kw-2">&amp;</span>TestVal(<span class="number">9999</span>))
+            .<span class="kw">await
+            </span>.is_ok());
+        <span class="macro">assert!</span>(dbtx
+            .insert_entry(<span class="kw-2">&amp;</span>TestKey(<span class="number">54</span>), <span class="kw-2">&amp;</span>TestVal(<span class="number">8888</span>))
+            .<span class="kw">await
+            </span>.is_ok());
 
-        <span class="macro">assert!</span>(dbtx.insert_entry(<span class="kw-2">&amp;</span>AltTestKey(<span class="number">55</span>), <span class="kw-2">&amp;</span>TestVal(<span class="number">7777</span>)).is_ok());
-        <span class="macro">assert!</span>(dbtx.insert_entry(<span class="kw-2">&amp;</span>AltTestKey(<span class="number">54</span>), <span class="kw-2">&amp;</span>TestVal(<span class="number">6666</span>)).is_ok());
+        <span class="macro">assert!</span>(dbtx
+            .insert_entry(<span class="kw-2">&amp;</span>AltTestKey(<span class="number">55</span>), <span class="kw-2">&amp;</span>TestVal(<span class="number">7777</span>))
+            .<span class="kw">await
+            </span>.is_ok());
+        <span class="macro">assert!</span>(dbtx
+            .insert_entry(<span class="kw-2">&amp;</span>AltTestKey(<span class="number">54</span>), <span class="kw-2">&amp;</span>TestVal(<span class="number">6666</span>))
+            .<span class="kw">await
+            </span>.is_ok());
         dbtx.commit_tx().<span class="kw">await</span>.expect(<span class="string">&quot;DB Error&quot;</span>);
 
         <span class="comment">// Verify finding by prefix returns the correct set of key pairs
-        </span><span class="kw">let </span>dbtx = db.begin_transaction();
+        </span><span class="kw">let </span>dbtx = db.begin_transaction(ModuleRegistry::default());
         <span class="kw">let </span><span class="kw-2">mut </span>returned_keys = <span class="number">0</span>;
         <span class="kw">let </span>expected_keys = <span class="number">2</span>;
         <span class="kw">for </span>res <span class="kw">in </span>dbtx.find_by_prefix(<span class="kw-2">&amp;</span>DbPrefixTestPrefix) {
@@ -1106,31 +1230,34 @@
     }
 
     <span class="kw">pub async fn </span>verify_commit(db: Database) {
-        <span class="kw">let </span><span class="kw-2">mut </span>dbtx = db.begin_transaction();
+        <span class="kw">let </span><span class="kw-2">mut </span>dbtx = db.begin_transaction(ModuleRegistry::default());
 
         <span class="macro">assert!</span>(dbtx
             .insert_entry(<span class="kw-2">&amp;</span>TestKey(<span class="number">1</span>), <span class="kw-2">&amp;</span>TestVal(<span class="number">2</span>))
-            .unwrap()
+            .<span class="kw">await
+            </span>.unwrap()
             .is_none());
         dbtx.commit_tx().<span class="kw">await</span>.expect(<span class="string">&quot;DB Error&quot;</span>);
 
         <span class="comment">// Verify dbtx2 can see committed transactions
-        </span><span class="kw">let </span>dbtx2 = db.begin_transaction();
+        </span><span class="kw">let </span>dbtx2 = db.begin_transaction(ModuleRegistry::default());
         <span class="macro">assert_eq!</span>(dbtx2.get_value(<span class="kw-2">&amp;</span>TestKey(<span class="number">1</span>)).unwrap(), <span class="prelude-val">Some</span>(TestVal(<span class="number">2</span>)));
     }
 
-    <span class="kw">pub fn </span>verify_rollback_to_savepoint(db: Database) {
-        <span class="kw">let </span><span class="kw-2">mut </span>dbtx_rollback = db.begin_transaction();
+    <span class="kw">pub async fn </span>verify_rollback_to_savepoint(db: Database) {
+        <span class="kw">let </span><span class="kw-2">mut </span>dbtx_rollback = db.begin_transaction(ModuleRegistry::default());
 
         <span class="macro">assert!</span>(dbtx_rollback
             .insert_entry(<span class="kw-2">&amp;</span>TestKey(<span class="number">20</span>), <span class="kw-2">&amp;</span>TestVal(<span class="number">2000</span>))
-            .is_ok());
+            .<span class="kw">await
+            </span>.is_ok());
 
         dbtx_rollback.set_tx_savepoint();
 
         <span class="macro">assert!</span>(dbtx_rollback
             .insert_entry(<span class="kw-2">&amp;</span>TestKey(<span class="number">21</span>), <span class="kw-2">&amp;</span>TestVal(<span class="number">2001</span>))
-            .is_ok());
+            .<span class="kw">await
+            </span>.is_ok());
 
         <span class="macro">assert_eq!</span>(
             dbtx_rollback.get_value(<span class="kw-2">&amp;</span>TestKey(<span class="number">20</span>)).unwrap(),
@@ -1141,7 +1268,7 @@
             <span class="prelude-val">Some</span>(TestVal(<span class="number">2001</span>))
         );
 
-        dbtx_rollback.rollback_tx_to_savepoint();
+        dbtx_rollback.rollback_tx_to_savepoint().<span class="kw">await</span>;
 
         <span class="macro">assert_eq!</span>(
             dbtx_rollback.get_value(<span class="kw-2">&amp;</span>TestKey(<span class="number">20</span>)).unwrap(),
@@ -1152,12 +1279,15 @@
     }
 
     <span class="kw">pub async fn </span>verify_prevent_nonrepeatable_reads(db: Database) {
-        <span class="kw">let </span>dbtx = db.begin_transaction();
+        <span class="kw">let </span>dbtx = db.begin_transaction(ModuleRegistry::default());
         <span class="macro">assert_eq!</span>(dbtx.get_value(<span class="kw-2">&amp;</span>TestKey(<span class="number">100</span>)).unwrap(), <span class="prelude-val">None</span>);
 
-        <span class="kw">let </span><span class="kw-2">mut </span>dbtx2 = db.begin_transaction();
+        <span class="kw">let </span><span class="kw-2">mut </span>dbtx2 = db.begin_transaction(ModuleRegistry::default());
 
-        <span class="macro">assert!</span>(dbtx2.insert_entry(<span class="kw-2">&amp;</span>TestKey(<span class="number">100</span>), <span class="kw-2">&amp;</span>TestVal(<span class="number">101</span>)).is_ok());
+        <span class="macro">assert!</span>(dbtx2
+            .insert_entry(<span class="kw-2">&amp;</span>TestKey(<span class="number">100</span>), <span class="kw-2">&amp;</span>TestVal(<span class="number">101</span>))
+            .<span class="kw">await
+            </span>.is_ok());
 
         <span class="macro">assert_eq!</span>(dbtx.get_value(<span class="kw-2">&amp;</span>TestKey(<span class="number">100</span>)).unwrap(), <span class="prelude-val">None</span>);
 
@@ -1185,15 +1315,21 @@
     }
 
     <span class="kw">pub async fn </span>verify_phantom_entry(db: Database) {
-        <span class="kw">let </span><span class="kw-2">mut </span>dbtx = db.begin_transaction();
+        <span class="kw">let </span><span class="kw-2">mut </span>dbtx = db.begin_transaction(ModuleRegistry::default());
 
-        <span class="macro">assert!</span>(dbtx.insert_entry(<span class="kw-2">&amp;</span>TestKey(<span class="number">100</span>), <span class="kw-2">&amp;</span>TestVal(<span class="number">101</span>)).is_ok());
+        <span class="macro">assert!</span>(dbtx
+            .insert_entry(<span class="kw-2">&amp;</span>TestKey(<span class="number">100</span>), <span class="kw-2">&amp;</span>TestVal(<span class="number">101</span>))
+            .<span class="kw">await
+            </span>.is_ok());
 
-        <span class="macro">assert!</span>(dbtx.insert_entry(<span class="kw-2">&amp;</span>TestKey(<span class="number">101</span>), <span class="kw-2">&amp;</span>TestVal(<span class="number">102</span>)).is_ok());
+        <span class="macro">assert!</span>(dbtx
+            .insert_entry(<span class="kw-2">&amp;</span>TestKey(<span class="number">101</span>), <span class="kw-2">&amp;</span>TestVal(<span class="number">102</span>))
+            .<span class="kw">await
+            </span>.is_ok());
 
         dbtx.commit_tx().<span class="kw">await</span>.expect(<span class="string">&quot;DB Error&quot;</span>);
 
-        <span class="kw">let </span>dbtx = db.begin_transaction();
+        <span class="kw">let </span>dbtx = db.begin_transaction(ModuleRegistry::default());
         <span class="kw">let </span><span class="kw-2">mut </span>returned_keys = <span class="number">0</span>;
         <span class="kw">let </span>expected_keys = <span class="number">2</span>;
         <span class="kw">for </span>res <span class="kw">in </span>dbtx.find_by_prefix(<span class="kw-2">&amp;</span>DbPrefixTestPrefix) {
@@ -1214,9 +1350,12 @@
 
         <span class="macro">assert_eq!</span>(returned_keys, expected_keys);
 
-        <span class="kw">let </span><span class="kw-2">mut </span>dbtx2 = db.begin_transaction();
+        <span class="kw">let </span><span class="kw-2">mut </span>dbtx2 = db.begin_transaction(ModuleRegistry::default());
 
-        <span class="macro">assert!</span>(dbtx2.insert_entry(<span class="kw-2">&amp;</span>TestKey(<span class="number">102</span>), <span class="kw-2">&amp;</span>TestVal(<span class="number">103</span>)).is_ok());
+        <span class="macro">assert!</span>(dbtx2
+            .insert_entry(<span class="kw-2">&amp;</span>TestKey(<span class="number">102</span>), <span class="kw-2">&amp;</span>TestVal(<span class="number">103</span>))
+            .<span class="kw">await
+            </span>.is_ok());
 
         dbtx2.commit_tx().<span class="kw">await</span>.expect(<span class="string">&quot;DB Error&quot;</span>);
 
@@ -1241,20 +1380,29 @@
     }
 
     <span class="kw">pub async fn </span>expect_write_conflict(db: Database) {
-        <span class="kw">let </span><span class="kw-2">mut </span>dbtx = db.begin_transaction();
-        <span class="macro">assert!</span>(dbtx.insert_entry(<span class="kw-2">&amp;</span>TestKey(<span class="number">100</span>), <span class="kw-2">&amp;</span>TestVal(<span class="number">101</span>)).is_ok());
+        <span class="kw">let </span><span class="kw-2">mut </span>dbtx = db.begin_transaction(ModuleRegistry::default());
+        <span class="macro">assert!</span>(dbtx
+            .insert_entry(<span class="kw-2">&amp;</span>TestKey(<span class="number">100</span>), <span class="kw-2">&amp;</span>TestVal(<span class="number">101</span>))
+            .<span class="kw">await
+            </span>.is_ok());
         dbtx.commit_tx().<span class="kw">await</span>.expect(<span class="string">&quot;DB Error&quot;</span>);
 
-        <span class="kw">let </span><span class="kw-2">mut </span>dbtx2 = db.begin_transaction();
-        <span class="kw">let </span><span class="kw-2">mut </span>dbtx3 = db.begin_transaction();
+        <span class="kw">let </span><span class="kw-2">mut </span>dbtx2 = db.begin_transaction(ModuleRegistry::default());
+        <span class="kw">let </span><span class="kw-2">mut </span>dbtx3 = db.begin_transaction(ModuleRegistry::default());
 
-        <span class="macro">assert!</span>(dbtx2.insert_entry(<span class="kw-2">&amp;</span>TestKey(<span class="number">100</span>), <span class="kw-2">&amp;</span>TestVal(<span class="number">102</span>)).is_ok());
+        <span class="macro">assert!</span>(dbtx2
+            .insert_entry(<span class="kw-2">&amp;</span>TestKey(<span class="number">100</span>), <span class="kw-2">&amp;</span>TestVal(<span class="number">102</span>))
+            .<span class="kw">await
+            </span>.is_ok());
 
-        <span class="macro">assert!</span>(dbtx3.insert_entry(<span class="kw-2">&amp;</span>TestKey(<span class="number">100</span>), <span class="kw-2">&amp;</span>TestVal(<span class="number">103</span>)).is_ok());
+        <span class="macro">assert!</span>(dbtx3
+            .insert_entry(<span class="kw-2">&amp;</span>TestKey(<span class="number">100</span>), <span class="kw-2">&amp;</span>TestVal(<span class="number">103</span>))
+            .<span class="kw">await
+            </span>.is_ok());
 
         dbtx2.commit_tx().<span class="kw">await</span>.expect(<span class="string">&quot;DB Error&quot;</span>);
         dbtx3.commit_tx().<span class="kw">await</span>.expect_err(<span class="string">&quot;Expecting an error to be returned because this transaction is in a write-write conflict with dbtx&quot;</span>);
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="fedimint_api" data-themes="" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (b833ad56f 2022-11-18)" data-search-js="search-df80cc3cb87b6482.js" data-settings-js="settings-7e1cf5cc683233f7.js" data-settings-css="settings-af96d9e2fc13e081.css" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="fedimint_api" data-themes="" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (e0098a5cc 2022-11-29)" data-search-js="search-444266647c4dba98.js" data-settings-js="settings-bebeae96e00e4617.js" data-settings-css="settings-af96d9e2fc13e081.css" ></div></body></html>

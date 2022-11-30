@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `gateway/ln-gateway/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-bfda650e0f1b8d97.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../static.files/light-73ec76ce6fb6d670.css"><link rel="stylesheet" disabled href="../../static.files/dark-505cdfdf9d48c666.css"><link rel="stylesheet" disabled href="../../static.files/ayu-de5a1c2641418e5f.css"><script id="default-settings" ></script><script src="../../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../../static.files/source-script-5cf2e01a42cc9858.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-2da75ee0e1909b3a.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><div class="width-limiter"><nav class="sub"><a class="sub-logo-container" href="../../ln_gateway/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `gateway/ln-gateway/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-ee9f86babca44bc2.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../static.files/light-3bcdcab5f4113412.css"><link rel="stylesheet" disabled href="../../static.files/dark-091ecdca18d5df85.css"><link rel="stylesheet" disabled href="../../static.files/ayu-45445754dcd01ab2.css"><script id="default-settings" ></script><script src="../../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../../static.files/source-script-5cf2e01a42cc9858.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-287cecec4dbb45b0.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><div class="width-limiter"><nav class="sub"><a class="sub-logo-container" href="../../ln_gateway/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -325,6 +325,30 @@
 <a href="#325" id="325">325</a>
 <a href="#326" id="326">326</a>
 <a href="#327" id="327">327</a>
+<a href="#328" id="328">328</a>
+<a href="#329" id="329">329</a>
+<a href="#330" id="330">330</a>
+<a href="#331" id="331">331</a>
+<a href="#332" id="332">332</a>
+<a href="#333" id="333">333</a>
+<a href="#334" id="334">334</a>
+<a href="#335" id="335">335</a>
+<a href="#336" id="336">336</a>
+<a href="#337" id="337">337</a>
+<a href="#338" id="338">338</a>
+<a href="#339" id="339">339</a>
+<a href="#340" id="340">340</a>
+<a href="#341" id="341">341</a>
+<a href="#342" id="342">342</a>
+<a href="#343" id="343">343</a>
+<a href="#344" id="344">344</a>
+<a href="#345" id="345">345</a>
+<a href="#346" id="346">346</a>
+<a href="#347" id="347">347</a>
+<a href="#348" id="348">348</a>
+<a href="#349" id="349">349</a>
+<a href="#350" id="350">350</a>
+<a href="#351" id="351">351</a>
 </pre><pre class="rust"><code><span class="kw">pub mod </span>actor;
 <span class="kw">pub mod </span>client;
 <span class="kw">pub mod </span>cln;
@@ -344,22 +368,15 @@
 <span class="kw">use </span>axum::response::{IntoResponse, Response};
 <span class="kw">use </span>bitcoin::Address;
 <span class="kw">use </span>bitcoin_hashes::sha256::Hash <span class="kw">as </span>Sha256Hash;
-<span class="kw">use </span>fedimint_api::config::ClientConfig;
-<span class="kw">use </span>fedimint_api::{Amount, NumPeers, TransactionId};
+<span class="kw">use </span>fedimint_api::{task::TaskGroup, Amount, TransactionId};
 <span class="kw">use </span>fedimint_server::modules::ln::contracts::Preimage;
 <span class="kw">use </span>mint_client::{
-    api::{WsFederationApi, WsFederationConnect},
-    ln::PayInvoicePayload,
-    mint::MintClientError,
-    query::CurrentConsensus,
-    ClientError, FederationId, GatewayClient, GatewayClientConfig,
+    api::WsFederationConnect, ln::PayInvoicePayload, mint::MintClientError, ClientError,
+    FederationId, GatewayClient,
 };
-<span class="kw">use </span>rand::thread_rng;
-<span class="kw">use </span>secp256k1::KeyPair;
 <span class="kw">use </span>thiserror::Error;
 <span class="kw">use </span>tokio::sync::mpsc;
 <span class="kw">use </span>tracing::{debug, error, warn};
-<span class="kw">use </span>url::Url;
 
 <span class="kw">use crate</span>::{
     actor::GatewayActor,
@@ -379,34 +396,52 @@
     config: GatewayConfig,
     actors: Mutex&lt;HashMap&lt;Sha256Hash, Arc&lt;GatewayActor&gt;&gt;&gt;,
     ln_rpc: Arc&lt;<span class="kw">dyn </span>LnRpc&gt;,
-    webserver: tokio::task::JoinHandle&lt;axum::response::Result&lt;()&gt;&gt;,
+    sender: mpsc::Sender&lt;GatewayRequest&gt;,
     receiver: mpsc::Receiver&lt;GatewayRequest&gt;,
     client_builder: GatewayClientBuilder,
+    task_group: TaskGroup,
 }
 
 <span class="kw">impl </span>LnGateway {
-    <span class="kw">pub fn </span>new(
+    <span class="kw">pub async fn </span>new(
         config: GatewayConfig,
         ln_rpc: Arc&lt;<span class="kw">dyn </span>LnRpc&gt;,
         client_builder: GatewayClientBuilder,
         <span class="comment">// TODO: consider encapsulating message channel within LnGateway
         </span>sender: mpsc::Sender&lt;GatewayRequest&gt;,
         receiver: mpsc::Receiver&lt;GatewayRequest&gt;,
+        task_group: TaskGroup,
     ) -&gt; <span class="self">Self </span>{
-        <span class="comment">// Run webserver asynchronously in tokio
-        </span><span class="kw">let </span>webserver = tokio::spawn(run_webserver(
-            config.password.clone(),
-            config.address,
-            GatewayRpcSender::new(sender),
-        ));
-
-        <span class="self">Self </span>{
+        <span class="kw">let </span>ln_gw = <span class="self">Self </span>{
             config,
             actors: Mutex::new(HashMap::new()),
             ln_rpc,
-            webserver,
+            sender,
             receiver,
             client_builder,
+            task_group,
+        };
+
+        ln_gw.load_federation_actors().<span class="kw">await</span>;
+
+        ln_gw
+    }
+
+    <span class="kw">async fn </span>load_federation_actors(<span class="kw-2">&amp;</span><span class="self">self</span>) {
+        <span class="kw">if let </span><span class="prelude-val">Ok</span>(configs) = <span class="self">self</span>.client_builder.load_configs() {
+            <span class="kw">for </span>config <span class="kw">in </span>configs {
+                <span class="kw">let </span>client = <span class="self">self
+                    </span>.client_builder
+                    .build(config.clone())
+                    .<span class="kw">await
+                    </span>.expect(<span class="string">&quot;Could not build federation client&quot;</span>);
+
+                <span class="kw">if let </span><span class="prelude-val">Err</span>(e) = <span class="self">self</span>.register_federation(Arc::new(client)).<span class="kw">await </span>{
+                    <span class="macro">error!</span>(<span class="string">&quot;Failed to register federation: {}&quot;</span>, e);
+                }
+            }
+        } <span class="kw">else </span>{
+            <span class="macro">warn!</span>(<span class="string">&quot;Could not load any previous federation configs&quot;</span>);
         }
     }
 
@@ -446,20 +481,6 @@
     </span><span class="kw">async fn </span>handle_register_federation(<span class="kw-2">&amp;</span><span class="self">self</span>, payload: RegisterFedPayload) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="kw">let </span>connect: WsFederationConnect =
             serde_json::from_str(<span class="kw-2">&amp;</span>payload.connect).expect(<span class="string">&quot;Invalid federation connect info&quot;</span>);
-        <span class="kw">let </span>api = WsFederationApi::new(connect.members);
-
-        <span class="kw">let </span>client_cfg: ClientConfig = api
-            .request(
-                <span class="string">&quot;/config&quot;</span>,
-                (),
-                CurrentConsensus::new(api.peers().one_honest()),
-            )
-            .<span class="kw">await
-            </span>.expect(<span class="string">&quot;Failed to get client config&quot;</span>);
-
-        <span class="kw">let </span><span class="kw-2">mut </span>rng = thread_rng();
-        <span class="kw">let </span>ctx = secp256k1::Secp256k1::new();
-        <span class="kw">let </span>kp_fed = KeyPair::new(<span class="kw-2">&amp;</span>ctx, <span class="kw-2">&amp;mut </span>rng);
 
         <span class="kw">let </span>node_pub_key = <span class="self">self
             </span>.ln_rpc
@@ -467,22 +488,24 @@
             .<span class="kw">await
             </span>.expect(<span class="string">&quot;Failed to get node pubkey from Lightning node&quot;</span>);
 
-        <span class="kw">let </span>gw_client_cfg = GatewayClientConfig {
-            client_config: client_cfg,
-            redeem_key: kp_fed,
-            timelock_delta: <span class="number">10</span>,
-            node_pub_key,
-            api: Url::parse(<span class="macro">format!</span>(<span class="string">&quot;http://{}&quot;</span>, <span class="self">self</span>.config.address).as_str())
-                .expect(<span class="string">&quot;Could not parse URL to generate GatewayClientConfig API endpoint&quot;</span>),
-        };
+        <span class="kw">let </span>gw_client_cfg = <span class="self">self
+            </span>.client_builder
+            .create_config(connect, node_pub_key, <span class="self">self</span>.config.announce_address.clone())
+            .<span class="kw">await
+            </span>.expect(<span class="string">&quot;Failed to create gateway client config&quot;</span>);
 
-        <span class="kw">let </span>client = <span class="self">self</span>.client_builder.build(gw_client_cfg.clone())<span class="question-mark">?</span>;
+        <span class="kw">let </span>client = Arc::new(
+            <span class="self">self</span>.client_builder
+                .build(gw_client_cfg.clone())
+                .<span class="kw">await
+                </span>.expect(<span class="string">&quot;Failed to build gateway client&quot;</span>),
+        );
 
-        <span class="kw">if let </span><span class="prelude-val">Err</span>(e) = <span class="self">self</span>.register_federation(Arc::new(client)).<span class="kw">await </span>{
+        <span class="kw">if let </span><span class="prelude-val">Err</span>(e) = <span class="self">self</span>.register_federation(client.clone()).<span class="kw">await </span>{
             <span class="macro">error!</span>(<span class="string">&quot;Failed to register federation: {}&quot;</span>, e);
         }
 
-        <span class="kw">if let </span><span class="prelude-val">Err</span>(e) = <span class="self">self</span>.client_builder.save_config(gw_client_cfg) {
+        <span class="kw">if let </span><span class="prelude-val">Err</span>(e) = <span class="self">self</span>.client_builder.save_config(client.config()) {
             <span class="macro">warn!</span>(
                 <span class="string">&quot;Failed to save default federation client configuration: {}&quot;</span>,
                 e
@@ -569,9 +592,34 @@
             .<span class="kw">await
     </span>}
 
-    <span class="kw">pub async fn </span>run(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+    <span class="kw">pub async fn </span>run(<span class="kw-2">mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>tg = <span class="self">self</span>.task_group.clone();
+
+        <span class="kw">let </span>cfg = <span class="self">self</span>.config.clone();
+        <span class="kw">let </span>sender = GatewayRpcSender::new(<span class="self">self</span>.sender.clone());
+        tg.spawn(<span class="string">&quot;Gateway Webserver&quot;</span>, <span class="kw">move </span>|server_ctrl| <span class="kw">async move </span>{
+            <span class="kw">let </span><span class="kw-2">mut </span>webserver = tokio::spawn(run_webserver(
+                cfg.password.clone(),
+                cfg.bind_address,
+                sender,
+            ));
+
+            <span class="comment">// Shut down webserver if requested
+            </span><span class="kw">if </span>server_ctrl.is_shutting_down() {
+                webserver.abort();
+                <span class="kw">let _ </span>= futures::executor::block_on(<span class="kw-2">&amp;mut </span>webserver);
+            }
+        })
+        .<span class="kw">await</span>;
+
         <span class="comment">// TODO: try to drive forward outgoing and incoming payments that were interrupted
-        </span><span class="kw">loop </span>{
+        </span><span class="kw">let </span>loop_ctrl = tg.make_handle();
+        <span class="kw">loop </span>{
+            <span class="comment">// Shut down main loop if requested
+            </span><span class="kw">if </span>loop_ctrl.is_shutting_down() {
+                <span class="kw">break</span>;
+            }
+
             <span class="kw">let </span>least_wait_until = Instant::now() + Duration::from_millis(<span class="number">100</span>);
 
             <span class="comment">// Handle messages from webserver and plugin
@@ -621,13 +669,13 @@
 
             fedimint_api::task::sleep_until(least_wait_until).<span class="kw">await</span>;
         }
+        <span class="prelude-val">Ok</span>(())
     }
 }
 
 <span class="kw">impl </span>Drop <span class="kw">for </span>LnGateway {
     <span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
-        <span class="self">self</span>.webserver.abort();
-        <span class="kw">let _ </span>= futures::executor::block_on(<span class="kw-2">&amp;mut </span><span class="self">self</span>.webserver);
+        futures::executor::block_on(<span class="self">self</span>.task_group.shutdown());
     }
 }
 
@@ -653,4 +701,4 @@
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="ln_gateway" data-themes="" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (b833ad56f 2022-11-18)" data-search-js="search-df80cc3cb87b6482.js" data-settings-js="settings-7e1cf5cc683233f7.js" data-settings-css="settings-af96d9e2fc13e081.css" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="ln_gateway" data-themes="" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (e0098a5cc 2022-11-29)" data-search-js="search-444266647c4dba98.js" data-settings-js="settings-bebeae96e00e4617.js" data-settings-css="settings-af96d9e2fc13e081.css" ></div></body></html>

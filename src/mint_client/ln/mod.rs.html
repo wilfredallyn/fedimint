@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `client/client-lib/src/ln/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-bfda650e0f1b8d97.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../../static.files/light-73ec76ce6fb6d670.css"><link rel="stylesheet" disabled href="../../../static.files/dark-505cdfdf9d48c666.css"><link rel="stylesheet" disabled href="../../../static.files/ayu-de5a1c2641418e5f.css"><script id="default-settings" ></script><script src="../../../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../../../static.files/source-script-5cf2e01a42cc9858.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-2da75ee0e1909b3a.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><div class="width-limiter"><nav class="sub"><a class="sub-logo-container" href="../../../mint_client/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `client/client-lib/src/ln/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-ee9f86babca44bc2.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../../static.files/light-3bcdcab5f4113412.css"><link rel="stylesheet" disabled href="../../../static.files/dark-091ecdca18d5df85.css"><link rel="stylesheet" disabled href="../../../static.files/ayu-45445754dcd01ab2.css"><script id="default-settings" ></script><script src="../../../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../../../static.files/source-script-5cf2e01a42cc9858.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-287cecec4dbb45b0.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><div class="width-limiter"><nav class="sub"><a class="sub-logo-container" href="../../../mint_client/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -548,15 +548,73 @@
 <a href="#548" id="548">548</a>
 <a href="#549" id="549">549</a>
 <a href="#550" id="550">550</a>
+<a href="#551" id="551">551</a>
+<a href="#552" id="552">552</a>
+<a href="#553" id="553">553</a>
+<a href="#554" id="554">554</a>
+<a href="#555" id="555">555</a>
+<a href="#556" id="556">556</a>
+<a href="#557" id="557">557</a>
+<a href="#558" id="558">558</a>
+<a href="#559" id="559">559</a>
+<a href="#560" id="560">560</a>
+<a href="#561" id="561">561</a>
+<a href="#562" id="562">562</a>
+<a href="#563" id="563">563</a>
+<a href="#564" id="564">564</a>
+<a href="#565" id="565">565</a>
+<a href="#566" id="566">566</a>
+<a href="#567" id="567">567</a>
+<a href="#568" id="568">568</a>
+<a href="#569" id="569">569</a>
+<a href="#570" id="570">570</a>
+<a href="#571" id="571">571</a>
+<a href="#572" id="572">572</a>
+<a href="#573" id="573">573</a>
+<a href="#574" id="574">574</a>
+<a href="#575" id="575">575</a>
+<a href="#576" id="576">576</a>
+<a href="#577" id="577">577</a>
+<a href="#578" id="578">578</a>
+<a href="#579" id="579">579</a>
+<a href="#580" id="580">580</a>
+<a href="#581" id="581">581</a>
+<a href="#582" id="582">582</a>
+<a href="#583" id="583">583</a>
+<a href="#584" id="584">584</a>
+<a href="#585" id="585">585</a>
+<a href="#586" id="586">586</a>
+<a href="#587" id="587">587</a>
+<a href="#588" id="588">588</a>
+<a href="#589" id="589">589</a>
+<a href="#590" id="590">590</a>
+<a href="#591" id="591">591</a>
+<a href="#592" id="592">592</a>
+<a href="#593" id="593">593</a>
+<a href="#594" id="594">594</a>
+<a href="#595" id="595">595</a>
+<a href="#596" id="596">596</a>
+<a href="#597" id="597">597</a>
+<a href="#598" id="598">598</a>
+<a href="#599" id="599">599</a>
+<a href="#600" id="600">600</a>
+<a href="#601" id="601">601</a>
+<a href="#602" id="602">602</a>
+<a href="#603" id="603">603</a>
 </pre><pre class="rust"><code><span class="comment">// TODO: once user and mint client are merged, make this private again
 </span><span class="kw">pub mod </span>db;
+<span class="kw">pub mod </span>decode_stub;
 <span class="kw">pub mod </span>incoming;
 <span class="kw">pub mod </span>outgoing;
 
+<span class="kw">use </span>std::sync::Arc;
 <span class="kw">use </span>std::time::Duration;
 
 <span class="kw">use </span>bitcoin_hashes::sha256::Hash <span class="kw">as </span>Sha256Hash;
+<span class="kw">use </span>fedimint_api::core::client::ClientModulePlugin;
+<span class="kw">use </span>fedimint_api::core::{ModuleKey, MODULE_KEY_LN};
 <span class="kw">use </span>fedimint_api::db::DatabaseTransaction;
+<span class="kw">use </span>fedimint_api::encoding::ModuleRegistry;
 <span class="kw">use </span>fedimint_api::module::TransactionItemAmount;
 <span class="kw">use </span>fedimint_api::task::timeout;
 <span class="kw">use </span>fedimint_api::{Amount, ServerModulePlugin};
@@ -582,15 +640,18 @@
 <span class="kw">use </span><span class="kw">crate</span>::ln::incoming::IncomingContractAccount;
 <span class="kw">use </span><span class="kw">crate</span>::ln::outgoing::{OutgoingContractAccount, OutgoingContractData};
 <span class="kw">use </span><span class="kw">crate</span>::utils::ClientContext;
-<span class="kw">use crate</span>::{FederationId, ModuleClient};
+<span class="kw">use </span><span class="kw">crate</span>::FederationId;
 
-<span class="kw">pub struct </span>LnClient&lt;<span class="lifetime">&#39;c</span>&gt; {
+<span class="attr">#[derive(Debug)]
+</span><span class="kw">pub struct </span>LnClient {
     <span class="kw">pub </span>config: LightningModuleClientConfig,
-    <span class="kw">pub </span>context: <span class="kw-2">&amp;</span><span class="lifetime">&#39;c </span>ClientContext,
+    <span class="kw">pub </span>context: Arc&lt;ClientContext&gt;,
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; ModuleClient <span class="kw">for </span>LnClient&lt;<span class="lifetime">&#39;a</span>&gt; {
+<span class="kw">impl </span>ClientModulePlugin <span class="kw">for </span>LnClient {
+    <span class="kw">type </span>Decoder = &lt;LightningModule <span class="kw">as </span>ServerModulePlugin&gt;::Decoder;
     <span class="kw">type </span>Module = LightningModule;
+    <span class="kw">const </span>MODULE_KEY: ModuleKey = MODULE_KEY_LN;
 
     <span class="kw">fn </span>input_amount(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
@@ -622,10 +683,10 @@
 }
 
 <span class="attr">#[allow(dead_code)]
-</span><span class="kw">impl</span>&lt;<span class="lifetime">&#39;c</span>&gt; LnClient&lt;<span class="lifetime">&#39;c</span>&gt; {
+</span><span class="kw">impl </span>LnClient {
     <span class="doccomment">/// Create an output that incentivizes a Lighning gateway to pay an invoice for us. It has time
     /// till the block height defined by `timelock`, after that we can claim our money back.
-    </span><span class="kw">pub fn </span>create_outgoing_output&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt;(
+    </span><span class="kw">pub async fn </span>create_outgoing_output&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt;(
         <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>,
         dbtx: <span class="kw-2">&amp;mut </span>DatabaseTransaction&lt;<span class="lifetime">&#39;b</span>&gt;,
         invoice: Invoice,
@@ -666,7 +727,8 @@
             <span class="kw-2">&amp;</span>OutgoingPaymentKey(contract.contract_id()),
             <span class="kw-2">&amp;</span>outgoing_payment,
         )
-        .expect(<span class="string">&quot;DB Error&quot;</span>);
+        .<span class="kw">await
+        </span>.expect(<span class="string">&quot;DB Error&quot;</span>);
 
         <span class="prelude-val">Ok</span>(LightningOutput::Contract(ContractOutput {
             amount: contract_amount,
@@ -737,7 +799,7 @@
         <span class="comment">// TODO: unify block height type
         </span><span class="self">self</span>.context
             .db
-            .begin_transaction()
+            .begin_transaction(ModuleRegistry::default())
             .find_by_prefix(<span class="kw-2">&amp;</span>OutgoingPaymentKeyPrefix)
             .filter_map(|res| {
                 <span class="kw">let </span>(_key, outgoing_data) = res.expect(<span class="string">&quot;DB error&quot;</span>);
@@ -800,9 +862,10 @@
     }
 
     <span class="kw">pub async fn </span>save_confirmed_invoice(<span class="kw-2">&amp;</span><span class="self">self</span>, invoice: <span class="kw-2">&amp;</span>ConfirmedInvoice) {
-        <span class="kw">let </span><span class="kw-2">mut </span>dbtx = <span class="self">self</span>.context.db.begin_transaction();
+        <span class="kw">let </span><span class="kw-2">mut </span>dbtx = <span class="self">self</span>.context.db.begin_transaction(ModuleRegistry::default());
         dbtx.insert_entry(<span class="kw-2">&amp;</span>ConfirmedInvoiceKey(invoice.contract_id()), invoice)
-            .expect(<span class="string">&quot;Db error&quot;</span>);
+            .<span class="kw">await
+            </span>.expect(<span class="string">&quot;Db error&quot;</span>);
         dbtx.commit_tx().<span class="kw">await</span>.expect(<span class="string">&quot;DB Error&quot;</span>);
     }
 
@@ -810,7 +873,7 @@
         <span class="kw">let </span>confirmed_invoice = <span class="self">self
             </span>.context
             .db
-            .begin_transaction()
+            .begin_transaction(ModuleRegistry::default())
             .get_value(<span class="kw-2">&amp;</span>ConfirmedInvoiceKey(contract_id))
             .expect(<span class="string">&quot;Db error&quot;</span>)
             .ok_or(LnClientError::NoConfirmedInvoice(contract_id))<span class="question-mark">?</span>;
@@ -866,18 +929,21 @@
     <span class="kw">use </span>async_trait::async_trait;
     <span class="kw">use </span>bitcoin::hashes::{sha256, Hash};
     <span class="kw">use </span>bitcoin::Address;
+    <span class="kw">use </span>fedimint_api::backup::SignedBackupRequest;
     <span class="kw">use </span>fedimint_api::config::ModuleConfigGenParams;
+    <span class="kw">use </span>fedimint_api::core::{Decoder, OutputOutcome, MODULE_KEY_LN};
     <span class="kw">use </span>fedimint_api::db::mem_impl::MemDatabase;
+    <span class="kw">use </span>fedimint_api::encoding::ModuleRegistry;
     <span class="kw">use </span>fedimint_api::{Amount, OutPoint, TransactionId};
     <span class="kw">use </span>fedimint_core::epoch::EpochHistory;
+    <span class="kw">use </span>fedimint_core::modules::ln::common::LightningModuleDecoder;
     <span class="kw">use </span>fedimint_core::modules::ln::config::LightningModuleClientConfig;
     <span class="kw">use </span>fedimint_core::modules::ln::contracts::incoming::IncomingContractOffer;
     <span class="kw">use </span>fedimint_core::modules::ln::contracts::{ContractId, IdentifyableContract};
     <span class="kw">use </span>fedimint_core::modules::ln::{ContractAccount, LightningModule, LightningModuleConfigGen};
     <span class="kw">use </span>fedimint_core::modules::ln::{LightningGateway, LightningOutput};
     <span class="kw">use </span>fedimint_core::modules::wallet::PegOutFees;
-    <span class="kw">use </span>fedimint_core::outcome::{OutputOutcome, TransactionStatus};
-    <span class="kw">use </span>fedimint_core::transaction::Transaction;
+    <span class="kw">use </span>fedimint_core::outcome::{SerdeOutputOutcome, TransactionStatus};
     <span class="kw">use </span>fedimint_testing::FakeFed;
     <span class="kw">use </span>lightning_invoice::Invoice;
     <span class="kw">use </span>threshold_crypto::PublicKey;
@@ -885,11 +951,12 @@
 
     <span class="kw">use </span><span class="kw">crate</span>::api::IFederationApi;
     <span class="kw">use </span><span class="kw">crate</span>::ln::LnClient;
-    <span class="kw">use </span><span class="kw">crate</span>::ClientContext;
+    <span class="kw">use crate</span>::{ClientContext, LegacyTransaction};
 
     <span class="kw">type </span>Fed = FakeFed&lt;LightningModule&gt;;
 
-    <span class="kw">struct </span>FakeApi {
+    <span class="attr">#[derive(Debug)]
+    </span><span class="kw">struct </span>FakeApi {
         mint: Arc&lt;tokio::sync::Mutex&lt;Fed&gt;&gt;,
     }
 
@@ -902,17 +969,20 @@
             <span class="kw">let </span>mint = <span class="self">self</span>.mint.lock().<span class="kw">await</span>;
             <span class="prelude-val">Ok</span>(TransactionStatus::Accepted {
                 epoch: <span class="number">0</span>,
-                outputs: <span class="macro">vec!</span>[OutputOutcome::LN(
+                outputs: <span class="macro">vec!</span>[SerdeOutputOutcome::from(<span class="kw-2">&amp;</span>OutputOutcome::from(
                     mint.output_outcome(OutPoint {
                         txid: tx,
                         out_idx: <span class="number">0</span>,
                     })
                     .unwrap(),
-                )],
+                ))],
             })
         }
 
-        <span class="kw">async fn </span>submit_transaction(<span class="kw-2">&amp;</span><span class="self">self</span>, _tx: Transaction) -&gt; <span class="kw">crate</span>::api::Result&lt;TransactionId&gt; {
+        <span class="kw">async fn </span>submit_transaction(
+            <span class="kw-2">&amp;</span><span class="self">self</span>,
+            _tx: LegacyTransaction,
+        ) -&gt; <span class="kw">crate</span>::api::Result&lt;TransactionId&gt; {
             <span class="macro">unimplemented!</span>()
         }
 
@@ -924,7 +994,12 @@
                 </span>.mint
                 .lock()
                 .<span class="kw">await
-                </span>.fetch_from_all(|m| m.get_contract_account(contract))
+                </span>.fetch_from_all(|m, db| {
+                    m.get_contract_account(
+                        <span class="kw-2">&amp;</span>db.begin_transaction(ModuleRegistry::default()),
+                        contract,
+                    )
+                })
                 .unwrap())
         }
 
@@ -963,12 +1038,36 @@
             <span class="macro">unimplemented!</span>()
         }
 
+        <span class="kw">async fn </span>fetch_last_epoch(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">crate</span>::api::Result&lt;u64&gt; {
+            <span class="macro">unimplemented!</span>()
+        }
+
         <span class="kw">async fn </span>offer_exists(
             <span class="kw-2">&amp;</span><span class="self">self</span>,
             _payment_hash: bitcoin::hashes::sha256::Hash,
         ) -&gt; <span class="kw">crate</span>::api::Result&lt;bool&gt; {
             <span class="macro">unimplemented!</span>()
         }
+
+        <span class="kw">async fn </span>upload_ecash_backup(
+            <span class="kw-2">&amp;</span><span class="self">self</span>,
+            _request: <span class="kw-2">&amp;</span>SignedBackupRequest,
+        ) -&gt; <span class="kw">crate</span>::api::Result&lt;()&gt; {
+            <span class="macro">unimplemented!</span>()
+        }
+
+        <span class="kw">async fn </span>download_ecash_backup(
+            <span class="kw-2">&amp;</span><span class="self">self</span>,
+            _id: <span class="kw-2">&amp;</span>secp256k1::XOnlyPublicKey,
+        ) -&gt; <span class="kw">crate</span>::api::Result&lt;Vec&lt;u8&gt;&gt; {
+            <span class="macro">unimplemented!</span>()
+        }
+    }
+
+    <span class="kw">fn </span>ln_decoders() -&gt; ModuleRegistry {
+        <span class="macro">vec!</span>[(MODULE_KEY_LN, Decoder::from_typed(LightningModuleDecoder))]
+            .into_iter()
+            .collect()
     }
 
     <span class="kw">async fn </span>new_mint_and_client() -&gt; (
@@ -976,16 +1075,19 @@
         LightningModuleClientConfig,
         ClientContext,
     ) {
-        <span class="kw">let </span>fed = Arc::new(tokio::sync::Mutex::new(
-            FakeFed::&lt;LightningModule&gt;::new(
-                <span class="number">4</span>,
-                |cfg, db| <span class="kw">async move </span>{ <span class="prelude-val">Ok</span>(LightningModule::new(cfg.to_typed()<span class="question-mark">?</span>, db)) },
-                <span class="kw-2">&amp;</span>ModuleConfigGenParams::fake_config_gen_params(),
-                <span class="kw-2">&amp;</span>LightningModuleConfigGen,
-            )
-            .<span class="kw">await
-            </span>.unwrap(),
-        ));
+        <span class="kw">let </span>fed =
+            Arc::new(tokio::sync::Mutex::new(
+                FakeFed::&lt;LightningModule&gt;::new(
+                    <span class="number">4</span>,
+                    |cfg, db| <span class="kw">async move </span>{
+                        <span class="prelude-val">Ok</span>(LightningModule::new(cfg.to_typed()<span class="question-mark">?</span>, db, ln_decoders()))
+                    },
+                    <span class="kw-2">&amp;</span>ModuleConfigGenParams::fake_config_gen_params(),
+                    <span class="kw-2">&amp;</span>LightningModuleConfigGen,
+                )
+                .<span class="kw">await
+                </span>.unwrap(),
+            ));
         <span class="kw">let </span>api = FakeApi { mint: fed.clone() };
         <span class="kw">let </span>client_config = fed.lock().<span class="kw">await</span>.client_cfg().clone();
 
@@ -1005,7 +1107,7 @@
 
         <span class="kw">let </span>client = LnClient {
             config: client_config,
-            context: <span class="kw-2">&amp;</span>client_context,
+            context: Arc::new(client_context),
         };
 
         fed.lock().<span class="kw">await</span>.set_block_height(<span class="number">1</span>);
@@ -1035,10 +1137,14 @@
         };
         <span class="kw">let </span>timelock = <span class="number">42</span>;
 
-        <span class="kw">let </span><span class="kw-2">mut </span>dbtx = client.context.db.begin_transaction();
+        <span class="kw">let </span><span class="kw-2">mut </span>dbtx = client
+            .context
+            .db
+            .begin_transaction(ModuleRegistry::default());
         <span class="kw">let </span>output = client
             .create_outgoing_output(<span class="kw-2">&amp;mut </span>dbtx, invoice.clone(), <span class="kw-2">&amp;</span>gateway, timelock, <span class="kw-2">&amp;mut </span>rng)
-            .unwrap();
+            .<span class="kw">await
+            </span>.unwrap();
 
         dbtx.commit_tx().<span class="kw">await</span>.expect(<span class="string">&quot;DB Error&quot;</span>);
 
@@ -1099,4 +1205,4 @@
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="mint_client" data-themes="" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (b833ad56f 2022-11-18)" data-search-js="search-df80cc3cb87b6482.js" data-settings-js="settings-7e1cf5cc683233f7.js" data-settings-css="settings-af96d9e2fc13e081.css" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="mint_client" data-themes="" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (e0098a5cc 2022-11-29)" data-search-js="search-444266647c4dba98.js" data-settings-js="settings-bebeae96e00e4617.js" data-settings-css="settings-af96d9e2fc13e081.css" ></div></body></html>
