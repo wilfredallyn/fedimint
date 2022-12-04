@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `modules/fedimint-ln/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-ee9f86babca44bc2.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../static.files/light-3bcdcab5f4113412.css"><link rel="stylesheet" disabled href="../../static.files/dark-091ecdca18d5df85.css"><link rel="stylesheet" disabled href="../../static.files/ayu-45445754dcd01ab2.css"><script id="default-settings" ></script><script src="../../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../../static.files/source-script-5cf2e01a42cc9858.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-287cecec4dbb45b0.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><div class="width-limiter"><nav class="sub"><a class="sub-logo-container" href="../../fedimint_ln/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `modules/fedimint-ln/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-e963ab4a0d0c903e.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../static.files/light-046227e470cd3629.css"><link rel="stylesheet" disabled href="../../static.files/dark-800f2ee593c8e6f7.css"><link rel="stylesheet" disabled href="../../static.files/ayu-9edae3c387f5a5b3.css"><script id="default-settings" ></script><script src="../../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../../static.files/source-script-5cf2e01a42cc9858.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-287cecec4dbb45b0.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><div class="width-limiter"><nav class="sub"><a class="sub-logo-container" href="../../fedimint_ln/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -926,6 +926,42 @@
 <a href="#926" id="926">926</a>
 <a href="#927" id="927">927</a>
 <a href="#928" id="928">928</a>
+<a href="#929" id="929">929</a>
+<a href="#930" id="930">930</a>
+<a href="#931" id="931">931</a>
+<a href="#932" id="932">932</a>
+<a href="#933" id="933">933</a>
+<a href="#934" id="934">934</a>
+<a href="#935" id="935">935</a>
+<a href="#936" id="936">936</a>
+<a href="#937" id="937">937</a>
+<a href="#938" id="938">938</a>
+<a href="#939" id="939">939</a>
+<a href="#940" id="940">940</a>
+<a href="#941" id="941">941</a>
+<a href="#942" id="942">942</a>
+<a href="#943" id="943">943</a>
+<a href="#944" id="944">944</a>
+<a href="#945" id="945">945</a>
+<a href="#946" id="946">946</a>
+<a href="#947" id="947">947</a>
+<a href="#948" id="948">948</a>
+<a href="#949" id="949">949</a>
+<a href="#950" id="950">950</a>
+<a href="#951" id="951">951</a>
+<a href="#952" id="952">952</a>
+<a href="#953" id="953">953</a>
+<a href="#954" id="954">954</a>
+<a href="#955" id="955">955</a>
+<a href="#956" id="956">956</a>
+<a href="#957" id="957">957</a>
+<a href="#958" id="958">958</a>
+<a href="#959" id="959">959</a>
+<a href="#960" id="960">960</a>
+<a href="#961" id="961">961</a>
+<a href="#962" id="962">962</a>
+<a href="#963" id="963">963</a>
+<a href="#964" id="964">964</a>
 </pre><pre class="rust"><code><span class="doccomment">//! # Lightning Module
 //!
 //! This module allows to atomically and trustlessly (in the federated trust model) interact with
@@ -955,9 +991,9 @@
     ClientModuleConfig, DkgPeerMsg, DkgRunner, ModuleConfigGenParams, ServerModuleConfig,
     TypedServerModuleConfig,
 };
-<span class="kw">use </span>fedimint_api::core::{Decoder, ModuleKey, MODULE_KEY_LN};
-<span class="kw">use </span>fedimint_api::db::{Database, DatabaseTransaction};
-<span class="kw">use </span>fedimint_api::encoding::{Decodable, Encodable, ModuleRegistry};
+<span class="kw">use </span>fedimint_api::core::{ModuleKey, MODULE_KEY_LN};
+<span class="kw">use </span>fedimint_api::db::DatabaseTransaction;
+<span class="kw">use </span>fedimint_api::encoding::{Decodable, Encodable};
 <span class="kw">use </span>fedimint_api::module::audit::Audit;
 <span class="kw">use </span>fedimint_api::module::interconnect::ModuleInterconect;
 <span class="kw">use </span>fedimint_api::module::{
@@ -1011,9 +1047,6 @@
 </span><span class="attr">#[derive(Debug)]
 </span><span class="kw">pub struct </span>LightningModule {
     cfg: LightningModuleConfig,
-    <span class="comment">// TODO: remove DB all together
-    </span>non_consensus_db: Database,
-    decoders: ModuleRegistry&lt;Decoder&gt;,
 }
 
 <span class="attr">#[derive(Debug, Clone, Eq, PartialEq, Hash, Deserialize, Serialize, Encodable, Decodable)]
@@ -1025,6 +1058,16 @@
     /// signature. The signature is aggregated on the transaction level, so only the optional
     /// preimage remains.
     </span><span class="kw">pub </span>witness: <span class="prelude-ty">Option</span>&lt;Preimage&gt;,
+}
+
+<span class="kw">impl </span>std::fmt::Display <span class="kw">for </span>LightningInput {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; std::fmt::Result {
+        <span class="macro">write!</span>(
+            f,
+            <span class="string">&quot;Lightning Contract {} with amount {}&quot;</span>,
+            <span class="self">self</span>.contract_id, <span class="self">self</span>.amount
+        )
+    }
 }
 
 <span class="doccomment">/// Represents an output of the Lightning module.
@@ -1053,6 +1096,38 @@
     },
 }
 
+<span class="kw">impl </span>std::fmt::Display <span class="kw">for </span>LightningOutput {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; std::fmt::Result {
+        <span class="kw">match </span><span class="self">self </span>{
+            LightningOutput::Contract(ContractOutput { amount, contract }) =&gt; <span class="kw">match </span>contract {
+                Contract::Account(acc) =&gt; {
+                    <span class="macro">write!</span>(f, <span class="string">&quot;LN Account Contract for {} key {}&quot;</span>, amount, acc.key)
+                }
+                Contract::Incoming(incoming) =&gt; {
+                    <span class="macro">write!</span>(
+                        f,
+                        <span class="string">&quot;LN Incoming Contract for {} hash {}&quot;</span>,
+                        amount, incoming.hash
+                    )
+                }
+                Contract::Outgoing(outgoing) =&gt; {
+                    <span class="macro">write!</span>(
+                        f,
+                        <span class="string">&quot;LN Outgoing Contract for {} hash {}&quot;</span>,
+                        amount, outgoing.hash
+                    )
+                }
+            },
+            LightningOutput::Offer(offer) =&gt; {
+                <span class="macro">write!</span>(f, <span class="string">&quot;LN offer for {} with hash {}&quot;</span>, offer.amount, offer.hash)
+            }
+            LightningOutput::CancelOutgoing { contract, .. } =&gt; {
+                <span class="macro">write!</span>(f, <span class="string">&quot;LN outgoing contract cancellation {}&quot;</span>, contract)
+            }
+        }
+    }
+}
+
 <span class="attr">#[derive(Debug, Clone, Eq, PartialEq, Hash, Deserialize, Serialize, Encodable, Decodable)]
 </span><span class="kw">pub struct </span>ContractOutput {
     <span class="kw">pub </span>amount: fedimint_api::Amount,
@@ -1076,6 +1151,19 @@
     },
 }
 
+<span class="kw">impl </span>std::fmt::Display <span class="kw">for </span>LightningOutputOutcome {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; std::fmt::Result {
+        <span class="kw">match </span><span class="self">self </span>{
+            LightningOutputOutcome::Contract { id, .. } =&gt; {
+                <span class="macro">write!</span>(f, <span class="string">&quot;LN Contract {}&quot;</span>, id)
+            }
+            LightningOutputOutcome::Offer { id } =&gt; {
+                <span class="macro">write!</span>(f, <span class="string">&quot;LN Offer {}&quot;</span>, id)
+            }
+        }
+    }
+}
+
 <span class="attr">#[derive(Debug, Clone, Serialize, Deserialize, Encodable, Decodable, PartialEq, Eq, Hash)]
 </span><span class="kw">pub struct </span>LightningGateway {
     <span class="kw">pub </span>mint_pub_key: secp256k1::XOnlyPublicKey,
@@ -1087,6 +1175,12 @@
 </span><span class="kw">pub struct </span>LightningConsensusItem {
     <span class="kw">pub </span>contract_id: ContractId,
     <span class="kw">pub </span>share: PreimageDecryptionShare,
+}
+
+<span class="kw">impl </span>std::fmt::Display <span class="kw">for </span>LightningConsensusItem {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; std::fmt::Result {
+        <span class="macro">write!</span>(f, <span class="string">&quot;LN Decryption Share for contract {}&quot;</span>, <span class="self">self</span>.contract_id)
+    }
 }
 
 <span class="attr">#[derive(Debug, Clone, PartialEq, Eq, Hash, Encodable, Decodable, Serialize, Deserialize)]
@@ -1140,7 +1234,7 @@
         peers: <span class="kw-2">&amp;</span>[PeerId],
         _params: <span class="kw-2">&amp;</span>ModuleConfigGenParams,
         _task_group: <span class="kw-2">&amp;mut </span>TaskGroup,
-    ) -&gt; anyhow::Result&lt;Cancellable&lt;(ServerModuleConfig, ClientModuleConfig)&gt;&gt; {
+    ) -&gt; anyhow::Result&lt;Cancellable&lt;ServerModuleConfig&gt;&gt; {
         <span class="kw">let </span><span class="kw-2">mut </span>dkg = DkgRunner::new((), peers.threshold(), our_id, peers);
         <span class="kw">let </span>g1 = <span class="kw">if let </span><span class="prelude-val">Ok</span>(g1) = dkg.run_g1(MODULE_KEY_LN, connections, <span class="kw-2">&amp;mut </span>OsRng).<span class="kw">await </span>{
             g1
@@ -1151,25 +1245,13 @@
         <span class="kw">let </span>(pks, sks) = g1[<span class="kw-2">&amp;</span>()].threshold_crypto();
 
         <span class="kw">let </span>server = LightningModuleConfig {
-            threshold_pub_keys: pks.clone(),
+            threshold_pub_keys: pks,
             threshold_sec_key: SerdeSecret(sks),
             threshold: peers.threshold(),
             fee_consensus: Default::default(),
         };
 
-        <span class="kw">let </span>client = LightningModuleClientConfig {
-            threshold_pub_key: pks.public_key(),
-            fee_consensus: Default::default(),
-        };
-
-        <span class="prelude-val">Ok</span>(<span class="prelude-val">Ok</span>((
-            serde_json::to_value(<span class="kw-2">&amp;</span>server)
-                .expect(<span class="string">&quot;serialization can&#39;t fail&quot;</span>)
-                .into(),
-            serde_json::to_value(<span class="kw-2">&amp;</span>client)
-                .expect(<span class="string">&quot;serialization can&#39;t fail&quot;</span>)
-                .into(),
-        )))
+        <span class="prelude-val">Ok</span>(<span class="prelude-val">Ok</span>(server.to_erased()))
     }
 
     <span class="kw">fn </span>to_client_config(<span class="kw-2">&amp;</span><span class="self">self</span>, config: ServerModuleConfig) -&gt; anyhow::Result&lt;ClientModuleConfig&gt; {
@@ -1185,7 +1267,7 @@
     }
 }
 
-<span class="attr">#[async_trait(<span class="question-mark">?</span>Send)]
+<span class="attr">#[async_trait]
 </span><span class="kw">impl </span>ServerModulePlugin <span class="kw">for </span>LightningModule {
     <span class="kw">type </span>Decoder = LightningModuleDecoder;
     <span class="kw">type </span>Input = LightningInput;
@@ -1202,16 +1284,17 @@
         LightningModuleDecoder
     }
 
-    <span class="kw">async fn </span>await_consensus_proposal(<span class="kw-2">&amp;</span><span class="self">self</span>) {
-        <span class="kw">if </span><span class="self">self</span>.consensus_proposal().<span class="kw">await</span>.is_empty() {
+    <span class="kw">async fn </span>await_consensus_proposal(<span class="kw-2">&amp;</span><span class="self">self</span>, dbtx: <span class="kw-2">&amp;mut </span>DatabaseTransaction&lt;<span class="lifetime">&#39;_</span>&gt;) {
+        <span class="kw">if </span><span class="self">self</span>.consensus_proposal(dbtx).<span class="kw">await</span>.is_empty() {
             std::future::pending().<span class="kw">await
         </span>}
     }
 
-    <span class="kw">async fn </span>consensus_proposal(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;<span class="self">Self</span>::ConsensusItem&gt; {
-        <span class="self">self</span>.non_consensus_db
-            .begin_transaction(<span class="self">self</span>.decoders.clone())
-            .find_by_prefix(<span class="kw-2">&amp;</span>ProposeDecryptionShareKeyPrefix)
+    <span class="kw">async fn </span>consensus_proposal(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        dbtx: <span class="kw-2">&amp;mut </span>DatabaseTransaction&lt;<span class="lifetime">&#39;_</span>&gt;,
+    ) -&gt; Vec&lt;<span class="self">Self</span>::ConsensusItem&gt; {
+        dbtx.find_by_prefix(<span class="kw-2">&amp;</span>ProposeDecryptionShareKeyPrefix)
             .map(|res| {
                 <span class="kw">let </span>(ProposeDecryptionShareKey(contract_id), share) = res.expect(<span class="string">&quot;DB error&quot;</span>);
                 LightningConsensusItem { contract_id, share }
@@ -1244,10 +1327,10 @@
         LightningVerificationCache
     }
 
-    <span class="kw">fn </span>validate_input&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt;(
+    <span class="kw">async fn </span>validate_input&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt;(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         interconnect: <span class="kw-2">&amp;</span><span class="kw">dyn </span>ModuleInterconect,
-        dbtx: <span class="kw-2">&amp;</span>DatabaseTransaction&lt;<span class="lifetime">&#39;b</span>&gt;,
+        dbtx: <span class="kw-2">&amp;mut </span>DatabaseTransaction&lt;<span class="lifetime">&#39;b</span>&gt;,
         _verification_cache: <span class="kw-2">&amp;</span><span class="self">Self</span>::VerificationCache,
         input: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">Self</span>::Input,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;InputMeta, ModuleError&gt; {
@@ -1266,7 +1349,7 @@
 
         <span class="kw">let </span>pub_key = <span class="kw">match </span>account.contract {
             FundedContract::Outgoing(outgoing) =&gt; {
-                <span class="kw">if </span>outgoing.timelock &gt; block_height(interconnect) &amp;&amp; !outgoing.cancelled {
+                <span class="kw">if </span>outgoing.timelock &gt; block_height(interconnect).<span class="kw">await </span>&amp;&amp; !outgoing.cancelled {
                     <span class="comment">// If the timelock hasn&#39;t expired yet …
                     </span><span class="kw">let </span>preimage_hash = bitcoin_hashes::sha256::Hash::hash(
                         <span class="kw-2">&amp;</span>input
@@ -1324,7 +1407,9 @@
         input: <span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span><span class="self">Self</span>::Input,
         cache: <span class="kw-2">&amp;</span><span class="self">Self</span>::VerificationCache,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;InputMeta, ModuleError&gt; {
-        <span class="kw">let </span>meta = <span class="self">self</span>.validate_input(interconnect, dbtx, cache, input)<span class="question-mark">?</span>;
+        <span class="kw">let </span>meta = <span class="self">self
+            </span>.validate_input(interconnect, dbtx, cache, input)
+            .<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="kw">let </span>account_db_key = ContractKey(input.contract_id);
         <span class="kw">let </span><span class="kw-2">mut </span>contract_account = dbtx
@@ -1341,7 +1426,7 @@
 
     <span class="kw">fn </span>validate_output(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        dbtx: <span class="kw-2">&amp;</span>DatabaseTransaction,
+        dbtx: <span class="kw-2">&amp;mut </span>DatabaseTransaction,
         output: <span class="kw-2">&amp;</span><span class="self">Self</span>::Output,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;TransactionItemAmount, ModuleError&gt; {
         <span class="kw">match </span>output {
@@ -1674,21 +1759,19 @@
         bad_peers
     }
 
-    <span class="kw">fn </span>output_status(<span class="kw-2">&amp;</span><span class="self">self</span>, out_point: OutPoint) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::OutputOutcome&gt; {
-        <span class="self">self</span>.non_consensus_db
-            .begin_transaction(<span class="self">self</span>.decoders.clone())
-            .get_value(<span class="kw-2">&amp;</span>ContractUpdateKey(out_point))
+    <span class="kw">fn </span>output_status(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        dbtx: <span class="kw-2">&amp;mut </span>DatabaseTransaction&lt;<span class="lifetime">&#39;_</span>&gt;,
+        out_point: OutPoint,
+    ) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::OutputOutcome&gt; {
+        dbtx.get_value(<span class="kw-2">&amp;</span>ContractUpdateKey(out_point))
             .expect(<span class="string">&quot;DB error&quot;</span>)
     }
 
-    <span class="kw">fn </span>audit(<span class="kw-2">&amp;</span><span class="self">self</span>, audit: <span class="kw-2">&amp;mut </span>Audit) {
-        audit.add_items(
-            <span class="kw-2">&amp;</span><span class="self">self
-                </span>.non_consensus_db
-                .begin_transaction(<span class="self">self</span>.decoders.clone()),
-            <span class="kw-2">&amp;</span>ContractKeyPrefix,
-            |<span class="kw">_</span>, v| -(v.amount.milli_sat <span class="kw">as </span>i64),
-        );
+    <span class="kw">fn </span>audit(<span class="kw-2">&amp;</span><span class="self">self</span>, dbtx: <span class="kw-2">&amp;mut </span>DatabaseTransaction&lt;<span class="lifetime">&#39;_</span>&gt;, audit: <span class="kw-2">&amp;mut </span>Audit) {
+        audit.add_items(dbtx, <span class="kw-2">&amp;</span>ContractKeyPrefix, |<span class="kw">_</span>, v| {
+            -(v.amount.milli_sat <span class="kw">as </span>i64)
+        });
     }
 
     <span class="kw">fn </span>api_base_name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str {
@@ -1699,23 +1782,23 @@
         <span class="macro">vec!</span>[
             <span class="macro">api_endpoint! </span>{
                 <span class="string">&quot;/account&quot;</span>,
-                <span class="kw">async </span>|module: <span class="kw-2">&amp;</span>LightningModule, contract_id: ContractId| -&gt; ContractAccount {
+                <span class="kw">async </span>|module: <span class="kw-2">&amp;</span>LightningModule, dbtx, contract_id: ContractId| -&gt; ContractAccount {
                     module
-                        .get_contract_account(<span class="kw-2">&amp;</span>module.non_consensus_db.begin_transaction(module.decoders.clone()), contract_id)
+                        .get_contract_account(<span class="kw-2">&amp;mut </span>dbtx, contract_id)
                         .ok_or_else(|| ApiError::not_found(String::from(<span class="string">&quot;Contract not found&quot;</span>)))
                 }
             },
             <span class="macro">api_endpoint! </span>{
                 <span class="string">&quot;/offers&quot;</span>,
-                <span class="kw">async </span>|module: <span class="kw-2">&amp;</span>LightningModule, _params: ()| -&gt; Vec&lt;IncomingContractOffer&gt; {
-                    <span class="prelude-val">Ok</span>(module.get_offers(<span class="kw-2">&amp;</span>module.non_consensus_db.begin_transaction(module.decoders.clone())))
+                <span class="kw">async </span>|module: <span class="kw-2">&amp;</span>LightningModule, dbtx, _params: ()| -&gt; Vec&lt;IncomingContractOffer&gt; {
+                    <span class="prelude-val">Ok</span>(module.get_offers(<span class="kw-2">&amp;mut </span>dbtx))
                 }
             },
             <span class="macro">api_endpoint! </span>{
                 <span class="string">&quot;/offer&quot;</span>,
-                <span class="kw">async </span>|module: <span class="kw-2">&amp;</span>LightningModule, payment_hash: bitcoin_hashes::sha256::Hash| -&gt; IncomingContractOffer {
+                <span class="kw">async </span>|module: <span class="kw-2">&amp;</span>LightningModule, dbtx, payment_hash: bitcoin_hashes::sha256::Hash| -&gt; IncomingContractOffer {
                     <span class="kw">let </span>offer = module
-                        .get_offer(<span class="kw-2">&amp;</span>module.non_consensus_db.begin_transaction(module.decoders.clone()), payment_hash)
+                        .get_offer(<span class="kw-2">&amp;mut </span>dbtx, payment_hash)
                         .ok_or_else(|| ApiError::not_found(String::from(<span class="string">&quot;Offer not found&quot;</span>)))<span class="question-mark">?</span>;
 
                     <span class="macro">debug!</span>(%payment_hash, <span class="string">&quot;Sending offer info&quot;</span>);
@@ -1724,16 +1807,15 @@
             },
             <span class="macro">api_endpoint! </span>{
                 <span class="string">&quot;/list_gateways&quot;</span>,
-                <span class="kw">async </span>|module: <span class="kw-2">&amp;</span>LightningModule, _v: ()| -&gt; Vec&lt;LightningGateway&gt; {
-                    <span class="prelude-val">Ok</span>(module.list_gateways(<span class="kw-2">&amp;</span>module.non_consensus_db.begin_transaction(module.decoders.clone())))
+                <span class="kw">async </span>|module: <span class="kw-2">&amp;</span>LightningModule, dbtx, _v: ()| -&gt; Vec&lt;LightningGateway&gt; {
+                    <span class="prelude-val">Ok</span>(module.list_gateways(<span class="kw-2">&amp;mut </span>dbtx))
                 }
             },
             <span class="macro">api_endpoint! </span>{
                 <span class="string">&quot;/register_gateway&quot;</span>,
-                <span class="kw">async </span>|module: <span class="kw-2">&amp;</span>LightningModule, gateway: LightningGateway| -&gt; () {
-                    futures::executor::block_on( <span class="kw">async </span>{
-                       module.register_gateway(gateway).<span class="kw">await</span>;
-                    });
+                <span class="kw">async </span>|module: <span class="kw-2">&amp;</span>LightningModule, dbtx, gateway: LightningGateway| -&gt; () {
+                    module.register_gateway(<span class="kw-2">&amp;mut </span>dbtx, gateway).<span class="kw">await</span>;
+                    dbtx.commit_tx().<span class="kw">await</span>.expect(<span class="string">&quot;DB Error&quot;</span>);
                     <span class="prelude-val">Ok</span>(())
                 }
             },
@@ -1742,16 +1824,8 @@
 }
 
 <span class="kw">impl </span>LightningModule {
-    <span class="kw">pub fn </span>new(
-        cfg: LightningModuleConfig,
-        db: Database,
-        decoders: ModuleRegistry&lt;Decoder&gt;,
-    ) -&gt; <span class="self">Self </span>{
-        LightningModule {
-            cfg,
-            non_consensus_db: db,
-            decoders,
-        }
+    <span class="kw">pub fn </span>new(cfg: LightningModuleConfig) -&gt; <span class="self">Self </span>{
+        LightningModule { cfg }
     }
 
     <span class="kw">fn </span>validate_decryption_share(
@@ -1768,13 +1842,13 @@
 
     <span class="kw">pub fn </span>get_offer(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        dbtx: <span class="kw-2">&amp;</span>DatabaseTransaction,
+        dbtx: <span class="kw-2">&amp;mut </span>DatabaseTransaction,
         payment_hash: bitcoin_hashes::sha256::Hash,
     ) -&gt; <span class="prelude-ty">Option</span>&lt;IncomingContractOffer&gt; {
         dbtx.get_value(<span class="kw-2">&amp;</span>OfferKey(payment_hash)).expect(<span class="string">&quot;DB error&quot;</span>)
     }
 
-    <span class="kw">pub fn </span>get_offers(<span class="kw-2">&amp;</span><span class="self">self</span>, dbtx: <span class="kw-2">&amp;</span>DatabaseTransaction) -&gt; Vec&lt;IncomingContractOffer&gt; {
+    <span class="kw">pub fn </span>get_offers(<span class="kw-2">&amp;</span><span class="self">self</span>, dbtx: <span class="kw-2">&amp;mut </span>DatabaseTransaction) -&gt; Vec&lt;IncomingContractOffer&gt; {
         dbtx.find_by_prefix(<span class="kw-2">&amp;</span>OfferKeyPrefix)
             .map(|res| res.expect(<span class="string">&quot;DB error&quot;</span>).<span class="number">1</span>)
             .collect()
@@ -1782,26 +1856,26 @@
 
     <span class="kw">pub fn </span>get_contract_account(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        dbtx: <span class="kw-2">&amp;</span>DatabaseTransaction,
+        dbtx: <span class="kw-2">&amp;mut </span>DatabaseTransaction,
         contract_id: ContractId,
     ) -&gt; <span class="prelude-ty">Option</span>&lt;ContractAccount&gt; {
         dbtx.get_value(<span class="kw-2">&amp;</span>ContractKey(contract_id)).expect(<span class="string">&quot;DB error&quot;</span>)
     }
 
-    <span class="kw">pub fn </span>list_gateways(<span class="kw-2">&amp;</span><span class="self">self</span>, dbtx: <span class="kw-2">&amp;</span>DatabaseTransaction) -&gt; Vec&lt;LightningGateway&gt; {
+    <span class="kw">pub fn </span>list_gateways(<span class="kw-2">&amp;</span><span class="self">self</span>, dbtx: <span class="kw-2">&amp;mut </span>DatabaseTransaction) -&gt; Vec&lt;LightningGateway&gt; {
         dbtx.find_by_prefix(<span class="kw-2">&amp;</span>LightningGatewayKeyPrefix)
             .map(|res| res.expect(<span class="string">&quot;DB error&quot;</span>).<span class="number">1</span>)
             .collect()
     }
 
-    <span class="kw">pub async fn </span>register_gateway(<span class="kw-2">&amp;</span><span class="self">self</span>, gateway: LightningGateway) {
-        <span class="kw">let </span><span class="kw-2">mut </span>dbtx = <span class="self">self
-            </span>.non_consensus_db
-            .begin_transaction(<span class="self">self</span>.decoders.clone());
+    <span class="kw">pub async fn </span>register_gateway(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        dbtx: <span class="kw-2">&amp;mut </span>DatabaseTransaction&lt;<span class="lifetime">&#39;_</span>&gt;,
+        gateway: LightningGateway,
+    ) {
         dbtx.insert_entry(<span class="kw-2">&amp;</span>LightningGatewayKey(gateway.node_pub_key), <span class="kw-2">&amp;</span>gateway)
             .<span class="kw">await
             </span>.expect(<span class="string">&quot;DB error&quot;</span>);
-        dbtx.commit_tx().<span class="kw">await</span>.expect(<span class="string">&quot;DB Error&quot;</span>);
     }
 }
 
@@ -1814,15 +1888,13 @@
     LightningVerificationCache
 );
 
-<span class="kw">fn </span>block_height(interconnect: <span class="kw-2">&amp;</span><span class="kw">dyn </span>ModuleInterconect) -&gt; u32 {
+<span class="kw">async fn </span>block_height(interconnect: <span class="kw-2">&amp;</span><span class="kw">dyn </span>ModuleInterconect) -&gt; u32 {
     <span class="comment">// This is a future because we are normally reading from a network socket. But for internal
     // calls the data is available instantly in one go, so we can just block on it.
-    </span><span class="kw">let </span>body = futures::executor::block_on(interconnect.call(
-        <span class="string">&quot;wallet&quot;</span>,
-        <span class="string">&quot;/block_height&quot;</span>.to_owned(),
-        Default::default(),
-    ))
-    .expect(<span class="string">&quot;Wallet module not present or malfunctioning!&quot;</span>);
+    </span><span class="kw">let </span>body = interconnect
+        .call(<span class="string">&quot;wallet&quot;</span>, <span class="string">&quot;/block_height&quot;</span>.to_owned(), Default::default())
+        .<span class="kw">await
+        </span>.expect(<span class="string">&quot;Wallet module not present or malfunctioning!&quot;</span>);
 
     serde_json::from_value(body).expect(<span class="string">&quot;Malformed block height response from wallet module!&quot;</span>)
 }
@@ -1855,4 +1927,4 @@
     </span>InvalidCancellationSignature,
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="fedimint_ln" data-themes="" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (e0098a5cc 2022-11-29)" data-search-js="search-444266647c4dba98.js" data-settings-js="settings-bebeae96e00e4617.js" data-settings-css="settings-af96d9e2fc13e081.css" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="fedimint_ln" data-themes="" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (234151769 2022-12-03)" data-search-js="search-444266647c4dba98.js" data-settings-js="settings-bebeae96e00e4617.js" data-settings-css="settings-af96d9e2fc13e081.css" ></div></body></html>
