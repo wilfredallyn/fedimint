@@ -2,7 +2,7 @@ use std::collections::{BTreeMap, HashSet};
 use std::fmt;
 
 use async_trait::async_trait;
-use common::DummyModuleDecoder;
+use common::ProofModuleDecoder;
 use fedimint_api::cancellable::Cancellable;
 use fedimint_api::config::TypedServerModuleConsensusConfig;
 use fedimint_api::config::{
@@ -25,51 +25,50 @@ use fedimint_api::{plugin_types_trait_impl, OutPoint, PeerId, ServerModulePlugin
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
-use crate::config::{DummyConfig, DummyConfigConsensus, DummyConfigPrivate};
+use crate::config::{ProofConfig, ProofConfigConsensus, ProofConfigPrivate};
 
 pub mod common;
 pub mod config;
 pub mod db;
 
-/// Dummy module
 #[derive(Debug)]
-pub struct Dummy {
-    pub cfg: DummyConfig,
+pub struct Proof {
+    pub cfg: ProofConfig,
 }
 
 #[derive(Debug, Clone, Eq, PartialEq, Hash, Serialize, Deserialize, Encodable, Decodable)]
-pub struct DummyOutputConfirmation;
+pub struct ProofOutputConfirmation;
 
 #[derive(Debug, Clone)]
-pub struct DummyVerificationCache;
+pub struct ProofVerificationCache;
 
-pub struct DummyConfigGenerator;
+pub struct ProofConfigGenerator;
 
 #[async_trait]
-impl FederationModuleConfigGen for DummyConfigGenerator {
+impl FederationModuleConfigGen for ProofConfigGenerator {
     fn trusted_dealer_gen(
         &self,
         peers: &[PeerId],
         params: &ConfigGenParams,
     ) -> BTreeMap<PeerId, ServerModuleConfig> {
         let _params = params
-            .get::<DummyConfigGenParams>()
-            .expect("Invalid mint params");
+            .get::<ProofConfigGenParams>()
+            .expect("Invalid proof params");
 
-        let mint_cfg: BTreeMap<_, DummyConfig> = peers
+        let proof_cfg: BTreeMap<_, ProofConfig> = peers
             .iter()
             .map(|&peer| {
-                let config = DummyConfig {
-                    private: DummyConfigPrivate {
+                let config = ProofConfig {
+                    private: ProofConfigPrivate {
                         something_private: 3,
                     },
-                    consensus: DummyConfigConsensus { something: 1 },
+                    consensus: ProofConfigConsensus { something: 1 },
                 };
                 (peer, config)
             })
             .collect();
 
-        mint_cfg
+        proof_cfg
             .into_iter()
             .map(|(k, v)| (k, v.to_erased()))
             .collect()
@@ -84,14 +83,14 @@ impl FederationModuleConfigGen for DummyConfigGenerator {
         _task_group: &mut TaskGroup,
     ) -> anyhow::Result<Cancellable<ServerModuleConfig>> {
         let _params = params
-            .get::<DummyConfigGenParams>()
-            .expect("Invalid mint params");
+            .get::<ProofConfigGenParams>()
+            .expect("Invalid proof params");
 
-        let server = DummyConfig {
-            private: DummyConfigPrivate {
+        let server = ProofConfig {
+            private: ProofConfigPrivate {
                 something_private: 3,
             },
-            consensus: DummyConfigConsensus { something: 2 },
+            consensus: ProofConfigConsensus { something: 2 },
         };
 
         Ok(Ok(server.to_erased()))
@@ -99,7 +98,7 @@ impl FederationModuleConfigGen for DummyConfigGenerator {
 
     fn to_client_config(&self, config: ServerModuleConfig) -> anyhow::Result<ClientModuleConfig> {
         Ok(config
-            .to_typed::<DummyConfig>()?
+            .to_typed::<ProofConfig>()?
             .consensus
             .to_client_config())
     }
@@ -108,74 +107,74 @@ impl FederationModuleConfigGen for DummyConfigGenerator {
         &self,
         config: serde_json::Value,
     ) -> anyhow::Result<ClientModuleConfig> {
-        Ok(serde_json::from_value::<DummyConfigConsensus>(config)?.to_client_config())
+        Ok(serde_json::from_value::<ProofConfigConsensus>(config)?.to_client_config())
     }
 
     fn validate_config(&self, identity: &PeerId, config: ServerModuleConfig) -> anyhow::Result<()> {
-        config.to_typed::<DummyConfig>()?.validate_config(identity)
+        config.to_typed::<ProofConfig>()?.validate_config(identity)
     }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct DummyConfigGenParams {
+pub struct ProofConfigGenParams {
     pub important_param: u64,
 }
 
-impl ModuleConfigGenParams for DummyConfigGenParams {
-    const MODULE_NAME: &'static str = "dummy";
+impl ModuleConfigGenParams for ProofConfigGenParams {
+    const MODULE_NAME: &'static str = "proof";
 }
 
 #[derive(
     Debug, Clone, Eq, PartialEq, Hash, Deserialize, Serialize, Encodable, Decodable, Default,
 )]
-pub struct DummyInput;
+pub struct ProofInput;
 
-impl fmt::Display for DummyInput {
+impl fmt::Display for ProofInput {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "DummyInput")
+        write!(f, "ProofInput")
     }
 }
 
 #[derive(
     Debug, Clone, Eq, PartialEq, Hash, Deserialize, Serialize, Encodable, Decodable, Default,
 )]
-pub struct DummyOutput;
+pub struct ProofOutput;
 
-impl fmt::Display for DummyOutput {
+impl fmt::Display for ProofOutput {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "DummyOutput")
+        write!(f, "ProofOutput")
     }
 }
 #[derive(Debug, Clone, Eq, PartialEq, Hash, Deserialize, Serialize, Encodable, Decodable)]
-pub struct DummyOutputOutcome;
+pub struct ProofOutputOutcome;
 
-impl fmt::Display for DummyOutputOutcome {
+impl fmt::Display for ProofOutputOutcome {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "DummyOutputOutcome")
+        write!(f, "ProofOutputOutcome")
     }
 }
 
-impl fmt::Display for DummyOutputConfirmation {
+impl fmt::Display for ProofOutputConfirmation {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "DummyOutputConfirmation")
+        write!(f, "ProofOutputConfirmation")
     }
 }
 
 #[async_trait]
-impl ServerModulePlugin for Dummy {
-    type Decoder = DummyModuleDecoder;
-    type Input = DummyInput;
-    type Output = DummyOutput;
-    type OutputOutcome = DummyOutputOutcome;
-    type ConsensusItem = DummyOutputConfirmation;
-    type VerificationCache = DummyVerificationCache;
+impl ServerModulePlugin for Proof {
+    type Decoder = ProofModuleDecoder;
+    type Input = ProofInput;
+    type Output = ProofOutput;
+    type OutputOutcome = ProofOutputOutcome;
+    type ConsensusItem = ProofOutputConfirmation;
+    type VerificationCache = ProofVerificationCache;
 
     fn module_key(&self) -> ModuleKey {
         MODULE_KEY_DUMMY
     }
 
     fn decoder(&self) -> &'static Self::Decoder {
-        &DummyModuleDecoder
+        &ProofModuleDecoder
     }
 
     async fn await_consensus_proposal(&self, _dbtx: &mut DatabaseTransaction<'_>) {}
@@ -198,7 +197,7 @@ impl ServerModulePlugin for Dummy {
         &'a self,
         _inputs: impl Iterator<Item = &'a Self::Input> + Send,
     ) -> Self::VerificationCache {
-        DummyVerificationCache
+        ProofVerificationCache
     }
 
     async fn validate_input<'a, 'b>(
@@ -257,23 +256,23 @@ impl ServerModulePlugin for Dummy {
     async fn audit(&self, _dbtx: &mut DatabaseTransaction<'_>, _audit: &mut Audit) {}
 
     fn api_base_name(&self) -> &'static str {
-        "dummy"
+        "proof"
     }
 
     fn api_endpoints(&self) -> Vec<ApiEndpoint<Self>> {
         vec![api_endpoint! {
-            "/dummy",
-            async |_module: &Dummy, _dbtx, _request: ()| -> () {
+            "/proof",
+            async |_module: &Proof, _dbtx, _request: ()| -> () {
                 Ok(())
             }
         }]
     }
 }
 
-impl Dummy {
+impl Proof {
     /// Create new module instance
-    pub fn new(cfg: DummyConfig) -> Dummy {
-        Dummy { cfg }
+    pub fn new(cfg: ProofConfig) -> Proof {
+        Proof { cfg }
     }
 }
 
@@ -282,15 +281,15 @@ impl Dummy {
 pub const MODULE_KEY_DUMMY: u16 = 128;
 plugin_types_trait_impl!(
     MODULE_KEY_DUMMY,
-    DummyInput,
-    DummyOutput,
-    DummyOutputOutcome,
-    DummyOutputConfirmation,
-    DummyVerificationCache
+    ProofInput,
+    ProofOutput,
+    ProofOutputOutcome,
+    ProofOutputConfirmation,
+    ProofVerificationCache
 );
 
 #[derive(Debug, Clone, Eq, PartialEq, Hash, Error)]
-pub enum DummyError {
+pub enum ProofError {
     #[error("Something went wrong")]
-    SomethingDummyWentWrong,
+    SomethingProofWentWrong,
 }
