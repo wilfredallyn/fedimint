@@ -139,7 +139,21 @@ async fn main() -> anyhow::Result<()> {
 
     let consensus = FedimintConsensus::new(cfg.clone(), db, module_inits, &mut task_group).await?;
 
+<<<<<<< HEAD
     FedimintServer::run(cfg, consensus, decoders, &mut task_group).await?;
+=======
+    let ln = LightningModule::new(cfg.get_module_config_typed("ln")?);
+
+    let proof = Proof::new(cfg.get_module_config_typed("proof")?);
+
+    let mut consensus = FedimintConsensus::new(cfg.clone(), db, module_config_gens);
+    consensus.register_module(mint.into());
+    consensus.register_module(ln.into());
+    consensus.register_module(wallet.into());
+    consensus.register_module(proof.into());
+
+    FedimintServer::run(cfg, consensus, &mut task_group).await?;
+>>>>>>> 5a1f3c8f1a (plug into fedimintd and config gen)
 
     local_task_set.await;
     task_group.join_all().await?;
