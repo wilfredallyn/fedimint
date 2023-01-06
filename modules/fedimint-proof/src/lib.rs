@@ -177,7 +177,11 @@ impl ServerModulePlugin for Proof {
         &ProofModuleDecoder
     }
 
-    async fn await_consensus_proposal(&self, _dbtx: &mut DatabaseTransaction<'_>) {}
+    async fn await_consensus_proposal(&self, dbtx: &mut DatabaseTransaction<'_>) {
+        if self.consensus_proposal(dbtx).await.is_empty() {
+            std::future::pending().await
+        }
+    }
 
     async fn consensus_proposal(
         &self,

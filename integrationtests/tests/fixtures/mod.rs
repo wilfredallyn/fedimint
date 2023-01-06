@@ -165,6 +165,7 @@ pub async fn fixtures(num_peers: u16) -> anyhow::Result<Fixtures> {
         ),
         ("mint", Arc::new(MintConfigGenerator)),
         ("ln", Arc::new(LightningModuleConfigGen)),
+        ("proof", Arc::new(ProofConfigGenerator)),
     ]);
 
     match env::var("FM_TEST_DISABLE_MOCKS") {

@@ -27,6 +27,7 @@ fedimint-bitcoind = { path = "../fedimint-bitcoind" }
 fedimint-api = { path = "../fedimint-api" }
 fedimint-ln = { path = "../modules/fedimint-ln" }
 fedimint-mint = { path = "../modules/fedimint-mint" }
+fedimint-proof = { path = "../modules/fedimint-proof" }
 fedimint-rocksdb = { path = "../fedimint-rocksdb" }
 fedimint-sqlite = { path = "../fedimint-sqlite" }
 fedimint-testing = { path = "../fedimint-testing" }

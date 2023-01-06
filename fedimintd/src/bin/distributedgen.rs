@@ -10,6 +10,7 @@ use fedimint_api::task::TaskGroup;
 use fedimint_api::Amount;
 use fedimint_ln::LightningModuleConfigGen;
 use fedimint_mint::MintConfigGenerator;
+use fedimint_proof::ProofConfigGenerator;
 use fedimint_server::config::ModuleInitRegistry;
 use fedimint_wallet::WalletConfigGenerator;
 use fedimintd::distributedgen::{create_cert, run_dkg};
@@ -143,6 +144,7 @@ async fn main() {
         ),
         ("mint", Arc::new(MintConfigGenerator)),
         ("ln", Arc::new(LightningModuleConfigGen)),
+        ("proof", Arc::new(ProofConfigGenerator)),
     ]);
 
     let mut task_group = TaskGroup::new();

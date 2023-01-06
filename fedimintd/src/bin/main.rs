@@ -8,6 +8,7 @@ use fedimint_api::module::ModuleInit;
 use fedimint_api::task::TaskGroup;
 use fedimint_ln::LightningModuleConfigGen;
 use fedimint_mint::MintConfigGenerator;
+use fedimint_proof::{Proof, ProofConfigGenerator};
 use fedimint_server::config::ModuleInitRegistry;
 use fedimint_server::consensus::FedimintConsensus;
 use fedimint_server::FedimintServer;
@@ -131,6 +132,7 @@ async fn main() -> anyhow::Result<()> {
         ),
         ("mint", Arc::new(MintConfigGenerator)),
         ("ln", Arc::new(LightningModuleConfigGen)),
+        ("proof", Arc::new(ProofConfigGenerator)),
     ]);
 
     let decoders = module_inits.decoders();
