@@ -18,7 +18,9 @@ use bitcoin::util::key::KeyPair;
 use bitcoin::{secp256k1, Address, Transaction as BitcoinTransaction};
 use bitcoin_hashes::{sha256, Hash};
 use fedimint_api::config::ClientConfig;
-use fedimint_api::core::{Decoder, MODULE_KEY_LN, MODULE_KEY_MINT, MODULE_KEY_WALLET};
+use fedimint_api::core::{
+    Decoder, MODULE_KEY_LN, MODULE_KEY_MINT, MODULE_KEY_PROOF, MODULE_KEY_WALLET,
+};
 use fedimint_api::db::Database;
 use fedimint_api::encoding::{Decodable, Encodable};
 use fedimint_api::module::registry::ModuleDecoderRegistry;
@@ -32,6 +34,7 @@ use fedimint_core::modules::ln::config::LightningModuleClientConfig;
 use fedimint_core::modules::mint::common::MintModuleDecoder;
 use fedimint_core::modules::mint::config::MintClientConfig;
 use fedimint_core::modules::mint::{MintOutput, MintOutputOutcome};
+use fedimint_core::modules::proof::common::ProofModuleDecoder;
 use fedimint_core::modules::wallet::common::WalletModuleDecoder;
 use fedimint_core::modules::wallet::config::WalletClientConfig;
 use fedimint_core::modules::wallet::{PegOut, WalletInput, WalletOutput};
@@ -1300,6 +1303,7 @@ fn module_decode_stubs() -> ModuleDecoderRegistry {
         (MODULE_KEY_LN, Decoder::from_typed(&LightningModuleDecoder)),
         (MODULE_KEY_WALLET, Decoder::from_typed(&WalletModuleDecoder)),
         (MODULE_KEY_MINT, Decoder::from_typed(&MintModuleDecoder)),
+        (MODULE_KEY_PROOF, Decoder::from_typed(&ProofModuleDecoder)),
     ])
 }
 

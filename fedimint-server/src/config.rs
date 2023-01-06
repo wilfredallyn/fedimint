@@ -17,6 +17,7 @@ use fedimint_api::task::TaskGroup;
 use fedimint_api::{Amount, PeerId};
 pub use fedimint_core::config::*;
 use fedimint_core::modules::mint::MintConfigGenParams;
+use fedimint_core::modules::proof::ProofConfigGenParams;
 use fedimint_wallet::WalletConfigGenParams;
 use hbbft::crypto::serde_impl::SerdeSecret;
 use hbbft::NetworkInfo;
@@ -598,6 +599,9 @@ impl ServerConfigParams {
                 })
                 .attach(MintConfigGenParams {
                     mint_amounts: ServerConfigParams::gen_denominations(max_denomination),
+                })
+                .attach(ProofConfigGenParams {
+                    important_param: 21,
                 }),
         }
     }

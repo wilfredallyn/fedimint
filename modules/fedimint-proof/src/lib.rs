@@ -9,7 +9,7 @@ use fedimint_api::config::{
     ClientModuleConfig, ConfigGenParams, DkgPeerMsg, ModuleConfigGenParams, ServerModuleConfig,
     TypedServerModuleConfig,
 };
-use fedimint_api::core::ModuleKey;
+use fedimint_api::core::{ModuleKey, MODULE_KEY_PROOF};
 use fedimint_api::db::DatabaseTransaction;
 use fedimint_api::encoding::{Decodable, Encodable};
 use fedimint_api::module::__reexports::serde_json;
@@ -170,7 +170,7 @@ impl ServerModulePlugin for Proof {
     type VerificationCache = ProofVerificationCache;
 
     fn module_key(&self) -> ModuleKey {
-        MODULE_KEY_DUMMY
+        MODULE_KEY_PROOF
     }
 
     fn decoder(&self) -> &'static Self::Decoder {

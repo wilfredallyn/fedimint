@@ -34,6 +34,7 @@ pub type ModuleKey = u16;
 pub const MODULE_KEY_WALLET: u16 = 0;
 pub const MODULE_KEY_MINT: u16 = 1;
 pub const MODULE_KEY_LN: u16 = 2;
+pub const MODULE_KEY_PROOF: u16 = 3;
 // not really a module
 pub const MODULE_KEY_GLOBAL: u16 = 1024;
 
