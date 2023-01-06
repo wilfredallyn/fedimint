@@ -35,6 +35,7 @@ impl Final for OutputOutcome {
                 ContractOutcome::Incoming(_) => false,
                 ContractOutcome::Outgoing(_) => true,
             },
+            OutputOutcome::Proof(_) => true,
         }
     }
 }

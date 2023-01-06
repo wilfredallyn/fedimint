@@ -17,6 +17,7 @@ use fedimint_api::task::TaskGroup;
 use fedimint_api::Amount;
 use fedimint_ln::LightningModuleConfigGen;
 use fedimint_mint::MintConfigGenerator;
+use fedimint_proof::ProofConfigGenerator;
 use fedimint_server::config::ModuleInitRegistry;
 use fedimint_wallet::WalletConfigGenerator;
 use http::StatusCode;
@@ -140,6 +141,7 @@ async fn post_guardians(
         ),
         ("mint", Arc::new(MintConfigGenerator)),
         ("ln", Arc::new(LightningModuleConfigGen)),
+        ("proof", Arc::new(ProofConfigGenerator)),
     ]);
     let dir_out_path = state.cfg_path.clone();
     let fedimintd_sender = state.sender.clone();

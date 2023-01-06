@@ -17,7 +17,7 @@ pub enum TransactionStatus {
 serde_module_encoding_wrapper!(SerdeOutputOutcome, fedimint_api::core::OutputOutcome);
 
 pub mod legacy {
-    use fedimint_api::core::{MODULE_KEY_LN, MODULE_KEY_MINT, MODULE_KEY_WALLET};
+    use fedimint_api::core::{MODULE_KEY_LN, MODULE_KEY_MINT, MODULE_KEY_PROOF, MODULE_KEY_WALLET};
     use fedimint_api::encoding::{Decodable, Encodable};
     use fedimint_api::ServerModulePlugin;
     use fedimint_ln::contracts::incoming::OfferId;
@@ -27,6 +27,7 @@ pub mod legacy {
     };
     use fedimint_ln::{LightningModule, LightningOutputOutcome};
     use fedimint_mint::{Mint, MintOutputOutcome};
+    use fedimint_proof::{Proof, ProofOutputOutcome};
     use fedimint_wallet::{Wallet, WalletOutputOutcome};
 
     use crate::CoreError;
@@ -36,6 +37,7 @@ pub mod legacy {
         Mint(<Mint as ServerModulePlugin>::OutputOutcome),
         Wallet(<Wallet as ServerModulePlugin>::OutputOutcome),
         LN(<LightningModule as ServerModulePlugin>::OutputOutcome),
+        Proof(<Proof as ServerModulePlugin>::OutputOutcome),
     }
 
     impl From<fedimint_api::core::OutputOutcome> for OutputOutcome {
@@ -56,6 +58,12 @@ pub mod legacy {
                 MODULE_KEY_WALLET => OutputOutcome::Wallet(
                     oo.as_any()
                         .downcast_ref::<WalletOutputOutcome>()
+                        .expect("Module key matches")
+                        .clone(),
+                ),
+                MODULE_KEY_PROOF => OutputOutcome::Proof(
+                    oo.as_any()
+                        .downcast_ref::<ProofOutputOutcome>()
                         .expect("Module key matches")
                         .clone(),
                 ),
@@ -80,6 +88,7 @@ pub mod legacy {
                 OutputOutcome::Mint(outcome) => Ok(outcome),
                 OutputOutcome::Wallet(_) => Err(CoreError::MismatchingVariant("mint", "wallet")),
                 OutputOutcome::LN(_) => Err(CoreError::MismatchingVariant("mint", "ln")),
+                OutputOutcome::Proof(_) => Err(CoreError::MismatchingVariant("mint", "proof")),
             }
         }
     }
@@ -90,6 +99,7 @@ pub mod legacy {
                 OutputOutcome::Mint(_) => Err(CoreError::MismatchingVariant("wallet", "mint")),
                 OutputOutcome::Wallet(outcome) => Ok(outcome),
                 OutputOutcome::LN(_) => Err(CoreError::MismatchingVariant("wallet", "ln")),
+                OutputOutcome::Proof(_) => Err(CoreError::MismatchingVariant("wallet", "proof")),
             }
         }
     }
@@ -100,6 +110,18 @@ pub mod legacy {
                 OutputOutcome::Mint(_) => Err(CoreError::MismatchingVariant("ln", "mint")),
                 OutputOutcome::Wallet(_) => Err(CoreError::MismatchingVariant("ln", "wallet")),
                 OutputOutcome::LN(outcome) => Ok(outcome),
+                OutputOutcome::Proof(_) => Err(CoreError::MismatchingVariant("ln", "proof")),
+            }
+        }
+    }
+
+    impl TryIntoOutcome for ProofOutputOutcome {
+        fn try_into_outcome(common_outcome: OutputOutcome) -> Result<Self, CoreError> {
+            match common_outcome {
+                OutputOutcome::Mint(_) => Err(CoreError::MismatchingVariant("proof", "mint")),
+                OutputOutcome::Wallet(_) => Err(CoreError::MismatchingVariant("proof", "wallet")),
+                OutputOutcome::LN(_) => Err(CoreError::MismatchingVariant("proof", "ln")),
+                OutputOutcome::Proof(outcome) => Ok(outcome),
             }
         }
     }
