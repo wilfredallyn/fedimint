@@ -22,8 +22,11 @@ use fedimint_api::module::{
 use fedimint_api::net::peers::MuxPeerConnections;
 use fedimint_api::task::TaskGroup;
 use fedimint_api::{plugin_types_trait_impl, OutPoint, PeerId, ServerModulePlugin};
+use fedimint_wallet::db::{UTXOKey, UTXOPrefixKey};
+use fedimint_wallet::SpendableUTXO;
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
+use tracing::info;
 
 use crate::config::{ProofConfig, ProofConfigConsensus, ProofConfigPrivate};
 
@@ -244,8 +247,11 @@ impl ServerModulePlugin for Proof {
     async fn end_consensus_epoch<'a, 'b>(
         &'a self,
         _consensus_peers: &HashSet<PeerId>,
-        _dbtx: &mut DatabaseTransaction<'b>,
+        dbtx: &mut DatabaseTransaction<'b>,
     ) -> Vec<PeerId> {
+        info!("proof: end_consensus_epoch");
+        let utxos = available_utxos(dbtx).await;
+        info!("available_utxos {:?}", &utxos);
         vec![]
     }
 
@@ -291,6 +297,20 @@ plugin_types_trait_impl!(
     ProofOutputConfirmation,
     ProofVerificationCache
 );
+
+async fn available_utxos(dbtx: &mut DatabaseTransaction<'_>) -> String {
+    let utxos: Vec<(UTXOKey, SpendableUTXO)> = dbtx
+        .find_by_prefix(&UTXOPrefixKey)
+        .await
+        .collect::<Result<_, _>>()
+        .expect("DB error");
+
+    let utxo_addresses: Vec<bitcoin::OutPoint> =
+        utxos.into_iter().map(|(utxo_key, _)| utxo_key.0).collect();
+
+    let json = serde_json::to_string_pretty(&utxo_addresses).unwrap();
+    json
+}
 
 #[derive(Debug, Clone, Eq, PartialEq, Hash, Error)]
 pub enum ProofError {
