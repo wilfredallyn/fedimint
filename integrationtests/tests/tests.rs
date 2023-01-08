@@ -1040,3 +1040,23 @@ async fn ecash_can_be_recovered() -> Result<()> {
     })
     .await
 }
+
+#[tokio::test(flavor = "multi_thread")]
+async fn proof() -> Result<()> {
+    test(2, |fed, user, bitcoin, _, _| async move {
+        let peg_ins: Vec<u64> = vec![5000, 8000, 10000];
+        for peg_in_amount in peg_ins.clone().into_iter() {
+            let peg_in_address = user.client.get_new_pegin_address(rng()).await;
+            let (proof, tx) =
+                bitcoin.send_and_mine_block(&peg_in_address, Amount::from_sat(peg_in_amount));
+            bitcoin.mine_blocks(fed.wallet.consensus.finality_delay as u64);
+            fed.run_consensus_epochs(1).await;
+
+            user.client.peg_in(proof, tx, rng()).await.unwrap();
+            fed.run_consensus_epochs(2).await; // peg in epoch + partial sigs epoch
+        }
+        user.assert_total_coins(sats(peg_ins.into_iter().sum()))
+            .await;
+    })
+    .await
+}
