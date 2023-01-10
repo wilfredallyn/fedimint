@@ -38,6 +38,7 @@ use fedimint_api::{sats, Amount};
 use fedimint_bitcoind::BitcoindRpc;
 use fedimint_ln::{LightningGateway, LightningModuleConfigGen};
 use fedimint_mint::{MintConfigGenerator, MintOutput};
+use fedimint_proof::ProofConfigGenerator;
 use fedimint_server::config::{connect, ServerConfig};
 use fedimint_server::config::{ModuleInitRegistry, ServerConfigParams};
 use fedimint_server::consensus::{ConsensusProposal, HbbftConsensusOutcome};
