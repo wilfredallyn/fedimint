@@ -11,6 +11,7 @@ use fedimint_api::task::TaskGroup;
 use fedimint_api::{Amount, PeerId};
 use fedimint_ln::LightningModuleConfigGen;
 use fedimint_mint::MintConfigGenerator;
+use fedimint_proof::ProofConfigGenerator;
 use fedimint_server::config::{PeerServerParams, ServerConfig, ServerConfigParams};
 use fedimint_server::multiplexed::PeerConnectionMultiplexer;
 use fedimint_wallet::WalletConfigGenerator;
@@ -93,6 +94,7 @@ pub async fn run_dkg(
         ),
         ("mint", Arc::new(MintConfigGenerator)),
         ("ln", Arc::new(LightningModuleConfigGen)),
+        ("proof", Arc::new(ProofConfigGenerator)),
     ]);
 
     let result = ServerConfig::distributed_gen(
