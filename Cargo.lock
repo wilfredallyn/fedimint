@@ -1013,6 +1013,7 @@ dependencies = [
  "fedimint-api",
  "fedimint-ln",
  "fedimint-mint",
+ "fedimint-proof",
  "fedimint-wallet",
  "futures",
  "hex",
@@ -1152,6 +1153,26 @@ dependencies = [
 ]
 
 [[package]]
+name = "fedimint-proof"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "async-trait",
+ "bitcoin",
+ "fedimint-api",
+ "fedimint-wallet",
+ "futures",
+ "impl-tools",
+ "rand",
+ "rayon",
+ "serde",
+ "strum",
+ "strum_macros",
+ "thiserror",
+ "tracing",
+]
+
+[[package]]
 name = "fedimint-rocksdb"
 version = "0.1.0"
 dependencies = [
@@ -1270,6 +1291,7 @@ dependencies = [
  "fedimint-bitcoind",
  "fedimint-ln",
  "fedimint-mint",
+ "fedimint-proof",
  "fedimint-rocksdb",
  "fedimint-server",
  "fedimint-sqlite",
@@ -1336,6 +1358,7 @@ dependencies = [
  "fedimint-core",
  "fedimint-ln",
  "fedimint-mint",
+ "fedimint-proof",
  "fedimint-rocksdb",
  "fedimint-server",
  "fedimint-wallet",
@@ -2522,6 +2545,7 @@ dependencies = [
  "fedimint-core",
  "fedimint-derive-secret",
  "fedimint-mint",
+ "fedimint-proof",
  "fedimint-rocksdb",
  "fedimint-testing",
  "futures",
