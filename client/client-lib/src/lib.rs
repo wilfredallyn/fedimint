@@ -293,6 +293,14 @@ impl<T: AsRef<ClientConfig> + Clone> Client<T> {
         self.submit_tx_with_change(tx, &mut rng).await
     }
 
+    pub async fn proof(&self) -> Result<String> {
+        let result = self.wallet_client().get_proof_of_reserves().await;
+        match result {
+            Ok(proof) => return Ok(proof.join(", ")),
+            Err(e) => Err(ClientError::WalletClientError(e)),
+        }
+    }
+
     async fn submit_tx_with_change<R: RngCore + CryptoRng>(
         &self,
         tx: TransactionBuilder,

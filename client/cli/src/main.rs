@@ -106,6 +106,10 @@ enum CliOutput {
     },
 
     Backup,
+
+    Proof {
+        output: String,
+    },
 }
 
 impl fmt::Display for CliOutput {
@@ -294,6 +298,9 @@ enum Command {
     /// Wipe the notes data from the DB. Useful for testing backup & restore
     #[clap(hide = true)]
     WipeNotes,
+
+    /// Proof of Reserves
+    Proof,
 }
 
 trait ErrorHandler<T, E> {
@@ -452,7 +459,11 @@ async fn handle_command(
                 CliErrorKind::GeneralFederationError,
                 "peg-in failed (no further information)",
             ),
-
+        Command::Proof => client.proof().await.transform(
+            |v| CliOutput::Proof { output: (v) },
+            CliErrorKind::GeneralFederationError,
+            "proof of reserves failed (no further information)",
+        ),
         Command::Reissue { coins } => {
             let id = client.reissue(coins, &mut rng).await;
             id.transform(

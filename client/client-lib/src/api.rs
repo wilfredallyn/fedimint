@@ -97,6 +97,9 @@ pub trait IFederationApi: Debug + Send + Sync {
         &self,
         id: &secp256k1::XOnlyPublicKey,
     ) -> Result<Vec<ECashUserBackupSnapshot>>;
+
+    /// Calculate proof of reserves, for now just print out all spendable UTXOs
+    async fn proof_of_reserves(&self) -> Result<Vec<String>>;
 }
 
 dyn_newtype_define! {
@@ -406,6 +409,16 @@ impl<C: JsonRpcClient + Debug + Send + Sync> IFederationApi for WsFederationApi<
             .into_iter()
             .flatten()
             .collect())
+    }
+
+    async fn proof_of_reserves(&self) -> Result<Vec<String>> {
+        Ok(self
+            .request(
+                "/wallet/proof_of_reserves",
+                (),
+                CurrentConsensus::new(self.peers().threshold()),
+            )
+            .await?)
     }
 }
 

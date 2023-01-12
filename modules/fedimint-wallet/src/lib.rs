@@ -794,6 +794,13 @@ impl ServerModulePlugin for Wallet {
                     Ok(tx.map(|tx| tx.fees))
                 }
             },
+            api_endpoint! {
+                "/proof_of_reserves",
+                async |module: &Wallet, dbtx, _params: ()| -> Vec<String> {
+                    // TODO x.0.0 seems like smelly code...refactor this obj?
+                    Ok(module.available_utxos(&mut dbtx).await.iter().map(|x| x.0.0.to_string()).collect())
+                }
+            },
         ]
     }
 }
