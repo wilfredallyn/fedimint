@@ -263,7 +263,7 @@ impl ServerModulePlugin for Proof {
         dbtx: &mut DatabaseTransaction<'b>,
     ) -> Vec<PeerId> {
         info!("proof: end_consensus_epoch");
-        let utxos = available_utxos(dbtx).await;
+        let utxos = self.available_utxos(dbtx).await;
         info!("available_utxos {:?}", &utxos);
         vec![]
     }
@@ -284,9 +284,10 @@ impl ServerModulePlugin for Proof {
 
     fn api_endpoints(&self) -> Vec<ApiEndpoint<Self>> {
         vec![api_endpoint! {
-            "/proof",
-            async |_module: &Proof, _dbtx, _request: ()| -> () {
-                Ok(())
+            "/proof_of_reserves",
+            async |module: &Proof, dbtx, _params: ()| -> String {
+                // TODO x.0.0 seems like smelly code...refactor this obj?
+                Ok(module.available_utxos(&mut dbtx).await)
             }
         }]
     }
@@ -296,6 +297,20 @@ impl Proof {
     /// Create new module instance
     pub fn new(cfg: ProofConfig) -> Proof {
         Proof { cfg }
+    }
+
+    async fn available_utxos(&self, dbtx: &mut DatabaseTransaction<'_>) -> String {
+        let utxos: Vec<(UTXOKey, SpendableUTXO)> = dbtx
+            .find_by_prefix(&UTXOPrefixKey)
+            .await
+            .collect::<Result<_, _>>()
+            .expect("DB error");
+
+        let utxo_addresses: Vec<bitcoin::OutPoint> =
+            utxos.into_iter().map(|(utxo_key, _)| utxo_key.0).collect();
+
+        let json = serde_json::to_string(&utxo_addresses).unwrap();
+        json
     }
 }
 
@@ -310,20 +325,6 @@ plugin_types_trait_impl!(
     ProofOutputConfirmation,
     ProofVerificationCache
 );
-
-async fn available_utxos(dbtx: &mut DatabaseTransaction<'_>) -> String {
-    let utxos: Vec<(UTXOKey, SpendableUTXO)> = dbtx
-        .find_by_prefix(&UTXOPrefixKey)
-        .await
-        .collect::<Result<_, _>>()
-        .expect("DB error");
-
-    let utxo_addresses: Vec<bitcoin::OutPoint> =
-        utxos.into_iter().map(|(utxo_key, _)| utxo_key.0).collect();
-
-    let json = serde_json::to_string_pretty(&utxo_addresses).unwrap();
-    json
-}
 
 #[derive(Debug, Clone, Eq, PartialEq, Hash, Error)]
 pub enum ProofError {

@@ -172,11 +172,6 @@ impl WalletClient {
             .await?;
         Ok(outcome.0)
     }
-
-    pub async fn get_proof_of_reserves(&self) -> Result<Vec<String>> {
-        let proof: Vec<String> = self.context.api.proof_of_reserves().await?;
-        Ok(proof)
-    }
 }
 
 type Result<T> = std::result::Result<T, WalletClientError>;

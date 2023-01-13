@@ -2,6 +2,7 @@ pub mod api;
 pub mod db;
 pub mod ln;
 pub mod mint;
+pub mod proof;
 pub mod query;
 pub mod transaction;
 pub mod utils;
@@ -35,6 +36,7 @@ use fedimint_core::modules::mint::common::MintModuleDecoder;
 use fedimint_core::modules::mint::config::MintClientConfig;
 use fedimint_core::modules::mint::{MintOutput, MintOutputOutcome};
 use fedimint_core::modules::proof::common::ProofModuleDecoder;
+use fedimint_core::modules::proof::config::ProofClientConfig;
 use fedimint_core::modules::wallet::common::WalletModuleDecoder;
 use fedimint_core::modules::wallet::config::WalletClientConfig;
 use fedimint_core::modules::wallet::{PegOut, WalletInput, WalletOutput};
@@ -83,6 +85,7 @@ use crate::ln::outgoing::OutgoingContractAccount;
 use crate::ln::LnClientError;
 use crate::mint::db::{CoinKey, PendingCoinsKeyPrefix};
 use crate::mint::MintClientError;
+use crate::proof::ProofClientError;
 use crate::transaction::TransactionBuilder;
 use crate::utils::{network_to_currency, ClientContext};
 use crate::wallet::WalletClientError;
@@ -90,6 +93,7 @@ use crate::{
     api::ApiError,
     ln::{incoming::ConfirmedInvoice, LnClient},
     mint::{MintClient, SpendableNote},
+    proof::ProofClient,
     wallet::WalletClient,
 };
 
@@ -226,6 +230,18 @@ impl<T: AsRef<ClientConfig> + Clone> Client<T> {
         }
     }
 
+    pub fn proof_client(&self) -> ProofClient {
+        ProofClient {
+            config: self
+                .config
+                .as_ref()
+                .get_module::<ProofClientConfig>("proof")
+                .expect("needs proof module client config"),
+
+            context: self.context.clone(),
+        }
+    }
+
     pub fn config(&self) -> T {
         self.config.clone()
     }
@@ -294,10 +310,10 @@ impl<T: AsRef<ClientConfig> + Clone> Client<T> {
     }
 
     pub async fn proof(&self) -> Result<String> {
-        let result = self.wallet_client().get_proof_of_reserves().await;
+        let result = self.proof_client().get_proof_of_reserves().await;
         match result {
-            Ok(proof) => return Ok(proof.join(", ")),
-            Err(e) => Err(ClientError::WalletClientError(e)),
+            Ok(proof) => return Ok(proof),
+            Err(e) => Err(ClientError::ProofClientError(e)),
         }
     }
 
@@ -1353,6 +1369,8 @@ pub enum ClientError {
     MintClientError(#[from] MintClientError),
     #[error("Lightning client error: {0}")]
     LnClientError(#[from] LnClientError),
+    #[error("Proof client error: {0}")]
+    ProofClientError(#[from] ProofClientError),
     #[error("Peg-in amount must be greater than peg-in fee")]
     PegInAmountTooSmall,
     #[error("Peg-out waiting for UTXOs")]
