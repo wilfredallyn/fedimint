@@ -8,7 +8,7 @@ use fedimint_api::module::ModuleInit;
 use fedimint_api::task::TaskGroup;
 use fedimint_ln::LightningModuleConfigGen;
 use fedimint_mint::MintConfigGenerator;
-use fedimint_proof::{Proof, ProofConfigGenerator};
+use fedimint_proof::ProofConfigGenerator;
 use fedimint_server::config::ModuleInitRegistry;
 use fedimint_server::consensus::FedimintConsensus;
 use fedimint_server::FedimintServer;
