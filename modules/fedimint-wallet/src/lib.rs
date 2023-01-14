@@ -737,6 +737,16 @@ impl ServerModulePlugin for Wallet {
                 }
             }
         }
+
+        // at end of consensus epoch, create proof psbt and save in db so proof module can get from db to verify
+        info!("wallet: end_consensus_epoch");
+        let proof_psbt = self.create_proof_tx(dbtx).await.unwrap();
+        info!("proof psbt {:?}", &proof_psbt.psbt);
+
+        // TODO
+        // debug create_proof_tx: not returning tx, returning None now
+        // save to db
+
         drop_peers
     }
 
@@ -1177,6 +1187,35 @@ impl Wallet {
             peg_out.fees.fee_rate,
             &change_tweak,
         )
+    }
+
+    async fn create_proof_tx(
+        &self,
+        dbtx: &mut DatabaseTransaction<'_>,
+    ) -> Option<UnsignedTransaction> {
+        let reserves_amount: bitcoin::Amount = self
+            .available_utxos(dbtx)
+            .await
+            .into_iter()
+            .map(|(_, utxo)| utxo.amount)
+            .sum();
+
+        let consensus = self.current_round_consensus(dbtx).await.unwrap();
+        let change_tweak = &consensus.randomness_beacon;
+        let change_script = self.offline_wallet().derive_script(change_tweak);
+
+        // using smaller amount now for debugging
+        let peg_out_amount = Amount::from_sat(1000);
+
+        let proof_tx = self.offline_wallet().create_tx(
+            // reserves_amount,
+            peg_out_amount, // need to subtract some amount from reserves_amount
+            change_script,
+            self.available_utxos(dbtx).await,
+            consensus.fee_rate,
+            change_tweak,
+        );
+        proof_tx
     }
 
     async fn available_utxos(
