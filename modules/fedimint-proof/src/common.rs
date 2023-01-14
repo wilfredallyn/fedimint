@@ -4,7 +4,7 @@ use fedimint_api::core::{ConsensusItem, Input, Output, OutputOutcome, PluginDeco
 use fedimint_api::encoding::{Decodable, DecodeError};
 use fedimint_api::module::registry::ModuleDecoderRegistry;
 
-use crate::{ProofInput, ProofOutput, ProofOutputConfirmation, ProofOutputOutcome};
+use crate::{ProofConsensusItem, ProofInput, ProofOutput, ProofOutputOutcome};
 
 #[derive(Debug, Default, Clone)]
 pub struct ProofModuleDecoder;
@@ -33,8 +33,9 @@ impl PluginDecode for ProofModuleDecoder {
     fn decode_consensus_item(
         mut r: &mut dyn io::Read,
     ) -> Result<fedimint_api::core::ConsensusItem, DecodeError> {
-        Ok(ConsensusItem::from(
-            ProofOutputConfirmation::consensus_decode(&mut r, &ModuleDecoderRegistry::default())?,
-        ))
+        Ok(ConsensusItem::from(ProofConsensusItem::consensus_decode(
+            &mut r,
+            &ModuleDecoderRegistry::default(),
+        )?))
     }
 }

@@ -16,6 +16,7 @@ The Database is split into different key spaces based on prefixing that can be u
 * `0x20-0x2A`: client (different db, but to be sure)
 * `0x30-0x3A`: wallet
 * `0x40-0x4A`: lightning
+* `0x50-0x5A`: proof
 
 ### Consensus
 
@@ -61,6 +62,13 @@ The Database is split into different key spaces based on prefixing that can be u
 | AgreedDecryptionShare            | `0x43` | contract id (sha256), peer id (u16) | `DecryptionShare`            |
 | ContractUpdate                   | `0x44` | out point (sha256, out idx)         | `fedimint_ln::OutputOutcome` |
 | LightningGateway                 | `0x45` | Node Pubkey (PublicKey)             | `LightningGateway`           |
+
+### Proof
+
+| Name                  | Prefix | Key                                       | Value                                     |
+|-----------------------|--------|-------------------------------------------|-------------------------------------------|
+| ProofTxSigCi          | `0x50` | block hash (32 bytes)                     | none                                      |
+| UnsignedProof         | `0x51` | bitcoin tx id (32 bytes)                  | PSBT                                      |
 
 ## Client DB Layout
 | Name                    | Prefix | Key                                | Value                        |

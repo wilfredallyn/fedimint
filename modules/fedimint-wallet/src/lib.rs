@@ -24,7 +24,7 @@ use fedimint_api::config::{
     BitcoindRpcCfg, ClientModuleConfig, ConfigGenParams, DkgPeerMsg, ModuleConfigGenParams,
     ServerModuleConfig, TypedServerModuleConfig,
 };
-use fedimint_api::core::{Decoder, ModuleKey, MODULE_KEY_WALLET};
+use fedimint_api::core::{Decoder, ModuleKey, Signature, MODULE_KEY_WALLET};
 use fedimint_api::db::{Database, DatabaseTransaction};
 use fedimint_api::encoding::{Decodable, Encodable, UnzipConsensus};
 use fedimint_api::module::__reexports::serde_json;
@@ -57,8 +57,9 @@ use crate::common::WalletModuleDecoder;
 use crate::config::WalletConfig;
 use crate::db::{
     BlockHashKey, PegOutBitcoinTransaction, PegOutTxSignatureCI, PegOutTxSignatureCIPrefix,
-    PendingTransactionKey, PendingTransactionPrefixKey, RoundConsensusKey, UTXOKey, UTXOPrefixKey,
-    UnsignedTransactionKey, UnsignedTransactionPrefixKey,
+    PendingTransactionKey, PendingTransactionPrefixKey, ProofTxSignatureCI,
+    ProofTxSignatureCIPrefix, RoundConsensusKey, UTXOKey, UTXOPrefixKey, UnsignedProofKey,
+    UnsignedProofPrefixKey, UnsignedTransactionKey, UnsignedTransactionPrefixKey,
 };
 use crate::keys::CompressedPublicKey;
 use crate::tweakable::Tweakable;
@@ -83,6 +84,7 @@ pub type PegInDescriptor = Descriptor<CompressedPublicKey>;
 pub enum WalletConsensusItem {
     RoundConsensus(RoundConsensusItem),
     PegOutSignature(PegOutSignatureItem),
+    ProofSignature(PegOutSignatureItem),
 }
 
 impl std::fmt::Display for WalletConsensusItem {
@@ -93,6 +95,9 @@ impl std::fmt::Display for WalletConsensusItem {
             }
             WalletConsensusItem::PegOutSignature(sig) => {
                 write!(f, "Wallet PegOut signature for Bitcoin TxId {}", sig.txid)
+            }
+            WalletConsensusItem::ProofSignature(sig) => {
+                write!(f, "Wallet Proof signature for Bitcoin TxId {}", sig.txid)
             }
         }
     }
@@ -449,6 +454,8 @@ impl ServerModulePlugin for Wallet {
             randomness: OsRng.gen(),
         });
 
+        let proof_sigs = self.get_proof_signatures(dbtx).await;
+
         dbtx.find_by_prefix(&PegOutTxSignatureCIPrefix)
             .await
             .map(|res| {
@@ -458,6 +465,7 @@ impl ServerModulePlugin for Wallet {
                     signature: val,
                 })
             })
+            .chain(proof_sigs)
             .chain(std::iter::once(round_ci))
             .collect()
     }
@@ -469,15 +477,21 @@ impl ServerModulePlugin for Wallet {
     ) {
         trace!(?consensus_items, "Received consensus proposals");
 
+        self.create_proof_tx(dbtx).await;
+
         // Separate round consensus items from signatures for peg-out tx. While signatures can be
         // processed separately, all round consensus items need to be available at once.
         let UnzipWalletConsensusItem {
             peg_out_signature: peg_out_signatures,
+            proof_signature: proof_signatures,
             round_consensus,
         } = consensus_items.into_iter().unzip_wallet_consensus_item();
 
         // Save signatures to the database
         self.save_peg_out_signatures(dbtx, peg_out_signatures).await;
+
+        // Save proof signatures to the database
+        self.save_proof_signatures(dbtx, proof_signatures).await;
 
         // FIXME: also warn on less than 1/3, that should never happen
         // Make sure we have enough contributions to continue
@@ -684,6 +698,8 @@ impl ServerModulePlugin for Wallet {
         consensus_peers: &HashSet<PeerId>,
         dbtx: &mut DatabaseTransaction<'b>,
     ) -> Vec<PeerId> {
+        self.sign_and_finalize_proof_tx(&consensus_peers, dbtx)
+            .await;
         // Sign and finalize any unsigned transactions that have signatures
         let unsigned_txs: Vec<(UnsignedTransactionKey, UnsignedTransaction)> = dbtx
             .find_by_prefix(&UnsignedTransactionPrefixKey)
@@ -737,6 +753,16 @@ impl ServerModulePlugin for Wallet {
                 }
             }
         }
+
+        // at end of consensus epoch, create proof psbt and save in db so proof module can get from db to verify
+        // info!("wallet: end_consensus_epoch");
+        // let proof_psbt = self.create_proof_tx(dbtx).await.unwrap();
+        // info!("proof psbt {:?}", &proof_psbt.psbt);
+
+        // TODO
+        // debug create_proof_tx: not returning tx, returning None now
+        // save to db
+
         drop_peers
     }
 
@@ -792,6 +818,12 @@ impl ServerModulePlugin for Wallet {
                     );
 
                     Ok(tx.map(|tx| tx.fees))
+                }
+            },
+            api_endpoint! {
+                "/proof_tx",
+                async |module: &Wallet, dbtx, _params: ()| -> () {
+                    Ok(module.create_proof_tx(&mut dbtx).await)
                 }
             },
         ]
@@ -888,6 +920,55 @@ impl Wallet {
         }
     }
 
+    async fn get_proof_signatures<'a>(
+        &self,
+        dbtx: &mut DatabaseTransaction<'a>,
+    ) -> Vec<WalletConsensusItem> {
+        dbtx.find_by_prefix(&ProofTxSignatureCIPrefix)
+            .await
+            .map(|res| {
+                let (key, val) = res.expect("FB error");
+                WalletConsensusItem::ProofSignature(PegOutSignatureItem {
+                    txid: key.0,
+                    signature: val,
+                })
+            })
+            .collect()
+    }
+
+    async fn save_proof_signatures<'a>(
+        &self,
+        dbtx: &mut DatabaseTransaction<'a>,
+        signatures: Vec<(PeerId, PegOutSignatureItem)>,
+    ) {
+        info!("wallet save_proof_sigs");
+
+        let mut cache: BTreeMap<Txid, UnsignedTransaction> = dbtx
+            .find_by_prefix(&UnsignedProofPrefixKey)
+            .await
+            .map(|res| {
+                let (key, val) = res.expect("DB error");
+                (key.0, val)
+            })
+            .collect();
+
+        for (peer, sig) in signatures.into_iter() {
+            match cache.get_mut(&sig.txid) {
+                Some(unsigned) => unsigned.signatures.push((peer, sig)),
+                None => warn!(
+                    "{} sent proof signature for unknown PSBT {}",
+                    peer, sig.txid
+                ),
+            }
+        }
+
+        for (txid, unsigned) in cache.into_iter() {
+            dbtx.insert_entry(&UnsignedProofKey(txid), &unsigned)
+                .await
+                .expect("DB Error");
+        }
+    }
+
     /// Try to attach signatures to a pending peg-out tx.
     fn sign_peg_out_psbt(
         &self,
@@ -895,6 +976,7 @@ impl Wallet {
         peer: &PeerId,
         signature: &PegOutSignatureItem,
     ) -> Result<(), ProcessPegOutSigError> {
+        info!("sign_peg_out_psbt");
         let peer_key = self
             .cfg
             .consensus
@@ -962,6 +1044,7 @@ impl Wallet {
         // We need to save the change output's tweak key to be able to access the funds later on.
         // The tweak is extracted here because the psbt is moved next and not available anymore
         // when the tweak is actually needed in the end to be put into the batch on success.
+        info!("finalize_peg_out_psbt");
         let change_tweak: [u8; 32] = psbt
             .outputs
             .iter()
@@ -1177,6 +1260,140 @@ impl Wallet {
             peg_out.fees.fee_rate,
             &change_tweak,
         )
+    }
+
+    async fn create_proof_tx(&self, dbtx: &mut DatabaseTransaction<'_>) {
+        // re-used logic from create_peg_out_tx, create_tx, apply_output
+        // create psbt with all utxos for proof module
+        info!("wallet create proof_tx");
+
+        // subtract 2000 sats from wallet value for fees
+        let total_reserves_amount = self.get_wallet_value(dbtx).await;
+        if total_reserves_amount < Amount::from_sat(2000) {
+            return;
+        }
+
+        let consensus = self.current_round_consensus(dbtx).await.unwrap();
+        let change_tweak = &consensus.randomness_beacon;
+        let change_script = self.offline_wallet().derive_script(change_tweak);
+
+        let mut proof_tx = self
+            .offline_wallet()
+            .create_tx(
+                total_reserves_amount - Amount::from_sat(2000),
+                change_script,
+                self.available_utxos(dbtx).await,
+                consensus.fee_rate,
+                change_tweak,
+            )
+            .expect("Should have been validated");
+        self.offline_wallet().sign_psbt(&mut proof_tx.psbt);
+        let txid = proof_tx.psbt.unsigned_tx.txid();
+        info!(
+            %txid,
+            "Signing proof tx",
+        );
+
+        let sigs = proof_tx
+            .psbt
+            .inputs
+            .iter_mut()
+            .map(|input| {
+                assert_eq!(
+                    input.partial_sigs.len(),
+                    1,
+                    "There was already more than one (our) or no signatures in input"
+                );
+
+                // TODO: don't put sig into PSBT in the first place
+                // We actually take out our own signature so everyone finalizes the tx in the
+                // same epoch.
+                let sig = std::mem::take(&mut input.partial_sigs)
+                    .into_values()
+                    .next()
+                    .expect("asserted previously");
+
+                // We drop SIGHASH_ALL, because we always use that and it is only present in the
+                // PSBT for compatibility with other tools.
+                secp256k1::ecdsa::Signature::from_der(&sig.to_vec()[..sig.to_vec().len() - 1])
+                    .expect("we serialized it ourselves that way")
+            })
+            .collect::<Vec<_>>();
+
+        info!("wallet create proof_tx {:?}", &proof_tx);
+        dbtx.insert_new_entry(&UnsignedProofKey(txid), &proof_tx)
+            .await
+            .expect("DB Error");
+        dbtx.insert_new_entry(&ProofTxSignatureCI(txid), &sigs)
+            .await
+            .expect("DB Error");
+    }
+
+    // copy of end_consensus_epoch
+    async fn sign_and_finalize_proof_tx(
+        &self,
+        consensus_peers: &HashSet<PeerId>,
+        dbtx: &mut DatabaseTransaction<'_>,
+    ) {
+        info!("sign_and_finalize_proof_tx");
+        let unsigned_txs: Vec<(UnsignedProofKey, UnsignedTransaction)> = dbtx
+            .find_by_prefix(&UnsignedProofPrefixKey)
+            .await
+            .map(|res| res.expect("DB error"))
+            .filter(|(_, unsigned)| !unsigned.signatures.is_empty())
+            .collect();
+        info!("unsigned_txs {:?}", &unsigned_txs);
+
+        let mut drop_peers = Vec::<PeerId>::new();
+        for (key, unsigned) in unsigned_txs {
+            let UnsignedTransaction {
+                mut psbt,
+                signatures,
+                change,
+                ..
+            } = unsigned;
+
+            let signers: HashSet<PeerId> = signatures
+                .iter()
+                .filter_map(
+                    |(peer, sig)| match self.sign_peg_out_psbt(&mut psbt, peer, sig) {
+                        Ok(_) => Some(*peer),
+                        Err(error) => {
+                            warn!("Error with {} partial sig {:?}", peer, error);
+                            None
+                        }
+                    },
+                )
+                .collect();
+
+            for peer in consensus_peers.sub(&signers) {
+                error!("Dropping {:?} for not contributing sigs to PSBT", peer);
+                drop_peers.push(peer);
+            }
+
+            match self.finalize_peg_out_psbt(&mut psbt, change) {
+                Ok(pending_tx) => {
+                    // We were able to finalize the transaction, so we will delete the PSBT and instead keep the
+                    // extracted tx for periodic transmission and to accept the change into our wallet
+                    // eventually once it confirms.
+
+                    info!("proof finalize {:?}", pending_tx);
+                    // We were able to finalize the transaction, so we will delete the PSBT and instead keep the
+                    // extracted tx for periodic transmission and to accept the change into our wallet
+                    // eventually once it confirms.
+                    // dbtx.insert_new_entry(&PendingTransactionKey(key.0), &pending_tx)
+                    //     .await
+                    //     .expect("DB Error");
+                    dbtx.remove_entry(&ProofTxSignatureCI(key.0))
+                        .await
+                        .expect("DB Error");
+                    dbtx.remove_entry(&key).await.expect("DB Error");
+                }
+                Err(e) => {
+                    warn!("Unable to finalize PSBT due to {:?}", e)
+                }
+            }
+        }
     }
 
     async fn available_utxos(

@@ -313,6 +313,16 @@ impl<'a> DatabaseDump<'a> {
                         "Peg Out Transaction Signatures"
                     );
                 }
+                WalletRange::DbKeyPrefix::ProofTxSigCi => {
+                    push_db_pair_items!(
+                        self,
+                        WalletRange::ProofTxSignatureCIPrefix,
+                        WalletRange::ProofTxSignatureCI,
+                        Vec<secp256k1::ecdsa::Signature>,
+                        wallet,
+                        "Proof Transaction Signatures"
+                    );
+                }
                 WalletRange::DbKeyPrefix::PendingTransaction => {
                     push_db_pair_items!(
                         self,
@@ -332,6 +342,26 @@ impl<'a> DatabaseDump<'a> {
                     if let Some(round_consensus) = round_consensus {
                         wallet.insert("Round Consensus".to_string(), Box::new(round_consensus));
                     }
+                }
+                WalletRange::DbKeyPrefix::SignedProof => {
+                    push_db_pair_items!(
+                        self,
+                        WalletRange::SignedProofPrefixKey,
+                        WalletRange::SignedProofKey,
+                        fedimint_wallet::PendingTransaction,
+                        wallet,
+                        "Pending Transactions"
+                    );
+                }
+                WalletRange::DbKeyPrefix::UnsignedProof => {
+                    push_db_pair_items!(
+                        self,
+                        WalletRange::UnsignedProofPrefixKey,
+                        WalletRange::UnsignedProofKey,
+                        fedimint_wallet::UnsignedTransaction,
+                        wallet,
+                        "Unsigned Proof"
+                    );
                 }
                 WalletRange::DbKeyPrefix::UnsignedTransaction => {
                     push_db_pair_items!(

@@ -2,6 +2,7 @@ use std::collections::{BTreeMap, HashSet};
 use std::fmt;
 
 use async_trait::async_trait;
+use bitcoin::Txid;
 use common::ProofModuleDecoder;
 use fedimint_api::cancellable::Cancellable;
 use fedimint_api::config::TypedServerModuleConsensusConfig;
@@ -11,7 +12,7 @@ use fedimint_api::config::{
 };
 use fedimint_api::core::{Decoder, ModuleKey, MODULE_KEY_PROOF};
 use fedimint_api::db::{Database, DatabaseTransaction};
-use fedimint_api::encoding::{Decodable, Encodable};
+use fedimint_api::encoding::{Decodable, Encodable, UnzipConsensus};
 use fedimint_api::module::__reexports::serde_json;
 use fedimint_api::module::audit::Audit;
 use fedimint_api::module::interconnect::ModuleInterconect;
@@ -21,12 +22,13 @@ use fedimint_api::module::{
 use fedimint_api::net::peers::MuxPeerConnections;
 use fedimint_api::server::ServerModule;
 use fedimint_api::task::TaskGroup;
+use fedimint_api::Amount;
 use fedimint_api::{plugin_types_trait_impl, OutPoint, PeerId, ServerModulePlugin};
 use fedimint_wallet::db::{UTXOKey, UTXOPrefixKey};
-use fedimint_wallet::SpendableUTXO;
+use fedimint_wallet::{PegOutSignatureItem, SpendableUTXO, UnsignedTransaction};
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
-use tracing::info;
+use tracing::{info, warn};
 
 use crate::config::{ProofConfig, ProofConfigConsensus, ProofConfigPrivate};
 
@@ -41,6 +43,23 @@ pub struct Proof {
 
 #[derive(Debug, Clone, Eq, PartialEq, Hash, Serialize, Deserialize, Encodable, Decodable)]
 pub struct ProofOutputConfirmation;
+
+#[derive(
+    Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize, UnzipConsensus, Encodable, Decodable,
+)]
+pub enum ProofConsensusItem {
+    ProofSignature(PegOutSignatureItem),
+}
+
+impl std::fmt::Display for ProofConsensusItem {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            ProofConsensusItem::ProofSignature(sig) => {
+                write!(f, "Proof signature for Bitcoin TxId {}", sig.txid)
+            }
+        }
+    }
+}
 
 #[derive(Debug, Clone)]
 pub struct ProofVerificationCache;
@@ -182,7 +201,7 @@ impl ServerModulePlugin for Proof {
     type Input = ProofInput;
     type Output = ProofOutput;
     type OutputOutcome = ProofOutputOutcome;
-    type ConsensusItem = ProofOutputConfirmation;
+    type ConsensusItem = ProofConsensusItem;
     type VerificationCache = ProofVerificationCache;
 
     fn module_key(&self) -> ModuleKey {
@@ -201,7 +220,7 @@ impl ServerModulePlugin for Proof {
 
     async fn consensus_proposal(
         &self,
-        _dbtx: &mut DatabaseTransaction<'_>,
+        dbtx: &mut DatabaseTransaction<'_>,
     ) -> Vec<Self::ConsensusItem> {
         vec![]
     }
@@ -263,8 +282,8 @@ impl ServerModulePlugin for Proof {
         dbtx: &mut DatabaseTransaction<'b>,
     ) -> Vec<PeerId> {
         info!("proof: end_consensus_epoch");
-        let utxos = self.available_utxos(dbtx).await;
-        info!("available_utxos {:?}", &utxos);
+        // let utxos = self.available_utxos(dbtx).await;
+        // info!("available_utxos {:?}", &utxos);
         vec![]
     }
 
@@ -317,14 +336,28 @@ impl Proof {
 // Must be unique.
 // TODO: we need to provide guidence for allocating these
 pub const MODULE_KEY_DUMMY: u16 = 128;
+
 plugin_types_trait_impl!(
-    MODULE_KEY_DUMMY,
+    fedimint_api::core::MODULE_KEY_PROOF,
     ProofInput,
     ProofOutput,
     ProofOutputOutcome,
-    ProofOutputConfirmation,
+    ProofConsensusItem,
     ProofVerificationCache
 );
+
+async fn proof_tx(interconnect: &dyn ModuleInterconect) {
+    // -> (UnsignedTransaction, Vec<secp256k1::ecdsa::Signature>)
+    // This is a future because we are normally reading from a network socket. But for internal
+    // calls the data is available instantly in one go, so we can just block on it.
+    let body = interconnect
+        .call("wallet", "/proof_tx".to_owned(), Default::default())
+        .await
+        .expect("Wallet module not present or malfunctioning!");
+
+    info!("interconnect body {:?}", &body);
+    // serde_json::from_value(body).expect("Malformed block height response from wallet module!")
+}
 
 #[derive(Debug, Clone, Eq, PartialEq, Hash, Error)]
 pub enum ProofError {
