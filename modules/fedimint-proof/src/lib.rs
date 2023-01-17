@@ -24,14 +24,15 @@ use fedimint_api::server::ServerModule;
 use fedimint_api::task::TaskGroup;
 use fedimint_api::Amount;
 use fedimint_api::{plugin_types_trait_impl, OutPoint, PeerId, ServerModulePlugin};
-use fedimint_wallet::db::{UTXOKey, UTXOPrefixKey};
+use fedimint_wallet::db::{
+    ProofTxSignatureCIPrefix, UTXOKey, UTXOPrefixKey, UnsignedProofKey, UnsignedProofPrefixKey,
+};
 use fedimint_wallet::{PegOutSignatureItem, SpendableUTXO, UnsignedTransaction};
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 use tracing::{info, warn};
 
 use crate::config::{ProofConfig, ProofConfigConsensus, ProofConfigPrivate};
-use crate::db::{ProofTxSignatureCIPrefix, UnsignedProofKey, UnsignedProofPrefixKey};
 
 pub mod common;
 pub mod config;
@@ -224,7 +225,8 @@ impl ServerModulePlugin for Proof {
         dbtx: &mut DatabaseTransaction<'_>,
     ) -> Vec<Self::ConsensusItem> {
         info!("proof consensus proposal");
-        dbtx.find_by_prefix(&ProofTxSignatureCIPrefix)
+        let sigs = dbtx
+            .find_by_prefix(&ProofTxSignatureCIPrefix)
             .await
             .map(|res| {
                 let (key, val) = res.expect("FB error");
@@ -233,7 +235,9 @@ impl ServerModulePlugin for Proof {
                     signature: val,
                 })
             })
-            .collect()
+            .collect();
+        info!("proof consensus sigs {:?}", &sigs);
+        sigs
     }
 
     async fn begin_consensus_epoch<'a, 'b>(
@@ -266,6 +270,7 @@ impl ServerModulePlugin for Proof {
         verification_cache: &Self::VerificationCache,
         input: &'a Self::Input,
     ) -> Result<InputMeta, ModuleError> {
+        info!("proof validate input");
         Ok(InputMeta {
             amount: TransactionItemAmount {
                 amount: Amount { msats: 0 },
@@ -366,6 +371,7 @@ impl Proof {
         dbtx: &mut DatabaseTransaction<'a>,
         signatures: Vec<(PeerId, PegOutSignatureItem)>,
     ) {
+        info!("proof save_proof_sigs");
         let mut cache: BTreeMap<Txid, UnsignedTransaction> = dbtx
             .find_by_prefix(&UnsignedProofPrefixKey)
             .await

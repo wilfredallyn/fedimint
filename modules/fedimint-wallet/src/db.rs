@@ -19,6 +19,8 @@ pub enum DbKeyPrefix {
     PendingTransaction = 0x35,
     PegOutTxSigCi = 0x36,
     PegOutBitcoinOutPoint = 0x37,
+    ProofTxSigCi = 0x38,
+    UnsignedProof = 0x39,
 }
 
 impl std::fmt::Display for DbKeyPrefix {
@@ -142,4 +144,40 @@ impl DatabaseKeyPrefixConst for PegOutBitcoinTransactionPrefix {
     const DB_PREFIX: u8 = DbKeyPrefix::PegOutBitcoinOutPoint as u8;
     type Key = PegOutBitcoinTransaction;
     type Value = WalletOutputOutcome;
+}
+
+#[derive(Clone, Debug, Encodable, Decodable, Serialize)]
+pub struct UnsignedProofKey(pub Txid);
+
+impl DatabaseKeyPrefixConst for UnsignedProofKey {
+    const DB_PREFIX: u8 = DbKeyPrefix::UnsignedProof as u8;
+    type Key = Self;
+    type Value = UnsignedTransaction;
+}
+
+#[derive(Clone, Debug, Encodable, Decodable)]
+pub struct UnsignedProofPrefixKey;
+
+impl DatabaseKeyPrefixConst for UnsignedProofPrefixKey {
+    const DB_PREFIX: u8 = DbKeyPrefix::UnsignedProof as u8;
+    type Key = UnsignedProofKey;
+    type Value = UnsignedTransaction;
+}
+
+#[derive(Clone, Debug, Encodable, Decodable, Serialize)]
+pub struct ProofTxSignatureCI(pub Txid);
+
+impl DatabaseKeyPrefixConst for ProofTxSignatureCI {
+    const DB_PREFIX: u8 = DbKeyPrefix::ProofTxSigCi as u8;
+    type Key = Self;
+    type Value = Vec<Signature>; // TODO: define newtype
+}
+
+#[derive(Clone, Debug, Encodable, Decodable)]
+pub struct ProofTxSignatureCIPrefix;
+
+impl DatabaseKeyPrefixConst for ProofTxSignatureCIPrefix {
+    const DB_PREFIX: u8 = DbKeyPrefix::ProofTxSigCi as u8;
+    type Key = ProofTxSignatureCI;
+    type Value = Vec<Signature>;
 }

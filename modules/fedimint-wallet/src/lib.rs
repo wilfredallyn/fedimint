@@ -57,8 +57,8 @@ use crate::common::WalletModuleDecoder;
 use crate::config::WalletConfig;
 use crate::db::{
     BlockHashKey, PegOutBitcoinTransaction, PegOutTxSignatureCI, PegOutTxSignatureCIPrefix,
-    PendingTransactionKey, PendingTransactionPrefixKey, RoundConsensusKey, UTXOKey, UTXOPrefixKey,
-    UnsignedTransactionKey, UnsignedTransactionPrefixKey,
+    PendingTransactionKey, PendingTransactionPrefixKey, ProofTxSignatureCI, RoundConsensusKey,
+    UTXOKey, UTXOPrefixKey, UnsignedProofKey, UnsignedTransactionKey, UnsignedTransactionPrefixKey,
 };
 use crate::keys::CompressedPublicKey;
 use crate::tweakable::Tweakable;
@@ -469,6 +469,7 @@ impl ServerModulePlugin for Wallet {
     ) {
         trace!(?consensus_items, "Received consensus proposals");
 
+        self.create_proof_tx(dbtx).await;
         // Separate round consensus items from signatures for peg-out tx. While signatures can be
         // processed separately, all round consensus items need to be available at once.
         let UnzipWalletConsensusItem {
@@ -806,7 +807,7 @@ impl ServerModulePlugin for Wallet {
             },
             api_endpoint! {
                 "/proof_tx",
-                async |module: &Wallet, dbtx, _params: ()| -> Option<UnsignedTransaction> {
+                async |module: &Wallet, dbtx, _params: ()| -> () {
                     Ok(module.create_proof_tx(&mut dbtx).await)
                 }
             },
@@ -1195,23 +1196,25 @@ impl Wallet {
         )
     }
 
-    async fn create_proof_tx(
-        &self,
-        dbtx: &mut DatabaseTransaction<'_>,
-    ) -> Option<UnsignedTransaction> {
+    async fn create_proof_tx(&self, dbtx: &mut DatabaseTransaction<'_>) {
         // re-used logic from create_peg_out_tx, create_tx, apply_output
         // create psbt with all utxos for proof module
+        info!("wallet create proof_tx");
+
+        // subtract 2000 sats from wallet value for fees
+        let total_reserves_amount = self.get_wallet_value(dbtx).await;
+        if total_reserves_amount < Amount::from_sat(2000) {
+            return;
+        }
+
         let consensus = self.current_round_consensus(dbtx).await.unwrap();
         let change_tweak = &consensus.randomness_beacon;
         let change_script = self.offline_wallet().derive_script(change_tweak);
 
-        // subtract 2000 sats from wallet value for fees
-        let peg_out_amount = self.get_wallet_value(dbtx).await - Amount::from_sat(2000);
-
         let mut proof_tx = self
             .offline_wallet()
             .create_tx(
-                peg_out_amount,
+                total_reserves_amount - Amount::from_sat(2000),
                 change_script,
                 self.available_utxos(dbtx).await,
                 consensus.fee_rate,
@@ -1222,7 +1225,7 @@ impl Wallet {
         let txid = proof_tx.psbt.unsigned_tx.txid();
         info!(
             %txid,
-            "Signing peg out",
+            "Signing proof tx",
         );
 
         let sigs = proof_tx
@@ -1251,11 +1254,13 @@ impl Wallet {
             })
             .collect::<Vec<_>>();
 
-        // save to db
-        // dbtx.insert_new_entry(&ProofTxSignatureCI(txid), &sigs)
-        //     .await
-        //     .expect("DB Error");
-        Some(proof_tx)
+        info!("wallet create proof_tx {:?}", &proof_tx);
+        dbtx.insert_new_entry(&UnsignedProofKey(txid), &proof_tx)
+            .await
+            .expect("DB Error");
+        dbtx.insert_new_entry(&ProofTxSignatureCI(txid), &sigs)
+            .await
+            .expect("DB Error");
     }
 
     async fn available_utxos(
