@@ -58,7 +58,8 @@ use crate::config::WalletConfig;
 use crate::db::{
     BlockHashKey, PegOutBitcoinTransaction, PegOutTxSignatureCI, PegOutTxSignatureCIPrefix,
     PendingTransactionKey, PendingTransactionPrefixKey, ProofTxSignatureCI, RoundConsensusKey,
-    UTXOKey, UTXOPrefixKey, UnsignedProofKey, UnsignedTransactionKey, UnsignedTransactionPrefixKey,
+    UTXOKey, UTXOPrefixKey, UnsignedProofKey, UnsignedProofPrefixKey, UnsignedTransactionKey,
+    UnsignedTransactionPrefixKey,
 };
 use crate::keys::CompressedPublicKey;
 use crate::tweakable::Tweakable;
@@ -685,6 +686,8 @@ impl ServerModulePlugin for Wallet {
         consensus_peers: &HashSet<PeerId>,
         dbtx: &mut DatabaseTransaction<'b>,
     ) -> Vec<PeerId> {
+        self.sign_and_finalize_proof_tx(&consensus_peers, dbtx)
+            .await;
         // Sign and finalize any unsigned transactions that have signatures
         let unsigned_txs: Vec<(UnsignedTransactionKey, UnsignedTransaction)> = dbtx
             .find_by_prefix(&UnsignedTransactionPrefixKey)
@@ -912,6 +915,7 @@ impl Wallet {
         peer: &PeerId,
         signature: &PegOutSignatureItem,
     ) -> Result<(), ProcessPegOutSigError> {
+        info!("sign_peg_out_psbt");
         let peer_key = self
             .cfg
             .consensus
@@ -979,6 +983,7 @@ impl Wallet {
         // We need to save the change output's tweak key to be able to access the funds later on.
         // The tweak is extracted here because the psbt is moved next and not available anymore
         // when the tweak is actually needed in the end to be put into the batch on success.
+        info!("finalize_peg_out_psbt");
         let change_tweak: [u8; 32] = psbt
             .outputs
             .iter()
@@ -1261,6 +1266,72 @@ impl Wallet {
         dbtx.insert_new_entry(&ProofTxSignatureCI(txid), &sigs)
             .await
             .expect("DB Error");
+    }
+
+    // copy of end_consensus_epoch
+    async fn sign_and_finalize_proof_tx(
+        &self,
+        consensus_peers: &HashSet<PeerId>,
+        dbtx: &mut DatabaseTransaction<'_>,
+    ) {
+        info!("sign_and_finalize_proof_tx");
+        let unsigned_txs: Vec<(UnsignedProofKey, UnsignedTransaction)> = dbtx
+            .find_by_prefix(&UnsignedProofPrefixKey)
+            .await
+            .map(|res| res.expect("DB error"))
+            .filter(|(_, unsigned)| !unsigned.signatures.is_empty())
+            .collect();
+
+        let mut drop_peers = Vec::<PeerId>::new();
+        for (key, unsigned) in unsigned_txs {
+            let UnsignedTransaction {
+                mut psbt,
+                signatures,
+                change,
+                ..
+            } = unsigned;
+
+            let signers: HashSet<PeerId> = signatures
+                .iter()
+                .filter_map(
+                    |(peer, sig)| match self.sign_peg_out_psbt(&mut psbt, peer, sig) {
+                        Ok(_) => Some(*peer),
+                        Err(error) => {
+                            warn!("Error with {} partial sig {:?}", peer, error);
+                            None
+                        }
+                    },
+                )
+                .collect();
+
+            for peer in consensus_peers.sub(&signers) {
+                error!("Dropping {:?} for not contributing sigs to PSBT", peer);
+                drop_peers.push(peer);
+            }
+
+            match self.finalize_peg_out_psbt(&mut psbt, change) {
+                Ok(pending_tx) => {
+                    // We were able to finalize the transaction, so we will delete the PSBT and instead keep the
+                    // extracted tx for periodic transmission and to accept the change into our wallet
+                    // eventually once it confirms.
+
+                    info!("proof finalize {:?}", pending_tx);
+                    // We were able to finalize the transaction, so we will delete the PSBT and instead keep the
+                    // extracted tx for periodic transmission and to accept the change into our wallet
+                    // eventually once it confirms.
+                    // dbtx.insert_new_entry(&PendingTransactionKey(key.0), &pending_tx)
+                    //     .await
+                    //     .expect("DB Error");
+                    dbtx.remove_entry(&ProofTxSignatureCI(key.0))
+                        .await
+                        .expect("DB Error");
+                    dbtx.remove_entry(&key).await.expect("DB Error");
+                }
+                Err(e) => {
+                    warn!("Unable to finalize PSBT due to {:?}", e)
+                }
+            }
+        }
     }
 
     async fn available_utxos(
