@@ -24,9 +24,7 @@ use fedimint_api::server::ServerModule;
 use fedimint_api::task::TaskGroup;
 use fedimint_api::Amount;
 use fedimint_api::{plugin_types_trait_impl, OutPoint, PeerId, ServerModulePlugin};
-use fedimint_wallet::db::{
-    ProofTxSignatureCIPrefix, UTXOKey, UTXOPrefixKey, UnsignedProofKey, UnsignedProofPrefixKey,
-};
+use fedimint_wallet::db::{UTXOKey, UTXOPrefixKey};
 use fedimint_wallet::{PegOutSignatureItem, SpendableUTXO, UnsignedTransaction};
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
@@ -224,36 +222,14 @@ impl ServerModulePlugin for Proof {
         &self,
         dbtx: &mut DatabaseTransaction<'_>,
     ) -> Vec<Self::ConsensusItem> {
-        info!("proof consensus proposal");
-        let sigs = dbtx
-            .find_by_prefix(&ProofTxSignatureCIPrefix)
-            .await
-            .map(|res| {
-                let (key, val) = res.expect("FB error");
-                ProofConsensusItem::ProofSignature(PegOutSignatureItem {
-                    txid: key.0,
-                    signature: val,
-                })
-            })
-            .collect();
-        info!("proof consensus sigs {:?}", &sigs);
-        sigs
+        vec![]
     }
 
     async fn begin_consensus_epoch<'a, 'b>(
         &'a self,
-        dbtx: &mut DatabaseTransaction<'b>,
-        consensus_items: Vec<(PeerId, Self::ConsensusItem)>,
+        _dbtx: &mut DatabaseTransaction<'b>,
+        _consensus_items: Vec<(PeerId, Self::ConsensusItem)>,
     ) {
-        info!("proof begin_consensus_epoch");
-        let UnzipProofConsensusItem {
-            proof_signature: proof_signatures,
-        } = consensus_items.into_iter().unzip_proof_consensus_item();
-        // UnzipWalletConsensusItem
-        // Save signatures to the database
-        // self.save_proof_signatures(dbtx, proof_signatures).await;
-
-        // dbtx.insert_entry(&RoundConsensusKey, &round_consensus)
     }
 
     fn build_verification_cache<'a>(
@@ -265,41 +241,22 @@ impl ServerModulePlugin for Proof {
 
     async fn validate_input<'a, 'b>(
         &self,
-        interconnect: &dyn ModuleInterconect,
-        dbtx: &mut DatabaseTransaction<'b>,
-        verification_cache: &Self::VerificationCache,
-        input: &'a Self::Input,
+        _interconnect: &dyn ModuleInterconect,
+        _dbtx: &mut DatabaseTransaction<'b>,
+        _verification_cache: &Self::VerificationCache,
+        _input: &'a Self::Input,
     ) -> Result<InputMeta, ModuleError> {
-        info!("proof validate input");
-        Ok(InputMeta {
-            amount: TransactionItemAmount {
-                amount: Amount { msats: 0 },
-                fee: Amount { msats: 0 },
-            },
-            puk_keys: vec![],
-        })
+        unimplemented!()
     }
 
     async fn apply_input<'a, 'b, 'c>(
         &'a self,
-        interconnect: &'a dyn ModuleInterconect,
-        dbtx: &mut DatabaseTransaction<'c>,
-        input: &'b Self::Input,
-        cache: &Self::VerificationCache,
+        _interconnect: &'a dyn ModuleInterconect,
+        _dbtx: &mut DatabaseTransaction<'c>,
+        _input: &'b Self::Input,
+        _cache: &Self::VerificationCache,
     ) -> Result<InputMeta, ModuleError> {
-        let meta = self
-            .validate_input(interconnect, dbtx, cache, input)
-            .await?;
-        info!("proof apply input");
-        proof_tx(interconnect).await;
-        // let (proof_tx, sigs) = proof_tx(interconnect).await;
-        // info!("apply_input proof_tx: {:?}", proof_tx);
-        // use api endpoint with interconect
-        // call wallet.offline_wallet functions in interconect (need wallet.cfg)
-        // create_tx
-        // sign_psbt
-        // derive_script
-        Ok(meta)
+        unimplemented!()
     }
 
     async fn validate_output(
@@ -325,13 +282,8 @@ impl ServerModulePlugin for Proof {
         dbtx: &mut DatabaseTransaction<'b>,
     ) -> Vec<PeerId> {
         info!("proof: end_consensus_epoch");
-        let utxos = self.available_utxos(dbtx).await;
-        info!("available_utxos {:?}", &utxos);
-
-        // Need to remove UnsignedProof from db
-        // dbtx.remove_entry(&ProofTxSignatureCI(key.0))
-        //     .await
-        //     .expect("DB Error");
+        // let utxos = self.available_utxos(dbtx).await;
+        // info!("available_utxos {:?}", &utxos);
         vec![]
     }
 
@@ -364,38 +316,6 @@ impl Proof {
     /// Create new module instance
     pub fn new(cfg: ProofConfig) -> Proof {
         Proof { cfg }
-    }
-
-    async fn save_proof_signatures<'a>(
-        &self,
-        dbtx: &mut DatabaseTransaction<'a>,
-        signatures: Vec<(PeerId, PegOutSignatureItem)>,
-    ) {
-        info!("proof save_proof_sigs");
-        let mut cache: BTreeMap<Txid, UnsignedTransaction> = dbtx
-            .find_by_prefix(&UnsignedProofPrefixKey)
-            .await
-            .map(|res| {
-                let (key, val) = res.expect("DB error");
-                (key.0, val)
-            })
-            .collect();
-
-        for (peer, sig) in signatures.into_iter() {
-            match cache.get_mut(&sig.txid) {
-                Some(unsigned) => unsigned.signatures.push((peer, sig)),
-                None => warn!(
-                    "{} sent proof signature for unknown PSBT {}",
-                    peer, sig.txid
-                ),
-            }
-        }
-
-        for (txid, unsigned) in cache.into_iter() {
-            dbtx.insert_entry(&UnsignedProofKey(txid), &unsigned)
-                .await
-                .expect("DB Error");
-        }
     }
 
     async fn available_utxos(&self, dbtx: &mut DatabaseTransaction<'_>) -> String {
