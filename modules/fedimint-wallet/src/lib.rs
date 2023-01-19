@@ -57,9 +57,9 @@ use crate::common::WalletModuleDecoder;
 use crate::config::WalletConfig;
 use crate::db::{
     BlockHashKey, PegOutBitcoinTransaction, PegOutTxSignatureCI, PegOutTxSignatureCIPrefix,
-    PendingTransactionKey, PendingTransactionPrefixKey, ProofTxSignatureCI, RoundConsensusKey,
-    UTXOKey, UTXOPrefixKey, UnsignedProofKey, UnsignedProofPrefixKey, UnsignedTransactionKey,
-    UnsignedTransactionPrefixKey,
+    PendingTransactionKey, PendingTransactionPrefixKey, ProofTxSignatureCI,
+    ProofTxSignatureCIPrefix, RoundConsensusKey, UTXOKey, UTXOPrefixKey, UnsignedProofKey,
+    UnsignedProofPrefixKey, UnsignedTransactionKey, UnsignedTransactionPrefixKey,
 };
 use crate::keys::CompressedPublicKey;
 use crate::tweakable::Tweakable;
@@ -471,6 +471,8 @@ impl ServerModulePlugin for Wallet {
         trace!(?consensus_items, "Received consensus proposals");
 
         self.create_proof_tx(dbtx).await;
+
+        self.save_proof_signatures(dbtx).await;
         // Separate round consensus items from signatures for peg-out tx. While signatures can be
         // processed separately, all round consensus items need to be available at once.
         let UnzipWalletConsensusItem {
@@ -908,6 +910,39 @@ impl Wallet {
         }
     }
 
+    async fn save_proof_signatures<'a>(&self, dbtx: &mut DatabaseTransaction<'a>) {
+        info!("proof save_proof_sigs");
+
+        let mut cache: BTreeMap<Txid, UnsignedTransaction> = dbtx
+            .find_by_prefix(&UnsignedProofPrefixKey)
+            .await
+            .map(|res| {
+                let (key, val) = res.expect("DB error");
+                (key.0, val)
+            })
+            .collect();
+
+        let sigs: Vec<(PeerId, PegOutSignatureItem)> = dbtx
+            .find_by_prefix(&ProofTxSignatureCIPrefix)
+            .await
+            .collect();
+        for (peer, sig) in sigs.into_iter() {
+            match cache.get_mut(&sig.txid) {
+                Some(unsigned) => unsigned.signatures.push((peer, sig)),
+                None => warn!(
+                    "{} sent proof signature for unknown PSBT {}",
+                    peer, sig.txid
+                ),
+            }
+        }
+
+        for (txid, unsigned) in cache.into_iter() {
+            dbtx.insert_entry(&UnsignedProofKey(txid), &unsigned)
+                .await
+                .expect("DB Error");
+        }
+    }
+
     /// Try to attach signatures to a pending peg-out tx.
     fn sign_peg_out_psbt(
         &self,
@@ -1281,6 +1316,7 @@ impl Wallet {
             .map(|res| res.expect("DB error"))
             .filter(|(_, unsigned)| !unsigned.signatures.is_empty())
             .collect();
+        info!("unsigned_txs {:?}", &unsigned_txs);
 
         let mut drop_peers = Vec::<PeerId>::new();
         for (key, unsigned) in unsigned_txs {
