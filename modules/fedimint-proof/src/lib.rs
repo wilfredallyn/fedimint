@@ -251,7 +251,7 @@ impl ServerModulePlugin for Proof {
         } = consensus_items.into_iter().unzip_proof_consensus_item();
         // UnzipWalletConsensusItem
         // Save signatures to the database
-        self.save_proof_signatures(dbtx, proof_signatures).await;
+        // self.save_proof_signatures(dbtx, proof_signatures).await;
 
         // dbtx.insert_entry(&RoundConsensusKey, &round_consensus)
     }

@@ -84,6 +84,7 @@ pub type PegInDescriptor = Descriptor<CompressedPublicKey>;
 pub enum WalletConsensusItem {
     RoundConsensus(RoundConsensusItem),
     PegOutSignature(PegOutSignatureItem),
+    ProofSignature(PegOutSignatureItem),
 }
 
 impl std::fmt::Display for WalletConsensusItem {
@@ -94,6 +95,9 @@ impl std::fmt::Display for WalletConsensusItem {
             }
             WalletConsensusItem::PegOutSignature(sig) => {
                 write!(f, "Wallet PegOut signature for Bitcoin TxId {}", sig.txid)
+            }
+            WalletConsensusItem::ProofSignature(sig) => {
+                write!(f, "Wallet Proof signature for Bitcoin TxId {}", sig.txid)
             }
         }
     }
@@ -450,6 +454,8 @@ impl ServerModulePlugin for Wallet {
             randomness: OsRng.gen(),
         });
 
+        let proof_sigs = self.get_proof_signatures(dbtx).await;
+
         dbtx.find_by_prefix(&PegOutTxSignatureCIPrefix)
             .await
             .map(|res| {
@@ -459,6 +465,7 @@ impl ServerModulePlugin for Wallet {
                     signature: val,
                 })
             })
+            .chain(proof_sigs)
             .chain(std::iter::once(round_ci))
             .collect()
     }
@@ -472,16 +479,19 @@ impl ServerModulePlugin for Wallet {
 
         self.create_proof_tx(dbtx).await;
 
-        self.save_proof_signatures(dbtx).await;
         // Separate round consensus items from signatures for peg-out tx. While signatures can be
         // processed separately, all round consensus items need to be available at once.
         let UnzipWalletConsensusItem {
             peg_out_signature: peg_out_signatures,
+            proof_signature: proof_signatures,
             round_consensus,
         } = consensus_items.into_iter().unzip_wallet_consensus_item();
 
         // Save signatures to the database
         self.save_peg_out_signatures(dbtx, peg_out_signatures).await;
+
+        // Save proof signatures to the database
+        self.save_proof_signatures(dbtx, proof_signatures).await;
 
         // FIXME: also warn on less than 1/3, that should never happen
         // Make sure we have enough contributions to continue
@@ -910,8 +920,28 @@ impl Wallet {
         }
     }
 
-    async fn save_proof_signatures<'a>(&self, dbtx: &mut DatabaseTransaction<'a>) {
-        info!("proof save_proof_sigs");
+    async fn get_proof_signatures<'a>(
+        &self,
+        dbtx: &mut DatabaseTransaction<'a>,
+    ) -> Vec<WalletConsensusItem> {
+        dbtx.find_by_prefix(&ProofTxSignatureCIPrefix)
+            .await
+            .map(|res| {
+                let (key, val) = res.expect("FB error");
+                WalletConsensusItem::ProofSignature(PegOutSignatureItem {
+                    txid: key.0,
+                    signature: val,
+                })
+            })
+            .collect()
+    }
+
+    async fn save_proof_signatures<'a>(
+        &self,
+        dbtx: &mut DatabaseTransaction<'a>,
+        signatures: Vec<(PeerId, PegOutSignatureItem)>,
+    ) {
+        info!("wallet save_proof_sigs");
 
         let mut cache: BTreeMap<Txid, UnsignedTransaction> = dbtx
             .find_by_prefix(&UnsignedProofPrefixKey)
@@ -922,11 +952,7 @@ impl Wallet {
             })
             .collect();
 
-        let sigs: Vec<(PeerId, PegOutSignatureItem)> = dbtx
-            .find_by_prefix(&ProofTxSignatureCIPrefix)
-            .await
-            .collect();
-        for (peer, sig) in sigs.into_iter() {
+        for (peer, sig) in signatures.into_iter() {
             match cache.get_mut(&sig.txid) {
                 Some(unsigned) => unsigned.signatures.push((peer, sig)),
                 None => warn!(
