@@ -24,7 +24,7 @@ use fedimint_api::config::{
     BitcoindRpcCfg, ClientModuleConfig, ConfigGenParams, DkgPeerMsg, ModuleConfigGenParams,
     ServerModuleConfig, TypedServerModuleConfig,
 };
-use fedimint_api::core::{Decoder, ModuleKey, Signature, MODULE_KEY_WALLET};
+use fedimint_api::core::{Decoder, ModuleKey, MODULE_KEY_WALLET};
 use fedimint_api::db::{Database, DatabaseTransaction};
 use fedimint_api::encoding::{Decodable, Encodable, UnzipConsensus};
 use fedimint_api::module::__reexports::serde_json;
@@ -58,8 +58,9 @@ use crate::config::WalletConfig;
 use crate::db::{
     BlockHashKey, PegOutBitcoinTransaction, PegOutTxSignatureCI, PegOutTxSignatureCIPrefix,
     PendingTransactionKey, PendingTransactionPrefixKey, ProofTxSignatureCI,
-    ProofTxSignatureCIPrefix, RoundConsensusKey, UTXOKey, UTXOPrefixKey, UnsignedProofKey,
-    UnsignedProofPrefixKey, UnsignedTransactionKey, UnsignedTransactionPrefixKey,
+    ProofTxSignatureCIPrefix, RoundConsensusKey, SignedProofKey, SignedProofPrefixKey, UTXOKey,
+    UTXOPrefixKey, UnsignedProofKey, UnsignedProofPrefixKey, UnsignedTransactionKey,
+    UnsignedTransactionPrefixKey,
 };
 use crate::keys::CompressedPublicKey;
 use crate::tweakable::Tweakable;
@@ -409,7 +410,7 @@ impl ServerModulePlugin for Wallet {
         let mut our_target_height = self.target_height().await;
         let last_consensus_height = self.consensus_height(dbtx).await.unwrap_or(0);
 
-        if self.consensus_proposal(dbtx).await.len() == 1 {
+        if self.consensus_proposal(dbtx).await.len() <= 2 {
             while our_target_height <= last_consensus_height {
                 our_target_height = self.target_height().await;
                 // FIXME: remove after modularization finishes
@@ -700,6 +701,7 @@ impl ServerModulePlugin for Wallet {
     ) -> Vec<PeerId> {
         self.sign_and_finalize_proof_tx(&consensus_peers, dbtx)
             .await;
+
         // Sign and finalize any unsigned transactions that have signatures
         let unsigned_txs: Vec<(UnsignedTransactionKey, UnsignedTransaction)> = dbtx
             .find_by_prefix(&UnsignedTransactionPrefixKey)
@@ -753,15 +755,6 @@ impl ServerModulePlugin for Wallet {
                 }
             }
         }
-
-        // at end of consensus epoch, create proof psbt and save in db so proof module can get from db to verify
-        // info!("wallet: end_consensus_epoch");
-        // let proof_psbt = self.create_proof_tx(dbtx).await.unwrap();
-        // info!("proof psbt {:?}", &proof_psbt.psbt);
-
-        // TODO
-        // debug create_proof_tx: not returning tx, returning None now
-        // save to db
 
         drop_peers
     }
@@ -818,12 +811,6 @@ impl ServerModulePlugin for Wallet {
                     );
 
                     Ok(tx.map(|tx| tx.fees))
-                }
-            },
-            api_endpoint! {
-                "/proof_tx",
-                async |module: &Wallet, dbtx, _params: ()| -> () {
-                    Ok(module.create_proof_tx(&mut dbtx).await)
                 }
             },
         ]
@@ -941,7 +928,7 @@ impl Wallet {
         dbtx: &mut DatabaseTransaction<'a>,
         signatures: Vec<(PeerId, PegOutSignatureItem)>,
     ) {
-        info!("wallet save_proof_sigs");
+        // info!("wallet save_proof_sigs");
 
         let mut cache: BTreeMap<Txid, UnsignedTransaction> = dbtx
             .find_by_prefix(&UnsignedProofPrefixKey)
@@ -976,7 +963,7 @@ impl Wallet {
         peer: &PeerId,
         signature: &PegOutSignatureItem,
     ) -> Result<(), ProcessPegOutSigError> {
-        info!("sign_peg_out_psbt");
+        // info!("sign_peg_out_psbt");
         let peer_key = self
             .cfg
             .consensus
@@ -1044,7 +1031,7 @@ impl Wallet {
         // We need to save the change output's tweak key to be able to access the funds later on.
         // The tweak is extracted here because the psbt is moved next and not available anymore
         // when the tweak is actually needed in the end to be put into the batch on success.
-        info!("finalize_peg_out_psbt");
+        // info!("finalize_peg_out_psbt");
         let change_tweak: [u8; 32] = psbt
             .outputs
             .iter()
@@ -1265,12 +1252,50 @@ impl Wallet {
     async fn create_proof_tx(&self, dbtx: &mut DatabaseTransaction<'_>) {
         // re-used logic from create_peg_out_tx, create_tx, apply_output
         // create psbt with all utxos for proof module
-        info!("wallet create proof_tx");
+        // info!("wallet create proof_tx");
 
         // subtract 2000 sats from wallet value for fees
         let total_reserves_amount = self.get_wallet_value(dbtx).await;
         if total_reserves_amount < Amount::from_sat(2000) {
             return;
+        }
+
+        // need to filter out duplicate tx
+        let current_proof_tx = dbtx
+            .find_by_prefix(&SignedProofPrefixKey)
+            .await
+            .map(|res| {
+                let (key, transaction) = res.expect("DB error");
+                (key.0, transaction)
+            })
+            .collect::<HashMap<_, _>>();
+
+        let proof_value: Amount = Amount::from_sat(
+            current_proof_tx
+                .values()
+                .flat_map(|proof_tx| proof_tx.tx.output.iter().map(|output| output.value))
+                .sum(),
+        );
+
+        if !current_proof_tx.is_empty() {
+            let value_diff: Amount = std::cmp::max(total_reserves_amount, proof_value)
+                - std::cmp::min(total_reserves_amount, proof_value);
+            let perc_diff = value_diff.to_sat() / proof_value.to_sat();
+
+            // create new proof tx if difference > 10%
+            if perc_diff < 0.1 as u64 {
+                return;
+            }
+            // info!(
+            //     "value, value change, wallet, perc {:?}, {:?}, {:?} {:?}",
+            //     &proof_value, &value_diff, &total_reserves_amount, &perc_diff
+            // );
+            for (txid, _) in current_proof_tx {
+                // info!("txid {:?}", &txid);
+                dbtx.remove_entry(&SignedProofKey(txid))
+                    .await
+                    .expect("DB Error");
+            }
         }
 
         let consensus = self.current_round_consensus(dbtx).await.unwrap();
@@ -1320,7 +1345,7 @@ impl Wallet {
             })
             .collect::<Vec<_>>();
 
-        info!("wallet create proof_tx {:?}", &proof_tx);
+        // info!("wallet create proof_tx {:?}", &proof_tx);
         dbtx.insert_new_entry(&UnsignedProofKey(txid), &proof_tx)
             .await
             .expect("DB Error");
@@ -1335,14 +1360,18 @@ impl Wallet {
         consensus_peers: &HashSet<PeerId>,
         dbtx: &mut DatabaseTransaction<'_>,
     ) {
-        info!("sign_and_finalize_proof_tx");
+        // info!("sign_and_finalize_proof_tx");
         let unsigned_txs: Vec<(UnsignedProofKey, UnsignedTransaction)> = dbtx
             .find_by_prefix(&UnsignedProofPrefixKey)
             .await
             .map(|res| res.expect("DB error"))
             .filter(|(_, unsigned)| !unsigned.signatures.is_empty())
             .collect();
-        info!("unsigned_txs {:?}", &unsigned_txs);
+
+        if unsigned_txs.is_empty() {
+            return;
+        }
+        // info!("unsigned_txs {:?}", &unsigned_txs);
 
         let mut drop_peers = Vec::<PeerId>::new();
         for (key, unsigned) in unsigned_txs {
@@ -1374,16 +1403,13 @@ impl Wallet {
             match self.finalize_peg_out_psbt(&mut psbt, change) {
                 Ok(pending_tx) => {
                     // We were able to finalize the transaction, so we will delete the PSBT and instead keep the
-                    // extracted tx for periodic transmission and to accept the change into our wallet
-                    // eventually once it confirms.
+                    // extracted tx
 
-                    info!("proof finalize {:?}", pending_tx);
-                    // We were able to finalize the transaction, so we will delete the PSBT and instead keep the
-                    // extracted tx for periodic transmission and to accept the change into our wallet
-                    // eventually once it confirms.
-                    // dbtx.insert_new_entry(&PendingTransactionKey(key.0), &pending_tx)
-                    //     .await
-                    //     .expect("DB Error");
+                    // info!("proof finalize {:?}", &pending_tx);
+                    // info!("proof key {:?}", &key);
+                    dbtx.insert_new_entry(&SignedProofKey(key.0), &pending_tx)
+                        .await
+                        .expect("DB Error");
                     dbtx.remove_entry(&ProofTxSignatureCI(key.0))
                         .await
                         .expect("DB Error");

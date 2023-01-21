@@ -1,9 +1,3 @@
-use bitcoin::Txid;
-use fedimint_api::db::DatabaseKeyPrefixConst;
-use fedimint_api::encoding::{Decodable, Encodable};
-use fedimint_wallet::UnsignedTransaction;
-use secp256k1::ecdsa::Signature;
-use serde::Serialize;
 use strum_macros::EnumIter;
 
 #[repr(u8)]
