@@ -58,8 +58,9 @@ use crate::config::WalletConfig;
 use crate::db::{
     BlockHashKey, PegOutBitcoinTransaction, PegOutTxSignatureCI, PegOutTxSignatureCIPrefix,
     PendingTransactionKey, PendingTransactionPrefixKey, ProofTxSignatureCI,
-    ProofTxSignatureCIPrefix, RoundConsensusKey, UTXOKey, UTXOPrefixKey, UnsignedProofKey,
-    UnsignedProofPrefixKey, UnsignedTransactionKey, UnsignedTransactionPrefixKey,
+    ProofTxSignatureCIPrefix, RoundConsensusKey, SignedProofKey, SignedProofPrefixKey, UTXOKey,
+    UTXOPrefixKey, UnsignedProofKey, UnsignedProofPrefixKey, UnsignedTransactionKey,
+    UnsignedTransactionPrefixKey,
 };
 use crate::keys::CompressedPublicKey;
 use crate::tweakable::Tweakable;
@@ -1267,6 +1268,22 @@ impl Wallet {
         // create psbt with all utxos for proof module
         info!("wallet create proof_tx");
 
+        // need to filter out duplicate tx
+        let current_proof_tx = dbtx
+            .find_by_prefix(&SignedProofPrefixKey)
+            .await
+            .map(|res| {
+                let (key, transaction) = res.expect("DB error");
+                (key.0, transaction)
+            })
+            .collect::<HashMap<_, _>>();
+        info!("current proof_tx {:?}", &current_proof_tx);
+        let proof_value: u64 = current_proof_tx
+            .values()
+            .flat_map(|proof_tx| proof_tx.tx.output.iter().map(|output| output.value))
+            .sum();
+        info!("proof value {:?}", proof_value);
+
         // subtract 2000 sats from wallet value for fees
         let total_reserves_amount = self.get_wallet_value(dbtx).await;
         if total_reserves_amount < Amount::from_sat(2000) {
@@ -1374,16 +1391,12 @@ impl Wallet {
             match self.finalize_peg_out_psbt(&mut psbt, change) {
                 Ok(pending_tx) => {
                     // We were able to finalize the transaction, so we will delete the PSBT and instead keep the
-                    // extracted tx for periodic transmission and to accept the change into our wallet
-                    // eventually once it confirms.
+                    // extracted tx
 
-                    info!("proof finalize {:?}", pending_tx);
-                    // We were able to finalize the transaction, so we will delete the PSBT and instead keep the
-                    // extracted tx for periodic transmission and to accept the change into our wallet
-                    // eventually once it confirms.
-                    // dbtx.insert_new_entry(&PendingTransactionKey(key.0), &pending_tx)
-                    //     .await
-                    //     .expect("DB Error");
+                    info!("proof finalize {:?}", &pending_tx);
+                    dbtx.insert_new_entry(&SignedProofKey(key.0), &pending_tx)
+                        .await
+                        .expect("DB Error");
                     dbtx.remove_entry(&ProofTxSignatureCI(key.0))
                         .await
                         .expect("DB Error");

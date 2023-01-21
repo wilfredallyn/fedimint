@@ -21,6 +21,7 @@ pub enum DbKeyPrefix {
     PegOutBitcoinOutPoint = 0x37,
     ProofTxSigCi = 0x38,
     UnsignedProof = 0x39,
+    SignedProof = 0x50,
 }
 
 impl std::fmt::Display for DbKeyPrefix {
@@ -180,4 +181,22 @@ impl DatabaseKeyPrefixConst for ProofTxSignatureCIPrefix {
     const DB_PREFIX: u8 = DbKeyPrefix::ProofTxSigCi as u8;
     type Key = ProofTxSignatureCI;
     type Value = Vec<Signature>;
+}
+
+#[derive(Clone, Debug, Encodable, Decodable, Serialize)]
+pub struct SignedProofKey(pub Txid);
+
+impl DatabaseKeyPrefixConst for SignedProofKey {
+    const DB_PREFIX: u8 = DbKeyPrefix::SignedProof as u8;
+    type Key = Self;
+    type Value = PendingTransaction;
+}
+
+#[derive(Clone, Debug, Encodable, Decodable)]
+pub struct SignedProofPrefixKey;
+
+impl DatabaseKeyPrefixConst for SignedProofPrefixKey {
+    const DB_PREFIX: u8 = DbKeyPrefix::SignedProof as u8;
+    type Key = SignedProofKey;
+    type Value = PendingTransaction;
 }
