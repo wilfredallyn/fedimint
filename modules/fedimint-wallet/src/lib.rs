@@ -410,7 +410,7 @@ impl ServerModulePlugin for Wallet {
         let mut our_target_height = self.target_height().await;
         let last_consensus_height = self.consensus_height(dbtx).await.unwrap_or(0);
 
-        if self.consensus_proposal(dbtx).await.len() == 1 {
+        if self.consensus_proposal(dbtx).await.len() <= 2 {
             while our_target_height <= last_consensus_height {
                 our_target_height = self.target_height().await;
                 // FIXME: remove after modularization finishes
@@ -701,6 +701,7 @@ impl ServerModulePlugin for Wallet {
     ) -> Vec<PeerId> {
         self.sign_and_finalize_proof_tx(&consensus_peers, dbtx)
             .await;
+
         // Sign and finalize any unsigned transactions that have signatures
         let unsigned_txs: Vec<(UnsignedTransactionKey, UnsignedTransaction)> = dbtx
             .find_by_prefix(&UnsignedTransactionPrefixKey)
@@ -754,15 +755,6 @@ impl ServerModulePlugin for Wallet {
                 }
             }
         }
-
-        // at end of consensus epoch, create proof psbt and save in db so proof module can get from db to verify
-        // info!("wallet: end_consensus_epoch");
-        // let proof_psbt = self.create_proof_tx(dbtx).await.unwrap();
-        // info!("proof psbt {:?}", &proof_psbt.psbt);
-
-        // TODO
-        // debug create_proof_tx: not returning tx, returning None now
-        // save to db
 
         drop_peers
     }
@@ -819,12 +811,6 @@ impl ServerModulePlugin for Wallet {
                     );
 
                     Ok(tx.map(|tx| tx.fees))
-                }
-            },
-            api_endpoint! {
-                "/proof_tx",
-                async |module: &Wallet, dbtx, _params: ()| -> () {
-                    Ok(module.create_proof_tx(&mut dbtx).await)
                 }
             },
         ]
@@ -1268,6 +1254,12 @@ impl Wallet {
         // create psbt with all utxos for proof module
         info!("wallet create proof_tx");
 
+        // subtract 2000 sats from wallet value for fees
+        let total_reserves_amount = self.get_wallet_value(dbtx).await;
+        if total_reserves_amount < Amount::from_sat(2000) {
+            return;
+        }
+
         // need to filter out duplicate tx
         let current_proof_tx = dbtx
             .find_by_prefix(&SignedProofPrefixKey)
@@ -1277,17 +1269,33 @@ impl Wallet {
                 (key.0, transaction)
             })
             .collect::<HashMap<_, _>>();
-        info!("current proof_tx {:?}", &current_proof_tx);
-        let proof_value: u64 = current_proof_tx
-            .values()
-            .flat_map(|proof_tx| proof_tx.tx.output.iter().map(|output| output.value))
-            .sum();
-        info!("proof value {:?}", proof_value);
 
-        // subtract 2000 sats from wallet value for fees
-        let total_reserves_amount = self.get_wallet_value(dbtx).await;
-        if total_reserves_amount < Amount::from_sat(2000) {
-            return;
+        let proof_value: Amount = Amount::from_sat(
+            current_proof_tx
+                .values()
+                .flat_map(|proof_tx| proof_tx.tx.output.iter().map(|output| output.value))
+                .sum(),
+        );
+
+        if !current_proof_tx.is_empty() {
+            let value_diff: Amount = std::cmp::max(total_reserves_amount, proof_value)
+                - std::cmp::min(total_reserves_amount, proof_value);
+            let perc_diff = value_diff.to_sat() / proof_value.to_sat();
+
+            // create new proof tx if difference > 10%
+            if perc_diff < 0.1 as u64 {
+                return;
+            }
+            info!(
+                "value, value change, wallet, perc {:?}, {:?}, {:?} {:?}",
+                &proof_value, &value_diff, &total_reserves_amount, &perc_diff
+            );
+            for (txid, tx) in current_proof_tx {
+                info!("txid {:?}", &txid);
+                dbtx.remove_entry(&SignedProofKey(txid))
+                    .await
+                    .expect("DB Error");
+            }
         }
 
         let consensus = self.current_round_consensus(dbtx).await.unwrap();
@@ -1359,6 +1367,10 @@ impl Wallet {
             .map(|res| res.expect("DB error"))
             .filter(|(_, unsigned)| !unsigned.signatures.is_empty())
             .collect();
+
+        if unsigned_txs.is_empty() {
+            return;
+        }
         info!("unsigned_txs {:?}", &unsigned_txs);
 
         let mut drop_peers = Vec::<PeerId>::new();
@@ -1394,6 +1406,7 @@ impl Wallet {
                     // extracted tx
 
                     info!("proof finalize {:?}", &pending_tx);
+                    info!("proof key {:?}", &key);
                     dbtx.insert_new_entry(&SignedProofKey(key.0), &pending_tx)
                         .await
                         .expect("DB Error");
