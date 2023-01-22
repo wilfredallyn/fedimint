@@ -1,12 +1,6 @@
 use std::sync::Arc;
 
-use fedimint_api::core::client::ClientModulePlugin;
-use fedimint_api::core::{ModuleKey, MODULE_KEY_WALLET};
-use fedimint_api::db::DatabaseTransaction;
-use fedimint_api::ServerModulePlugin;
-use fedimint_core::modules::proof::common::ProofModuleDecoder;
 use fedimint_core::modules::proof::config::ProofClientConfig;
-use fedimint_core::modules::proof::Proof;
 use thiserror::Error;
 
 use crate::utils::ClientContext;

@@ -2,7 +2,6 @@ use std::collections::{BTreeMap, HashSet};
 use std::fmt;
 
 use async_trait::async_trait;
-use bitcoin::Txid;
 use common::ProofModuleDecoder;
 use fedimint_api::cancellable::Cancellable;
 use fedimint_api::config::TypedServerModuleConsensusConfig;
@@ -22,13 +21,11 @@ use fedimint_api::module::{
 use fedimint_api::net::peers::MuxPeerConnections;
 use fedimint_api::server::ServerModule;
 use fedimint_api::task::TaskGroup;
-use fedimint_api::Amount;
 use fedimint_api::{plugin_types_trait_impl, OutPoint, PeerId, ServerModulePlugin};
 use fedimint_wallet::db::{UTXOKey, UTXOPrefixKey};
-use fedimint_wallet::{PegOutSignatureItem, SpendableUTXO, UnsignedTransaction};
+use fedimint_wallet::{PegOutSignatureItem, SpendableUTXO};
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
-use tracing::{info, warn};
 
 use crate::config::{ProofConfig, ProofConfigConsensus, ProofConfigPrivate};
 
@@ -220,7 +217,7 @@ impl ServerModulePlugin for Proof {
 
     async fn consensus_proposal(
         &self,
-        dbtx: &mut DatabaseTransaction<'_>,
+        _dbtx: &mut DatabaseTransaction<'_>,
     ) -> Vec<Self::ConsensusItem> {
         vec![]
     }
@@ -279,11 +276,8 @@ impl ServerModulePlugin for Proof {
     async fn end_consensus_epoch<'a, 'b>(
         &'a self,
         _consensus_peers: &HashSet<PeerId>,
-        dbtx: &mut DatabaseTransaction<'b>,
+        _dbtx: &mut DatabaseTransaction<'b>,
     ) -> Vec<PeerId> {
-        info!("proof: end_consensus_epoch");
-        // let utxos = self.available_utxos(dbtx).await;
-        // info!("available_utxos {:?}", &utxos);
         vec![]
     }
 
@@ -345,19 +339,6 @@ plugin_types_trait_impl!(
     ProofConsensusItem,
     ProofVerificationCache
 );
-
-async fn proof_tx(interconnect: &dyn ModuleInterconect) {
-    // -> (UnsignedTransaction, Vec<secp256k1::ecdsa::Signature>)
-    // This is a future because we are normally reading from a network socket. But for internal
-    // calls the data is available instantly in one go, so we can just block on it.
-    let body = interconnect
-        .call("wallet", "/proof_tx".to_owned(), Default::default())
-        .await
-        .expect("Wallet module not present or malfunctioning!");
-
-    info!("interconnect body {:?}", &body);
-    // serde_json::from_value(body).expect("Malformed block height response from wallet module!")
-}
 
 #[derive(Debug, Clone, Eq, PartialEq, Hash, Error)]
 pub enum ProofError {

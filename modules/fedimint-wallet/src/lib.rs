@@ -24,7 +24,7 @@ use fedimint_api::config::{
     BitcoindRpcCfg, ClientModuleConfig, ConfigGenParams, DkgPeerMsg, ModuleConfigGenParams,
     ServerModuleConfig, TypedServerModuleConfig,
 };
-use fedimint_api::core::{Decoder, ModuleKey, Signature, MODULE_KEY_WALLET};
+use fedimint_api::core::{Decoder, ModuleKey, MODULE_KEY_WALLET};
 use fedimint_api::db::{Database, DatabaseTransaction};
 use fedimint_api::encoding::{Decodable, Encodable, UnzipConsensus};
 use fedimint_api::module::__reexports::serde_json;
@@ -928,7 +928,7 @@ impl Wallet {
         dbtx: &mut DatabaseTransaction<'a>,
         signatures: Vec<(PeerId, PegOutSignatureItem)>,
     ) {
-        info!("wallet save_proof_sigs");
+        // info!("wallet save_proof_sigs");
 
         let mut cache: BTreeMap<Txid, UnsignedTransaction> = dbtx
             .find_by_prefix(&UnsignedProofPrefixKey)
@@ -963,7 +963,7 @@ impl Wallet {
         peer: &PeerId,
         signature: &PegOutSignatureItem,
     ) -> Result<(), ProcessPegOutSigError> {
-        info!("sign_peg_out_psbt");
+        // info!("sign_peg_out_psbt");
         let peer_key = self
             .cfg
             .consensus
@@ -1031,7 +1031,7 @@ impl Wallet {
         // We need to save the change output's tweak key to be able to access the funds later on.
         // The tweak is extracted here because the psbt is moved next and not available anymore
         // when the tweak is actually needed in the end to be put into the batch on success.
-        info!("finalize_peg_out_psbt");
+        // info!("finalize_peg_out_psbt");
         let change_tweak: [u8; 32] = psbt
             .outputs
             .iter()
@@ -1252,7 +1252,7 @@ impl Wallet {
     async fn create_proof_tx(&self, dbtx: &mut DatabaseTransaction<'_>) {
         // re-used logic from create_peg_out_tx, create_tx, apply_output
         // create psbt with all utxos for proof module
-        info!("wallet create proof_tx");
+        // info!("wallet create proof_tx");
 
         // subtract 2000 sats from wallet value for fees
         let total_reserves_amount = self.get_wallet_value(dbtx).await;
@@ -1286,12 +1286,12 @@ impl Wallet {
             if perc_diff < 0.1 as u64 {
                 return;
             }
-            info!(
-                "value, value change, wallet, perc {:?}, {:?}, {:?} {:?}",
-                &proof_value, &value_diff, &total_reserves_amount, &perc_diff
-            );
-            for (txid, tx) in current_proof_tx {
-                info!("txid {:?}", &txid);
+            // info!(
+            //     "value, value change, wallet, perc {:?}, {:?}, {:?} {:?}",
+            //     &proof_value, &value_diff, &total_reserves_amount, &perc_diff
+            // );
+            for (txid, _) in current_proof_tx {
+                // info!("txid {:?}", &txid);
                 dbtx.remove_entry(&SignedProofKey(txid))
                     .await
                     .expect("DB Error");
@@ -1345,7 +1345,7 @@ impl Wallet {
             })
             .collect::<Vec<_>>();
 
-        info!("wallet create proof_tx {:?}", &proof_tx);
+        // info!("wallet create proof_tx {:?}", &proof_tx);
         dbtx.insert_new_entry(&UnsignedProofKey(txid), &proof_tx)
             .await
             .expect("DB Error");
@@ -1360,7 +1360,7 @@ impl Wallet {
         consensus_peers: &HashSet<PeerId>,
         dbtx: &mut DatabaseTransaction<'_>,
     ) {
-        info!("sign_and_finalize_proof_tx");
+        // info!("sign_and_finalize_proof_tx");
         let unsigned_txs: Vec<(UnsignedProofKey, UnsignedTransaction)> = dbtx
             .find_by_prefix(&UnsignedProofPrefixKey)
             .await
@@ -1371,7 +1371,7 @@ impl Wallet {
         if unsigned_txs.is_empty() {
             return;
         }
-        info!("unsigned_txs {:?}", &unsigned_txs);
+        // info!("unsigned_txs {:?}", &unsigned_txs);
 
         let mut drop_peers = Vec::<PeerId>::new();
         for (key, unsigned) in unsigned_txs {
@@ -1405,8 +1405,8 @@ impl Wallet {
                     // We were able to finalize the transaction, so we will delete the PSBT and instead keep the
                     // extracted tx
 
-                    info!("proof finalize {:?}", &pending_tx);
-                    info!("proof key {:?}", &key);
+                    // info!("proof finalize {:?}", &pending_tx);
+                    // info!("proof key {:?}", &key);
                     dbtx.insert_new_entry(&SignedProofKey(key.0), &pending_tx)
                         .await
                         .expect("DB Error");
