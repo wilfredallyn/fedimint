@@ -1044,7 +1044,7 @@ async fn ecash_can_be_recovered() -> Result<()> {
 #[tokio::test(flavor = "multi_thread")]
 async fn proof() -> Result<()> {
     test(2, |fed, user, bitcoin, _, _| async move {
-        let peg_ins: Vec<u64> = vec![5000, 8000, 10000];
+        let peg_ins: Vec<u64> = vec![5000, 8000, 10000, 2000, 7500];
         for peg_in_amount in peg_ins.clone().into_iter() {
             let peg_in_address = user.client.get_new_pegin_address(rng()).await;
             let (proof, tx) =

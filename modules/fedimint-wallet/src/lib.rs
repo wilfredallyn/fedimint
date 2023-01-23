@@ -1254,9 +1254,10 @@ impl Wallet {
         // create psbt with all utxos for proof module
         // info!("wallet create proof_tx");
 
-        // subtract 2000 sats from wallet value for fees
-        let total_reserves_amount = self.get_wallet_value(dbtx).await;
-        if total_reserves_amount < Amount::from_sat(2000) {
+        // subtract 2000 sats from wallet value for fees, will increase later if not enough
+        let fees_buffer = Amount::from_sat(2000);
+        let mut reserves_amount = self.get_wallet_value(dbtx).await;
+        if reserves_amount < fees_buffer {
             return;
         }
 
@@ -1278,8 +1279,8 @@ impl Wallet {
         );
 
         if !current_proof_tx.is_empty() {
-            let value_diff: Amount = std::cmp::max(total_reserves_amount, proof_value)
-                - std::cmp::min(total_reserves_amount, proof_value);
+            let value_diff: Amount = std::cmp::max(reserves_amount, proof_value)
+                - std::cmp::min(reserves_amount, proof_value);
             let perc_diff = value_diff.to_sat() / proof_value.to_sat();
 
             // create new proof tx if difference > 10%
@@ -1288,7 +1289,7 @@ impl Wallet {
             }
             // info!(
             //     "value, value change, wallet, perc {:?}, {:?}, {:?} {:?}",
-            //     &proof_value, &value_diff, &total_reserves_amount, &perc_diff
+            //     &proof_value, &value_diff, &reserves_amount, &perc_diff
             // );
             for (txid, _) in current_proof_tx {
                 // info!("txid {:?}", &txid);
@@ -1302,16 +1303,30 @@ impl Wallet {
         let change_tweak = &consensus.randomness_beacon;
         let change_script = self.offline_wallet().derive_script(change_tweak);
 
-        let mut proof_tx = self
-            .offline_wallet()
-            .create_tx(
-                total_reserves_amount - Amount::from_sat(2000),
-                change_script,
-                self.available_utxos(dbtx).await,
-                consensus.fee_rate,
-                change_tweak,
-            )
-            .expect("Should have been validated");
+        // Hacky code to handle issue that we don't know how much fees will be for proof_tx
+        // If fees are too small, None is returned from proof_tx. Code will try larger fees until successful
+        let mut proof_tx: Option<UnsignedTransaction> = None;
+        loop {
+            if proof_tx.is_none() {
+                reserves_amount = reserves_amount - fees_buffer;
+                info!("trying reserves_amount {:?}", &reserves_amount);
+                let tx = self.offline_wallet().create_tx(
+                    reserves_amount,
+                    change_script.clone(),
+                    self.available_utxos(dbtx).await,
+                    consensus.fee_rate,
+                    change_tweak,
+                );
+                proof_tx = tx;
+                if let Some(proof_tx) = proof_tx.clone() {
+                    break;
+                }
+            } else {
+                break;
+            }
+        }
+        let mut proof_tx = proof_tx.unwrap();
+
         self.offline_wallet().sign_psbt(&mut proof_tx.psbt);
         let txid = proof_tx.psbt.unsigned_tx.txid();
         info!(
