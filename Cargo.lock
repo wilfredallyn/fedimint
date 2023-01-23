@@ -1165,6 +1165,7 @@ dependencies = [
  "impl-tools",
  "rand",
  "rayon",
+ "secp256k1 0.24.2",
  "serde",
  "strum",
  "strum_macros",
