@@ -7,7 +7,7 @@ use std::time::Duration;
 
 use anyhow::bail;
 use async_trait::async_trait;
-use bitcoin::hashes::{sha256, Hash as BitcoinHash, HashEngine, Hmac, HmacEngine};
+use bitcoin::hashes::{hex::toHex, sha256, Hash as BitcoinHash, HashEngine, Hmac, HmacEngine};
 use bitcoin::secp256k1::{All, Secp256k1, Verification};
 use bitcoin::util::psbt::raw::ProprietaryKey;
 use bitcoin::util::psbt::{Input, PartiallySignedTransaction};
@@ -1422,6 +1422,10 @@ impl Wallet {
 
                     // info!("proof finalize {:?}", &pending_tx);
                     // info!("proof key {:?}", &key);
+                    info!(
+                        "proof tx hex {}",
+                        bitcoin::consensus::encode::serialize(&pending_tx.tx).to_hex()
+                    );
                     dbtx.insert_new_entry(&SignedProofKey(key.0), &pending_tx)
                         .await
                         .expect("DB Error");
