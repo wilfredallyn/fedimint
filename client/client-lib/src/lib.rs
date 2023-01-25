@@ -317,6 +317,22 @@ impl<T: AsRef<ClientConfig> + Clone> Client<T> {
         }
     }
 
+    pub async fn proof_tx_hex(&self) -> Result<String> {
+        let result = self.proof_client().get_proof_tx_hex().await;
+        match result {
+            Ok(proof) => return Ok(proof),
+            Err(e) => Err(ClientError::ProofClientError(e)),
+        }
+    }
+
+    pub async fn proof_tx_value(&self) -> Result<Amount> {
+        let result = self.proof_client().get_proof_tx_value().await;
+        match result {
+            Ok(value) => return Ok(value),
+            Err(e) => Err(ClientError::ProofClientError(e)),
+        }
+    }
+
     async fn submit_tx_with_change<R: RngCore + CryptoRng>(
         &self,
         tx: TransactionBuilder,

@@ -1317,7 +1317,7 @@ impl Wallet {
                     change_tweak,
                 );
                 proof_tx = tx;
-                if let Some(proof_tx) = proof_tx.clone() {
+                if let Some(_) = proof_tx.clone() {
                     break;
                 }
             } else {

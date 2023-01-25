@@ -110,6 +110,14 @@ enum CliOutput {
     Proof {
         output: String,
     },
+
+    ProofTxHex {
+        hex: String,
+    },
+
+    ProofTxValue {
+        value: Amount,
+    },
 }
 
 impl fmt::Display for CliOutput {
@@ -301,6 +309,12 @@ enum Command {
 
     /// Proof of Reserves
     Proof,
+
+    /// Hex of Proof of Reserves Transaction
+    ProofTxHex,
+
+    /// Value of Proof of Reserves Transaction
+    ProofTxValue,
 }
 
 trait ErrorHandler<T, E> {
@@ -461,6 +475,16 @@ async fn handle_command(
             ),
         Command::Proof => client.proof().await.transform(
             |v| CliOutput::Proof { output: (v) },
+            CliErrorKind::GeneralFederationError,
+            "proof of reserves failed (no further information)",
+        ),
+        Command::ProofTxHex => client.proof_tx_hex().await.transform(
+            |v| CliOutput::ProofTxHex { hex: (v) },
+            CliErrorKind::GeneralFederationError,
+            "proof of reserves failed (no further information)",
+        ),
+        Command::ProofTxValue => client.proof_tx_value().await.transform(
+            |v| CliOutput::ProofTxValue { value: (v) },
             CliErrorKind::GeneralFederationError,
             "proof of reserves failed (no further information)",
         ),
