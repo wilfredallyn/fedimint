@@ -9,7 +9,9 @@ use bitcoin_hashes::sha256::Hash as Sha256Hash;
 use fedimint_api::config::ClientConfig;
 use fedimint_api::module::registry::ModuleDecoderRegistry;
 use fedimint_api::task::{sleep, RwLock, RwLockWriteGuard};
-use fedimint_api::{dyn_newtype_define, NumPeers, OutPoint, PeerId, TransactionId};
+use fedimint_api::{
+    dyn_newtype_define, Amount as FedimintAmount, NumPeers, OutPoint, PeerId, TransactionId,
+};
 use fedimint_core::epoch::{SerdeEpochHistory, SignedEpochOutcome};
 use fedimint_core::modules::ln::contracts::incoming::IncomingContractOffer;
 use fedimint_core::modules::ln::contracts::ContractId;
@@ -100,6 +102,12 @@ pub trait IFederationApi: Debug + Send + Sync {
 
     /// Calculate proof of reserves, for now just print out all spendable UTXOs
     async fn proof_of_reserves(&self) -> Result<String>;
+
+    /// Get hex of proof of reserves transaction
+    async fn proof_tx_hex(&self) -> Result<String>;
+
+    /// Get value of proof of reserves transaction
+    async fn proof_tx_value(&self) -> Result<FedimintAmount>;
 }
 
 dyn_newtype_define! {
@@ -415,6 +423,26 @@ impl<C: JsonRpcClient + Debug + Send + Sync> IFederationApi for WsFederationApi<
         Ok(self
             .request(
                 "/proof/proof_of_reserves",
+                (),
+                CurrentConsensus::new(self.peers().threshold()),
+            )
+            .await?)
+    }
+
+    async fn proof_tx_hex(&self) -> Result<String> {
+        Ok(self
+            .request(
+                "/proof/proof_tx_hex",
+                (),
+                CurrentConsensus::new(self.peers().threshold()),
+            )
+            .await?)
+    }
+
+    async fn proof_tx_value(&self) -> Result<FedimintAmount> {
+        Ok(self
+            .request(
+                "/proof/proof_tx_value",
                 (),
                 CurrentConsensus::new(self.peers().threshold()),
             )

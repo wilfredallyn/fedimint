@@ -1,4 +1,4 @@
-use std::collections::{BTreeMap, HashSet};
+use std::collections::{BTreeMap, HashMap, HashSet};
 use std::fmt;
 
 use async_trait::async_trait;
@@ -21,9 +21,9 @@ use fedimint_api::module::{
 use fedimint_api::net::peers::MuxPeerConnections;
 use fedimint_api::server::ServerModule;
 use fedimint_api::task::TaskGroup;
-use fedimint_api::{plugin_types_trait_impl, OutPoint, PeerId, ServerModulePlugin};
-use fedimint_wallet::db::{UTXOKey, UTXOPrefixKey};
-use fedimint_wallet::{PegOutSignatureItem, SpendableUTXO};
+use fedimint_api::{plugin_types_trait_impl, Amount, OutPoint, PeerId, ServerModulePlugin};
+use fedimint_wallet::db::{SignedProofPrefixKey, UTXOKey, UTXOPrefixKey};
+use fedimint_wallet::{PegOutSignatureItem, PendingTransaction, SpendableUTXO};
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
@@ -296,13 +296,27 @@ impl ServerModulePlugin for Proof {
     }
 
     fn api_endpoints(&self) -> Vec<ApiEndpoint<Self>> {
-        vec![api_endpoint! {
-            "/proof_of_reserves",
-            async |module: &Proof, dbtx, _params: ()| -> String {
-                // TODO x.0.0 seems like smelly code...refactor this obj?
-                Ok(module.available_utxos(&mut dbtx).await)
-            }
-        }]
+        vec![
+            api_endpoint! {
+                "/proof_of_reserves",
+                async |module: &Proof, dbtx, _params: ()| -> String {
+                    // TODO x.0.0 seems like smelly code...refactor this obj?
+                    Ok(module.available_utxos(&mut dbtx).await)
+                }
+            },
+            api_endpoint! {
+                "/proof_tx_hex",
+                async |module: &Proof, dbtx, _params: ()| -> String {
+                    Ok(module.get_proof_tx_hex(&mut dbtx).await)
+                }
+            },
+            api_endpoint! {
+                "/proof_tx_value",
+                async |module: &Proof, dbtx, _params: ()| -> Amount {
+                    Ok(module.get_proof_tx_value(&mut dbtx).await)
+                }
+            },
+        ]
     }
 }
 
@@ -324,6 +338,44 @@ impl Proof {
 
         let json = serde_json::to_string(&utxo_addresses).unwrap();
         json
+    }
+
+    async fn get_proof_tx_hex(&self, dbtx: &mut DatabaseTransaction<'_>) -> String {
+        let proof_tx: Vec<PendingTransaction> = dbtx
+            .find_by_prefix(&SignedProofPrefixKey)
+            .await
+            .map(|res| {
+                let (_, transaction) = res.expect("DB error");
+                transaction
+            })
+            .collect::<_>();
+        if proof_tx.is_empty() {
+            "There is no proof of reserves transaction".to_string()
+        } else {
+            bitcoin::consensus::encode::serialize_hex(&proof_tx[0].tx)
+        }
+    }
+
+    async fn get_proof_tx_value(&self, dbtx: &mut DatabaseTransaction<'_>) -> Amount {
+        let current_proof_tx = dbtx
+            .find_by_prefix(&SignedProofPrefixKey)
+            .await
+            .map(|res| {
+                let (key, transaction) = res.expect("DB error");
+                (key.0, transaction)
+            })
+            .collect::<HashMap<_, _>>();
+
+        if current_proof_tx.is_empty() {
+            Amount::from_sats(0)
+        } else {
+            Amount::from_sats(
+                current_proof_tx
+                    .values()
+                    .flat_map(|proof_tx| proof_tx.tx.output.iter().map(|output| output.value))
+                    .sum(),
+            )
+        }
     }
 }
 

@@ -1,5 +1,6 @@
 use std::sync::Arc;
 
+use fedimint_api::Amount;
 use fedimint_core::modules::proof::config::ProofClientConfig;
 use thiserror::Error;
 
@@ -18,6 +19,16 @@ impl ProofClient {
     pub async fn get_proof_of_reserves(&self) -> Result<String> {
         let proof: String = self.context.api.proof_of_reserves().await?;
         Ok(proof)
+    }
+
+    pub async fn get_proof_tx_hex(&self) -> Result<String> {
+        let proof_tx_hex: String = self.context.api.proof_tx_hex().await?;
+        Ok(proof_tx_hex)
+    }
+
+    pub async fn get_proof_tx_value(&self) -> Result<Amount> {
+        let proof_tx_value: Amount = self.context.api.proof_tx_value().await?;
+        Ok(proof_tx_value)
     }
 }
 
