@@ -7,6 +7,7 @@ use std::time::Duration;
 
 use anyhow::bail;
 use async_trait::async_trait;
+use bitcoin::blockdata::{transaction, witness};
 use bitcoin::hashes::{hex::ToHex, sha256, Hash as BitcoinHash, HashEngine, Hmac, HmacEngine};
 use bitcoin::secp256k1::{All, Secp256k1, Verification};
 use bitcoin::util::psbt::raw::ProprietaryKey;
@@ -1327,6 +1328,19 @@ impl Wallet {
         }
         let mut proof_tx = proof_tx.unwrap();
 
+        info!("proof_tx before input {:?}", &proof_tx.psbt);
+        // add invalid input to make the psbt unspendable
+        proof_tx.psbt.unsigned_tx.input.push(TxIn {
+            previous_output: transaction::OutPoint {
+                txid: Txid::all_zeros(),
+                vout: 0,
+            },
+            script_sig: Script::new(),
+            sequence: Sequence::MAX,
+            witness: witness::Witness::default(),
+        });
+        info!("proof_tx after input {:?}", &proof_tx.psbt);
+
         self.offline_wallet().sign_psbt(&mut proof_tx.psbt);
         let txid = proof_tx.psbt.unsigned_tx.txid();
         info!(
@@ -1360,7 +1374,7 @@ impl Wallet {
             })
             .collect::<Vec<_>>();
 
-        // info!("wallet create proof_tx {:?}", &proof_tx);
+        info!("sigs after invalid input{:?}", &sigs);
         dbtx.insert_new_entry(&UnsignedProofKey(txid), &proof_tx)
             .await
             .expect("DB Error");
