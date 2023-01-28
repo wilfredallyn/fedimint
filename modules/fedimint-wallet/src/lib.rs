@@ -7,8 +7,7 @@ use std::time::Duration;
 
 use anyhow::bail;
 use async_trait::async_trait;
-use bitcoin::blockdata::{transaction, witness};
-use bitcoin::hashes::{hex::ToHex, sha256, Hash as BitcoinHash, HashEngine, Hmac, HmacEngine};
+use bitcoin::hashes::{sha256, Hash as BitcoinHash, HashEngine, Hmac, HmacEngine};
 use bitcoin::secp256k1::{All, Secp256k1, Verification};
 use bitcoin::util::psbt::raw::ProprietaryKey;
 use bitcoin::util::psbt::{Input, PartiallySignedTransaction};
@@ -929,8 +928,6 @@ impl Wallet {
         dbtx: &mut DatabaseTransaction<'a>,
         signatures: Vec<(PeerId, PegOutSignatureItem)>,
     ) {
-        // info!("wallet save_proof_sigs");
-
         let mut cache: BTreeMap<Txid, UnsignedTransaction> = dbtx
             .find_by_prefix(&UnsignedProofPrefixKey)
             .await
@@ -964,7 +961,6 @@ impl Wallet {
         peer: &PeerId,
         signature: &PegOutSignatureItem,
     ) -> Result<(), ProcessPegOutSigError> {
-        // info!("sign_peg_out_psbt");
         let peer_key = self
             .cfg
             .consensus
@@ -1032,7 +1028,6 @@ impl Wallet {
         // We need to save the change output's tweak key to be able to access the funds later on.
         // The tweak is extracted here because the psbt is moved next and not available anymore
         // when the tweak is actually needed in the end to be put into the batch on success.
-        // info!("finalize_peg_out_psbt");
         let change_tweak: [u8; 32] = psbt
             .outputs
             .iter()
@@ -1251,18 +1246,16 @@ impl Wallet {
     }
 
     async fn create_proof_tx(&self, dbtx: &mut DatabaseTransaction<'_>) {
-        // re-used logic from create_peg_out_tx, create_tx, apply_output
-        // create psbt with all utxos for proof module
-        // info!("wallet create proof_tx");
+        // Create psbt with available utxos (minus fees) for Proof module
+        // Logic based on create_peg_out_tx, create_tx, apply_output
 
-        // subtract 2000 sats from wallet value for fees, will increase later if not enough
+        // Subtract 2000 sats from wallet value for fees, will increase later if not enough
         let fees_buffer = Amount::from_sat(2000);
         let mut reserves_amount = self.get_wallet_value(dbtx).await;
         if reserves_amount < fees_buffer {
             return;
         }
 
-        // need to filter out duplicate tx
         let current_proof_tx = dbtx
             .find_by_prefix(&SignedProofPrefixKey)
             .await
@@ -1283,16 +1276,13 @@ impl Wallet {
                 - std::cmp::min(reserves_amount, proof_value);
             let perc_diff = value_diff.to_sat() / proof_value.to_sat();
 
-            // create new proof tx if difference > 10%
+            // Create new proof_tx if difference > 10%
             if perc_diff < 0.1 as u64 {
                 return;
             }
-            // info!(
-            //     "value, value change, wallet, perc {:?}, {:?}, {:?} {:?}",
-            //     &proof_value, &value_diff, &reserves_amount, &perc_diff
-            // );
+
+            // Delete current proof_tx
             for (txid, _) in current_proof_tx {
-                // info!("txid {:?}", &txid);
                 dbtx.remove_entry(&SignedProofKey(txid))
                     .await
                     .expect("DB Error");
@@ -1327,18 +1317,17 @@ impl Wallet {
         }
         let mut proof_tx = proof_tx.unwrap();
 
-        info!("proof_tx before input {:?}", &proof_tx.psbt);
-        // add invalid input to make the psbt unspendable
-        proof_tx.psbt.unsigned_tx.input.push(TxIn {
-            previous_output: transaction::OutPoint {
-                txid: Txid::all_zeros(),
-                vout: 0,
-            },
-            script_sig: Script::new(),
-            sequence: Sequence::MAX,
-            witness: witness::Witness::default(),
-        });
-        info!("proof_tx after input {:?}", &proof_tx.psbt);
+        // Add invalid input to make the psbt unspendable
+        // Commented out since leads to decode error when query db later find_by_prefix(&SignedProofPrefixKey)
+        // proof_tx.psbt.unsigned_tx.input.push(TxIn {
+        //     previous_output: transaction::OutPoint {
+        //         txid: Txid::all_zeros(),
+        //         vout: 0,
+        //     },
+        //     script_sig: Script::new(),
+        //     sequence: Sequence::MAX,
+        //     witness: witness::Witness::default(),
+        // });
 
         self.offline_wallet().sign_psbt(&mut proof_tx.psbt);
         let txid = proof_tx.psbt.unsigned_tx.txid();
@@ -1373,7 +1362,6 @@ impl Wallet {
             })
             .collect::<Vec<_>>();
 
-        info!("sigs after invalid input{:?}", &sigs);
         dbtx.insert_new_entry(&UnsignedProofKey(txid), &proof_tx)
             .await
             .expect("DB Error");
@@ -1382,13 +1370,11 @@ impl Wallet {
             .expect("DB Error");
     }
 
-    // copy of end_consensus_epoch
     async fn sign_and_finalize_proof_tx(
         &self,
         consensus_peers: &HashSet<PeerId>,
         dbtx: &mut DatabaseTransaction<'_>,
     ) {
-        // info!("sign_and_finalize_proof_tx");
         let unsigned_txs: Vec<(UnsignedProofKey, UnsignedTransaction)> = dbtx
             .find_by_prefix(&UnsignedProofPrefixKey)
             .await
@@ -1399,7 +1385,6 @@ impl Wallet {
         if unsigned_txs.is_empty() {
             return;
         }
-        // info!("unsigned_txs {:?}", &unsigned_txs);
 
         let mut drop_peers = Vec::<PeerId>::new();
         for (key, unsigned) in unsigned_txs {
@@ -1432,13 +1417,6 @@ impl Wallet {
                 Ok(pending_tx) => {
                     // We were able to finalize the transaction, so we will delete the PSBT and instead keep the
                     // extracted tx
-
-                    // info!("proof finalize {:?}", &pending_tx);
-                    // info!("proof key {:?}", &key);
-                    info!(
-                        "proof tx hex {}",
-                        bitcoin::consensus::encode::serialize(&pending_tx.tx).to_hex()
-                    );
                     dbtx.insert_new_entry(&SignedProofKey(key.0), &pending_tx)
                         .await
                         .expect("DB Error");
