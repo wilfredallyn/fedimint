@@ -1044,7 +1044,7 @@ async fn ecash_can_be_recovered() -> Result<()> {
 #[tokio::test(flavor = "multi_thread")]
 async fn proof() -> Result<()> {
     test(2, |fed, user, bitcoin, _, _| async move {
-        let peg_ins: Vec<u64> = vec![5000, 8000, 10000, 2000, 7500];
+        let peg_ins: Vec<u64> = vec![5000, 15000, 2000, 15000];
         for peg_in_amount in peg_ins.clone().into_iter() {
             let peg_in_address = user.client.get_new_pegin_address(rng()).await;
             let (proof, tx) =
@@ -1055,8 +1055,22 @@ async fn proof() -> Result<()> {
             user.client.peg_in(proof, tx, rng()).await.unwrap();
             fed.run_consensus_epochs(2).await; // peg in epoch + partial sigs epoch
         }
-        user.assert_total_coins(sats(peg_ins.into_iter().sum()))
-            .await;
+
+        let proof_value = user
+            .client
+            .proof_client()
+            .get_proof_tx_value()
+            .await
+            .unwrap();
+        println!("Proof tx value = {}", &proof_value);
+        assert!(proof_value > fedimint_api::Amount::from_sats(20000));
+
+        let proof_tx_hex = user.client.proof_client().get_proof_tx_hex().await.unwrap();
+        println!("Proof tx hex = {}", &proof_tx_hex);
+        assert_ne!(
+            proof_tx_hex,
+            "There is no proof of reserves transaction".to_string()
+        );
     })
     .await
 }
