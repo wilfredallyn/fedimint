@@ -51,6 +51,9 @@ The Database is split into different key spaces based on prefixing that can be u
 | PendingTransaction    | `0x35` | bitcoin tx id (32 bytes)                  | consensus encoded tx, change tweak        |
 | PegOutTxSigCi         | `0x36` | bitcoin tx id (32 bytes)                  | list of signatures (1 per input)          |
 | PegOutBitcoinOutPoint | `0x37` | Fedimint out point                        | Outpoint                                  |
+| ProofTxSigCi          | `0x38` | block hash (32 bytes)                     | none                                      |
+| UnsignedProof         | `0x39` | bitcoin tx id (32 bytes)                  | PSBT                                      |
+| SignedProof           | `0x50` | bitcoin tx id (32 bytes)                  | PSBT                                      |
 
 ### Lightning
 
@@ -62,13 +65,6 @@ The Database is split into different key spaces based on prefixing that can be u
 | AgreedDecryptionShare            | `0x43` | contract id (sha256), peer id (u16) | `DecryptionShare`            |
 | ContractUpdate                   | `0x44` | out point (sha256, out idx)         | `fedimint_ln::OutputOutcome` |
 | LightningGateway                 | `0x45` | Node Pubkey (PublicKey)             | `LightningGateway`           |
-
-### Proof
-
-| Name                  | Prefix | Key                                       | Value                                     |
-|-----------------------|--------|-------------------------------------------|-------------------------------------------|
-| ProofTxSigCi          | `0x50` | block hash (32 bytes)                     | none                                      |
-| UnsignedProof         | `0x51` | bitcoin tx id (32 bytes)                  | PSBT                                      |
 
 ## Client DB Layout
 | Name                    | Prefix | Key                                | Value                        |
