@@ -6,7 +6,7 @@ We created a module to automatically create a proof-of-reserves transaction as f
 We chose to work on this since a major obstacle to widespread adoption of Fedimint is trust. Two of the major tradeoffs are [custodial and debasement risk](https://fedimint.org/docs/TradeOffs/Trust-Trade-Offs). The average non-technical person will be skeptical, and increasing transparency will help address their concerns.
 
 ## Code Description
-Most of the logic for creating a proof-of-reserves transaction is in the Wallet module. This decision is explained in the [Implementation Details](#implementation) section.
+Most of the logic for creating a proof-of-reserves transaction is in the Wallet module. This decision is explained in the [Implementation Details](#implementation-details) section.
 
 ### Wallet Module
 * `consensus_proposal`: [get signature shares for proof tx](https://github.com/wilfredallyn/fedimint/blob/module/modules/fedimint-wallet/src/lib.rs#L458)
@@ -31,7 +31,7 @@ Most of the logic for creating a proof-of-reserves transaction is in the Wallet 
 * Added integration test
 
 
-## Implementation Details  {#implementation}
+## Implementation Details
 Initially, we tried to put the logic for creating the proof transaction in the Proof module but needed functionality from the Wallet module
 * Tried to use the `StatelessWallet` but couldn't get information from the wallet config into the proof config (`cfg.consensus.peg_in_descriptor` and `cfg.private.peg_in_key` from the wallet config)
 * Tried to use `ModuleInterconnect` but that was limited to the `validate_input` and `apply_input` methods
@@ -98,5 +98,9 @@ We also created an integration test (`proof`) that shows how to get the proof tr
 
 
 ## Future work
+<<<<<<< HEAD
 * [BIP-127](https://github.com/bitcoin/bips/blob/master/bip-0127.mediawiki#proof-format) proposes a standard format for constructing proof-of-reserves transactions. It would be nice to revise the tx to follow this standard.
+=======
+* BIP-127 POR: https://github.com/bitcoin/bips/blob/master/bip-0127.mediawiki#proof-format
+>>>>>>> 2603a5bb78 (Update README.MD)
 * In addition to proof of reserves, it would be interesting implement a testament of liabilities for outstanding notes. Due to the privacy of blind signatures, We don't believe it is possible to prove that the federation has not issued more eCash tokens than there are liabilities. However, we could increase transparency and trust in the fedimint with a merkle sum tree data structure allowing all eCash note holders to verify the presence of their notes, and the absence of any negative sums in the neighboring leaves of the merkle tree. This is not a 'proof' because it isn't independently verifiable like a signed-but-invalid PSBT that spends on-chain funds.
