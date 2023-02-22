@@ -63,7 +63,7 @@ where
         self.request_with_strategy(
             EventuallyConsistent::new(self.all_members().one_honest()),
             format!("/module/{LEGACY_HARDCODED_INSTANCE_ID_LN}/clock_time"),
-            erased_no_param(),
+            ApiRequestErased::default(),
         )
         .await
     }

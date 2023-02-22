@@ -1,7 +1,7 @@
 use std::collections::{BTreeMap, HashMap, HashSet};
 use std::ffi::OsString;
 use std::ops::Sub;
-use std::time::{SystemTime, UNIX_EPOCH};
+use std::time::{Duration, UNIX_EPOCH};
 
 use bitcoin_hashes::Hash as BitcoinHash;
 use fedimint_core::config::{
@@ -19,7 +19,7 @@ use fedimint_core::module::{
     ModuleConsensusVersion, ModuleError, PeerHandle, ServerModuleGen, TransactionItemAmount,
 };
 use fedimint_core::server::DynServerModule;
-use fedimint_core::task::TaskGroup;
+use fedimint_core::task::{sleep, TaskGroup};
 use fedimint_core::{
     apply, async_trait_maybe_send, push_db_pair_items, Amount, NumPeers, OutPoint, PeerId,
     ServerModule,
@@ -29,6 +29,7 @@ use fedimint_ln_common::config::{
     FeeConsensus, LightningConfig, LightningConfigConsensus, LightningConfigPrivate,
 };
 use fedimint_ln_common::contracts::incoming::IncomingContractOffer;
+use fedimint_ln_common::contracts::outgoing::OutgoingContract;
 use fedimint_ln_common::contracts::{
     Contract, ContractId, ContractOutcome, DecryptedPreimage, EncryptedPreimage, FundedContract,
     IdentifiableContract, Preimage, PreimageDecryptionShare,
@@ -277,8 +278,10 @@ impl ServerModule for Lightning {
         &self,
         dbtx: &mut ModuleDatabaseTransaction<'_, ModuleInstanceId>,
     ) {
-        if !self.consensus_proposal(dbtx).await.forces_new_epoch() {
-            std::future::pending().await
+        while !self.consensus_proposal(dbtx).await.forces_new_epoch() {
+            // FIXME: remove after modularization finishes
+            #[cfg(not(target_family = "wasm"))]
+            sleep(Duration::from_millis(1000)).await;
         }
     }
 
@@ -287,25 +290,51 @@ impl ServerModule for Lightning {
         dbtx: &mut ModuleDatabaseTransaction<'_, ModuleInstanceId>,
     ) -> ConsensusProposal<LightningConsensusItem> {
         let round_ci = LightningConsensusItem::RoundConsensus(RoundConsensusItem {
-            clock_time: SystemTime::now()
+            clock_time: fedimint_core::time::now()
                 .duration_since(UNIX_EPOCH)
                 .expect("Error getting clock time")
                 .as_secs(),
         });
 
-        ConsensusProposal::new_auto_trigger(
-            dbtx.find_by_prefix(&ProposeDecryptionShareKeyPrefix)
-                .await
-                .map(|(ProposeDecryptionShareKey(contract_id), share)| {
-                    LightningConsensusItem::DecryptionShare(DecryptionShareCI {
-                        contract_id,
-                        share,
-                    })
-                })
-                .chain(stream::once(async { round_ci }))
-                .collect::<Vec<LightningConsensusItem>>()
-                .await,
-        )
+        let items = dbtx
+            .find_by_prefix(&ProposeDecryptionShareKeyPrefix)
+            .await
+            .map(|(ProposeDecryptionShareKey(contract_id), share)| {
+                LightningConsensusItem::DecryptionShare(DecryptionShareCI { contract_id, share })
+            })
+            .chain(stream::once(async { round_ci }))
+            .collect::<Vec<LightningConsensusItem>>()
+            .await;
+
+        // We force new epochs with new clock time only if invoice expires to avoid
+        // continually producing epochs
+        let mut outgoing_contracts: Vec<OutgoingContract> = dbtx
+            .find_by_prefix(&ContractKeyPrefix)
+            .await
+            .filter_map(|(_, contract)| async move {
+                if let FundedContract::Outgoing(outgoing_contract) = contract.contract {
+                    Some(outgoing_contract)
+                } else {
+                    None
+                }
+            })
+            .collect()
+            .await;
+
+        outgoing_contracts
+            .sort_by_key(|contract| contract.invoice.timestamp() + contract.invoice.expiry_time());
+
+        // We force new epochs only if invoice expires, or we have decryption share (more than
+        // just round_ci item)
+        if 1 < items.len()
+            || (outgoing_contracts
+                .first()
+                .map_or(false, |c| c.invoice.is_expired()))
+        {
+            ConsensusProposal::Trigger(items)
+        } else {
+            ConsensusProposal::Contribute(items)
+        }
     }
 
     async fn begin_consensus_epoch<'a, 'b>(
@@ -473,6 +502,15 @@ impl ServerModule for Lightning {
                             contract.amount,
                         ))
                         .into_module_error_other();
+                    }
+                } else if let Contract::Outgoing(outgoing) = &contract.contract {
+                    let clock_time = self.consensus_clock_time(dbtx).await.unwrap_or(0);
+
+                    if outgoing
+                        .invoice
+                        .would_expire(Duration::from_secs(clock_time))
+                    {
+                        return Err(LightningError::ExpiredInvoice).into_module_error_other();
                     }
                 }
 
@@ -804,8 +842,8 @@ impl ServerModule for Lightning {
             },
             api_endpoint! {
                 "/clock_time",
-                async |module: &Lightning, dbtx, _params: ()| -> u64 {
-                   Ok(module.consensus_clock_time(dbtx).await.unwrap_or(0))
+                async |module: &Lightning, context, _params: ()| -> u64 {
+                   Ok(module.consensus_clock_time(context.dbtx()).await.unwrap_or(0))
                 }
             },
             api_endpoint! {
@@ -1086,7 +1124,7 @@ mod fedimint_migration_tests {
             api: Url::parse("http://example.com")
                 .expect("Could not parse URL to generate GatewayClientConfig API endpoint"),
             route_hints: vec![],
-            valid_until: SystemTime::now(),
+            valid_until: fedimint_core::time::now(),
         };
         dbtx.insert_new_entry(&LightningGatewayKey(pk), &gateway)
             .await;
