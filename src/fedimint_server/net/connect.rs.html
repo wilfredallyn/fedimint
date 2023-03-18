@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `fedimint-server/src/net/connect.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>connect.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-389f8b4a37bc03c9.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../../static.files/light-046227e470cd3629.css"><link rel="stylesheet" disabled href="../../../static.files/dark-800f2ee593c8e6f7.css"><link rel="stylesheet" disabled href="../../../static.files/ayu-9edae3c387f5a5b3.css"><script id="default-settings" ></script><script src="../../../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../../../static.files/source-script-5cf2e01a42cc9858.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-287cecec4dbb45b0.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><div class="width-limiter"><nav class="sub"><a class="sub-logo-container" href="../../../fedimint_server/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `fedimint-server/src/net/connect.rs`."><title>connect.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-505eba68f310f6bf.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../../static.files/light-f501212b8b071243.css"><link rel="stylesheet" disabled href="../../../static.files/dark-e92fc12c34ff89d3.css"><link rel="stylesheet" disabled href="../../../static.files/ayu-c8c85693c8a4f9db.css"><script id="default-settings" ></script><script src="../../../static.files/storage-3891ce972e3a2bf8.js"></script><script defer src="../../../static.files/source-script-ea63cb6500f71309.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-364b95f387bc3166.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../fedimint_server/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -590,22 +590,59 @@
 <a href="#590" id="590">590</a>
 <a href="#591" id="591">591</a>
 <a href="#592" id="592">592</a>
-</pre><pre class="rust"><code><span class="doccomment">//! Provides an abstract network connection interface and multiple implementations
+<a href="#593" id="593">593</a>
+<a href="#594" id="594">594</a>
+<a href="#595" id="595">595</a>
+<a href="#596" id="596">596</a>
+<a href="#597" id="597">597</a>
+<a href="#598" id="598">598</a>
+<a href="#599" id="599">599</a>
+<a href="#600" id="600">600</a>
+<a href="#601" id="601">601</a>
+<a href="#602" id="602">602</a>
+<a href="#603" id="603">603</a>
+<a href="#604" id="604">604</a>
+<a href="#605" id="605">605</a>
+<a href="#606" id="606">606</a>
+<a href="#607" id="607">607</a>
+<a href="#608" id="608">608</a>
+<a href="#609" id="609">609</a>
+<a href="#610" id="610">610</a>
+<a href="#611" id="611">611</a>
+<a href="#612" id="612">612</a>
+<a href="#613" id="613">613</a>
+<a href="#614" id="614">614</a>
+<a href="#615" id="615">615</a>
+<a href="#616" id="616">616</a>
+<a href="#617" id="617">617</a>
+<a href="#618" id="618">618</a>
+<a href="#619" id="619">619</a>
+<a href="#620" id="620">620</a>
+<a href="#621" id="621">621</a>
+<a href="#622" id="622">622</a>
+<a href="#623" id="623">623</a>
+<a href="#624" id="624">624</a>
+<a href="#625" id="625">625</a>
+</pre><pre class="rust"><code><span class="doccomment">//! Provides an abstract network connection interface and multiple
+//! implementations
 
-</span><span class="kw">use </span>std::collections::HashMap;
+</span><span class="kw">use </span>std::collections::BTreeMap;
 <span class="kw">use </span>std::convert::TryFrom;
 <span class="kw">use </span>std::fmt::Debug;
+<span class="kw">use </span>std::net::SocketAddr;
 <span class="kw">use </span>std::pin::Pin;
 <span class="kw">use </span>std::sync::Arc;
 
+<span class="kw">use </span>anyhow::format_err;
 <span class="kw">use </span>async_trait::async_trait;
-<span class="kw">use </span>fedimint_api::PeerId;
+<span class="kw">use </span>fedimint_core::PeerId;
 <span class="kw">use </span>futures::Stream;
 <span class="kw">use </span>tokio::io::{ReadHalf, WriteHalf};
 <span class="kw">use </span>tokio::net::{TcpListener, TcpStream};
 <span class="kw">use </span>tokio_rustls::rustls::server::AllowAnyAuthenticatedClient;
 <span class="kw">use </span>tokio_rustls::rustls::RootCertStore;
 <span class="kw">use </span>tokio_rustls::{rustls, TlsAcceptor, TlsConnector, TlsStream};
+<span class="kw">use </span>url::Url;
 
 <span class="kw">use </span><span class="kw">crate</span>::net::framed::{AnyFramedTransport, BidiFramed, FramedTransport};
 
@@ -624,17 +661,18 @@
 
 <span class="doccomment">/// Allows to connect to peers and to listen for incoming connections
 ///
-/// Connections are message based ([`FramedTransport`]) and should be authenticated and encrypted
-/// for production deployments.
+/// Connections are message based ([`FramedTransport`]) and should be
+/// authenticated and encrypted for production deployments.
 </span><span class="attr">#[async_trait]
 </span><span class="kw">pub trait </span>Connector&lt;M&gt; {
     <span class="doccomment">/// Connect to a `destination`
-    </span><span class="kw">async fn </span>connect_framed(<span class="kw-2">&amp;</span><span class="self">self</span>, destination: String, peer: PeerId) -&gt; ConnectResult&lt;M&gt;;
+    </span><span class="kw">async fn </span>connect_framed(<span class="kw-2">&amp;</span><span class="self">self</span>, destination: Url, peer: PeerId) -&gt; ConnectResult&lt;M&gt;;
 
     <span class="doccomment">/// Listen for incoming connections on `bind_addr`
-    </span><span class="kw">async fn </span>listen(<span class="kw-2">&amp;</span><span class="self">self</span>, bind_addr: String) -&gt; <span class="prelude-ty">Result</span>&lt;ConnectionListener&lt;M&gt;, anyhow::Error&gt;;
+    </span><span class="kw">async fn </span>listen(<span class="kw-2">&amp;</span><span class="self">self</span>, bind_addr: SocketAddr) -&gt; <span class="prelude-ty">Result</span>&lt;ConnectionListener&lt;M&gt;, anyhow::Error&gt;;
 
-    <span class="doccomment">/// Transform this concrete `Connector` into an owned trait object version of itself
+    <span class="doccomment">/// Transform this concrete `Connector` into an owned trait object version
+    /// of itself
     </span><span class="kw">fn </span>into_dyn(<span class="self">self</span>) -&gt; AnyConnector&lt;M&gt;
     <span class="kw">where
         </span><span class="self">Self</span>: Sized + Send + Sync + Unpin + <span class="lifetime">&#39;static</span>,
@@ -649,17 +687,17 @@
     our_certificate: rustls::Certificate,
     our_private_key: rustls::PrivateKey,
     peer_certs: Arc&lt;PeerCertStore&gt;,
-    <span class="doccomment">/// Copy of the certs from `peer_certs`, but in a format that `tokio_rustls` understands
+    <span class="doccomment">/// Copy of the certs from `peer_certs`, but in a format that `tokio_rustls`
+    /// understands
     </span>cert_store: RootCertStore,
-    peer_names: HashMap&lt;PeerId, String&gt;,
+    peer_names: BTreeMap&lt;PeerId, String&gt;,
 }
 
 <span class="attr">#[derive(Debug, Clone)]
 </span><span class="kw">pub struct </span>TlsConfig {
-    <span class="kw">pub </span>our_certificate: rustls::Certificate,
     <span class="kw">pub </span>our_private_key: rustls::PrivateKey,
-    <span class="kw">pub </span>peer_certs: HashMap&lt;PeerId, rustls::Certificate&gt;,
-    <span class="kw">pub </span>peer_names: HashMap&lt;PeerId, String&gt;,
+    <span class="kw">pub </span>peer_certs: BTreeMap&lt;PeerId, rustls::Certificate&gt;,
+    <span class="kw">pub </span>peer_names: BTreeMap&lt;PeerId, String&gt;,
 }
 
 <span class="attr">#[derive(Debug, Clone)]
@@ -668,7 +706,7 @@
 }
 
 <span class="kw">impl </span>TlsTcpConnector {
-    <span class="kw">pub fn </span>new(cfg: TlsConfig) -&gt; TlsTcpConnector {
+    <span class="kw">pub fn </span>new(cfg: TlsConfig, our_id: PeerId) -&gt; TlsTcpConnector {
         <span class="kw">let </span><span class="kw-2">mut </span>cert_store = RootCertStore::empty();
         <span class="kw">for </span>(<span class="kw">_</span>, cert) <span class="kw">in </span>cfg.peer_certs.iter() {
             cert_store
@@ -677,7 +715,7 @@
         }
 
         TlsTcpConnector {
-            our_certificate: cfg.our_certificate,
+            our_certificate: cfg.peer_certs.get(<span class="kw-2">&amp;</span>our_id).expect(<span class="string">&quot;exists&quot;</span>).clone(),
             our_private_key: cfg.our_private_key,
             peer_certs: Arc::new(PeerCertStore::new(cfg.peer_certs)),
             cert_store,
@@ -747,7 +785,7 @@
 <span class="kw">where
     </span>M: Debug + serde::Serialize + serde::de::DeserializeOwned + Send + Unpin + <span class="lifetime">&#39;static</span>,
 {
-    <span class="kw">async fn </span>connect_framed(<span class="kw-2">&amp;</span><span class="self">self</span>, destination: String, peer: PeerId) -&gt; ConnectResult&lt;M&gt; {
+    <span class="kw">async fn </span>connect_framed(<span class="kw-2">&amp;</span><span class="self">self</span>, destination: Url, peer: PeerId) -&gt; ConnectResult&lt;M&gt; {
         <span class="kw">let </span>cfg = rustls::ClientConfig::builder()
             .with_safe_defaults()
             .with_root_certificates(<span class="self">self</span>.cert_store.clone())
@@ -762,7 +800,10 @@
 
         <span class="kw">let </span>connector = TlsConnector::from(Arc::new(cfg));
         <span class="kw">let </span>tls_conn = connector
-            .connect(fake_domain, TcpStream::connect(destination).<span class="kw">await</span><span class="question-mark">?</span>)
+            .connect(
+                fake_domain,
+                TcpStream::connect(parse_host_port(destination)<span class="question-mark">?</span>).<span class="kw">await</span><span class="question-mark">?</span>,
+            )
             .<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="kw">let </span>(<span class="kw">_</span>, tls_session) = tls_conn.get_ref();
@@ -783,7 +824,7 @@
         <span class="prelude-val">Ok</span>((peer, framed))
     }
 
-    <span class="kw">async fn </span>listen(<span class="kw-2">&amp;</span><span class="self">self</span>, bind_addr: String) -&gt; <span class="prelude-ty">Result</span>&lt;ConnectionListener&lt;M&gt;, anyhow::Error&gt; {
+    <span class="kw">async fn </span>listen(<span class="kw-2">&amp;</span><span class="self">self</span>, bind_addr: SocketAddr) -&gt; <span class="prelude-ty">Result</span>&lt;ConnectionListener&lt;M&gt;, anyhow::Error&gt; {
         <span class="kw">let </span>verifier = AllowAnyAuthenticatedClient::new(<span class="self">self</span>.cert_store.clone());
         <span class="kw">let </span>config = rustls::ServerConfig::builder()
             .with_safe_defaults()
@@ -809,26 +850,40 @@
     }
 }
 
+<span class="doccomment">/// Parses the host and port from a url
+</span><span class="kw">pub fn </span>parse_host_port(url: Url) -&gt; anyhow::Result&lt;String&gt; {
+    <span class="kw">let </span>host = url
+        .host_str()
+        .ok_or_else(|| <span class="macro">format_err!</span>(<span class="string">&quot;Missing host in {url}&quot;</span>))<span class="question-mark">?</span>;
+    <span class="kw">let </span>port = url
+        .port()
+        .ok_or_else(|| <span class="macro">format_err!</span>(<span class="string">&quot;Missing port in {url}&quot;</span>))<span class="question-mark">?</span>;
+
+    <span class="prelude-val">Ok</span>(<span class="macro">format!</span>(<span class="string">&quot;{host}:{port}&quot;</span>))
+}
+
 <span class="doccomment">/// Fake network stack used in tests
 </span><span class="attr">#[allow(unused_imports)]
 </span><span class="kw">pub mod </span>mock {
     <span class="kw">use </span>std::collections::HashMap;
     <span class="kw">use </span>std::fmt::Debug;
     <span class="kw">use </span>std::future::Future;
+    <span class="kw">use </span>std::net::SocketAddr;
     <span class="kw">use </span>std::pin::Pin;
     <span class="kw">use </span>std::sync::Arc;
     <span class="kw">use </span>std::time::Duration;
 
     <span class="kw">use </span>anyhow::Error;
-    <span class="kw">use </span>fedimint_api::PeerId;
+    <span class="kw">use </span>fedimint_core::PeerId;
     <span class="kw">use </span>futures::{FutureExt, SinkExt, Stream, StreamExt};
     <span class="kw">use </span>tokio::io::{
         AsyncRead, AsyncReadExt, AsyncWrite, AsyncWriteExt, DuplexStream, ReadHalf, WriteHalf,
     };
     <span class="kw">use </span>tokio::sync::mpsc::Sender;
     <span class="kw">use </span>tokio::sync::Mutex;
+    <span class="kw">use </span>url::Url;
 
-    <span class="kw">use </span><span class="kw">crate</span>::net::connect::{ConnectResult, Connector};
+    <span class="kw">use </span><span class="kw">crate</span>::net::connect::{parse_host_port, ConnectResult, Connector};
     <span class="kw">use </span><span class="kw">crate</span>::net::framed::{BidiFramed, FramedTransport};
 
     <span class="kw">pub struct </span>MockNetwork {
@@ -861,9 +916,9 @@
     <span class="kw">where
         </span>M: Debug + serde::Serialize + serde::de::DeserializeOwned + Send + Unpin + <span class="lifetime">&#39;static</span>,
     {
-        <span class="kw">async fn </span>connect_framed(<span class="kw-2">&amp;</span><span class="self">self</span>, destination: String, _peer: PeerId) -&gt; ConnectResult&lt;M&gt; {
+        <span class="kw">async fn </span>connect_framed(<span class="kw-2">&amp;</span><span class="self">self</span>, destination: Url, _peer: PeerId) -&gt; ConnectResult&lt;M&gt; {
             <span class="kw">let </span><span class="kw-2">mut </span>clients_lock = <span class="self">self</span>.clients.lock().<span class="kw">await</span>;
-            <span class="kw">if let </span><span class="prelude-val">Some</span>(client) = clients_lock.get_mut(<span class="kw-2">&amp;</span>destination) {
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(client) = clients_lock.get_mut(<span class="kw-2">&amp;</span>parse_host_port(destination)<span class="question-mark">?</span>) {
                 <span class="kw">let </span>(<span class="kw-2">mut </span>stream_our, stream_theirs) = tokio::io::duplex(<span class="number">43_689</span>);
                 client.send(stream_theirs).<span class="kw">await</span>.unwrap();
                 <span class="kw">let </span>peer = do_handshake(<span class="self">self</span>.id, <span class="kw-2">&amp;mut </span>stream_our).<span class="kw">await</span>.unwrap();
@@ -879,12 +934,18 @@
 
         <span class="kw">async fn </span>listen(
             <span class="kw-2">&amp;</span><span class="self">self</span>,
-            bind_addr: String,
+            bind_addr: SocketAddr,
         ) -&gt; <span class="prelude-ty">Result</span>&lt;Pin&lt;Box&lt;<span class="kw">dyn </span>Stream&lt;Item = ConnectResult&lt;M&gt;&gt; + Send + Unpin + <span class="lifetime">&#39;static</span>&gt;&gt;, Error&gt;
         {
             <span class="kw">let </span>(send, receive) = tokio::sync::mpsc::channel(<span class="number">16</span>);
 
-            <span class="kw">if </span><span class="self">self</span>.clients.lock().<span class="kw">await</span>.insert(bind_addr, send).is_some() {
+            <span class="kw">if </span><span class="self">self
+                </span>.clients
+                .lock()
+                .<span class="kw">await
+                </span>.insert(bind_addr.to_string(), send)
+                .is_some()
+            {
                 <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="macro">anyhow::anyhow!</span>(<span class="string">&quot;Address already bound&quot;</span>));
             }
 
@@ -922,6 +983,8 @@
 
     <span class="attr">#[tokio::test]
     </span><span class="kw">async fn </span>test_mock_network() {
+        <span class="kw">let </span>bind_addr: SocketAddr = <span class="string">&quot;127.0.0.1:7000&quot;</span>.parse().unwrap();
+        <span class="kw">let </span>url: Url = <span class="string">&quot;ws://127.0.0.1:7000&quot;</span>.parse().unwrap();
         <span class="kw">let </span>peer_a = PeerId::from(<span class="number">1</span>);
         <span class="kw">let </span>peer_b = PeerId::from(<span class="number">2</span>);
 
@@ -929,13 +992,12 @@
         <span class="kw">let </span>conn_a = net.connector(peer_a);
         <span class="kw">let </span>conn_b = net.connector(peer_b);
 
-        <span class="kw">let </span><span class="kw-2">mut </span>listener = Connector::&lt;u64&gt;::listen(<span class="kw-2">&amp;</span>conn_a, <span class="string">&quot;a&quot;</span>.into()).<span class="kw">await</span>.unwrap();
+        <span class="kw">let </span><span class="kw-2">mut </span>listener = Connector::&lt;u64&gt;::listen(<span class="kw-2">&amp;</span>conn_a, bind_addr).<span class="kw">await</span>.unwrap();
         <span class="kw">let </span>conn_a_fut = tokio::spawn(<span class="kw">async move </span>{ listener.next().<span class="kw">await</span>.unwrap().unwrap() });
 
-        <span class="kw">let </span>(auth_peer_b, <span class="kw-2">mut </span>conn_b) =
-            Connector::&lt;u64&gt;::connect_framed(<span class="kw-2">&amp;</span>conn_b, <span class="string">&quot;a&quot;</span>.into(), peer_a)
-                .<span class="kw">await
-                </span>.unwrap();
+        <span class="kw">let </span>(auth_peer_b, <span class="kw-2">mut </span>conn_b) = Connector::&lt;u64&gt;::connect_framed(<span class="kw-2">&amp;</span>conn_b, url, peer_a)
+            .<span class="kw">await
+            </span>.unwrap();
         <span class="kw">let </span>(auth_peer_a, <span class="kw-2">mut </span>conn_a) = conn_a_fut.<span class="kw">await</span>.unwrap();
 
         <span class="macro">assert_eq!</span>(auth_peer_a, peer_b);
@@ -958,6 +1020,8 @@
 
     <span class="attr">#[tokio::test]
     </span><span class="kw">async fn </span>test_large_messages() {
+        <span class="kw">let </span>bind_addr: SocketAddr = <span class="string">&quot;127.0.0.1:7000&quot;</span>.parse().unwrap();
+        <span class="kw">let </span>url: Url = <span class="string">&quot;ws://127.0.0.1:7000&quot;</span>.parse().unwrap();
         <span class="kw">let </span>peer_a = PeerId::from(<span class="number">1</span>);
         <span class="kw">let </span>peer_b = PeerId::from(<span class="number">2</span>);
 
@@ -965,15 +1029,14 @@
         <span class="kw">let </span>conn_a = net.connector(peer_a);
         <span class="kw">let </span>conn_b = net.connector(peer_b);
 
-        <span class="kw">let </span><span class="kw-2">mut </span>listener = Connector::&lt;Vec&lt;u8&gt;&gt;::listen(<span class="kw-2">&amp;</span>conn_a, <span class="string">&quot;a&quot;</span>.into())
+        <span class="kw">let </span><span class="kw-2">mut </span>listener = Connector::&lt;Vec&lt;u8&gt;&gt;::listen(<span class="kw-2">&amp;</span>conn_a, bind_addr)
             .<span class="kw">await
             </span>.unwrap();
         <span class="kw">let </span>conn_a_fut = tokio::spawn(<span class="kw">async move </span>{ listener.next().<span class="kw">await</span>.unwrap().unwrap() });
 
-        <span class="kw">let </span>(auth_peer_b, <span class="kw-2">mut </span>conn_b) =
-            Connector::&lt;Vec&lt;u8&gt;&gt;::connect_framed(<span class="kw-2">&amp;</span>conn_b, <span class="string">&quot;a&quot;</span>.into(), peer_a)
-                .<span class="kw">await
-                </span>.unwrap();
+        <span class="kw">let </span>(auth_peer_b, <span class="kw-2">mut </span>conn_b) = Connector::&lt;Vec&lt;u8&gt;&gt;::connect_framed(<span class="kw-2">&amp;</span>conn_b, url, peer_a)
+            .<span class="kw">await
+            </span>.unwrap();
         <span class="kw">let </span>(auth_peer_a, <span class="kw-2">mut </span>conn_a) = conn_a_fut.<span class="kw">await</span>.unwrap();
 
         <span class="macro">assert_eq!</span>(auth_peer_a, peer_b);
@@ -997,8 +1060,11 @@
 
 <span class="attr">#[cfg(test)]
 </span><span class="kw">mod </span>tests {
-    <span class="kw">use </span>fedimint_api::PeerId;
+    <span class="kw">use </span>std::net::SocketAddr;
+
+    <span class="kw">use </span>fedimint_core::PeerId;
     <span class="kw">use </span>futures::{SinkExt, StreamExt};
+    <span class="kw">use </span>url::Url;
 
     <span class="kw">use </span><span class="kw">crate</span>::config::gen_cert_and_key;
     <span class="kw">use </span><span class="kw">crate</span>::net::connect::{ConnectionListener, TlsConfig};
@@ -1015,8 +1081,7 @@
 
         peer_keys
             .iter()
-            .map(|(cert, key)| TlsConfig {
-                our_certificate: cert.clone(),
+            .map(|(_cert, key)| TlsConfig {
                 our_private_key: key.clone(),
                 peer_certs: peer_keys
                     .iter()
@@ -1026,7 +1091,7 @@
                 peer_names: peer_keys
                     .iter()
                     .enumerate()
-                    .map(|(peer, (<span class="kw">_</span>, <span class="kw">_</span>))| (PeerId::from(peer <span class="kw">as </span>u16), <span class="macro">format!</span>(<span class="string">&quot;peer-{}&quot;</span>, peer)))
+                    .map(|(peer, (<span class="kw">_</span>, <span class="kw">_</span>))| (PeerId::from(peer <span class="kw">as </span>u16), <span class="macro">format!</span>(<span class="string">&quot;peer-{peer}&quot;</span>)))
                     .collect(),
             })
             .collect()
@@ -1034,15 +1099,17 @@
 
     <span class="attr">#[tokio::test]
     </span><span class="kw">async fn </span>connect_success() {
-        <span class="comment">// FIXME: don&#39;t actually bind here, probably requires yet another Box&lt;dyn Trait&gt; layer :(
-        </span><span class="kw">let </span>bind_addr = <span class="string">&quot;127.0.0.1:7000&quot;</span>.to_owned();
+        <span class="comment">// FIXME: don&#39;t actually bind here, probably requires yet another Box&lt;dyn Trait&gt;
+        // layer :(
+        </span><span class="kw">let </span>bind_addr: SocketAddr = <span class="string">&quot;127.0.0.1:7000&quot;</span>.parse().unwrap();
+        <span class="kw">let </span>url: Url = <span class="string">&quot;ws://127.0.0.1:7000&quot;</span>.parse().unwrap();
         <span class="kw">let </span>connectors = gen_connector_config(<span class="number">5</span>)
             .into_iter()
-            .map(TlsTcpConnector::new)
+            .enumerate()
+            .map(|(id, cfg)| TlsTcpConnector::new(cfg, PeerId::from(id <span class="kw">as </span>u16)))
             .collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;();
 
-        <span class="kw">let </span><span class="kw-2">mut </span>server: ConnectionListener&lt;u64&gt; =
-            connectors[<span class="number">0</span>].listen(bind_addr.clone()).<span class="kw">await</span>.unwrap();
+        <span class="kw">let </span><span class="kw-2">mut </span>server: ConnectionListener&lt;u64&gt; = connectors[<span class="number">0</span>].listen(bind_addr).<span class="kw">await</span>.unwrap();
 
         <span class="kw">let </span>server_task = tokio::spawn(<span class="kw">async move </span>{
             <span class="kw">let </span>(peer, <span class="kw-2">mut </span>conn) = server.next().<span class="kw">await</span>.unwrap().unwrap();
@@ -1054,7 +1121,7 @@
         });
 
         <span class="kw">let </span>(peer_of_a, <span class="kw-2">mut </span>client_a): (<span class="kw">_</span>, AnyFramedTransport&lt;u64&gt;) = connectors[<span class="number">2</span>]
-            .connect_framed(bind_addr.clone(), PeerId::from(<span class="number">0</span>))
+            .connect_framed(url.clone(), PeerId::from(<span class="number">0</span>))
             .<span class="kw">await
             </span>.unwrap();
         <span class="macro">assert_eq!</span>(peer_of_a.to_usize(), <span class="number">0</span>);
@@ -1068,19 +1135,19 @@
 
     <span class="attr">#[tokio::test]
     </span><span class="kw">async fn </span>connect_reject() {
-        <span class="kw">let </span>bind_addr = <span class="string">&quot;127.0.0.1:7001&quot;</span>.to_owned();
+        <span class="kw">let </span>bind_addr: SocketAddr = <span class="string">&quot;127.0.0.1:7001&quot;</span>.parse().unwrap();
+        <span class="kw">let </span>url: Url = <span class="string">&quot;wss://127.0.0.1:7001&quot;</span>.parse().unwrap();
         <span class="kw">let </span>cfg = gen_connector_config(<span class="number">5</span>);
 
-        <span class="kw">let </span>honest = TlsTcpConnector::new(cfg[<span class="number">0</span>].clone());
+        <span class="kw">let </span>honest = TlsTcpConnector::new(cfg[<span class="number">0</span>].clone(), PeerId::from(<span class="number">0</span>));
 
         <span class="kw">let </span><span class="kw-2">mut </span>malicious_wrong_key_cfg = cfg[<span class="number">1</span>].clone();
         malicious_wrong_key_cfg.our_private_key = cfg[<span class="number">2</span>].our_private_key.clone();
-        <span class="kw">let </span>malicious_wrong_key = TlsTcpConnector::new(malicious_wrong_key_cfg);
+        <span class="kw">let </span>malicious_wrong_key = TlsTcpConnector::new(malicious_wrong_key_cfg, PeerId::from(<span class="number">1</span>));
 
         <span class="comment">// Honest server, malicious client with wrong private key
         </span>{
-            <span class="kw">let </span><span class="kw-2">mut </span>server: ConnectionListener&lt;u64&gt; =
-                honest.listen(bind_addr.clone()).<span class="kw">await</span>.unwrap();
+            <span class="kw">let </span><span class="kw-2">mut </span>server: ConnectionListener&lt;u64&gt; = honest.listen(bind_addr).<span class="kw">await</span>.unwrap();
 
             <span class="kw">let </span>server_task = tokio::spawn(<span class="kw">async move </span>{
                 <span class="kw">let </span>conn_res = server.next().<span class="kw">await</span>.unwrap();
@@ -1092,7 +1159,7 @@
 
             <span class="kw">let </span>err_anytime = <span class="kw">async </span>{
                 <span class="kw">let </span>(_peer, <span class="kw-2">mut </span>conn): (<span class="kw">_</span>, AnyFramedTransport&lt;u64&gt;) = malicious_wrong_key
-                    .connect_framed(bind_addr.clone(), PeerId::from(<span class="number">0</span>))
+                    .connect_framed(url.clone(), PeerId::from(<span class="number">0</span>))
                     .<span class="kw">await</span><span class="question-mark">?</span>;
 
                 conn.send(<span class="number">42</span>).<span class="kw">await</span><span class="question-mark">?</span>;
@@ -1114,7 +1181,7 @@
         <span class="comment">// Malicious server with wrong key, honest client
         </span>{
             <span class="kw">let </span><span class="kw-2">mut </span>server: ConnectionListener&lt;u64&gt; =
-                malicious_wrong_key.listen(bind_addr.clone()).<span class="kw">await</span>.unwrap();
+                malicious_wrong_key.listen(bind_addr).<span class="kw">await</span>.unwrap();
 
             <span class="kw">let </span>server_task = tokio::spawn(<span class="kw">async move </span>{
                 <span class="kw">let </span>conn_res = server.next().<span class="kw">await</span>.unwrap();
@@ -1125,9 +1192,8 @@
             });
 
             <span class="kw">let </span>err_anytime = <span class="kw">async </span>{
-                <span class="kw">let </span>(_peer, <span class="kw-2">mut </span>conn): (<span class="kw">_</span>, AnyFramedTransport&lt;u64&gt;) = honest
-                    .connect_framed(bind_addr.clone(), PeerId::from(<span class="number">1</span>))
-                    .<span class="kw">await</span><span class="question-mark">?</span>;
+                <span class="kw">let </span>(_peer, <span class="kw-2">mut </span>conn): (<span class="kw">_</span>, AnyFramedTransport&lt;u64&gt;) =
+                    honest.connect_framed(url.clone(), PeerId::from(<span class="number">1</span>)).<span class="kw">await</span><span class="question-mark">?</span>;
 
                 conn.send(<span class="number">42</span>).<span class="kw">await</span><span class="question-mark">?</span>;
                 conn.flush().<span class="kw">await</span><span class="question-mark">?</span>;
@@ -1147,10 +1213,11 @@
 
         <span class="comment">// Server with wrong certificate, honest client
         </span>{
-            <span class="kw">let </span><span class="kw-2">mut </span>server: ConnectionListener&lt;u64&gt; = TlsTcpConnector::new(cfg[<span class="number">2</span>].clone())
-                .listen(bind_addr.clone())
-                .<span class="kw">await
-                </span>.unwrap();
+            <span class="kw">let </span><span class="kw-2">mut </span>server: ConnectionListener&lt;u64&gt; =
+                TlsTcpConnector::new(cfg[<span class="number">2</span>].clone(), PeerId::from(<span class="number">2</span>))
+                    .listen(bind_addr)
+                    .<span class="kw">await
+                    </span>.unwrap();
 
             <span class="kw">let </span>server_task = tokio::spawn(<span class="kw">async move </span>{
                 <span class="kw">let </span>conn_res = server.next().<span class="kw">await</span>.unwrap();
@@ -1161,9 +1228,8 @@
             });
 
             <span class="kw">let </span>err_anytime = <span class="kw">async </span>{
-                <span class="kw">let </span>(_peer, <span class="kw-2">mut </span>conn): (<span class="kw">_</span>, AnyFramedTransport&lt;u64&gt;) = honest
-                    .connect_framed(bind_addr.clone(), PeerId::from(<span class="number">0</span>))
-                    .<span class="kw">await</span><span class="question-mark">?</span>;
+                <span class="kw">let </span>(_peer, <span class="kw-2">mut </span>conn): (<span class="kw">_</span>, AnyFramedTransport&lt;u64&gt;) =
+                    honest.connect_framed(url.clone(), PeerId::from(<span class="number">0</span>)).<span class="kw">await</span><span class="question-mark">?</span>;
 
                 conn.send(<span class="number">42</span>).<span class="kw">await</span><span class="question-mark">?</span>;
                 conn.flush().<span class="kw">await</span><span class="question-mark">?</span>;
@@ -1183,4 +1249,4 @@
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="fedimint_server" data-themes="" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (b28d30e1e 2022-12-06)" data-search-js="search-444266647c4dba98.js" data-settings-js="settings-bebeae96e00e4617.js" data-settings-css="settings-af96d9e2fc13e081.css" ></div></body></html>
+</section></main><div id="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="fedimint_server" data-themes="" data-resource-suffix="" data-rustdoc-version="1.69.0-nightly (f3126500f 2023-02-02)" data-search-js="search-98d53477a794af0b.js" data-settings-js="settings-f0c5c39777a9a2f6.js" data-settings-css="settings-0bcba95ff279c1db.css" ></div></body></html>

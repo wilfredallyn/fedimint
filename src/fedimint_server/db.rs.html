@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `fedimint-server/src/db.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>db.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-389f8b4a37bc03c9.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../static.files/light-046227e470cd3629.css"><link rel="stylesheet" disabled href="../../static.files/dark-800f2ee593c8e6f7.css"><link rel="stylesheet" disabled href="../../static.files/ayu-9edae3c387f5a5b3.css"><script id="default-settings" ></script><script src="../../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../../static.files/source-script-5cf2e01a42cc9858.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-287cecec4dbb45b0.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><div class="width-limiter"><nav class="sub"><a class="sub-logo-container" href="../../fedimint_server/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `fedimint-server/src/db.rs`."><title>db.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-505eba68f310f6bf.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../static.files/light-f501212b8b071243.css"><link rel="stylesheet" disabled href="../../static.files/dark-e92fc12c34ff89d3.css"><link rel="stylesheet" disabled href="../../static.files/ayu-c8c85693c8a4f9db.css"><script id="default-settings" ></script><script src="../../static.files/storage-3891ce972e3a2bf8.js"></script><script defer src="../../static.files/source-script-ea63cb6500f71309.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-364b95f387bc3166.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../fedimint_server/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -125,132 +125,138 @@
 <a href="#125" id="125">125</a>
 <a href="#126" id="126">126</a>
 <a href="#127" id="127">127</a>
-</pre><pre class="rust"><code><span class="kw">use </span>std::fmt::Debug;
+<a href="#128" id="128">128</a>
+<a href="#129" id="129">129</a>
+<a href="#130" id="130">130</a>
+</pre><pre class="rust"><code><span class="kw">use </span>std::collections::BTreeSet;
+<span class="kw">use </span>std::fmt::Debug;
 
-<span class="kw">use </span>fedimint_api::db::DatabaseKeyPrefixConst;
-<span class="kw">use </span>fedimint_api::encoding::{Decodable, Encodable};
-<span class="kw">use </span>fedimint_api::{PeerId, TransactionId};
-<span class="kw">use </span>fedimint_core::epoch::EpochHistory;
+<span class="kw">use </span>fedimint_core::db::{DatabaseVersion, MigrationMap, MODULE_GLOBAL_PREFIX};
+<span class="kw">use </span>fedimint_core::encoding::{Decodable, Encodable};
+<span class="kw">use </span>fedimint_core::epoch::{SerdeSignature, SignedEpochOutcome};
+<span class="kw">use </span>fedimint_core::{impl_db_lookup, impl_db_record, PeerId, TransactionId};
 <span class="kw">use </span>serde::Serialize;
 <span class="kw">use </span>strum_macros::EnumIter;
 
 <span class="kw">use </span><span class="kw">crate</span>::consensus::AcceptedTransaction;
-<span class="kw">use </span><span class="kw">crate</span>::transaction::Transaction;
+
+<span class="kw">pub const </span>GLOBAL_DATABASE_VERSION: DatabaseVersion = DatabaseVersion(<span class="number">0</span>);
 
 <span class="attr">#[repr(u8)]
 #[derive(Clone, EnumIter, Debug)]
 </span><span class="kw">pub enum </span>DbKeyPrefix {
-    ProposedTransaction = <span class="number">0x01</span>,
     AcceptedTransaction = <span class="number">0x02</span>,
     DropPeer = <span class="number">0x03</span>,
     RejectedTransaction = <span class="number">0x04</span>,
     EpochHistory = <span class="number">0x05</span>,
     LastEpoch = <span class="number">0x06</span>,
+    ClientConfigSignature = <span class="number">0x07</span>,
+    ConsensusUpgrade = <span class="number">0x08</span>,
+    Module = MODULE_GLOBAL_PREFIX,
 }
 
 <span class="kw">impl </span>std::fmt::Display <span class="kw">for </span>DbKeyPrefix {
     <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter) -&gt; std::fmt::Result {
-        <span class="macro">write!</span>(f, <span class="string">&quot;{:?}&quot;</span>, <span class="self">self</span>)
+        <span class="macro">write!</span>(f, <span class="string">&quot;{self:?}&quot;</span>)
     }
-}
-
-<span class="attr">#[derive(Debug, Encodable, Decodable, Serialize)]
-</span><span class="kw">pub struct </span>ProposedTransactionKey(<span class="kw">pub </span>TransactionId);
-
-<span class="kw">impl </span>DatabaseKeyPrefixConst <span class="kw">for </span>ProposedTransactionKey {
-    <span class="kw">const </span>DB_PREFIX: u8 = DbKeyPrefix::ProposedTransaction <span class="kw">as </span>u8;
-    <span class="kw">type </span>Key = <span class="self">Self</span>;
-    <span class="kw">type </span>Value = Transaction;
-}
-
-<span class="attr">#[derive(Debug, Encodable, Decodable)]
-</span><span class="kw">pub struct </span>ProposedTransactionKeyPrefix;
-
-<span class="kw">impl </span>DatabaseKeyPrefixConst <span class="kw">for </span>ProposedTransactionKeyPrefix {
-    <span class="kw">const </span>DB_PREFIX: u8 = DbKeyPrefix::ProposedTransaction <span class="kw">as </span>u8;
-    <span class="kw">type </span>Key = ProposedTransactionKey;
-    <span class="kw">type </span>Value = Transaction;
 }
 
 <span class="attr">#[derive(Debug, Encodable, Decodable, Serialize)]
 </span><span class="kw">pub struct </span>AcceptedTransactionKey(<span class="kw">pub </span>TransactionId);
 
-<span class="kw">impl </span>DatabaseKeyPrefixConst <span class="kw">for </span>AcceptedTransactionKey {
-    <span class="kw">const </span>DB_PREFIX: u8 = DbKeyPrefix::AcceptedTransaction <span class="kw">as </span>u8;
-    <span class="kw">type </span>Key = <span class="self">Self</span>;
-    <span class="kw">type </span>Value = AcceptedTransaction;
-}
-
 <span class="attr">#[derive(Debug, Encodable, Decodable)]
 </span><span class="kw">pub struct </span>AcceptedTransactionKeyPrefix;
 
-<span class="kw">impl </span>DatabaseKeyPrefixConst <span class="kw">for </span>AcceptedTransactionKeyPrefix {
-    <span class="kw">const </span>DB_PREFIX: u8 = DbKeyPrefix::AcceptedTransaction <span class="kw">as </span>u8;
-    <span class="kw">type </span>Key = AcceptedTransactionKey;
-    <span class="kw">type </span>Value = AcceptedTransaction;
-}
+<span class="macro">impl_db_record!</span>(
+    key = AcceptedTransactionKey,
+    value = AcceptedTransaction,
+    db_prefix = DbKeyPrefix::AcceptedTransaction,
+    notify_on_modify = <span class="bool-val">true</span>,
+);
+<span class="macro">impl_db_lookup!</span>(
+    key = AcceptedTransactionKey,
+    query_prefix = AcceptedTransactionKeyPrefix
+);
 
 <span class="attr">#[derive(Debug, Encodable, Decodable, Serialize)]
 </span><span class="kw">pub struct </span>RejectedTransactionKey(<span class="kw">pub </span>TransactionId);
 
-<span class="kw">impl </span>DatabaseKeyPrefixConst <span class="kw">for </span>RejectedTransactionKey {
-    <span class="kw">const </span>DB_PREFIX: u8 = DbKeyPrefix::RejectedTransaction <span class="kw">as </span>u8;
-    <span class="kw">type </span>Key = <span class="self">Self</span>;
-    <span class="kw">type </span>Value = String;
-}
-
 <span class="attr">#[derive(Debug, Encodable, Decodable)]
 </span><span class="kw">pub struct </span>RejectedTransactionKeyPrefix;
 
-<span class="kw">impl </span>DatabaseKeyPrefixConst <span class="kw">for </span>RejectedTransactionKeyPrefix {
-    <span class="kw">const </span>DB_PREFIX: u8 = DbKeyPrefix::RejectedTransaction <span class="kw">as </span>u8;
-    <span class="kw">type </span>Key = RejectedTransactionKey;
-    <span class="kw">type </span>Value = String;
-}
+<span class="macro">impl_db_record!</span>(
+    key = RejectedTransactionKey,
+    value = String,
+    db_prefix = DbKeyPrefix::RejectedTransaction,
+    notify_on_modify = <span class="bool-val">true</span>,
+);
+<span class="macro">impl_db_lookup!</span>(
+    key = RejectedTransactionKey,
+    query_prefix = RejectedTransactionKeyPrefix
+);
 
 <span class="attr">#[derive(Debug, Encodable, Decodable, Serialize)]
 </span><span class="kw">pub struct </span>DropPeerKey(<span class="kw">pub </span>PeerId);
 
-<span class="kw">impl </span>DatabaseKeyPrefixConst <span class="kw">for </span>DropPeerKey {
-    <span class="kw">const </span>DB_PREFIX: u8 = DbKeyPrefix::DropPeer <span class="kw">as </span>u8;
-    <span class="kw">type </span>Key = <span class="self">Self</span>;
-    <span class="kw">type </span>Value = ();
-}
-
 <span class="attr">#[derive(Debug, Encodable, Decodable)]
 </span><span class="kw">pub struct </span>DropPeerKeyPrefix;
 
-<span class="kw">impl </span>DatabaseKeyPrefixConst <span class="kw">for </span>DropPeerKeyPrefix {
-    <span class="kw">const </span>DB_PREFIX: u8 = DbKeyPrefix::DropPeer <span class="kw">as </span>u8;
-    <span class="kw">type </span>Key = DropPeerKey;
-    <span class="kw">type </span>Value = ();
-}
+<span class="macro">impl_db_record!</span>(
+    key = DropPeerKey,
+    value = (),
+    db_prefix = DbKeyPrefix::DropPeer,
+);
+<span class="macro">impl_db_lookup!</span>(key = DropPeerKey, query_prefix = DropPeerKeyPrefix);
 
 <span class="attr">#[derive(Debug, Copy, Clone, Encodable, Decodable, Serialize)]
 </span><span class="kw">pub struct </span>EpochHistoryKey(<span class="kw">pub </span>u64);
 
-<span class="kw">impl </span>DatabaseKeyPrefixConst <span class="kw">for </span>EpochHistoryKey {
-    <span class="kw">const </span>DB_PREFIX: u8 = DbKeyPrefix::EpochHistory <span class="kw">as </span>u8;
-    <span class="kw">type </span>Key = <span class="self">Self</span>;
-    <span class="kw">type </span>Value = EpochHistory;
-}
-
 <span class="attr">#[derive(Debug, Encodable, Decodable)]
 </span><span class="kw">pub struct </span>EpochHistoryKeyPrefix;
 
-<span class="kw">impl </span>DatabaseKeyPrefixConst <span class="kw">for </span>EpochHistoryKeyPrefix {
-    <span class="kw">const </span>DB_PREFIX: u8 = DbKeyPrefix::EpochHistory <span class="kw">as </span>u8;
-    <span class="kw">type </span>Key = EpochHistoryKey;
-    <span class="kw">type </span>Value = EpochHistory;
-}
+<span class="macro">impl_db_record!</span>(
+    key = EpochHistoryKey,
+    value = SignedEpochOutcome,
+    db_prefix = DbKeyPrefix::EpochHistory,
+);
+<span class="macro">impl_db_lookup!</span>(key = EpochHistoryKey, query_prefix = EpochHistoryKeyPrefix);
 
 <span class="attr">#[derive(Debug, Encodable, Decodable, Serialize)]
 </span><span class="kw">pub struct </span>LastEpochKey;
 
-<span class="kw">impl </span>DatabaseKeyPrefixConst <span class="kw">for </span>LastEpochKey {
-    <span class="kw">const </span>DB_PREFIX: u8 = DbKeyPrefix::LastEpoch <span class="kw">as </span>u8;
-    <span class="kw">type </span>Key = <span class="self">Self</span>;
-    <span class="kw">type </span>Value = EpochHistoryKey;
+<span class="macro">impl_db_record!</span>(
+    key = LastEpochKey,
+    value = EpochHistoryKey,
+    db_prefix = DbKeyPrefix::LastEpoch
+);
+
+<span class="attr">#[derive(Debug, Encodable, Decodable, Serialize)]
+</span><span class="kw">pub struct </span>ClientConfigSignatureKey;
+
+<span class="attr">#[derive(Debug, Encodable, Decodable)]
+</span><span class="kw">pub struct </span>ClientConfigSignatureKeyPrefix;
+
+<span class="macro">impl_db_record!</span>(
+    key = ClientConfigSignatureKey,
+    value = SerdeSignature,
+    db_prefix = DbKeyPrefix::ClientConfigSignature,
+);
+<span class="macro">impl_db_lookup!</span>(
+    key = ClientConfigSignatureKey,
+    query_prefix = ClientConfigSignatureKeyPrefix
+);
+
+<span class="attr">#[derive(Debug, Encodable, Decodable, Serialize)]
+</span><span class="kw">pub struct </span>ConsensusUpgradeKey;
+
+<span class="macro">impl_db_record!</span>(
+    key = ConsensusUpgradeKey,
+    value = BTreeSet&lt;PeerId&gt;,
+    db_prefix = DbKeyPrefix::ConsensusUpgrade,
+);
+
+<span class="kw">pub fn </span>get_global_database_migrations&lt;<span class="lifetime">&#39;a</span>&gt;() -&gt; MigrationMap&lt;<span class="lifetime">&#39;a</span>&gt; {
+    MigrationMap::new()
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="fedimint_server" data-themes="" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (b28d30e1e 2022-12-06)" data-search-js="search-444266647c4dba98.js" data-settings-js="settings-bebeae96e00e4617.js" data-settings-css="settings-af96d9e2fc13e081.css" ></div></body></html>
+</section></main><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="fedimint_server" data-themes="" data-resource-suffix="" data-rustdoc-version="1.69.0-nightly (f3126500f 2023-02-02)" data-search-js="search-98d53477a794af0b.js" data-settings-js="settings-f0c5c39777a9a2f6.js" data-settings-css="settings-0bcba95ff279c1db.css" ></div></body></html>

@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"mod":[["encrypt",""],["ui",""]]};
+window.SIDEBAR_ITEMS = {"fn":[["configure_modules","Generates the configuration for the modules configured in the server binary"]],"mod":[["distributed_gen","Module for creating `distributetgen` binary with custom modules"],["fedimintd","Module for creating `fedimintd` binary with custom modules"],["ui",""]]};

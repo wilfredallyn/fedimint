@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `fedimint-core/src/epoch.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>epoch.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-389f8b4a37bc03c9.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../static.files/light-046227e470cd3629.css"><link rel="stylesheet" disabled href="../../static.files/dark-800f2ee593c8e6f7.css"><link rel="stylesheet" disabled href="../../static.files/ayu-9edae3c387f5a5b3.css"><script id="default-settings" ></script><script src="../../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../../static.files/source-script-5cf2e01a42cc9858.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-287cecec4dbb45b0.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><div class="width-limiter"><nav class="sub"><a class="sub-logo-container" href="../../fedimint_core/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `fedimint-core/src/epoch.rs`."><title>epoch.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-505eba68f310f6bf.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../static.files/light-f501212b8b071243.css"><link rel="stylesheet" disabled href="../../static.files/dark-e92fc12c34ff89d3.css"><link rel="stylesheet" disabled href="../../static.files/ayu-c8c85693c8a4f9db.css"><script id="default-settings" ></script><script src="../../static.files/storage-3891ce972e3a2bf8.js"></script><script defer src="../../static.files/source-script-ea63cb6500f71309.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-364b95f387bc3166.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../fedimint_core/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -349,45 +349,81 @@
 <a href="#349" id="349">349</a>
 <a href="#350" id="350">350</a>
 <a href="#351" id="351">351</a>
-</pre><pre class="rust"><code><span class="kw">use </span>std::collections::{BTreeMap, HashSet};
+<a href="#352" id="352">352</a>
+<a href="#353" id="353">353</a>
+<a href="#354" id="354">354</a>
+<a href="#355" id="355">355</a>
+<a href="#356" id="356">356</a>
+<a href="#357" id="357">357</a>
+<a href="#358" id="358">358</a>
+<a href="#359" id="359">359</a>
+<a href="#360" id="360">360</a>
+<a href="#361" id="361">361</a>
+<a href="#362" id="362">362</a>
+<a href="#363" id="363">363</a>
+<a href="#364" id="364">364</a>
+<a href="#365" id="365">365</a>
+<a href="#366" id="366">366</a>
+<a href="#367" id="367">367</a>
+<a href="#368" id="368">368</a>
+<a href="#369" id="369">369</a>
+<a href="#370" id="370">370</a>
+<a href="#371" id="371">371</a>
+<a href="#372" id="372">372</a>
+<a href="#373" id="373">373</a>
+</pre><pre class="rust"><code><span class="kw">use </span>std::collections::{BTreeMap, BTreeSet, HashSet};
 
 <span class="kw">use </span>bitcoin_hashes::sha256::Hash <span class="kw">as </span>Sha256;
-<span class="kw">use </span>bitcoin_hashes::sha256::HashEngine;
-<span class="kw">use </span>fedimint_api::core::{ConsensusItem <span class="kw">as </span>ModuleConsensusItem, ModuleDecode};
-<span class="kw">use </span>fedimint_api::encoding::{Decodable, DecodeError, Encodable, ModuleRegistry, UnzipConsensus};
-<span class="kw">use </span>fedimint_api::{serde_module_encoding_wrapper, BitcoinHash, PeerId};
+<span class="kw">use </span>fedimint_core::core::DynModuleConsensusItem <span class="kw">as </span>ModuleConsensusItem;
+<span class="kw">use </span>fedimint_core::encoding::{Decodable, DecodeError, Encodable, UnzipConsensus};
+<span class="kw">use </span>fedimint_core::module::registry::ModuleDecoderRegistry;
+<span class="kw">use </span>fedimint_core::module::SerdeModuleEncoding;
+<span class="kw">use </span>fedimint_core::{PeerId, TransactionId};
 <span class="kw">use </span>itertools::Itertools;
 <span class="kw">use </span>serde::{Deserialize, Serialize};
 <span class="kw">use </span>threshold_crypto::{PublicKey, PublicKeySet, Signature, SignatureShare};
 
 <span class="kw">use </span><span class="kw">crate</span>::transaction::Transaction;
 
-<span class="attr">#[derive(Debug, Clone, Eq, PartialEq, Hash, UnzipConsensus, Encodable, Decodable)]
+<span class="doccomment">/// All the items that may be produced during a consensus epoch
+</span><span class="attr">#[derive(Debug, Clone, Eq, PartialEq, Hash, UnzipConsensus, Encodable, Decodable)]
 </span><span class="kw">pub enum </span>ConsensusItem {
-    EpochInfo(EpochSignatureShare),
-    Transaction(Transaction),
-    Module(ModuleConsensusItem),
+    <span class="doccomment">/// Fed shutdown occurs once a threshold want to upgrade
+    </span>ConsensusUpgrade(ConsensusUpgrade),
+    <span class="doccomment">/// Threshold sign the configs for verification via the API
+    </span>ClientConfigSignatureShare(SerdeSignatureShare),
+    <span class="doccomment">/// Threshold sign the epoch history for verification via the API
+    </span>EpochOutcomeSignatureShare(SerdeSignatureShare),
+    <span class="doccomment">/// Fedimint tx that contains module inputs and outputs that are net
+    /// equal
+    </span>Transaction(Transaction),
+    <span class="doccomment">/// Any data that modules require consensus on
+    </span>Module(ModuleConsensusItem),
 }
 
-<span class="macro">serde_module_encoding_wrapper!</span>(SerdeConsensusItem, ConsensusItem);
+<span class="doccomment">/// May eventually contains consensus info about the upgrade
+</span><span class="attr">#[derive(Debug, Clone, Eq, PartialEq, Hash, Encodable, Decodable)]
+</span><span class="kw">pub struct </span>ConsensusUpgrade;
+
+<span class="kw">pub type </span>SerdeConsensusItem = SerdeModuleEncoding&lt;ConsensusItem&gt;;
 
 <span class="attr">#[derive(Debug, Clone, Eq, PartialEq, Hash, Serialize, Deserialize)]
-</span><span class="kw">pub struct </span>EpochSignatureShare(<span class="kw">pub </span>SignatureShare);
+</span><span class="kw">pub struct </span>SerdeSignatureShare(<span class="kw">pub </span>SignatureShare);
 
 <span class="attr">#[derive(Debug, Clone, Eq, PartialEq, Hash, Serialize, Deserialize)]
-</span><span class="kw">pub struct </span>EpochSignature(<span class="kw">pub </span>Signature);
+</span><span class="kw">pub struct </span>SerdeSignature(<span class="kw">pub </span>Signature);
 
 <span class="attr">#[derive(Debug, Clone, Eq, PartialEq, Hash, Encodable, Decodable)]
-</span><span class="kw">pub struct </span>EpochHistory {
-    <span class="kw">pub </span>outcome: OutcomeHistory,
+</span><span class="kw">pub struct </span>SignedEpochOutcome {
+    <span class="kw">pub </span>outcome: EpochOutcome,
     <span class="kw">pub </span>hash: Sha256,
-    <span class="kw">pub </span>signature: <span class="prelude-ty">Option</span>&lt;EpochSignature&gt;,
+    <span class="kw">pub </span>signature: <span class="prelude-ty">Option</span>&lt;SerdeSignature&gt;,
 }
 
-<span class="macro">serde_module_encoding_wrapper!</span>(SerdeEpochHistory, EpochHistory);
+<span class="kw">pub type </span>SerdeEpochHistory = SerdeModuleEncoding&lt;SignedEpochOutcome&gt;;
 
 <span class="attr">#[derive(Debug, Clone, Eq, PartialEq, Hash, Encodable, Decodable)]
-</span><span class="kw">pub struct </span>OutcomeHistory {
+</span><span class="kw">pub struct </span>EpochOutcome {
     <span class="kw">pub </span>epoch: u64,
     <span class="kw">pub </span>last_hash: <span class="prelude-ty">Option</span>&lt;Sha256&gt;,
     <span class="doccomment">/// All the consensus items along with the `PeerId` of the
@@ -395,35 +431,34 @@
     /// Some of the consensus items here might be invalid,
     /// (eg. transaction double-spending) but they were still
     /// submitted and considered as accepted.
+    </span><span class="comment">// TODO: It would be better to encode this as `Vec&lt;(ConsensusItem, Vec&lt;PeerId&gt;)&gt;`
+    // to avoid duplicates (and make iterating over it nicer too in a lot of uses).
     </span><span class="kw">pub </span>items: Vec&lt;(PeerId, Vec&lt;ConsensusItem&gt;)&gt;,
+
+    <span class="doccomment">/// Transactions from `items` that turned out to be invalid.
+    </span><span class="kw">pub </span>rejected_txs: BTreeSet&lt;TransactionId&gt;,
 }
 
-<span class="kw">impl </span>OutcomeHistory {
-    <span class="kw">pub fn </span>hash(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Sha256 {
-        <span class="kw">let </span><span class="kw-2">mut </span>engine = HashEngine::default();
-        <span class="self">self</span>.consensus_encode(<span class="kw-2">&amp;mut </span>engine).unwrap();
-        Sha256::from_engine(engine)
-    }
-}
-
-<span class="kw">impl </span>EpochHistory {
+<span class="kw">impl </span>SignedEpochOutcome {
     <span class="kw">pub fn </span>new(
         epoch: u64,
         contributions: BTreeMap&lt;PeerId, Vec&lt;ConsensusItem&gt;&gt;,
-        prev_epoch: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span>&lt;EpochHistory&gt;,
+        rejected_txs: BTreeSet&lt;TransactionId&gt;,
+        prev_epoch: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>SignedEpochOutcome&gt;,
     ) -&gt; <span class="self">Self </span>{
         <span class="kw">let </span>items = contributions
             .into_iter()
             .sorted_by_key(|(peer, <span class="kw">_</span>)| <span class="kw-2">*</span>peer)
             .collect();
-        <span class="kw">let </span>outcome = OutcomeHistory {
-            last_hash: prev_epoch.clone().map(|epoch| epoch.hash),
+        <span class="kw">let </span>outcome = EpochOutcome {
+            last_hash: prev_epoch.map(|epoch| epoch.hash),
             items,
             epoch,
+            rejected_txs,
         };
 
-        EpochHistory {
-            hash: outcome.hash(),
+        SignedEpochOutcome {
+            hash: outcome.consensus_hash().expect(<span class="string">&quot;Hashes&quot;</span>),
             outcome,
             signature: <span class="prelude-val">None</span>,
         }
@@ -432,8 +467,8 @@
     <span class="kw">pub fn </span>add_sig_to_prev(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         pks: <span class="kw-2">&amp;</span>PublicKeySet,
-        <span class="kw-2">mut </span>prev_epoch: EpochHistory,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;EpochHistory, EpochVerifyError&gt; {
+        <span class="kw-2">mut </span>prev_epoch: SignedEpochOutcome,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;SignedEpochOutcome, EpochVerifyError&gt; {
         <span class="kw">let </span><span class="kw-2">mut </span>contributing_peers = HashSet::new();
 
         <span class="kw">let </span>sigs: BTreeMap&lt;<span class="kw">_</span>, <span class="kw">_</span>&gt; = <span class="self">self
@@ -442,7 +477,9 @@
             .iter()
             .flat_map(|(peer, items)| items.iter().map(|i| (<span class="kw-2">*</span>peer, i)))
             .filter_map(|(peer, item)| <span class="kw">match </span>item {
-                ConsensusItem::EpochInfo(EpochSignatureShare(sig)) =&gt; <span class="prelude-val">Some</span>((peer, sig)),
+                ConsensusItem::EpochOutcomeSignatureShare(SerdeSignatureShare(sig)) =&gt; {
+                    <span class="prelude-val">Some</span>((peer, sig))
+                }
                 <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
             })
             .filter(|(peer, sig)| {
@@ -458,7 +495,7 @@
         <span class="kw">if let </span><span class="prelude-val">Ok</span>(final_sig) = pks.combine_signatures(sigs) {
             <span class="macro">assert!</span>(pks.public_key().verify(<span class="kw-2">&amp;</span>final_sig, prev_epoch.hash));
 
-            prev_epoch.signature = <span class="prelude-val">Some</span>(EpochSignature(final_sig));
+            prev_epoch.signature = <span class="prelude-val">Some</span>(SerdeSignature(final_sig));
             <span class="prelude-val">Ok</span>(prev_epoch)
         } <span class="kw">else </span>{
             <span class="prelude-val">Err</span>(EpochVerifyError::NotEnoughValidSigShares(
@@ -467,9 +504,9 @@
         }
     }
 
-    <span class="kw">pub fn </span>verify_sig(<span class="kw-2">&amp;</span><span class="self">self</span>, pks: <span class="kw-2">&amp;</span>PublicKey) -&gt; <span class="prelude-ty">Result</span>&lt;(), EpochVerifyError&gt; {
+    <span class="kw">pub fn </span>verify_sig(<span class="kw-2">&amp;</span><span class="self">self</span>, pk: <span class="kw-2">&amp;</span>PublicKey) -&gt; <span class="prelude-ty">Result</span>&lt;(), EpochVerifyError&gt; {
         <span class="kw">if let </span><span class="prelude-val">Some</span>(sig) = <span class="kw-2">&amp;</span><span class="self">self</span>.signature {
-            <span class="kw">if </span>!pks.verify(<span class="kw-2">&amp;</span>sig.<span class="number">0</span>, <span class="self">self</span>.hash) {
+            <span class="kw">if </span>!pk.verify(<span class="kw-2">&amp;</span>sig.<span class="number">0</span>, <span class="self">self</span>.hash) {
                 <span class="kw">return </span><span class="prelude-val">Err</span>(EpochVerifyError::InvalidSignature);
             }
         } <span class="kw">else </span>{
@@ -479,18 +516,22 @@
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">pub fn </span>verify_hash(<span class="kw-2">&amp;</span><span class="self">self</span>, prev_epoch: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span>&lt;EpochHistory&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;(), EpochVerifyError&gt; {
+    <span class="kw">pub fn </span>verify_hash(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        prev_epoch: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span>&lt;SignedEpochOutcome&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;(), EpochVerifyError&gt; {
         <span class="kw">if </span><span class="self">self</span>.outcome.epoch &gt; <span class="number">0 </span>{
             <span class="kw">match </span>prev_epoch {
                 <span class="prelude-val">None </span>=&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(EpochVerifyError::MissingPreviousEpoch),
-                <span class="prelude-val">Some</span>(epoch) <span class="kw">if </span><span class="prelude-val">Some</span>(epoch.outcome.hash()) != <span class="self">self</span>.outcome.last_hash =&gt; {
-                    <span class="kw">return </span><span class="prelude-val">Err</span>(EpochVerifyError::InvalidPreviousEpochHash)
+                <span class="prelude-val">Some</span>(prev_epoch) =&gt; {
+                    <span class="kw">if </span>prev_epoch.outcome.consensus_hash().ok() != <span class="self">self</span>.outcome.last_hash {
+                        <span class="kw">return </span><span class="prelude-val">Err</span>(EpochVerifyError::InvalidPreviousEpochHash);
+                    }
                 }
-                <span class="kw">_ </span>=&gt; {}
             }
         }
 
-        <span class="kw">if </span><span class="self">self</span>.hash == <span class="self">self</span>.outcome.hash() {
+        <span class="kw">if </span><span class="prelude-val">Some</span>(<span class="self">self</span>.hash) == <span class="self">self</span>.outcome.consensus_hash().ok() {
             <span class="prelude-val">Ok</span>(())
         } <span class="kw">else </span>{
             <span class="prelude-val">Err</span>(EpochVerifyError::InvalidEpochHash)
@@ -508,43 +549,37 @@
     NotEnoughValidSigShares(HashSet&lt;PeerId&gt;),
 }
 
-<span class="kw">impl </span>Encodable <span class="kw">for </span>EpochSignature {
+<span class="kw">impl </span>Encodable <span class="kw">for </span>SerdeSignature {
     <span class="kw">fn </span>consensus_encode&lt;W: std::io::Write&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, writer: <span class="kw-2">&amp;mut </span>W) -&gt; <span class="prelude-ty">Result</span>&lt;usize, std::io::Error&gt; {
         <span class="self">self</span>.<span class="number">0</span>.to_bytes().consensus_encode(writer)
     }
 }
 
-<span class="kw">impl </span>Decodable <span class="kw">for </span>EpochSignature {
-    <span class="kw">fn </span>consensus_decode&lt;M, D: std::io::Read&gt;(
+<span class="kw">impl </span>Decodable <span class="kw">for </span>SerdeSignature {
+    <span class="kw">fn </span>consensus_decode&lt;D: std::io::Read&gt;(
         d: <span class="kw-2">&amp;mut </span>D,
-        _modules: <span class="kw-2">&amp;</span>ModuleRegistry&lt;M&gt;,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, DecodeError&gt;
-    <span class="kw">where
-        </span>M: ModuleDecode,
-    {
+        _modules: <span class="kw-2">&amp;</span>ModuleDecoderRegistry,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, DecodeError&gt; {
         <span class="kw">let </span><span class="kw-2">mut </span>bytes = [<span class="number">0u8</span>; <span class="number">96</span>];
         d.read_exact(<span class="kw-2">&amp;mut </span>bytes).map_err(DecodeError::from_err)<span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>(EpochSignature(Signature::from_bytes(bytes).unwrap()))
+        <span class="prelude-val">Ok</span>(SerdeSignature(Signature::from_bytes(bytes).unwrap()))
     }
 }
 
-<span class="kw">impl </span>Encodable <span class="kw">for </span>EpochSignatureShare {
+<span class="kw">impl </span>Encodable <span class="kw">for </span>SerdeSignatureShare {
     <span class="kw">fn </span>consensus_encode&lt;W: std::io::Write&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, writer: <span class="kw-2">&amp;mut </span>W) -&gt; <span class="prelude-ty">Result</span>&lt;usize, std::io::Error&gt; {
         <span class="self">self</span>.<span class="number">0</span>.to_bytes().consensus_encode(writer)
     }
 }
 
-<span class="kw">impl </span>Decodable <span class="kw">for </span>EpochSignatureShare {
-    <span class="kw">fn </span>consensus_decode&lt;M, D: std::io::Read&gt;(
+<span class="kw">impl </span>Decodable <span class="kw">for </span>SerdeSignatureShare {
+    <span class="kw">fn </span>consensus_decode&lt;D: std::io::Read&gt;(
         d: <span class="kw-2">&amp;mut </span>D,
-        _modules: <span class="kw-2">&amp;</span>ModuleRegistry&lt;M&gt;,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, DecodeError&gt;
-    <span class="kw">where
-        </span>M: ModuleDecode,
-    {
+        _modules: <span class="kw-2">&amp;</span>ModuleDecoderRegistry,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, DecodeError&gt; {
         <span class="kw">let </span><span class="kw-2">mut </span>bytes = [<span class="number">0u8</span>; <span class="number">96</span>];
         d.read_exact(<span class="kw-2">&amp;mut </span>bytes).map_err(DecodeError::from_err)<span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>(EpochSignatureShare(
+        <span class="prelude-val">Ok</span>(SerdeSignatureShare(
             SignatureShare::from_bytes(bytes).unwrap(),
         ))
     }
@@ -552,40 +587,45 @@
 
 <span class="attr">#[cfg(test)]
 </span><span class="kw">mod </span>tests {
-    <span class="kw">use </span>std::collections::HashSet;
+    <span class="kw">use </span>std::collections::{BTreeSet, HashSet};
 
     <span class="kw">use </span>bitcoin::hashes::Hash;
-    <span class="kw">use </span>fedimint_api::PeerId;
+    <span class="kw">use </span>fedimint_core::encoding::Encodable;
+    <span class="kw">use </span>fedimint_core::PeerId;
     <span class="kw">use </span>rand::rngs::OsRng;
     <span class="kw">use </span>threshold_crypto::{SecretKey, SecretKeySet};
 
-    <span class="kw">use </span><span class="kw">crate</span>::epoch::{ConsensusItem, EpochSignatureShare, Sha256};
-    <span class="kw">use </span><span class="kw">crate</span>::epoch::{EpochHistory, EpochSignature, EpochVerifyError, OutcomeHistory};
+    <span class="kw">use </span><span class="kw">crate</span>::epoch::{
+        ConsensusItem, EpochOutcome, EpochVerifyError, SerdeSignature, SerdeSignatureShare, Sha256,
+        SignedEpochOutcome,
+    };
 
     <span class="kw">fn </span>signed_history(
         epoch: u16,
-        prev_epoch: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span>&lt;EpochHistory&gt;,
+        prev_epoch: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span>&lt;SignedEpochOutcome&gt;,
         sk: <span class="kw-2">&amp;</span>SecretKey,
-    ) -&gt; EpochHistory {
+    ) -&gt; SignedEpochOutcome {
         <span class="kw">let </span>missing_sig = history(epoch, prev_epoch, <span class="prelude-val">None</span>);
-        <span class="kw">let </span>signature = sk.sign(missing_sig.outcome.hash());
-        history(epoch, prev_epoch, <span class="prelude-val">Some</span>(EpochSignature(signature)))
+        <span class="kw">let </span>signature = sk.sign(missing_sig.outcome.consensus_hash().expect(<span class="string">&quot;Hashes&quot;</span>));
+        history(epoch, prev_epoch, <span class="prelude-val">Some</span>(SerdeSignature(signature)))
     }
 
     <span class="kw">fn </span>history(
         epoch: u16,
-        prev_epoch: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span>&lt;EpochHistory&gt;,
-        signature: <span class="prelude-ty">Option</span>&lt;EpochSignature&gt;,
-    ) -&gt; EpochHistory {
+        prev_epoch: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span>&lt;SignedEpochOutcome&gt;,
+        signature: <span class="prelude-ty">Option</span>&lt;SerdeSignature&gt;,
+    ) -&gt; SignedEpochOutcome {
         <span class="kw">let </span>items = <span class="macro">vec!</span>[(PeerId::from(epoch), <span class="macro">vec!</span>[])];
-        <span class="kw">let </span>outcome = OutcomeHistory {
+        <span class="kw">let </span>outcome = EpochOutcome {
             last_hash: prev_epoch.clone().map(|epoch| epoch.hash),
             items,
             epoch: epoch <span class="kw">as </span>u64,
+            <span class="comment">// seems like in these tests we don&#39;t care about this one
+            </span>rejected_txs: BTreeSet::default(),
         };
 
-        EpochHistory {
-            hash: outcome.hash(),
+        SignedEpochOutcome {
+            hash: outcome.consensus_hash().expect(<span class="string">&quot;Hashes&quot;</span>),
             outcome,
             signature,
         }
@@ -607,15 +647,18 @@
                 <span class="kw">let </span>sig = sk_set.secret_key_share(peer.to_usize()).sign(epoch0.hash);
                 (
                     peer,
-                    <span class="macro">vec!</span>[ConsensusItem::EpochInfo(EpochSignatureShare(sig))],
+                    <span class="macro">vec!</span>[ConsensusItem::EpochOutcomeSignatureShare(
+                        SerdeSignatureShare(sig),
+                    )],
                 )
             })
             .collect();
 
-        epoch1.outcome = OutcomeHistory {
+        epoch1.outcome = EpochOutcome {
             epoch: <span class="number">1</span>,
             last_hash: <span class="prelude-val">None</span>,
             items: sigs[<span class="number">0</span>..<span class="number">1</span>].to_vec(),
+            rejected_txs: BTreeSet::default(),
         };
         <span class="kw">let </span>contributing = HashSet::from([PeerId::from(<span class="number">0</span>)]);
         <span class="kw">let </span>result = epoch1.add_sig_to_prev(<span class="kw-2">&amp;</span>pk_set, epoch0.clone()).unwrap_err();
@@ -624,10 +667,11 @@
             EpochVerifyError::NotEnoughValidSigShares(contributing)
         );
 
-        epoch1.outcome = OutcomeHistory {
+        epoch1.outcome = EpochOutcome {
             epoch: <span class="number">1</span>,
             last_hash: <span class="prelude-val">None</span>,
             items: sigs,
+            rejected_txs: BTreeSet::default(),
         };
         <span class="kw">let </span>epoch0 = epoch1.add_sig_to_prev(<span class="kw-2">&amp;</span>pk_set, epoch0).unwrap();
         <span class="macro">assert_eq!</span>(epoch0.verify_sig(<span class="kw-2">&amp;</span>pk_set.public_key()), <span class="prelude-val">Ok</span>(()));
@@ -638,10 +682,10 @@
         <span class="kw">let </span>sk: SecretKey = SecretKey::random();
         <span class="kw">let </span>_pk = sk.public_key();
         <span class="kw">let </span>wrong_hash: Sha256 = Hash::hash(<span class="string">b&quot;wrong&quot;</span>);
-        <span class="kw">let </span>sig = EpochSignature(sk.sign(wrong_hash));
+        <span class="kw">let </span>sig = SerdeSignature(sk.sign(wrong_hash));
 
         <span class="kw">let </span>epoch0 = history(<span class="number">0</span>, <span class="kw-2">&amp;</span><span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(sig));
-        <span class="kw">let </span>epoch = EpochHistory {
+        <span class="kw">let </span>epoch = SignedEpochOutcome {
             outcome: epoch0.outcome,
             hash: wrong_hash,
             signature: epoch0.signature,
@@ -701,4 +745,4 @@
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="fedimint_core" data-themes="" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (b28d30e1e 2022-12-06)" data-search-js="search-444266647c4dba98.js" data-settings-js="settings-bebeae96e00e4617.js" data-settings-css="settings-af96d9e2fc13e081.css" ></div></body></html>
+</section></main><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="fedimint_core" data-themes="" data-resource-suffix="" data-rustdoc-version="1.69.0-nightly (f3126500f 2023-02-02)" data-search-js="search-98d53477a794af0b.js" data-settings-js="settings-f0c5c39777a9a2f6.js" data-settings-css="settings-0bcba95ff279c1db.css" ></div></body></html>

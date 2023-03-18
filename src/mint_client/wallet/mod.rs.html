@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `client/client-lib/src/wallet/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-389f8b4a37bc03c9.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../../static.files/light-046227e470cd3629.css"><link rel="stylesheet" disabled href="../../../static.files/dark-800f2ee593c8e6f7.css"><link rel="stylesheet" disabled href="../../../static.files/ayu-9edae3c387f5a5b3.css"><script id="default-settings" ></script><script src="../../../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../../../static.files/source-script-5cf2e01a42cc9858.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-287cecec4dbb45b0.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><div class="width-limiter"><nav class="sub"><a class="sub-logo-container" href="../../../mint_client/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `client/client-lib/src/wallet/mod.rs`."><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-505eba68f310f6bf.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../../static.files/light-f501212b8b071243.css"><link rel="stylesheet" disabled href="../../../static.files/dark-e92fc12c34ff89d3.css"><link rel="stylesheet" disabled href="../../../static.files/ayu-c8c85693c8a4f9db.css"><script id="default-settings" ></script><script src="../../../static.files/storage-3891ce972e3a2bf8.js"></script><script defer src="../../../static.files/source-script-ea63cb6500f71309.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-364b95f387bc3166.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../mint_client/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -415,118 +415,76 @@
 <a href="#415" id="415">415</a>
 <a href="#416" id="416">416</a>
 <a href="#417" id="417">417</a>
-<a href="#418" id="418">418</a>
-<a href="#419" id="419">419</a>
-<a href="#420" id="420">420</a>
-<a href="#421" id="421">421</a>
-<a href="#422" id="422">422</a>
-<a href="#423" id="423">423</a>
-<a href="#424" id="424">424</a>
-<a href="#425" id="425">425</a>
-<a href="#426" id="426">426</a>
-<a href="#427" id="427">427</a>
-<a href="#428" id="428">428</a>
-<a href="#429" id="429">429</a>
-<a href="#430" id="430">430</a>
-<a href="#431" id="431">431</a>
-<a href="#432" id="432">432</a>
-<a href="#433" id="433">433</a>
-<a href="#434" id="434">434</a>
-<a href="#435" id="435">435</a>
-<a href="#436" id="436">436</a>
-<a href="#437" id="437">437</a>
-<a href="#438" id="438">438</a>
-<a href="#439" id="439">439</a>
-<a href="#440" id="440">440</a>
-<a href="#441" id="441">441</a>
-<a href="#442" id="442">442</a>
-<a href="#443" id="443">443</a>
-<a href="#444" id="444">444</a>
-<a href="#445" id="445">445</a>
-<a href="#446" id="446">446</a>
-<a href="#447" id="447">447</a>
-<a href="#448" id="448">448</a>
-<a href="#449" id="449">449</a>
-<a href="#450" id="450">450</a>
-<a href="#451" id="451">451</a>
-<a href="#452" id="452">452</a>
-<a href="#453" id="453">453</a>
-<a href="#454" id="454">454</a>
-<a href="#455" id="455">455</a>
-<a href="#456" id="456">456</a>
-<a href="#457" id="457">457</a>
-<a href="#458" id="458">458</a>
-<a href="#459" id="459">459</a>
-<a href="#460" id="460">460</a>
 </pre><pre class="rust"><code><span class="kw">use </span>std::sync::Arc;
 
-<span class="kw">use </span>bitcoin::Address;
-<span class="kw">use </span>bitcoin::KeyPair;
+<span class="kw">use </span>bitcoin::{Address, KeyPair};
 <span class="kw">use </span>db::PegInKey;
-<span class="kw">use </span>fedimint_api::core::client::ClientModulePlugin;
-<span class="kw">use </span>fedimint_api::core::{ModuleKey, MODULE_KEY_WALLET};
-<span class="kw">use </span>fedimint_api::db::DatabaseTransaction;
-<span class="kw">use </span>fedimint_api::encoding::ModuleRegistry;
-<span class="kw">use </span>fedimint_api::module::TransactionItemAmount;
-<span class="kw">use </span>fedimint_api::{Amount, ServerModulePlugin};
-<span class="kw">use </span>fedimint_core::modules::wallet::config::WalletClientConfig;
-<span class="kw">use </span>fedimint_core::modules::wallet::tweakable::Tweakable;
-<span class="kw">use </span>fedimint_core::modules::wallet::txoproof::{PegInProof, PegInProofError, TxOutProof};
-<span class="kw">use </span>fedimint_core::modules::wallet::{Wallet, WalletOutputOutcome};
+<span class="kw">use </span>fedimint_core::api::{GlobalFederationApi, OutputOutcomeError};
+<span class="kw">use </span>fedimint_core::core::client::ClientModule;
+<span class="kw">use </span>fedimint_core::core::Decoder;
+<span class="kw">use </span>fedimint_core::db::DatabaseTransaction;
+<span class="kw">use </span>fedimint_core::module::{ModuleCommon, TransactionItemAmount};
+<span class="kw">use </span>fedimint_core::Amount;
 <span class="kw">use </span>rand::{CryptoRng, RngCore};
 <span class="kw">use </span>thiserror::Error;
 <span class="kw">use </span>tracing::debug;
 
+<span class="kw">use </span><span class="kw">crate</span>::modules::wallet::config::WalletClientConfig;
+<span class="kw">use </span><span class="kw">crate</span>::modules::wallet::tweakable::Tweakable;
+<span class="kw">use </span><span class="kw">crate</span>::modules::wallet::txoproof::{PegInProof, PegInProofError, TxOutProof};
+<span class="kw">use </span><span class="kw">crate</span>::modules::wallet::{WalletInput, WalletModuleTypes, WalletOutput, WalletOutputOutcome};
+<span class="kw">use </span><span class="kw">crate</span>::outcome::legacy::OutputOutcome;
 <span class="kw">use </span><span class="kw">crate</span>::utils::ClientContext;
-<span class="kw">use </span><span class="kw">crate</span>::ApiError;
+<span class="kw">use </span><span class="kw">crate</span>::MemberError;
 
 <span class="kw">pub mod </span>db;
-<span class="kw">pub mod </span>decode_stub;
 
-<span class="doccomment">/// Federation module client for the Wallet module. It can both create transaction inputs and
-/// outputs of the wallet (on-chain) type.
+<span class="doccomment">/// Federation module client for the Wallet module. It can both create
+/// transaction inputs and outputs of the wallet (on-chain) type.
 </span><span class="attr">#[derive(Debug)]
 </span><span class="kw">pub struct </span>WalletClient {
     <span class="kw">pub </span>config: WalletClientConfig,
     <span class="kw">pub </span>context: Arc&lt;ClientContext&gt;,
 }
 
-<span class="kw">impl </span>ClientModulePlugin <span class="kw">for </span>WalletClient {
-    <span class="kw">type </span>Decoder = &lt;Wallet <span class="kw">as </span>ServerModulePlugin&gt;::Decoder;
-    <span class="kw">type </span>Module = Wallet;
-    <span class="kw">const </span>MODULE_KEY: ModuleKey = MODULE_KEY_WALLET;
+<span class="kw">impl </span>ClientModule <span class="kw">for </span>WalletClient {
+    <span class="kw">const </span>KIND: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;wallet&quot;</span>;
+    <span class="kw">type </span>Module = WalletModuleTypes;
 
-    <span class="kw">fn </span>input_amount(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        input: <span class="kw-2">&amp;</span>&lt;<span class="self">Self</span>::Module <span class="kw">as </span>ServerModulePlugin&gt;::Input,
-    ) -&gt; TransactionItemAmount {
+    <span class="kw">fn </span>decoder(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Decoder {
+        WalletModuleTypes::decoder()
+    }
+
+    <span class="kw">fn </span>input_amount(<span class="kw-2">&amp;</span><span class="self">self</span>, input: <span class="kw-2">&amp;</span>WalletInput) -&gt; TransactionItemAmount {
         TransactionItemAmount {
-            amount: Amount::from_sat(input.tx_output().value),
+            amount: Amount::from_sats(input.tx_output().value),
             fee: <span class="self">self</span>.config.fee_consensus.peg_in_abs,
         }
     }
 
-    <span class="kw">fn </span>output_amount(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        output: <span class="kw-2">&amp;</span>&lt;<span class="self">Self</span>::Module <span class="kw">as </span>ServerModulePlugin&gt;::Output,
-    ) -&gt; TransactionItemAmount {
+    <span class="kw">fn </span>output_amount(<span class="kw-2">&amp;</span><span class="self">self</span>, output: <span class="kw-2">&amp;</span>WalletOutput) -&gt; TransactionItemAmount {
         TransactionItemAmount {
-            amount: (output.amount + output.fees.amount()).into(),
+            amount: output.amount().into(),
             fee: <span class="self">self</span>.config.fee_consensus.peg_out_abs,
         }
     }
 }
 
 <span class="kw">impl </span>WalletClient {
-    <span class="doccomment">/// Returns a bitcoin-address derived from the federations peg-in-descriptor and a random tweak
+    <span class="doccomment">/// Returns a bitcoin-address derived from the federations peg-in-descriptor
+    /// and a random tweak
     ///
-    /// This function will create a public/secret [keypair](bitcoin::KeyPair). The public key is used to tweak the
-    /// federations peg-in-descriptor resulting in a bitcoin script. Both script and keypair are stored in the DB
-    /// by using the script as part of the key and the keypair as the value. Even though only the public-key is used to tweak
-    /// the descriptor, the secret-key is needed to prove that one actually created the tweak to be able to claim the funds and
+    /// This function will create a public/secret [keypair](bitcoin::KeyPair).
+    /// The public key is used to tweak the federations peg-in-descriptor
+    /// resulting in a bitcoin script. Both script and keypair are stored in the
+    /// DB by using the script as part of the key and the keypair as the
+    /// value. Even though only the public-key is used to tweak
+    /// the descriptor, the secret-key is needed to prove that one actually
+    /// created the tweak to be able to claim the funds and
     /// prevent front-running by a malicious  federation member
-    /// The returned bitcoin-address is derived from the script. Thus sending bitcoin to that address will result in a
-    /// transaction containing the scripts public-key in at least one of it&#39;s outpoints.
+    /// The returned bitcoin-address is derived from the script. Thus sending
+    /// bitcoin to that address will result in a transaction containing the
+    /// scripts public-key in at least one of it&#39;s outpoints.
     </span><span class="kw">pub async fn </span>get_new_pegin_address&lt;<span class="lifetime">&#39;a</span>, R: RngCore + CryptoRng&gt;(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         dbtx: <span class="kw-2">&amp;mut </span>DatabaseTransaction&lt;<span class="lifetime">&#39;a</span>&gt;,
@@ -552,8 +510,7 @@
             },
             <span class="kw-2">&amp;</span>peg_in_keypair.secret_bytes(),
         )
-        .<span class="kw">await
-        </span>.expect(<span class="string">&quot;DB Error&quot;</span>);
+        .<span class="kw">await</span>;
 
         address
     }
@@ -569,13 +526,13 @@
                 <span class="kw">let </span>result = <span class="self">self
                     </span>.context
                     .db
-                    .begin_transaction(ModuleRegistry::default())
-                    .get_value(<span class="kw-2">&amp;</span>PegInKey {
+                    .begin_transaction()
+                    .<span class="kw">await
+                    </span>.get_value(<span class="kw-2">&amp;</span>PegInKey {
                         peg_in_script: out.script_pubkey.clone(),
                     })
                     .<span class="kw">await
-                    </span>.expect(<span class="string">&quot;DB error&quot;</span>)
-                    .map(|tweak_secret| (idx, tweak_secret));
+                    </span>.map(|tweak_secret| (idx, tweak_secret));
                 <span class="kw">if </span>result.is_some() {
                     <span class="kw">return </span>result;
                 }
@@ -603,7 +560,7 @@
             .verify(<span class="kw-2">&amp;</span><span class="self">self</span>.context.secp, <span class="kw-2">&amp;</span><span class="self">self</span>.config.peg_in_descriptor)
             .map_err(WalletClientError::PegInProofError)<span class="question-mark">?</span>;
 
-        <span class="kw">let </span>amount = Amount::from_sat(peg_in_proof.tx_output().value)
+        <span class="kw">let </span>amount = Amount::from_sats(peg_in_proof.tx_output().value)
             .saturating_sub(<span class="self">self</span>.config.fee_consensus.peg_in_abs);
         <span class="kw">if </span>amount == Amount::ZERO {
             <span class="kw">return </span><span class="prelude-val">Err</span>(WalletClientError::PegInAmountTooSmall);
@@ -616,15 +573,16 @@
 
     <span class="kw">pub async fn </span>await_peg_out_outcome(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        out_point: fedimint_api::OutPoint,
+        out_point: fedimint_core::OutPoint,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;bitcoin::Txid&gt; {
         <span class="comment">// TODO: define timeout centrally
         </span><span class="kw">let </span>timeout = std::time::Duration::from_secs(<span class="number">15</span>);
         <span class="kw">let </span>outcome: WalletOutputOutcome = <span class="self">self
             </span>.context
             .api
-            .await_output_outcome(out_point, timeout)
-            .<span class="kw">await</span><span class="question-mark">?</span>;
+            .await_output_outcome::&lt;OutputOutcome&gt;(out_point, timeout, <span class="kw-2">&amp;</span><span class="self">self</span>.context.decoders)
+            .<span class="kw">await</span><span class="question-mark">?
+            </span>.try_into_variant()<span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(outcome.<span class="number">0</span>)
     }
 }
@@ -639,8 +597,10 @@
     </span>PegInAmountTooSmall,
     <span class="attr">#[error(<span class="string">&quot;Inconsistent peg-in proof: {0}&quot;</span>)]
     </span>PegInProofError(PegInProofError),
+    <span class="attr">#[error(<span class="string">&quot;Output outcome error: {0}&quot;</span>)]
+    </span>OutputOutcomeError(<span class="attr">#[from] </span>OutputOutcomeError),
     <span class="attr">#[error(<span class="string">&quot;Mint API error: {0}&quot;</span>)]
-    </span>ApiError(<span class="attr">#[from] </span>ApiError),
+    </span>ApiError(<span class="attr">#[from] </span>MemberError),
 }
 
 <span class="attr">#[cfg(test)]
@@ -649,34 +609,29 @@
     <span class="kw">use </span>std::sync::Arc;
     <span class="kw">use </span>std::time::Duration;
 
-    <span class="kw">use </span>async_trait::async_trait;
     <span class="kw">use </span>bitcoin::hashes::sha256;
     <span class="kw">use </span>bitcoin::{Address, Txid};
     <span class="kw">use </span>bitcoin_hashes::Hash;
-    <span class="kw">use </span>fedimint_api::backup::SignedBackupRequest;
-    <span class="kw">use </span>fedimint_api::config::ModuleConfigGenParams;
-    <span class="kw">use </span>fedimint_api::core::{Decoder, MODULE_KEY_WALLET};
-    <span class="kw">use </span>fedimint_api::db::mem_impl::MemDatabase;
-    <span class="kw">use </span>fedimint_api::encoding::ModuleRegistry;
-    <span class="kw">use </span>fedimint_api::task::TaskGroup;
-    <span class="kw">use </span>fedimint_api::{Feerate, OutPoint, TransactionId};
-    <span class="kw">use </span>fedimint_core::epoch::EpochHistory;
-    <span class="kw">use </span>fedimint_core::modules::ln::contracts::incoming::IncomingContractOffer;
-    <span class="kw">use </span>fedimint_core::modules::ln::contracts::ContractId;
-    <span class="kw">use </span>fedimint_core::modules::ln::{ContractAccount, LightningGateway};
-    <span class="kw">use </span>fedimint_core::modules::wallet::common::WalletModuleDecoder;
-    <span class="kw">use </span>fedimint_core::modules::wallet::config::WalletClientConfig;
-    <span class="kw">use </span>fedimint_core::modules::wallet::{
-        PegOut, PegOutFees, Wallet, WalletConfigGenerator, WalletOutput, WalletOutputOutcome,
+    <span class="kw">use </span>fedimint_core::config::ConfigGenParams;
+    <span class="kw">use </span>fedimint_core::core::{
+        DynOutputOutcome, ModuleInstanceId, LEGACY_HARDCODED_INSTANCE_ID_WALLET,
     };
+    <span class="kw">use </span>fedimint_core::db::mem_impl::MemDatabase;
+    <span class="kw">use </span>fedimint_core::db::Database;
+    <span class="kw">use </span>fedimint_core::module::registry::ModuleDecoderRegistry;
     <span class="kw">use </span>fedimint_core::outcome::{SerdeOutputOutcome, TransactionStatus};
+    <span class="kw">use </span>fedimint_core::task::TaskGroup;
+    <span class="kw">use </span>fedimint_core::{Feerate, OutPoint, ServerModule, TransactionId};
     <span class="kw">use </span>fedimint_testing::btc::bitcoind::{FakeBitcoindRpc, FakeBitcoindRpcController};
     <span class="kw">use </span>fedimint_testing::FakeFed;
-    <span class="kw">use </span>threshold_crypto::PublicKey;
+    <span class="kw">use </span>fedimint_wallet_server::{Wallet, WalletGen, WalletGenParams};
+    <span class="kw">use </span>tokio::sync::Mutex;
 
-    <span class="kw">use </span><span class="kw">crate</span>::api::IFederationApi;
+    <span class="kw">use </span><span class="kw">crate</span>::api::fake::FederationApiFaker;
+    <span class="kw">use </span><span class="kw">crate</span>::modules::wallet::config::WalletClientConfig;
+    <span class="kw">use </span><span class="kw">crate</span>::modules::wallet::{PegOut, PegOutFees, WalletOutput, WalletOutputOutcome};
     <span class="kw">use </span><span class="kw">crate</span>::wallet::WalletClient;
-    <span class="kw">use crate</span>::{ClientContext, LegacyTransaction};
+    <span class="kw">use crate</span>::{module_decode_stubs, ClientContext};
 
     <span class="kw">type </span>Fed = FakeFed&lt;Wallet&gt;;
     <span class="kw">type </span>SharedFed = Arc&lt;tokio::sync::Mutex&lt;Fed&gt;&gt;;
@@ -687,99 +642,42 @@
         </span>_mint: SharedFed,
     }
 
-    <span class="attr">#[async_trait]
-    </span><span class="kw">impl </span>IFederationApi <span class="kw">for </span>FakeApi {
-        <span class="kw">async fn </span>fetch_tx_outcome(
-            <span class="kw-2">&amp;</span><span class="self">self</span>,
-            _tx: TransactionId,
-        ) -&gt; <span class="kw">crate</span>::api::Result&lt;TransactionStatus&gt; {
-            <span class="prelude-val">Ok</span>(TransactionStatus::Accepted {
-                epoch: <span class="number">0</span>,
-                outputs: <span class="macro">vec!</span>[SerdeOutputOutcome::from(
-                    <span class="kw-2">&amp;</span>(WalletOutputOutcome(Txid::from_slice([<span class="number">0</span>; <span class="number">32</span>].as_slice()).unwrap()).into()),
-                )],
-            })
-        }
-
-        <span class="kw">async fn </span>submit_transaction(
-            <span class="kw-2">&amp;</span><span class="self">self</span>,
-            _tx: LegacyTransaction,
-        ) -&gt; <span class="kw">crate</span>::api::Result&lt;TransactionId&gt; {
-            <span class="macro">unimplemented!</span>()
-        }
-
-        <span class="kw">async fn </span>fetch_contract(
-            <span class="kw-2">&amp;</span><span class="self">self</span>,
-            _contract: ContractId,
-        ) -&gt; <span class="kw">crate</span>::api::Result&lt;ContractAccount&gt; {
-            <span class="macro">unimplemented!</span>()
-        }
-
-        <span class="kw">async fn </span>fetch_consensus_block_height(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">crate</span>::api::Result&lt;u64&gt; {
-            <span class="macro">unimplemented!</span>()
-        }
-
-        <span class="kw">async fn </span>fetch_offer(
-            <span class="kw-2">&amp;</span><span class="self">self</span>,
-            _payment_hash: bitcoin::hashes::sha256::Hash,
-        ) -&gt; <span class="kw">crate</span>::api::Result&lt;IncomingContractOffer&gt; {
-            <span class="macro">unimplemented!</span>();
-        }
-
-        <span class="kw">async fn </span>fetch_peg_out_fees(
-            <span class="kw-2">&amp;</span><span class="self">self</span>,
-            _address: <span class="kw-2">&amp;</span>Address,
-            _amount: <span class="kw-2">&amp;</span>bitcoin::Amount,
-        ) -&gt; <span class="kw">crate</span>::api::Result&lt;<span class="prelude-ty">Option</span>&lt;PegOutFees&gt;&gt; {
-            <span class="macro">unimplemented!</span>();
-        }
-
-        <span class="kw">async fn </span>fetch_gateways(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">crate</span>::api::Result&lt;Vec&lt;LightningGateway&gt;&gt; {
-            <span class="macro">unimplemented!</span>()
-        }
-
-        <span class="kw">async fn </span>register_gateway(<span class="kw-2">&amp;</span><span class="self">self</span>, _gateway: LightningGateway) -&gt; <span class="kw">crate</span>::api::Result&lt;()&gt; {
-            <span class="macro">unimplemented!</span>()
-        }
-
-        <span class="kw">async fn </span>fetch_epoch_history(
-            <span class="kw-2">&amp;</span><span class="self">self</span>,
-            _epoch: u64,
-            _pk: PublicKey,
-        ) -&gt; <span class="kw">crate</span>::api::Result&lt;EpochHistory&gt; {
-            <span class="macro">unimplemented!</span>()
-        }
-
-        <span class="kw">async fn </span>fetch_last_epoch(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">crate</span>::api::Result&lt;u64&gt; {
-            <span class="macro">unimplemented!</span>()
-        }
-
-        <span class="kw">async fn </span>offer_exists(
-            <span class="kw-2">&amp;</span><span class="self">self</span>,
-            _payment_hash: bitcoin::hashes::sha256::Hash,
-        ) -&gt; <span class="kw">crate</span>::api::Result&lt;bool&gt; {
-            <span class="macro">unimplemented!</span>()
-        }
-
-        <span class="kw">async fn </span>upload_ecash_backup(
-            <span class="kw-2">&amp;</span><span class="self">self</span>,
-            _request: <span class="kw-2">&amp;</span>SignedBackupRequest,
-        ) -&gt; <span class="kw">crate</span>::api::Result&lt;()&gt; {
-            <span class="macro">unimplemented!</span>()
-        }
-
-        <span class="kw">async fn </span>download_ecash_backup(
-            <span class="kw-2">&amp;</span><span class="self">self</span>,
-            _id: <span class="kw-2">&amp;</span>secp256k1::XOnlyPublicKey,
-        ) -&gt; <span class="kw">crate</span>::api::Result&lt;Vec&lt;u8&gt;&gt; {
-            <span class="macro">unimplemented!</span>()
-        }
-    }
-
-    <span class="kw">fn </span>wallet_decoders() -&gt; ModuleRegistry {
-        <span class="macro">vec!</span>[(MODULE_KEY_WALLET, Decoder::from_typed(WalletModuleDecoder))]
-            .into_iter()
-            .collect()
+    <span class="kw">pub async fn </span>make_test_mint_fed(
+        module_id: ModuleInstanceId,
+        fed: Arc&lt;Mutex&lt;FakeFed&lt;Wallet&gt;&gt;&gt;,
+    ) -&gt; FederationApiFaker&lt;tokio::sync::Mutex&lt;FakeFed&lt;Wallet&gt;&gt;&gt; {
+        <span class="kw">let </span>members = fed
+            .lock()
+            .<span class="kw">await
+            </span>.members
+            .iter()
+            .map(|(peer_id, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>)| <span class="kw-2">*</span>peer_id)
+            .collect();
+        FederationApiFaker::new(fed, members)
+            .with(
+                <span class="string">&quot;/fetch_transaction&quot;</span>,
+                <span class="kw">move </span>|_mint: Arc&lt;Mutex&lt;FakeFed&lt;Wallet&gt;&gt;&gt;, _tx: TransactionId| <span class="kw">async move </span>{
+                    <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(TransactionStatus::Accepted {
+                        epoch: <span class="number">0</span>,
+                        outputs: <span class="macro">vec!</span>[SerdeOutputOutcome::from(<span class="kw-2">&amp;</span>DynOutputOutcome::from_typed(
+                            module_id,
+                            WalletOutputOutcome(Txid::from_slice([<span class="number">0</span>; <span class="number">32</span>].as_slice()).unwrap()),
+                        ))],
+                    }))
+                },
+            )
+            .with(
+                <span class="string">&quot;/wait_transaction&quot;</span>,
+                <span class="kw">move </span>|_mint: Arc&lt;Mutex&lt;FakeFed&lt;Wallet&gt;&gt;&gt;, _tx: TransactionId| <span class="kw">async move </span>{
+                    <span class="prelude-val">Ok</span>(TransactionStatus::Accepted {
+                        epoch: <span class="number">0</span>,
+                        outputs: <span class="macro">vec!</span>[SerdeOutputOutcome::from(<span class="kw-2">&amp;</span>DynOutputOutcome::from_typed(
+                            module_id,
+                            WalletOutputOutcome(Txid::from_slice([<span class="number">0</span>; <span class="number">32</span>].as_slice()).unwrap()),
+                        ))],
+                    })
+                },
+            )
     }
 
     <span class="kw">async fn </span>new_mint_and_client(
@@ -793,6 +691,7 @@
         <span class="kw">let </span>btc_rpc = FakeBitcoindRpc::new();
         <span class="kw">let </span>btc_rpc_controller = btc_rpc.controller();
 
+        <span class="kw">let </span>module_id = LEGACY_HARDCODED_INSTANCE_ID_WALLET;
         <span class="kw">let </span>fed = Arc::new(tokio::sync::Mutex::new(
             FakeFed::&lt;Wallet&gt;::new(
                 <span class="number">4</span>,
@@ -802,27 +701,35 @@
                     <span class="kw">async move </span>{
                         <span class="prelude-val">Ok</span>(Wallet::new_with_bitcoind(
                             cfg.to_typed().unwrap(),
-                            db,
+                            db.new_isolated(module_id),
                             btc_rpc_clone.clone().into(),
                             <span class="kw-2">&amp;mut </span>task_group,
-                            wallet_decoders(),
                         )
                         .<span class="kw">await</span><span class="question-mark">?</span>)
                     }
                 },
-                <span class="kw-2">&amp;</span>ModuleConfigGenParams::fake_config_gen_params(),
-                <span class="kw-2">&amp;</span>WalletConfigGenerator,
+                <span class="kw-2">&amp;</span>ConfigGenParams::new().attach(WalletGenParams {
+                    network: bitcoin::network::constants::Network::Regtest,
+                    finality_delay: <span class="number">10</span>,
+                }),
+                <span class="kw-2">&amp;</span>WalletGen,
+                module_id,
             )
             .<span class="kw">await
             </span>.unwrap(),
         ));
 
-        <span class="kw">let </span>api = FakeApi { _mint: fed.clone() }.into();
+        <span class="kw">let </span>api = make_test_mint_fed(module_id, fed.clone()).<span class="kw">await</span>;
         <span class="kw">let </span>client_config = fed.lock().<span class="kw">await</span>.client_cfg().clone();
 
         <span class="kw">let </span>client = ClientContext {
-            db: MemDatabase::new().into(),
-            api,
+            decoders: ModuleDecoderRegistry::from_iter([(
+                module_id,
+                &lt;Wallet <span class="kw">as </span>ServerModule&gt;::decoder(),
+            )]),
+            module_gens: Default::default(),
+            db: Database::new(MemDatabase::new(), module_decode_stubs()),
+            api: api.into(),
             secp: secp256k1_zkp::Secp256k1::new(),
         };
 
@@ -844,9 +751,8 @@
             context: Arc::new(client_context),
         };
 
-        <span class="comment">// Set fees low forever
-        </span>btc_rpc
-            .set_fee_rate(<span class="prelude-val">Some</span>(Feerate { sats_per_kvb: <span class="number">0 </span>}))
+        btc_rpc
+            .set_fee_rate(<span class="prelude-val">Some</span>(Feerate { sats_per_kvb: <span class="number">1000 </span>}))
             .<span class="kw">await</span>;
 
         <span class="comment">// generate fake UTXO
@@ -862,17 +768,14 @@
         <span class="kw">let </span>output = PegOut {
             recipient: addr.clone(),
             amount,
-            fees: PegOutFees {
-                fee_rate: Feerate { sats_per_kvb: <span class="number">0 </span>},
-                total_weight: <span class="number">0</span>,
-            },
+            fees: PegOutFees::new(<span class="number">1000</span>, <span class="number">883</span>),
         };
 
         <span class="comment">// agree on output
         </span>btc_rpc.set_block_height(<span class="number">100</span>).<span class="kw">await</span>;
         fed.lock()
             .<span class="kw">await
-            </span>.consensus_round(<span class="kw-2">&amp;</span>[], <span class="kw-2">&amp;</span>[(out_point, WalletOutput(output))])
+            </span>.consensus_round(<span class="kw-2">&amp;</span>[], <span class="kw-2">&amp;</span>[(out_point, WalletOutput::PegOut(output))])
             .<span class="kw">await</span>;
 
         <span class="comment">// begin pegout
@@ -882,20 +785,26 @@
         <span class="comment">// combine signatures
         </span>fed.lock().<span class="kw">await</span>.consensus_round(<span class="kw-2">&amp;</span>[], <span class="kw-2">&amp;</span>[]).<span class="kw">await</span>;
 
-        <span class="comment">// FIXME: find out why these extra rounds are necessary (needs tracing improvement), increases latency only negligibly
+        <span class="comment">// FIXME: find out why these extra rounds are necessary (needs tracing
+        // improvement), increases latency only negligibly
         </span>fed.lock().<span class="kw">await</span>.consensus_round(<span class="kw-2">&amp;</span>[], <span class="kw-2">&amp;</span>[]).<span class="kw">await</span>;
         fed.lock().<span class="kw">await</span>.consensus_round(<span class="kw-2">&amp;</span>[], <span class="kw-2">&amp;</span>[]).<span class="kw">await</span>;
 
         <span class="comment">// wait for broadcast
-        </span>fedimint_api::task::sleep(Duration::from_secs(<span class="number">12</span>)).<span class="kw">await</span>;
+        </span>fedimint_core::task::sleep(Duration::from_secs(<span class="number">12</span>)).<span class="kw">await</span>;
         <span class="macro">assert!</span>(btc_rpc.is_btc_sent_to(amount, addr).<span class="kw">await</span>);
 
         <span class="kw">let </span>wallet_value = fed
             .lock()
             .<span class="kw">await
-            </span>.fetch_from_all(|wallet, db| <span class="kw">async </span>{
+            </span>.fetch_from_all(|wallet, db, module_instance_id| <span class="kw">async </span>{
                 wallet
-                    .get_wallet_value(<span class="kw-2">&amp;mut </span>db.begin_transaction(ModuleRegistry::default()))
+                    .get_wallet_value(
+                        <span class="kw-2">&amp;mut </span>db
+                            .begin_transaction()
+                            .<span class="kw">await
+                            </span>.with_module_prefix(<span class="kw-2">*</span>module_instance_id),
+                    )
                     .<span class="kw">await
             </span>})
             .<span class="kw">await</span>;
@@ -909,9 +818,14 @@
         <span class="kw">let </span>wallet_value = fed
             .lock()
             .<span class="kw">await
-            </span>.fetch_from_all(|wallet, db| <span class="kw">async </span>{
+            </span>.fetch_from_all(|wallet, db, module_instance_id| <span class="kw">async </span>{
                 wallet
-                    .get_wallet_value(<span class="kw-2">&amp;mut </span>db.begin_transaction(ModuleRegistry::default()))
+                    .get_wallet_value(
+                        <span class="kw-2">&amp;mut </span>db
+                            .begin_transaction()
+                            .<span class="kw">await
+                            </span>.with_module_prefix(<span class="kw-2">*</span>module_instance_id),
+                    )
                     .<span class="kw">await
             </span>})
             .<span class="kw">await</span>;
@@ -919,4 +833,4 @@
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="mint_client" data-themes="" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (b28d30e1e 2022-12-06)" data-search-js="search-444266647c4dba98.js" data-settings-js="settings-bebeae96e00e4617.js" data-settings-css="settings-af96d9e2fc13e081.css" ></div></body></html>
+</section></main><div id="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="mint_client" data-themes="" data-resource-suffix="" data-rustdoc-version="1.69.0-nightly (f3126500f 2023-02-02)" data-search-js="search-98d53477a794af0b.js" data-settings-js="settings-f0c5c39777a9a2f6.js" data-settings-css="settings-0bcba95ff279c1db.css" ></div></body></html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `fedimint-server/src/net/api.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>api.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-389f8b4a37bc03c9.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../../static.files/light-046227e470cd3629.css"><link rel="stylesheet" disabled href="../../../static.files/dark-800f2ee593c8e6f7.css"><link rel="stylesheet" disabled href="../../../static.files/ayu-9edae3c387f5a5b3.css"><script id="default-settings" ></script><script src="../../../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../../../static.files/source-script-5cf2e01a42cc9858.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-287cecec4dbb45b0.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><div class="width-limiter"><nav class="sub"><a class="sub-logo-container" href="../../../fedimint_server/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `fedimint-server/src/net/api.rs`."><title>api.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-505eba68f310f6bf.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../../static.files/light-f501212b8b071243.css"><link rel="stylesheet" disabled href="../../../static.files/dark-e92fc12c34ff89d3.css"><link rel="stylesheet" disabled href="../../../static.files/ayu-c8c85693c8a4f9db.css"><script id="default-settings" ></script><script src="../../../static.files/storage-3891ce972e3a2bf8.js"></script><script defer src="../../../static.files/source-script-ea63cb6500f71309.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-364b95f387bc3166.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../fedimint_server/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -232,6 +232,53 @@
 <a href="#232" id="232">232</a>
 <a href="#233" id="233">233</a>
 <a href="#234" id="234">234</a>
+<a href="#235" id="235">235</a>
+<a href="#236" id="236">236</a>
+<a href="#237" id="237">237</a>
+<a href="#238" id="238">238</a>
+<a href="#239" id="239">239</a>
+<a href="#240" id="240">240</a>
+<a href="#241" id="241">241</a>
+<a href="#242" id="242">242</a>
+<a href="#243" id="243">243</a>
+<a href="#244" id="244">244</a>
+<a href="#245" id="245">245</a>
+<a href="#246" id="246">246</a>
+<a href="#247" id="247">247</a>
+<a href="#248" id="248">248</a>
+<a href="#249" id="249">249</a>
+<a href="#250" id="250">250</a>
+<a href="#251" id="251">251</a>
+<a href="#252" id="252">252</a>
+<a href="#253" id="253">253</a>
+<a href="#254" id="254">254</a>
+<a href="#255" id="255">255</a>
+<a href="#256" id="256">256</a>
+<a href="#257" id="257">257</a>
+<a href="#258" id="258">258</a>
+<a href="#259" id="259">259</a>
+<a href="#260" id="260">260</a>
+<a href="#261" id="261">261</a>
+<a href="#262" id="262">262</a>
+<a href="#263" id="263">263</a>
+<a href="#264" id="264">264</a>
+<a href="#265" id="265">265</a>
+<a href="#266" id="266">266</a>
+<a href="#267" id="267">267</a>
+<a href="#268" id="268">268</a>
+<a href="#269" id="269">269</a>
+<a href="#270" id="270">270</a>
+<a href="#271" id="271">271</a>
+<a href="#272" id="272">272</a>
+<a href="#273" id="273">273</a>
+<a href="#274" id="274">274</a>
+<a href="#275" id="275">275</a>
+<a href="#276" id="276">276</a>
+<a href="#277" id="277">277</a>
+<a href="#278" id="278">278</a>
+<a href="#279" id="279">279</a>
+<a href="#280" id="280">280</a>
+<a href="#281" id="281">281</a>
 </pre><pre class="rust"><code><span class="doccomment">//! Implements the client API through which users interact with the federation
 </span><span class="kw">use </span>std::fmt::Formatter;
 <span class="kw">use </span>std::panic::AssertUnwindSafe;
@@ -239,21 +286,20 @@
 <span class="kw">use </span>std::time::Duration;
 
 <span class="kw">use </span>anyhow::Context;
-<span class="kw">use </span>fedimint_api::server::ServerModule;
-<span class="kw">use </span>fedimint_api::{
-    config::ClientConfig,
-    module::{api_endpoint, ApiEndpoint, ApiError},
-    task::TaskHandle,
-    TransactionId,
-};
+<span class="kw">use </span>fedimint_core::config::ConfigResponse;
+<span class="kw">use </span>fedimint_core::core::ModuleInstanceId;
 <span class="kw">use </span>fedimint_core::epoch::SerdeEpochHistory;
+<span class="kw">use </span>fedimint_core::module::{api_endpoint, ApiEndpoint, ApiError};
 <span class="kw">use </span>fedimint_core::outcome::TransactionStatus;
+<span class="kw">use </span>fedimint_core::server::DynServerModule;
+<span class="kw">use </span>fedimint_core::task::TaskHandle;
+<span class="kw">use </span>fedimint_core::TransactionId;
+<span class="kw">use </span>fedimint_logging::LOG_NET_API;
 <span class="kw">use </span>futures::FutureExt;
-<span class="kw">use </span>jsonrpsee::{
-    server::ServerBuilder,
-    types::{error::CallError, ErrorObject},
-    RpcModule,
-};
+<span class="kw">use </span>jsonrpsee::server::ServerBuilder;
+<span class="kw">use </span>jsonrpsee::types::error::CallError;
+<span class="kw">use </span>jsonrpsee::types::ErrorObject;
+<span class="kw">use </span>jsonrpsee::RpcModule;
 <span class="kw">use </span>tracing::{debug, error};
 
 <span class="kw">use </span><span class="kw">crate</span>::config::ServerConfig;
@@ -284,17 +330,17 @@
 
     attach_endpoints(<span class="kw-2">&amp;mut </span>rpc_module, server_endpoints(), <span class="prelude-val">None</span>);
 
-    <span class="kw">for </span>module <span class="kw">in </span>fedimint.modules.values() {
-        attach_endpoints_erased(<span class="kw-2">&amp;mut </span>rpc_module, module);
+    <span class="kw">for </span>(id, module) <span class="kw">in </span>fedimint.modules.iter_modules() {
+        attach_endpoints_erased(<span class="kw-2">&amp;mut </span>rpc_module, id, module);
     }
 
-    <span class="macro">debug!</span>(addr = cfg.api_bind_addr, <span class="string">&quot;Starting WSServer&quot;</span>);
+    <span class="macro">debug!</span>(addr = cfg.local.api_bind.to_string(), <span class="string">&quot;Starting WSServer&quot;</span>);
     <span class="kw">let </span>server = ServerBuilder::new()
-        .max_connections(cfg.max_connections)
+        .max_connections(cfg.local.max_connections)
         .ping_interval(Duration::from_secs(<span class="number">10</span>))
-        .build(<span class="kw-2">&amp;</span>cfg.api_bind_addr)
+        .build(<span class="kw-2">&amp;</span>cfg.local.api_bind.to_string())
         .<span class="kw">await
-        </span>.context(<span class="macro">format!</span>(<span class="string">&quot;Bind address: {}&quot;</span>, cfg.api_bind_addr))
+        </span>.context(<span class="macro">format!</span>(<span class="string">&quot;Bind address: {}&quot;</span>, cfg.local.api_bind))
         .expect(<span class="string">&quot;Could not start API server&quot;</span>);
 
     <span class="kw">let </span>server_handle = server
@@ -304,58 +350,79 @@
     <span class="kw">let </span>stop_handle = server_handle.clone();
 
     task_handle
-        .on_shutdown(<span class="kw">move </span>|| {
-            <span class="comment">// ignore errors: we don&#39;t care if already stopped
-            </span><span class="kw">let _ </span>= stop_handle.stop();
-        })
+        .on_shutdown(Box::new(<span class="kw">move </span>|| {
+            Box::pin(<span class="kw">async move </span>{
+                <span class="comment">// ignore errors: we don&#39;t care if already stopped
+                </span><span class="kw">let _ </span>= stop_handle.stop();
+            })
+        }))
         .<span class="kw">await</span>;
 
     server_handle.stopped().<span class="kw">await
 </span>}
 
+<span class="kw">const </span>API_ENDPOINT_TIMEOUT: Duration = Duration::from_secs(<span class="number">60</span>);
+
 <span class="comment">// TODO: remove once modularized
 </span><span class="kw">fn </span>attach_endpoints(
     rpc_module: <span class="kw-2">&amp;mut </span>RpcModule&lt;RpcHandlerCtx&gt;,
     endpoints: Vec&lt;ApiEndpoint&lt;FedimintConsensus&gt;&gt;,
-    base_name: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
+    module_instance_id: <span class="prelude-ty">Option</span>&lt;ModuleInstanceId&gt;,
 ) {
     <span class="kw">for </span>endpoint <span class="kw">in </span>endpoints {
-        <span class="kw">let </span>path = <span class="kw">if let </span><span class="prelude-val">Some</span>(base_name) = base_name {
+        <span class="kw">let </span>path = <span class="kw">if let </span><span class="prelude-val">Some</span>(module_instance_id) = module_instance_id {
             <span class="comment">// This memory leak is fine because it only happens on server startup
             // and path has to live till the end of program anyways.
-            </span>Box::leak(<span class="macro">format!</span>(<span class="string">&quot;/{}{}&quot;</span>, base_name, endpoint.path).into_boxed_str())
+            </span>Box::leak(<span class="macro">format!</span>(<span class="string">&quot;/module/{}{}&quot;</span>, module_instance_id, endpoint.path).into_boxed_str())
         } <span class="kw">else </span>{
             endpoint.path
         };
 
-        <span class="comment">// Another memory leak that is fine because the function is only called once at startup
+        <span class="comment">// Another memory leak that is fine because the function is only called once at
+        // startup
         </span><span class="kw">let </span>handler: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span><span class="kw">_ </span>= Box::leak(endpoint.handler);
 
         rpc_module
             .register_async_method(path, <span class="kw">move </span>|params, state| <span class="kw">async move </span>{
                 <span class="kw">let </span>params = params.one::&lt;serde_json::Value&gt;()<span class="question-mark">?</span>;
                 <span class="kw">let </span>fedimint = <span class="kw-2">&amp;</span>state.fedimint;
-                <span class="kw">let </span>dbtx = fedimint.database_transaction();
+
+                <span class="kw">let </span>dbtx = fedimint.db.begin_transaction().<span class="kw">await</span>;
                 <span class="comment">// Using AssertUnwindSafe here is far from ideal. In theory this means we could
                 // end up with an inconsistent state in theory. In practice most API functions
                 // are only reading and the few that do write anything are atomic. Lastly, this
                 // is only the last line of defense
-                </span>AssertUnwindSafe((handler)(fedimint, dbtx, params))
-                    .catch_unwind()
-                    .<span class="kw">await
-                    </span>.map_err(|<span class="kw">_</span>| {
-                        <span class="macro">error!</span>(path, <span class="string">&quot;API handler panicked, DO NOT IGNORE, FIX IT!!!&quot;</span>);
-                        jsonrpsee::core::Error::Call(CallError::Custom(ErrorObject::owned(
-                            <span class="number">500</span>,
-                            <span class="string">&quot;API handler panicked&quot;</span>,
-                            <span class="prelude-val">None</span>::&lt;()&gt;,
-                        )))
-                    })<span class="question-mark">?
-                    </span>.map_err(|e| {
-                        jsonrpsee::core::Error::Call(CallError::Custom(ErrorObject::owned(
-                            e.code, e.message, <span class="prelude-val">None</span>::&lt;()&gt;,
-                        )))
-                    })
+                </span>AssertUnwindSafe(tokio::time::timeout(
+                    API_ENDPOINT_TIMEOUT,
+                    (handler)(
+                        fedimint,
+                        dbtx,
+                        params,
+                        module_instance_id,
+                        fedimint.cfg.private.api_auth.clone(),
+                    ),
+                ))
+                .catch_unwind()
+                .<span class="kw">await
+                </span>.map_err(|<span class="kw">_</span>| {
+                    <span class="macro">error!</span>(
+                        target: LOG_NET_API,
+                        path, <span class="string">&quot;API handler panicked, DO NOT IGNORE, FIX IT!!!&quot;
+                    </span>);
+                    jsonrpsee::core::Error::Call(CallError::Custom(ErrorObject::owned(
+                        <span class="number">500</span>,
+                        <span class="string">&quot;API handler panicked&quot;</span>,
+                        <span class="prelude-val">None</span>::&lt;()&gt;,
+                    )))
+                })<span class="question-mark">?
+                </span>.map_err(|tokio::time::error::Elapsed { .. }| {
+                    jsonrpsee::core::Error::RequestTimeout
+                })<span class="question-mark">?
+                </span>.map_err(|e| {
+                    jsonrpsee::core::Error::Call(CallError::Custom(ErrorObject::owned(
+                        e.code, e.message, <span class="prelude-val">None</span>::&lt;()&gt;,
+                    )))
+                })
             })
             .expect(<span class="string">&quot;Failed to register async method&quot;</span>);
     }
@@ -363,17 +430,16 @@
 
 <span class="kw">fn </span>attach_endpoints_erased(
     rpc_module: <span class="kw-2">&amp;mut </span>RpcModule&lt;RpcHandlerCtx&gt;,
-    server_module: <span class="kw-2">&amp;</span>ServerModule,
+    module_instance: ModuleInstanceId,
+    server_module: <span class="kw-2">&amp;</span>DynServerModule,
 ) {
-    <span class="kw">let </span>base_name = server_module.api_base_name();
     <span class="kw">let </span>endpoints = server_module.api_endpoints();
-    <span class="kw">let </span>module_key = server_module.module_key();
 
     <span class="kw">for </span>endpoint <span class="kw">in </span>endpoints {
         <span class="comment">// This memory leak is fine because it only happens on server startup
         // and path has to live till the end of program anyways.
         </span><span class="kw">let </span>path: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span><span class="kw">_ </span>=
-            Box::leak(<span class="macro">format!</span>(<span class="string">&quot;/{}{}&quot;</span>, base_name, endpoint.path).into_boxed_str());
+            Box::leak(<span class="macro">format!</span>(<span class="string">&quot;/module/{}{}&quot;</span>, module_instance, endpoint.path).into_boxed_str());
         <span class="kw">let </span>handler: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span><span class="kw">_ </span>= Box::leak(endpoint.handler);
 
         rpc_module
@@ -381,28 +447,36 @@
                 <span class="comment">// Hack to avoid Sync/Send issues
                 </span><span class="kw">let </span>params = params.one::&lt;serde_json::Value&gt;()<span class="question-mark">?</span>;
                 <span class="kw">let </span>fedimint = <span class="kw-2">&amp;</span>state.fedimint;
-                <span class="kw">let </span>dbtx = fedimint.database_transaction();
+                <span class="kw">let </span>dbtx = fedimint.db.begin_transaction().<span class="kw">await</span>;
                 <span class="comment">// Using AssertUnwindSafe here is far from ideal. In theory this means we could
                 // end up with an inconsistent state in theory. In practice most API functions
                 // are only reading and the few that do write anything are atomic. Lastly, this
                 // is only the last line of defense
-                </span>AssertUnwindSafe((handler)(
-                    fedimint
-                        .modules
-                        .get(<span class="kw-2">&amp;</span>module_key)
-                        .expect(<span class="string">&quot;Module exists if it was registered&quot;</span>),
-                    dbtx,
-                    params,
+                </span>AssertUnwindSafe(tokio::time::timeout(
+                    API_ENDPOINT_TIMEOUT,
+                    (handler)(
+                        fedimint.modules.get_expect(module_instance),
+                        dbtx,
+                        params,
+                        <span class="prelude-val">Some</span>(module_instance),
+                        fedimint.cfg.private.api_auth.clone(),
+                    ),
                 ))
                 .catch_unwind()
                 .<span class="kw">await
                 </span>.map_err(|<span class="kw">_</span>| {
-                    <span class="macro">error!</span>(path, <span class="string">&quot;API handler panicked, DO NOT IGNORE, FIX IT!!!&quot;</span>);
+                    <span class="macro">error!</span>(
+                        target: LOG_NET_API,
+                        path, <span class="string">&quot;API handler panicked, DO NOT IGNORE, FIX IT!!!&quot;
+                    </span>);
                     jsonrpsee::core::Error::Call(CallError::Custom(ErrorObject::owned(
                         <span class="number">500</span>,
                         <span class="string">&quot;API handler panicked&quot;</span>,
                         <span class="prelude-val">None</span>::&lt;()&gt;,
                     )))
+                })<span class="question-mark">?
+                </span>.map_err(|tokio::time::error::Elapsed { .. }| {
+                    jsonrpsee::core::Error::RequestTimeout
                 })<span class="question-mark">?
                 </span>.map_err(|e| {
                     jsonrpsee::core::Error::Call(CallError::Custom(ErrorObject::owned(
@@ -418,12 +492,8 @@
     <span class="macro">vec!</span>[
         <span class="macro">api_endpoint! </span>{
             <span class="string">&quot;/transaction&quot;</span>,
-            <span class="kw">async </span>|fedimint: <span class="kw-2">&amp;</span>FedimintConsensus, _dbtx, transaction: serde_json::Value| -&gt; TransactionId {
-                <span class="comment">// deserializing Transaction from json Value always fails
-                // we need to convert it to string first
-                </span><span class="kw">let </span>string = serde_json::to_string(<span class="kw-2">&amp;</span>transaction).map_err(|e| ApiError::bad_request(e.to_string()))<span class="question-mark">?</span>;
-                <span class="kw">let </span>serde_transaction: SerdeTransaction = serde_json::from_str(<span class="kw-2">&amp;</span>string).map_err(|e| ApiError::bad_request(e.to_string()))<span class="question-mark">?</span>;
-                <span class="kw">let </span>transaction = serde_transaction.try_into_inner(<span class="kw-2">&amp;</span>fedimint.modules).map_err(|e| ApiError::bad_request(e.to_string()))<span class="question-mark">?</span>;
+            <span class="kw">async </span>|fedimint: <span class="kw-2">&amp;</span>FedimintConsensus, _context, serde_transaction: SerdeTransaction| -&gt; TransactionId {
+                <span class="kw">let </span>transaction = serde_transaction.try_into_inner(<span class="kw-2">&amp;</span>fedimint.modules.decoder_registry()).map_err(|e| ApiError::bad_request(e.to_string()))<span class="question-mark">?</span>;
 
                 <span class="kw">let </span>tx_id = transaction.tx_hash();
 
@@ -436,10 +506,23 @@
         },
         <span class="macro">api_endpoint! </span>{
             <span class="string">&quot;/fetch_transaction&quot;</span>,
-            <span class="kw">async </span>|fedimint: <span class="kw-2">&amp;</span>FedimintConsensus, _dbtx, tx_hash: TransactionId| -&gt; TransactionStatus {
+            <span class="kw">async </span>|fedimint: <span class="kw-2">&amp;</span>FedimintConsensus, _context, tx_hash: TransactionId| -&gt; <span class="prelude-ty">Option</span>&lt;TransactionStatus&gt; {
                 <span class="macro">debug!</span>(transaction = %tx_hash, <span class="string">&quot;Recieved request&quot;</span>);
 
-                <span class="kw">let </span>tx_status = fedimint.transaction_status(tx_hash).<span class="kw">await</span>.ok_or_else(|| ApiError::not_found(String::from(<span class="string">&quot;transaction not found&quot;</span>)))<span class="question-mark">?</span>;
+                <span class="kw">let </span>tx_status = fedimint.transaction_status(tx_hash)
+                    .<span class="kw">await</span>;
+
+                <span class="macro">debug!</span>(transaction = %tx_hash, <span class="string">&quot;Sending outcome&quot;</span>);
+                <span class="prelude-val">Ok</span>(tx_status)
+            }
+        },
+        <span class="macro">api_endpoint! </span>{
+            <span class="string">&quot;/wait_transaction&quot;</span>,
+            <span class="kw">async </span>|fedimint: <span class="kw-2">&amp;</span>FedimintConsensus, _context, tx_hash: TransactionId| -&gt; TransactionStatus {
+                <span class="macro">debug!</span>(transaction = %tx_hash, <span class="string">&quot;Recieved request&quot;</span>);
+
+                <span class="kw">let </span>tx_status = fedimint.wait_transaction_status(tx_hash)
+                    .<span class="kw">await</span>;
 
                 <span class="macro">debug!</span>(transaction = %tx_hash, <span class="string">&quot;Sending outcome&quot;</span>);
                 <span class="prelude-val">Ok</span>(tx_status)
@@ -447,24 +530,35 @@
         },
         <span class="macro">api_endpoint! </span>{
             <span class="string">&quot;/fetch_epoch_history&quot;</span>,
-            <span class="kw">async </span>|fedimint: <span class="kw-2">&amp;</span>FedimintConsensus, _dbtx, epoch: u64| -&gt; SerdeEpochHistory {
+            <span class="kw">async </span>|fedimint: <span class="kw-2">&amp;</span>FedimintConsensus, _context, epoch: u64| -&gt; SerdeEpochHistory {
                 <span class="kw">let </span>epoch = fedimint.epoch_history(epoch).<span class="kw">await</span>.ok_or_else(|| ApiError::not_found(String::from(<span class="string">&quot;epoch not found&quot;</span>)))<span class="question-mark">?</span>;
                 <span class="prelude-val">Ok</span>((<span class="kw-2">&amp;</span>epoch).into())
             }
         },
         <span class="macro">api_endpoint! </span>{
-            <span class="string">&quot;/epoch&quot;</span>,
-            <span class="kw">async </span>|fedimint: <span class="kw-2">&amp;</span>FedimintConsensus, _dbtx, _v: ()| -&gt; u64 {
-                <span class="prelude-val">Ok</span>(fedimint.get_last_epoch().<span class="kw">await</span>.ok_or_else(|| ApiError::not_found(String::from(<span class="string">&quot;epoch not found&quot;</span>)))<span class="question-mark">?</span>)
+            <span class="string">&quot;/fetch_epoch_count&quot;</span>,
+            <span class="kw">async </span>|fedimint: <span class="kw-2">&amp;</span>FedimintConsensus, _context, _v: ()| -&gt; u64 {
+                <span class="prelude-val">Ok</span>(fedimint.get_epoch_count().<span class="kw">await</span>)
             }
         },
         <span class="macro">api_endpoint! </span>{
             <span class="string">&quot;/config&quot;</span>,
-            <span class="kw">async </span>|fedimint: <span class="kw-2">&amp;</span>FedimintConsensus, _dbtx, _v: ()| -&gt; ClientConfig {
-                <span class="prelude-val">Ok</span>(fedimint.cfg.to_client_config())
+            <span class="kw">async </span>|fedimint: <span class="kw-2">&amp;</span>FedimintConsensus, context, _v: ()| -&gt; ConfigResponse {
+                <span class="prelude-val">Ok</span>(fedimint.get_config_with_sig(context.dbtx()).<span class="kw">await</span>)
+            }
+        },
+        <span class="macro">api_endpoint! </span>{
+            <span class="string">&quot;/upgrade&quot;</span>,
+            <span class="kw">async </span>|fedimint: <span class="kw-2">&amp;</span>FedimintConsensus, context, _v: ()| -&gt; () {
+                <span class="kw">if </span>context.has_auth() {
+                    fedimint.signal_upgrade().<span class="kw">await</span>.map_err(|<span class="kw">_</span>| ApiError::server_error(<span class="string">&quot;Unable to send signal to server&quot;</span>.to_string()))<span class="question-mark">?</span>;
+                    <span class="prelude-val">Ok</span>(())
+                } <span class="kw">else </span>{
+                    <span class="prelude-val">Err</span>(ApiError::unauthorized())
+                }
             }
         },
     ]
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="fedimint_server" data-themes="" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (b28d30e1e 2022-12-06)" data-search-js="search-444266647c4dba98.js" data-settings-js="settings-bebeae96e00e4617.js" data-settings-css="settings-af96d9e2fc13e081.css" ></div></body></html>
+</section></main><div id="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="fedimint_server" data-themes="" data-resource-suffix="" data-rustdoc-version="1.69.0-nightly (f3126500f 2023-02-02)" data-search-js="search-98d53477a794af0b.js" data-settings-js="settings-f0c5c39777a9a2f6.js" data-settings-css="settings-0bcba95ff279c1db.css" ></div></body></html>

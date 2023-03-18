@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `gateway/ln-gateway/src/client.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>client.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-389f8b4a37bc03c9.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../static.files/light-046227e470cd3629.css"><link rel="stylesheet" disabled href="../../static.files/dark-800f2ee593c8e6f7.css"><link rel="stylesheet" disabled href="../../static.files/ayu-9edae3c387f5a5b3.css"><script id="default-settings" ></script><script src="../../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../../static.files/source-script-5cf2e01a42cc9858.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-287cecec4dbb45b0.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><div class="width-limiter"><nav class="sub"><a class="sub-logo-container" href="../../ln_gateway/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `gateway/ln-gateway/src/client.rs`."><title>client.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-505eba68f310f6bf.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../static.files/light-f501212b8b071243.css"><link rel="stylesheet" disabled href="../../static.files/dark-e92fc12c34ff89d3.css"><link rel="stylesheet" disabled href="../../static.files/ayu-c8c85693c8a4f9db.css"><script id="default-settings" ></script><script src="../../static.files/storage-3891ce972e3a2bf8.js"></script><script defer src="../../static.files/source-script-ea63cb6500f71309.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-364b95f387bc3166.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../ln_gateway/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -191,39 +191,70 @@
 <a href="#191" id="191">191</a>
 <a href="#192" id="192">192</a>
 <a href="#193" id="193">193</a>
-</pre><pre class="rust"><code><span class="kw">use </span>std::{
-    fmt::Debug,
-    fs::File,
-    path::{Path, PathBuf},
-    sync::Arc,
-};
+<a href="#194" id="194">194</a>
+<a href="#195" id="195">195</a>
+<a href="#196" id="196">196</a>
+<a href="#197" id="197">197</a>
+<a href="#198" id="198">198</a>
+<a href="#199" id="199">199</a>
+<a href="#200" id="200">200</a>
+<a href="#201" id="201">201</a>
+<a href="#202" id="202">202</a>
+<a href="#203" id="203">203</a>
+<a href="#204" id="204">204</a>
+<a href="#205" id="205">205</a>
+<a href="#206" id="206">206</a>
+<a href="#207" id="207">207</a>
+<a href="#208" id="208">208</a>
+<a href="#209" id="209">209</a>
+<a href="#210" id="210">210</a>
+<a href="#211" id="211">211</a>
+<a href="#212" id="212">212</a>
+<a href="#213" id="213">213</a>
+<a href="#214" id="214">214</a>
+<a href="#215" id="215">215</a>
+<a href="#216" id="216">216</a>
+<a href="#217" id="217">217</a>
+<a href="#218" id="218">218</a>
+<a href="#219" id="219">219</a>
+<a href="#220" id="220">220</a>
+<a href="#221" id="221">221</a>
+<a href="#222" id="222">222</a>
+</pre><pre class="rust"><code><span class="kw">use </span>std::fmt::Debug;
+<span class="kw">use </span>std::fs::File;
+<span class="kw">use </span>std::path::{Path, PathBuf};
+<span class="kw">use </span>std::sync::Arc;
 
 <span class="kw">use </span>async_trait::async_trait;
-<span class="kw">use </span>fedimint_api::{
-    config::ClientConfig,
-    db::{mem_impl::MemDatabase, Database},
-    dyn_newtype_define, NumPeers,
+<span class="kw">use </span>fedimint_client::module::gen::{ClientModuleGenRegistry, ClientModuleGenRegistryExt};
+<span class="kw">use </span>fedimint_core::api::{
+    DynFederationApi, GlobalFederationApi, WsClientConnectInfo, WsFederationApi,
 };
-<span class="kw">use </span>fedimint_server::config::load_from_file;
-<span class="kw">use </span>mint_client::{
-    api::{WsFederationApi, WsFederationConnect},
-    query::CurrentConsensus,
-    Client, FederationId, GatewayClientConfig,
-};
+<span class="kw">use </span>fedimint_core::config::{load_from_file, FederationId};
+<span class="kw">use </span>fedimint_core::db::mem_impl::MemDatabase;
+<span class="kw">use </span>fedimint_core::db::Database;
+<span class="kw">use </span>fedimint_core::dyn_newtype_define;
+<span class="kw">use </span>fedimint_core::module::registry::ModuleDecoderRegistry;
+<span class="kw">use </span>mint_client::{module_decode_stubs, Client, GatewayClientConfig};
 <span class="kw">use </span>secp256k1::{KeyPair, PublicKey};
 <span class="kw">use </span>tracing::{debug, warn};
 <span class="kw">use </span>url::Url;
 
-<span class="kw">use crate</span>::{LnGatewayError, <span class="prelude-ty">Result</span>};
+<span class="kw">use crate</span>::{GatewayError, <span class="prelude-ty">Result</span>};
 
 <span class="kw">pub trait </span>IDbFactory: Debug {
-    <span class="kw">fn </span>create_database(<span class="kw-2">&amp;</span><span class="self">self</span>, federation_id: FederationId, path: PathBuf) -&gt; <span class="prelude-ty">Result</span>&lt;Database&gt;;
+    <span class="kw">fn </span>create_database(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        federation_id: FederationId,
+        path: PathBuf,
+        decoders: ModuleDecoderRegistry,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;Database&gt;;
 }
 
 <span class="macro">dyn_newtype_define!</span>(
     <span class="doccomment">/// Arc reference to a database factory
     </span><span class="attr">#[derive(Clone)]
-    </span><span class="kw">pub </span>DbFactory(Arc&lt;IDbFactory&gt;)
+    </span><span class="kw">pub </span>DynDbFactory(Arc&lt;IDbFactory&gt;)
 );
 
 <span class="doccomment">/// A factory that creates in-memory databases
@@ -231,8 +262,13 @@
 </span><span class="kw">pub struct </span>MemDbFactory;
 
 <span class="kw">impl </span>IDbFactory <span class="kw">for </span>MemDbFactory {
-    <span class="kw">fn </span>create_database(<span class="kw-2">&amp;</span><span class="self">self</span>, _federation_id: FederationId, _path: PathBuf) -&gt; <span class="prelude-ty">Result</span>&lt;Database&gt; {
-        <span class="prelude-val">Ok</span>(MemDatabase::new().into())
+    <span class="kw">fn </span>create_database(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        _federation_id: FederationId,
+        _path: PathBuf,
+        decoders: ModuleDecoderRegistry,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;Database&gt; {
+        <span class="prelude-val">Ok</span>(Database::new(MemDatabase::new(), decoders))
     }
 }
 
@@ -241,12 +277,15 @@
 </span><span class="kw">pub struct </span>RocksDbFactory;
 
 <span class="kw">impl </span>IDbFactory <span class="kw">for </span>RocksDbFactory {
-    <span class="kw">fn </span>create_database(<span class="kw-2">&amp;</span><span class="self">self</span>, federation_id: FederationId, path: PathBuf) -&gt; <span class="prelude-ty">Result</span>&lt;Database&gt; {
-        <span class="kw">let </span>db_path = path.join(<span class="macro">format!</span>(<span class="string">&quot;{}.db&quot;</span>, federation_id.hash()));
-        <span class="kw">let </span>db = fedimint_rocksdb::RocksDb::open(db_path)
-            .expect(<span class="string">&quot;Error opening new rocks DB&quot;</span>)
-            .into();
-        <span class="prelude-val">Ok</span>(db)
+    <span class="kw">fn </span>create_database(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        federation_id: FederationId,
+        path: PathBuf,
+        decoders: ModuleDecoderRegistry,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;Database&gt; {
+        <span class="kw">let </span>db_path = path.join(<span class="macro">format!</span>(<span class="string">&quot;{federation_id}.db&quot;</span>));
+        <span class="kw">let </span>db = fedimint_rocksdb::RocksDb::open(db_path).expect(<span class="string">&quot;Error opening new rocks DB&quot;</span>);
+        <span class="prelude-val">Ok</span>(Database::new(db, decoders))
     }
 }
 
@@ -254,14 +293,20 @@
 </span><span class="attr">#[async_trait]
 </span><span class="kw">pub trait </span>IGatewayClientBuilder: Debug {
     <span class="doccomment">/// Build a new gateway federation client
-    </span><span class="kw">async fn </span>build(<span class="kw-2">&amp;</span><span class="self">self</span>, config: GatewayClientConfig) -&gt; <span class="prelude-ty">Result</span>&lt;Client&lt;GatewayClientConfig&gt;&gt;;
+    </span><span class="kw">async fn </span>build(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        config: GatewayClientConfig,
+        decoders: ModuleDecoderRegistry,
+        module_gens: ClientModuleGenRegistry,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;Client&lt;GatewayClientConfig&gt;&gt;;
 
     <span class="doccomment">/// Create a new gateway federation client config from connect info
     </span><span class="kw">async fn </span>create_config(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        connect: WsFederationConnect,
+        connect: WsClientConnectInfo,
+        mint_channel_id: u64,
         node_pubkey: PublicKey,
-        announce_address: Url,
+        module_gens: ClientModuleGenRegistry,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;GatewayClientConfig&gt;;
 
     <span class="doccomment">/// Save and persist the configuration of the gateway federation client
@@ -274,88 +319,101 @@
 <span class="macro">dyn_newtype_define! </span>{
     <span class="doccomment">/// dyn newtype for a Gateway federation client builder
     </span><span class="attr">#[derive(Clone)]
-    </span><span class="kw">pub </span>GatewayClientBuilder(Arc&lt;IGatewayClientBuilder&gt;)
+    </span><span class="kw">pub </span>DynGatewayClientBuilder(Arc&lt;IGatewayClientBuilder&gt;)
 }
 
 <span class="attr">#[derive(Debug, Clone)]
 </span><span class="kw">pub struct </span>StandardGatewayClientBuilder {
     work_dir: PathBuf,
-    db_factory: DbFactory,
+    db_factory: DynDbFactory,
+    gateway_api: Url,
 }
 
 <span class="kw">impl </span>StandardGatewayClientBuilder {
-    <span class="kw">pub fn </span>new(work_dir: PathBuf, db_factory: DbFactory) -&gt; <span class="self">Self </span>{
+    <span class="kw">pub fn </span>new(work_dir: PathBuf, db_factory: DynDbFactory, gateway_api: Url) -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
             work_dir,
             db_factory,
+            gateway_api,
         }
     }
 }
 
 <span class="attr">#[async_trait]
 </span><span class="kw">impl </span>IGatewayClientBuilder <span class="kw">for </span>StandardGatewayClientBuilder {
-    <span class="kw">async fn </span>build(<span class="kw-2">&amp;</span><span class="self">self</span>, config: GatewayClientConfig) -&gt; <span class="prelude-ty">Result</span>&lt;Client&lt;GatewayClientConfig&gt;&gt; {
-        <span class="kw">let </span>federation_id = FederationId(config.client_config.federation_name.clone());
+    <span class="kw">async fn </span>build(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        config: GatewayClientConfig,
+        decoders: ModuleDecoderRegistry,
+        module_gens: ClientModuleGenRegistry,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;Client&lt;GatewayClientConfig&gt;&gt; {
+        <span class="kw">let </span>federation_id = config.client_config.federation_id.clone();
 
-        <span class="kw">let </span>db = <span class="self">self
-            </span>.db_factory
-            .create_database(federation_id, <span class="self">self</span>.work_dir.clone())<span class="question-mark">?</span>;
+        <span class="kw">let </span>db = <span class="self">self</span>.db_factory.create_database(
+            federation_id,
+            <span class="self">self</span>.work_dir.clone(),
+            module_decode_stubs(),
+        )<span class="question-mark">?</span>;
         <span class="kw">let </span>ctx = secp256k1::Secp256k1::new();
 
-        <span class="prelude-val">Ok</span>(Client::new(config, db, ctx).<span class="kw">await</span>)
+        <span class="prelude-val">Ok</span>(Client::new(config, decoders, module_gens, db, ctx).<span class="kw">await</span>)
     }
 
     <span class="kw">async fn </span>create_config(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        connect: WsFederationConnect,
+        connect: WsClientConnectInfo,
+        mint_channel_id: u64,
         node_pubkey: PublicKey,
-        announce_address: Url,
+        module_gens: ClientModuleGenRegistry,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;GatewayClientConfig&gt; {
-        <span class="kw">let </span>api = WsFederationApi::new(connect.members);
+        <span class="kw">let </span>api: DynFederationApi = WsFederationApi::from_urls(<span class="kw-2">&amp;</span>connect).into();
 
-        <span class="kw">let </span>client_cfg: ClientConfig = api
-            .request(
-                <span class="string">&quot;/config&quot;</span>,
-                (),
-                CurrentConsensus::new(api.peers().one_honest()),
-            )
-            .<span class="kw">await
-            </span>.expect(<span class="string">&quot;Failed to get client config&quot;</span>);
+        <span class="kw">let </span>client_config = api
+            .download_client_config(<span class="kw-2">&amp;</span>connect.id, module_gens.to_common())
+            .<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="kw">let </span><span class="kw-2">mut </span>rng = rand::rngs::OsRng;
         <span class="kw">let </span>ctx = secp256k1::Secp256k1::new();
         <span class="kw">let </span>kp_fed = KeyPair::new(<span class="kw-2">&amp;</span>ctx, <span class="kw-2">&amp;mut </span>rng);
 
         <span class="prelude-val">Ok</span>(GatewayClientConfig {
-            client_config: client_cfg,
+            mint_channel_id,
+            client_config,
             redeem_key: kp_fed,
             timelock_delta: <span class="number">10</span>,
             node_pub_key: node_pubkey,
-            api: announce_address,
+            api: <span class="self">self</span>.gateway_api.clone(),
         })
     }
 
     <span class="kw">fn </span>save_config(<span class="kw-2">&amp;</span><span class="self">self</span>, config: GatewayClientConfig) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="kw">let </span>federation_id = FederationId(config.client_config.federation_name.clone());
+        <span class="kw">let </span>id = config.client_config.federation_id.to_string();
+        <span class="kw">let </span>path: PathBuf = <span class="self">self</span>.work_dir.join(<span class="macro">format!</span>(<span class="string">&quot;{id}.json&quot;</span>));
 
-        <span class="kw">let </span>path: PathBuf = <span class="self">self</span>.work_dir.join(<span class="macro">format!</span>(<span class="string">&quot;{}.json&quot;</span>, federation_id.hash()));
+        <span class="kw">if </span>Path::new(<span class="kw-2">&amp;</span>path).is_file() {
+            <span class="kw">if </span>config
+                == load_from_file::&lt;GatewayClientConfig&gt;(<span class="kw-2">&amp;</span>path)
+                    .expect(<span class="string">&quot;Could not load existing gateway client config&quot;</span>)
+            {
+                <span class="macro">debug!</span>(<span class="string">&quot;Existing gateway client config has not changed&quot;</span>);
+                <span class="kw">return </span><span class="prelude-val">Ok</span>(());
+            }
 
-        <span class="kw">if </span>!Path::new(<span class="kw-2">&amp;</span>path).is_file() {
-            <span class="macro">debug!</span>(<span class="string">&quot;Creating new gateway cfg file at {}&quot;</span>, path.display());
-            <span class="kw">let </span>file = File::create(path).expect(<span class="string">&quot;Could not create gateway cfg file&quot;</span>);
-            serde_json::to_writer_pretty(file, <span class="kw-2">&amp;</span>config).expect(<span class="string">&quot;Could not write gateway cfg&quot;</span>);
-        } <span class="kw">else </span>{
-            <span class="macro">debug!</span>(<span class="string">&quot;Gateway cfg file already exists at {}&quot;</span>, path.display());
-            <span class="kw">let </span>file = File::open(path).expect(<span class="string">&quot;Could not load gateway cfg file&quot;</span>);
-            serde_json::to_writer_pretty(file, <span class="kw-2">&amp;</span>config).expect(<span class="string">&quot;Could not write gateway cfg&quot;</span>);
-        }
+            <span class="macro">panic!</span>(<span class="string">&quot;Attempted to overwrite existing gateway client config&quot;</span>)
+            <span class="comment">// TODO: Issue 1057: Safe persistence and migration of gateway
+            // federation config
+        </span>}
+
+        <span class="macro">debug!</span>(<span class="string">&quot;Saving gateway cfg in {}&quot;</span>, path.display());
+        <span class="kw">let </span>file = File::create(path).expect(<span class="string">&quot;Could not create gateway cfg file&quot;</span>);
+        serde_json::to_writer_pretty(file, <span class="kw-2">&amp;</span>config).expect(<span class="string">&quot;Could not write gateway cfg&quot;</span>);
 
         <span class="prelude-val">Ok</span>(())
     }
 
     <span class="kw">fn </span>load_configs(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;GatewayClientConfig&gt;&gt; {
         <span class="prelude-val">Ok</span>(std::fs::read_dir(<span class="kw-2">&amp;</span><span class="self">self</span>.work_dir)
-            .map_err(|e| LnGatewayError::Other(anyhow::Error::new(e)))<span class="question-mark">?
+            .map_err(|e| GatewayError::Other(anyhow::Error::new(e)))<span class="question-mark">?
             </span>.filter_map(|file_res| {
                 <span class="kw">let </span>file = file_res.ok()<span class="question-mark">?</span>;
                 <span class="kw">if </span>!file.file_type().ok()<span class="question-mark">?</span>.is_file() {
@@ -385,4 +443,4 @@
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="ln_gateway" data-themes="" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (b28d30e1e 2022-12-06)" data-search-js="search-444266647c4dba98.js" data-settings-js="settings-bebeae96e00e4617.js" data-settings-css="settings-af96d9e2fc13e081.css" ></div></body></html>
+</section></main><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="ln_gateway" data-themes="" data-resource-suffix="" data-rustdoc-version="1.69.0-nightly (f3126500f 2023-02-02)" data-search-js="search-98d53477a794af0b.js" data-settings-js="settings-f0c5c39777a9a2f6.js" data-settings-css="settings-0bcba95ff279c1db.css" ></div></body></html>

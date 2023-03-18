@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `client/client-lib/src/mint/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-389f8b4a37bc03c9.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../../static.files/light-046227e470cd3629.css"><link rel="stylesheet" disabled href="../../../static.files/dark-800f2ee593c8e6f7.css"><link rel="stylesheet" disabled href="../../../static.files/ayu-9edae3c387f5a5b3.css"><script id="default-settings" ></script><script src="../../../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../../../static.files/source-script-5cf2e01a42cc9858.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-287cecec4dbb45b0.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><div class="width-limiter"><nav class="sub"><a class="sub-logo-container" href="../../../mint_client/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `client/client-lib/src/mint/mod.rs`."><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-505eba68f310f6bf.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../../static.files/light-f501212b8b071243.css"><link rel="stylesheet" disabled href="../../../static.files/dark-e92fc12c34ff89d3.css"><link rel="stylesheet" disabled href="../../../static.files/ayu-c8c85693c8a4f9db.css"><script id="default-settings" ></script><script src="../../../static.files/storage-3891ce972e3a2bf8.js"></script><script defer src="../../../static.files/source-script-ea63cb6500f71309.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-364b95f387bc3166.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../mint_client/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -952,46 +952,93 @@
 <a href="#952" id="952">952</a>
 <a href="#953" id="953">953</a>
 <a href="#954" id="954">954</a>
+<a href="#955" id="955">955</a>
+<a href="#956" id="956">956</a>
+<a href="#957" id="957">957</a>
+<a href="#958" id="958">958</a>
+<a href="#959" id="959">959</a>
+<a href="#960" id="960">960</a>
+<a href="#961" id="961">961</a>
+<a href="#962" id="962">962</a>
+<a href="#963" id="963">963</a>
+<a href="#964" id="964">964</a>
+<a href="#965" id="965">965</a>
+<a href="#966" id="966">966</a>
+<a href="#967" id="967">967</a>
+<a href="#968" id="968">968</a>
+<a href="#969" id="969">969</a>
+<a href="#970" id="970">970</a>
+<a href="#971" id="971">971</a>
+<a href="#972" id="972">972</a>
+<a href="#973" id="973">973</a>
+<a href="#974" id="974">974</a>
+<a href="#975" id="975">975</a>
+<a href="#976" id="976">976</a>
+<a href="#977" id="977">977</a>
+<a href="#978" id="978">978</a>
+<a href="#979" id="979">979</a>
+<a href="#980" id="980">980</a>
+<a href="#981" id="981">981</a>
+<a href="#982" id="982">982</a>
+<a href="#983" id="983">983</a>
+<a href="#984" id="984">984</a>
+<a href="#985" id="985">985</a>
+<a href="#986" id="986">986</a>
+<a href="#987" id="987">987</a>
+<a href="#988" id="988">988</a>
+<a href="#989" id="989">989</a>
+<a href="#990" id="990">990</a>
+<a href="#991" id="991">991</a>
+<a href="#992" id="992">992</a>
+<a href="#993" id="993">993</a>
+<a href="#994" id="994">994</a>
+<a href="#995" id="995">995</a>
+<a href="#996" id="996">996</a>
+<a href="#997" id="997">997</a>
+<a href="#998" id="998">998</a>
 </pre><pre class="rust"><code><span class="kw">pub mod </span>db;
-<span class="kw">pub mod </span>decode_stub;
 
-<span class="kw">use </span>std::borrow::Cow;
+<span class="kw">use </span>std::fmt;
+<span class="kw">use </span>std::pin::Pin;
 <span class="kw">use </span>std::sync::Arc;
 <span class="kw">use </span>std::time::Duration;
 
-<span class="kw">use </span>db::{CoinKey, CoinKeyPrefix, OutputFinalizationKey, OutputFinalizationKeyPrefix};
-<span class="kw">use </span>fedimint_api::core::client::ClientModulePlugin;
-<span class="kw">use </span>fedimint_api::core::{ModuleKey, MODULE_KEY_MINT};
-<span class="kw">use </span>fedimint_api::db::DatabaseTransaction;
-<span class="kw">use </span>fedimint_api::encoding::{Decodable, Encodable, ModuleRegistry};
-<span class="kw">use </span>fedimint_api::module::TransactionItemAmount;
-<span class="kw">use </span>fedimint_api::tiered::InvalidAmountTierError;
-<span class="kw">use </span>fedimint_api::{Amount, OutPoint, ServerModulePlugin, Tiered, TieredMulti, TransactionId};
-<span class="kw">use </span>fedimint_core::modules::mint::config::MintClientConfig;
-<span class="kw">use </span>fedimint_core::modules::mint::{
-    BlindNonce, Mint, MintInput, MintOutput, MintOutputOutcome, Nonce, Note, OutputOutcome,
-};
-<span class="kw">use </span>fedimint_core::transaction::legacy::{Input, Output, Transaction};
-<span class="kw">use </span>futures::stream::FuturesUnordered;
-<span class="kw">use </span>futures::StreamExt;
+<span class="kw">use </span>db::{NoteKey, NoteKeyPrefix, OutputFinalizationKey, OutputFinalizationKeyPrefix};
+<span class="kw">use </span>fedimint_core::api::{GlobalFederationApi, MemberError, OutputOutcomeError};
+<span class="kw">use </span>fedimint_core::core::client::ClientModule;
+<span class="kw">use </span>fedimint_core::core::Decoder;
+<span class="kw">use </span>fedimint_core::db::DatabaseTransaction;
+<span class="kw">use </span>fedimint_core::encoding::{Decodable, Encodable};
+<span class="kw">use </span>fedimint_core::module::registry::ModuleDecoderRegistry;
+<span class="kw">use </span>fedimint_core::module::{ModuleCommon, TransactionItemAmount};
+<span class="kw">use </span>fedimint_core::tiered::InvalidAmountTierError;
+<span class="kw">use </span>fedimint_core::{Amount, OutPoint, Tiered, TieredMulti, TransactionId};
+<span class="kw">use </span>fedimint_mint_client::MintModuleTypes;
+<span class="kw">use </span>futures::{Future, StreamExt};
 <span class="kw">use </span>secp256k1_zkp::{KeyPair, Secp256k1, Signing};
-<span class="kw">use </span>serde::de::Error;
 <span class="kw">use </span>serde::{Deserialize, Serialize};
 <span class="kw">use </span>tbs::{blind_message, unblind_signature, AggregatePublicKey, BlindedSignature, BlindingKey};
 <span class="kw">use </span>thiserror::Error;
-<span class="kw">use </span>tracing::{debug, trace, warn};
+<span class="kw">use </span>tracing::{debug, error, trace, warn};
 
-<span class="kw">use </span><span class="kw">crate</span>::api::ApiError;
-<span class="kw">use </span><span class="kw">crate</span>::mint::db::{NextECashNoteIndexKey, PendingCoinsKey};
+<span class="kw">use </span><span class="kw">crate</span>::mint::db::{NextECashNoteIndexKey, NotesPerDenominationKey, PendingNotesKey};
+<span class="kw">use </span><span class="kw">crate</span>::modules::mint::config::MintClientConfig;
+<span class="kw">use </span><span class="kw">crate</span>::modules::mint::{
+    BlindNonce, MintInput, MintOutput, MintOutputBlindSignatures, MintOutputOutcome, Nonce, Note,
+};
+<span class="kw">use </span><span class="kw">crate</span>::outcome::legacy::OutputOutcome;
+<span class="kw">use </span><span class="kw">crate</span>::transaction::legacy::{Input, Output, Transaction};
 <span class="kw">use </span><span class="kw">crate</span>::utils::ClientContext;
-<span class="kw">use crate</span>::{ChildId, DerivableSecret};
+<span class="kw">use crate</span>::{ChildId, DerivableSecret, FuturesUnordered};
 
 <span class="kw">pub mod </span>backup;
 
 <span class="kw">const </span>MINT_E_CASH_TYPE_CHILD_ID: ChildId = ChildId(<span class="number">0</span>);
+<span class="kw">const </span>MINT_E_CASH_BACKUP_SNAPSHOT_TYPE_CHILD_ID: ChildId = ChildId(<span class="number">1</span>);
+<span class="kw">const </span>MINT_E_CASH_FETCH_TIMEOUT: Duration = Duration::from_secs(<span class="number">10</span>);
 
-<span class="doccomment">/// Federation module client for the Mint module. It can both create transaction inputs and outputs
-/// of the mint type.
+<span class="doccomment">/// Federation module client for the Mint module. It can both create transaction
+/// inputs and outputs of the mint type.
 </span><span class="attr">#[derive(Debug, Clone)]
 </span><span class="kw">pub struct </span>MintClient {
     <span class="kw">pub </span>epoch_pk: threshold_crypto::PublicKey,
@@ -1005,7 +1052,20 @@
 /// We allow converting it to u64 and incrementing it, but
 /// messing with it should be somewhat restricted to prevent
 /// silly errors.
-</span><span class="attr">#[derive(Copy, Clone, Debug, Serialize, Deserialize, PartialEq, Eq, Encodable, Decodable)]
+</span><span class="attr">#[derive(
+    Copy,
+    Clone,
+    Debug,
+    Serialize,
+    Deserialize,
+    PartialEq,
+    Eq,
+    Encodable,
+    Decodable,
+    Default,
+    PartialOrd,
+    Ord,
+)]
 </span><span class="kw">pub struct </span>NoteIndex(u64);
 
 <span class="kw">impl </span>NoteIndex {
@@ -1024,26 +1084,42 @@
     </span><span class="kw">fn </span>from_u64(v: u64) -&gt; <span class="self">Self </span>{
         <span class="self">Self</span>(v)
     }
+
+    <span class="kw">pub fn </span>advance(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="kw-2">*</span><span class="self">self </span>= <span class="self">self</span>.next()
+    }
 }
 
-<span class="doccomment">/// Single [`Note`] issuance request to the mint.
+<span class="kw">impl </span>fmt::Display <span class="kw">for </span>NoteIndex {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        <span class="self">self</span>.<span class="number">0</span>.fmt(f)
+    }
+}
+<span class="doccomment">/// Single [`Note`] issuance request to the mint.f
 ///
 /// Keeps the data to generate [`SpendableNote`] once the
-/// mint successfully processed the transaction signing the corresponding [`BlindNonce`].
-</span><span class="attr">#[derive(Debug, Clone, Deserialize, Serialize, Encodable, Decodable)]
+/// mint successfully processed the transaction signing the corresponding
+/// [`BlindNonce`].
+</span><span class="attr">#[derive(Debug, Copy, Clone, PartialEq, Eq, Deserialize, Serialize, Encodable, Decodable)]
 </span><span class="kw">pub struct </span>NoteIssuanceRequest {
-    <span class="doccomment">/// Spend key from which the coin nonce (corresponding public key) is derived
+    <span class="doccomment">/// Spend key from which the note nonce (corresponding public key) is
+    /// derived
     </span>spend_key: KeyPair,
-    <span class="doccomment">/// Key to unblind the blind signature supplied by the mint for this coin
+    <span class="doccomment">/// Key to unblind the blind signature supplied by the mint for this note
     </span>blinding_key: BlindingKey,
 }
 
 <span class="kw">impl </span>NoteIssuanceRequest {
+    <span class="kw">pub fn </span>recover_blind_nonce(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; BlindNonce {
+        <span class="kw">let </span>message = Nonce(<span class="self">self</span>.spend_key.x_only_public_key().<span class="number">0</span>).to_message();
+        BlindNonce(tbs::blind_message(message, <span class="self">self</span>.blinding_key))
+    }
+
     <span class="kw">pub fn </span>finalize(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         bsig: BlindedSignature,
         mint_pub_key: AggregatePublicKey,
-    ) -&gt; std::result::Result&lt;SpendableNote, CoinFinalizationError&gt; {
+    ) -&gt; std::result::Result&lt;SpendableNote, NoteFinalizationError&gt; {
         <span class="kw">let </span>sig = unblind_signature(<span class="self">self</span>.blinding_key, bsig);
         <span class="kw">let </span>note = Note(<span class="self">self</span>.nonce(), sig);
         <span class="kw">if </span>note.verify(mint_pub_key) {
@@ -1054,7 +1130,7 @@
 
             <span class="prelude-val">Ok</span>(spendable_note)
         } <span class="kw">else </span>{
-            <span class="prelude-val">Err</span>(CoinFinalizationError::InvalidSignature)
+            <span class="prelude-val">Err</span>(NoteFinalizationError::InvalidSignature)
         }
     }
 }
@@ -1062,148 +1138,169 @@
 ///
 /// Keeps all the data to generate [`SpendableNote`]s once the
 /// mint successfully processed corresponding [`NoteIssuanceRequest`]s.
-</span><span class="attr">#[derive(Debug, Clone, Default, Deserialize, Serialize, Encodable, Decodable)]
+</span><span class="attr">#[derive(Debug, Clone, Default, PartialEq, Eq, Deserialize, Serialize, Encodable, Decodable)]
 </span><span class="kw">pub struct </span>NoteIssuanceRequests {
-    <span class="doccomment">/// Finalization data for all coin outputs in this request
-    </span>coins: TieredMulti&lt;NoteIssuanceRequest&gt;,
+    <span class="doccomment">/// Finalization data for all note outputs in this request
+    </span>notes: TieredMulti&lt;NoteIssuanceRequest&gt;,
 }
 
-<span class="doccomment">/// A [`Note`] with associated secret key that allows to proof ownership (spend it)
-</span><span class="attr">#[derive(Debug, Clone, PartialEq, Eq, Hash, Deserialize, Serialize, Encodable, Decodable)]
+<span class="doccomment">/// A [`Note`] with associated secret key that allows to proof ownership (spend
+/// it)
+</span><span class="attr">#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Deserialize, Serialize, Encodable, Decodable)]
 </span><span class="kw">pub struct </span>SpendableNote {
     <span class="kw">pub </span>note: Note,
-    <span class="attr">#[serde(deserialize_with = <span class="string">&quot;deserialize_key_pair&quot;</span>)]
-    </span><span class="kw">pub </span>spend_key: KeyPair,
+    <span class="kw">pub </span>spend_key: KeyPair,
 }
 
-<span class="kw">impl </span>ClientModulePlugin <span class="kw">for </span>MintClient {
-    <span class="kw">type </span>Decoder = &lt;Mint <span class="kw">as </span>ServerModulePlugin&gt;::Decoder;
-    <span class="kw">type </span>Module = Mint;
-    <span class="kw">const </span>MODULE_KEY: ModuleKey = MODULE_KEY_MINT;
+<span class="kw">impl </span>ClientModule <span class="kw">for </span>MintClient {
+    <span class="kw">const </span>KIND: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;mint&quot;</span>;
+    <span class="kw">type </span>Module = MintModuleTypes;
 
-    <span class="kw">fn </span>input_amount(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        input: <span class="kw-2">&amp;</span>&lt;<span class="self">Self</span>::Module <span class="kw">as </span>ServerModulePlugin&gt;::Input,
-    ) -&gt; TransactionItemAmount {
+    <span class="kw">fn </span>decoder(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Decoder {
+        &lt;<span class="self">Self</span>::Module <span class="kw">as </span>ModuleCommon&gt;::decoder()
+    }
+
+    <span class="kw">fn </span>input_amount(<span class="kw-2">&amp;</span><span class="self">self</span>, input: <span class="kw-2">&amp;</span>MintInput) -&gt; TransactionItemAmount {
         TransactionItemAmount {
             amount: input.total_amount(),
-            fee: <span class="self">self</span>.config.fee_consensus.coin_spend_abs * (input.item_count() <span class="kw">as </span>u64),
+            fee: <span class="self">self</span>.config.fee_consensus.note_spend_abs * (input.count_items() <span class="kw">as </span>u64),
         }
     }
 
-    <span class="kw">fn </span>output_amount(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        output: <span class="kw-2">&amp;</span>&lt;<span class="self">Self</span>::Module <span class="kw">as </span>ServerModulePlugin&gt;::Output,
-    ) -&gt; TransactionItemAmount {
+    <span class="kw">fn </span>output_amount(<span class="kw-2">&amp;</span><span class="self">self</span>, output: <span class="kw-2">&amp;</span>MintOutput) -&gt; TransactionItemAmount {
         TransactionItemAmount {
             amount: output.total_amount(),
-            fee: <span class="self">self</span>.config.fee_consensus.coin_issuance_abs * (output.item_count() <span class="kw">as </span>u64),
+            fee: <span class="self">self</span>.config.fee_consensus.note_issuance_abs * (output.count_items() <span class="kw">as </span>u64),
         }
     }
 }
 
 <span class="kw">impl </span>MintClient {
-    <span class="kw">pub fn </span>start_dbtx(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; DatabaseTransaction&lt;<span class="lifetime">&#39;_</span>&gt; {
-        <span class="self">self</span>.context.db.begin_transaction(ModuleRegistry::default())
-    }
+    <span class="kw">pub async fn </span>start_dbtx(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; DatabaseTransaction&lt;<span class="lifetime">&#39;_</span>&gt; {
+        <span class="self">self</span>.context.db.begin_transaction().<span class="kw">await
+    </span>}
 
     <span class="doccomment">/// Adds the final amounts of `change` to the tx before submitting it
     /// Allows for multiple `change` outputs
-    </span><span class="kw">pub async fn </span>finalize_change(<span class="kw-2">&amp;</span><span class="self">self</span>, tx: <span class="kw-2">&amp;mut </span>Transaction, change: Vec&lt;Amount&gt;) {
-        <span class="kw">let </span><span class="kw-2">mut </span>change_outputs: Vec&lt;(usize, NoteIssuanceRequests)&gt; = <span class="macro">vec!</span>[];
+    </span><span class="kw">pub async fn </span>finalize_change(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        tx: <span class="kw-2">&amp;mut </span>Transaction,
+        dbtx: <span class="kw-2">&amp;mut </span>DatabaseTransaction&lt;<span class="lifetime">&#39;_</span>&gt;,
+        change: Vec&lt;Amount&gt;,
+    ) {
+        <span class="comment">// remove the spent ecash from the DB
+        </span><span class="kw">let </span><span class="kw-2">mut </span>input_ecash: Vec&lt;(Amount, SpendableNote)&gt; = <span class="macro">vec!</span>[];
+        <span class="kw">for </span>input <span class="kw">in </span><span class="kw-2">&amp;</span>tx.inputs {
+            <span class="kw">if let </span>Input::Mint(MintInput(notes)) = input {
+                <span class="kw">for </span>(amount, note) <span class="kw">in </span>notes.clone() {
+                    <span class="kw">let </span>key = NoteKey {
+                        amount,
+                        nonce: note.<span class="number">0</span>,
+                    };
+                    <span class="kw">let </span>spendable = dbtx.get_value(<span class="kw-2">&amp;</span>key).<span class="kw">await</span>.expect(<span class="string">&quot;Missing note&quot;</span>);
+                    input_ecash.push((amount, spendable));
+                    dbtx.remove_entry(<span class="kw-2">&amp;</span>key).<span class="kw">await</span>;
+                }
+            }
+        }
 
-        <span class="kw">for </span>amount <span class="kw">in </span>change {
-            <span class="kw">let </span>(issuances, nonces) = <span class="self">self</span>.create_output_coins(amount).<span class="kw">await</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>change_outputs: Vec&lt;(usize, NoteIssuanceRequests)&gt; = <span class="macro">vec!</span>[];
+        <span class="kw">let </span>notes_per_denomination = <span class="self">self</span>.notes_per_denomination(dbtx).<span class="kw">await</span>;
+        <span class="kw">for </span>amount <span class="kw">in </span>change.clone() {
+            <span class="kw">if </span>amount == Amount::ZERO {
+                <span class="kw">continue</span>;
+            }
+            <span class="kw">let </span>(issuances, nonces) = <span class="self">self
+                </span>.create_ecash(amount, notes_per_denomination, dbtx)
+                .<span class="kw">await</span>;
             <span class="kw">let </span>out_idx = tx.outputs.len();
             tx.outputs.push(Output::Mint(MintOutput(nonces)));
             change_outputs.push((out_idx, issuances));
         }
         <span class="kw">let </span>txid = tx.tx_hash();
 
-        <span class="kw">let </span><span class="kw-2">mut </span>dbtx = <span class="self">self</span>.context.db.begin_transaction(ModuleRegistry::default());
-
-        <span class="comment">// remove the spent ecash from the DB
-        </span><span class="kw">let </span><span class="kw-2">mut </span>input_ecash: Vec&lt;(Amount, SpendableNote)&gt; = <span class="macro">vec!</span>[];
-        <span class="kw">for </span>input <span class="kw">in </span><span class="kw-2">&amp;</span>tx.inputs {
-            <span class="kw">if let </span>Input::Mint(MintInput(notes)) = input {
-                <span class="kw">for </span>(amount, note) <span class="kw">in </span>notes.clone() {
-                    <span class="kw">let </span>key = CoinKey {
-                        amount,
-                        nonce: note.<span class="number">0</span>,
-                    };
-                    <span class="kw">let </span>spendable = dbtx
-                        .get_value(<span class="kw-2">&amp;</span>key)
-                        .<span class="kw">await
-                        </span>.expect(<span class="string">&quot;DB Error&quot;</span>)
-                        .expect(<span class="string">&quot;Missing note&quot;</span>);
-                    input_ecash.push((amount, spendable));
-                    dbtx.remove_entry(<span class="kw-2">&amp;</span>key).<span class="kw">await</span>.expect(<span class="string">&quot;DB Error&quot;</span>);
-                }
-            }
-        }
-
         <span class="comment">// move ecash to pending state, awaiting a transaction
         </span><span class="kw">if </span>!input_ecash.is_empty() {
             <span class="kw">let </span>pending = TieredMulti::from_iter(input_ecash.into_iter());
-            dbtx.insert_entry(<span class="kw-2">&amp;</span>PendingCoinsKey(txid), <span class="kw-2">&amp;</span>pending)
-                .<span class="kw">await
-                </span>.expect(<span class="string">&quot;DB Error&quot;</span>);
+            dbtx.insert_entry(<span class="kw-2">&amp;</span>PendingNotesKey(txid), <span class="kw-2">&amp;</span>pending).<span class="kw">await</span>;
         }
 
         <span class="comment">// write ecash outputs to db to await for tx success to be fetched later
-        </span><span class="kw">for </span>(out_idx, coins) <span class="kw">in </span>change_outputs.iter() {
+        </span><span class="kw">for </span>(out_idx, notes) <span class="kw">in </span>change_outputs.iter() {
             dbtx.insert_new_entry(
                 <span class="kw-2">&amp;</span>OutputFinalizationKey(OutPoint {
                     txid,
                     out_idx: <span class="kw-2">*</span>out_idx <span class="kw">as </span>u64,
                 }),
-                <span class="kw-2">&amp;</span>coins.clone(),
+                <span class="kw-2">&amp;</span>notes.clone(),
             )
-            .<span class="kw">await
-            </span>.expect(<span class="string">&quot;DB Error&quot;</span>);
+            .<span class="kw">await</span>;
         }
-
-        dbtx.commit_tx().<span class="kw">await</span>.expect(<span class="string">&quot;DB Error&quot;</span>);
     }
 
-    <span class="kw">async fn </span>create_output_coins(
+    <span class="kw">pub async fn </span>set_notes_per_denomination(<span class="kw-2">&amp;</span><span class="self">self</span>, notes: u16) {
+        <span class="kw">let </span><span class="kw-2">mut </span>dbtx = <span class="self">self</span>.start_dbtx().<span class="kw">await</span>;
+        dbtx.insert_entry(<span class="kw-2">&amp;</span>NotesPerDenominationKey, <span class="kw-2">&amp;</span>notes).<span class="kw">await</span>;
+        dbtx.commit_tx().<span class="kw">await</span>;
+    }
+
+    <span class="kw">async fn </span>notes_per_denomination(<span class="kw-2">&amp;</span><span class="self">self</span>, dbtx: <span class="kw-2">&amp;mut </span>DatabaseTransaction&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; u16 {
+        dbtx.get_value(<span class="kw-2">&amp;</span>NotesPerDenominationKey)
+            .<span class="kw">await
+            </span>.unwrap_or(<span class="self">self</span>.config.max_notes_per_denomination - <span class="number">1</span>)
+    }
+
+    <span class="doccomment">/// Generates unsigned ecash, along with the private keys that can spend it
+    </span><span class="kw">async fn </span>create_ecash(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         amount: Amount,
+        notes_per_denomination: u16,
+        dbtx: <span class="kw-2">&amp;mut </span>DatabaseTransaction&lt;<span class="lifetime">&#39;_</span>&gt;,
     ) -&gt; (NoteIssuanceRequests, TieredMulti&lt;BlindNonce&gt;) {
         <span class="kw">let </span><span class="kw-2">mut </span>amount_requests: Vec&lt;((Amount, NoteIssuanceRequest), (Amount, BlindNonce))&gt; =
             Vec::new();
-        <span class="kw">for </span>(amt, ()) <span class="kw">in </span>TieredMulti::represent_amount(amount, <span class="kw-2">&amp;</span><span class="self">self</span>.config.tbs_pks).into_iter() {
-            <span class="kw">let </span>(request, blind_nonce) = <span class="self">self</span>.new_ecash_note(<span class="kw-2">&amp;</span><span class="self">self</span>.context.secp, amt).<span class="kw">await</span>;
-            amount_requests.push(((amt, request), (amt, blind_nonce)));
+        <span class="kw">let </span>denominations = TieredMulti::represent_amount(
+            amount,
+            <span class="kw-2">&amp;</span><span class="self">self</span>.notes().<span class="kw">await</span>,
+            <span class="kw-2">&amp;</span><span class="self">self</span>.config.tbs_pks,
+            notes_per_denomination,
+        );
+        <span class="kw">for </span>(amt, num) <span class="kw">in </span>denominations.iter() {
+            <span class="kw">for _ in </span><span class="number">0</span>..<span class="kw-2">*</span>num {
+                <span class="kw">let </span>(request, blind_nonce) =
+                    <span class="self">self</span>.new_ecash_note(<span class="kw-2">&amp;</span><span class="self">self</span>.context.secp, amt, dbtx).<span class="kw">await</span>;
+                amount_requests.push(((amt, request), (amt, blind_nonce)));
+            }
         }
-        <span class="kw">let </span>(coin_finalization_data, sig_req): (NoteIssuanceRequests, MintOutput) =
+        <span class="kw">let </span>(note_finalization_data, sig_req): (NoteIssuanceRequests, MintOutput) =
             amount_requests.into_iter().unzip();
 
         <span class="macro">debug!</span>(
             %amount,
-            coins = %sig_req.<span class="number">0</span>.item_count(),
-            tiers = <span class="question-mark">?</span>sig_req.<span class="number">0</span>.tiers().collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;(),
+            notes = %sig_req.<span class="number">0</span>.count_items(),
+            tiers = <span class="question-mark">?</span>sig_req.<span class="number">0</span>.iter_tiers().collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;(),
             <span class="string">&quot;Generated issuance request&quot;
         </span>);
 
-        (coin_finalization_data, sig_req.<span class="number">0</span>)
+        (note_finalization_data, sig_req.<span class="number">0</span>)
     }
 
     <span class="kw">pub async fn </span>select_input(<span class="kw-2">&amp;</span><span class="self">self</span>, amount: Amount) -&gt; <span class="prelude-ty">Result</span>&lt;(Vec&lt;KeyPair&gt;, Input)&gt; {
-        <span class="self">Self</span>::ecash_input(<span class="self">self</span>.select_coins(amount).<span class="kw">await</span><span class="question-mark">?</span>)
+        <span class="self">Self</span>::ecash_input(<span class="self">self</span>.select_notes(amount).<span class="kw">await</span><span class="question-mark">?</span>)
     }
 
     <span class="kw">pub fn </span>ecash_input(ecash: TieredMulti&lt;SpendableNote&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;(Vec&lt;KeyPair&gt;, Input)&gt; {
         <span class="kw">let </span>note_key_pairs = ecash
             .into_iter()
             .map(|(amt, note)| {
-                <span class="comment">// We check for note validity in case we got it from an untrusted third party. We
-                // don&#39;t want to needlessly create invalid tx and bother the federation with them.
+                <span class="comment">// We check for note validity in case we got it from an untrusted third party.
+                // We don&#39;t want to needlessly create invalid tx and bother the
+                // federation with them.
                 </span><span class="kw">let </span>spend_pub_key = note.spend_key.x_only_public_key().<span class="number">0</span>;
                 <span class="kw">if </span><span class="kw-2">&amp;</span>spend_pub_key == note.note.spend_key() {
                     <span class="prelude-val">Ok</span>((note.spend_key, (amt, note.note)))
                 } <span class="kw">else </span>{
-                    <span class="prelude-val">Err</span>(MintClientError::ReceivedUspendableCoin)
+                    <span class="prelude-val">Err</span>(MintClientError::ReceivedUspendableNote)
                 }
             })
             .collect::&lt;<span class="prelude-ty">Result</span>&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;&gt;()<span class="question-mark">?</span>;
@@ -1211,30 +1308,27 @@
         <span class="prelude-val">Ok</span>((key_pairs, Input::Mint(MintInput(input))))
     }
 
-    <span class="kw">pub async fn </span>coins(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; TieredMulti&lt;SpendableNote&gt; {
+    <span class="kw">pub async fn </span>notes(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; TieredMulti&lt;SpendableNote&gt; {
         <span class="self">self</span>.start_dbtx()
-            .find_by_prefix(<span class="kw-2">&amp;</span>CoinKeyPrefix)
             .<span class="kw">await
-            </span>.map(|res| {
-                <span class="kw">let </span>(key, spendable_coin) = res.expect(<span class="string">&quot;DB error&quot;</span>);
-                (key.amount, spendable_coin)
-            })
+            </span>.find_by_prefix(<span class="kw-2">&amp;</span>NoteKeyPrefix)
+            .<span class="kw">await
+            </span>.map(|(key, spendable_note)| (key.amount, spendable_note))
             .collect()
-    }
+            .<span class="kw">await
+    </span>}
 
     <span class="doccomment">/// Get available spendable notes with a db transaction already opened
     </span><span class="kw">pub async fn </span>get_available_notes(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         dbtx: <span class="kw-2">&amp;mut </span>DatabaseTransaction&lt;<span class="lifetime">&#39;_</span>&gt;,
     ) -&gt; TieredMulti&lt;SpendableNote&gt; {
-        dbtx.find_by_prefix(<span class="kw-2">&amp;</span>CoinKeyPrefix)
+        dbtx.find_by_prefix(<span class="kw-2">&amp;</span>NoteKeyPrefix)
             .<span class="kw">await
-            </span>.map(|res| {
-                <span class="kw">let </span>(key, spendable_coin) = res.expect(<span class="string">&quot;DB error&quot;</span>);
-                (key.amount, spendable_coin)
-            })
+            </span>.map(|(key, spendable_note)| (key.amount, spendable_note))
             .collect()
-    }
+            .<span class="kw">await
+    </span>}
 
     <span class="kw">pub async fn </span>get_next_note_index(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
@@ -1244,50 +1338,60 @@
         NoteIndex(
             dbtx.get_value(<span class="kw-2">&amp;</span>NextECashNoteIndexKey(amount))
                 .<span class="kw">await
-                </span>.expect(<span class="string">&quot;DB error&quot;</span>)
-                .unwrap_or(<span class="number">0</span>),
+                </span>.unwrap_or(<span class="number">0</span>),
         )
     }
 
-    <span class="kw">async fn </span>new_note_secret(<span class="kw-2">&amp;</span><span class="self">self</span>, amount: Amount) -&gt; DerivableSecret {
-        <span class="kw">let </span><span class="kw-2">mut </span>new_idx;
-        <span class="kw">loop </span>{
-            <span class="kw">let </span><span class="kw-2">mut </span>dbtx = <span class="self">self</span>.start_dbtx();
-            new_idx = <span class="self">self</span>.get_next_note_index(<span class="kw-2">&amp;mut </span>dbtx, amount).<span class="kw">await</span>;
-            dbtx.insert_entry(<span class="kw-2">&amp;</span>NextECashNoteIndexKey(amount), <span class="kw-2">&amp;</span>new_idx.next().as_u64())
-                .<span class="kw">await
-                </span>.expect(<span class="string">&quot;DB error&quot;</span>);
-            <span class="kw">if </span>dbtx.commit_tx().<span class="kw">await</span>.is_ok() {
-                <span class="kw">break</span>;
-            }
-        }
+    <span class="kw">async fn </span>new_note_secret(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        amount: Amount,
+        dbtx: <span class="kw-2">&amp;mut </span>DatabaseTransaction&lt;<span class="lifetime">&#39;_</span>&gt;,
+    ) -&gt; DerivableSecret {
+        <span class="kw">let </span>new_idx = <span class="self">self</span>.get_next_note_index(dbtx, amount).<span class="kw">await</span>;
+        dbtx.insert_entry(<span class="kw-2">&amp;</span>NextECashNoteIndexKey(amount), <span class="kw-2">&amp;</span>new_idx.next().as_u64())
+            .<span class="kw">await</span>;
+        <span class="self">Self</span>::new_note_secret_static(<span class="kw-2">&amp;</span><span class="self">self</span>.secret, amount, new_idx)
+    }
 
-        <span class="self">self</span>.secret
+    <span class="doccomment">/// Derive the note `DerivableSecret` from the Mint&#39;s `secret` the `amount`
+    /// tier and `note_idx`
+    ///
+    /// Static to help re-use in other places, that don&#39;t have a whole [`Self`]
+    /// available
+    </span><span class="kw">pub fn </span>new_note_secret_static(
+        secret: <span class="kw-2">&amp;</span>DerivableSecret,
+        amount: Amount,
+        note_idx: NoteIndex,
+    ) -&gt; DerivableSecret {
+        <span class="macro">assert_eq!</span>(secret.level(), <span class="number">1</span>);
+        <span class="macro">debug!</span>(<span class="question-mark">?</span>secret, %amount, %note_idx, <span class="string">&quot;Deriving new mint note&quot;</span>);
+        secret
             .child_key(MINT_E_CASH_TYPE_CHILD_ID) <span class="comment">// TODO: cache
-            </span>.child_key(ChildId(amount.milli_sat))
-            .child_key(ChildId(new_idx.as_u64()))
+            </span>.child_key(ChildId(amount.msats))
+            .child_key(ChildId(note_idx.as_u64()))
+            .child_key(ChildId(amount.msats))
     }
 
     <span class="kw">pub async fn </span>new_ecash_note&lt;C: Signing&gt;(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         ctx: <span class="kw-2">&amp;</span>Secp256k1&lt;C&gt;,
         amount: Amount,
+        dbtx: <span class="kw-2">&amp;mut </span>DatabaseTransaction&lt;<span class="lifetime">&#39;_</span>&gt;,
     ) -&gt; (NoteIssuanceRequest, BlindNonce) {
-        <span class="kw">let </span>secret = <span class="self">self</span>.new_note_secret(amount).<span class="kw">await</span>;
+        <span class="kw">let </span>secret = <span class="self">self</span>.new_note_secret(amount, dbtx).<span class="kw">await</span>;
         NoteIssuanceRequest::new(ctx, secret)
     }
 
-    <span class="kw">pub async fn </span>select_coins(<span class="kw-2">&amp;</span><span class="self">self</span>, amount: Amount) -&gt; <span class="prelude-ty">Result</span>&lt;TieredMulti&lt;SpendableNote&gt;&gt; {
-        <span class="kw">let </span>coins = <span class="self">self
-            </span>.coins()
-            .<span class="kw">await
-            </span>.select_coins(amount)
-            .ok_or(MintClientError::NotEnoughCoins)<span class="question-mark">?</span>;
+    <span class="kw">pub async fn </span>select_notes(<span class="kw-2">&amp;</span><span class="self">self</span>, amount: Amount) -&gt; <span class="prelude-ty">Result</span>&lt;TieredMulti&lt;SpendableNote&gt;&gt; {
+        <span class="kw">let </span>notes = <span class="self">self</span>.notes().<span class="kw">await</span>;
+        <span class="kw">let </span>selected_notes = notes.select_notes(amount).ok_or_else(|| {
+            MintClientError::InsufficientBalance(amount, TieredMulti::total_amount(<span class="kw-2">&amp;</span>notes))
+        })<span class="question-mark">?</span>;
 
-        <span class="prelude-val">Ok</span>(coins)
+        <span class="prelude-val">Ok</span>(selected_notes)
     }
 
-    <span class="kw">pub async fn </span>receive_coins&lt;<span class="lifetime">&#39;a</span>, F, Fut&gt;(
+    <span class="kw">pub async fn </span>receive_notes&lt;<span class="lifetime">&#39;a</span>, F, Fut&gt;(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         amount: Amount,
         dbtx: <span class="kw-2">&amp;mut </span>DatabaseTransaction&lt;<span class="lifetime">&#39;a</span>&gt;,
@@ -1296,14 +1400,44 @@
         </span>F: FnMut(TieredMulti&lt;BlindNonce&gt;) -&gt; Fut,
         Fut: futures::Future&lt;Output = OutPoint&gt;,
     {
-        <span class="kw">let </span>(finalization, coins) = <span class="self">self</span>.create_output_coins(amount).<span class="kw">await</span>;
-        <span class="kw">let </span>out_point = create_tx(coins).<span class="kw">await</span>;
+        <span class="kw">let </span>notes_per_denomination = <span class="self">self</span>.notes_per_denomination(dbtx).<span class="kw">await</span>;
+        <span class="kw">let </span>(finalization, notes) = <span class="self">self
+            </span>.create_ecash(amount, notes_per_denomination, dbtx)
+            .<span class="kw">await</span>;
+        <span class="kw">let </span>out_point = create_tx(notes).<span class="kw">await</span>;
         dbtx.insert_new_entry(<span class="kw-2">&amp;</span>OutputFinalizationKey(out_point), <span class="kw-2">&amp;</span>finalization)
-            .<span class="kw">await
-            </span>.expect(<span class="string">&quot;DB Error&quot;</span>);
+            .<span class="kw">await</span>;
     }
 
-    <span class="kw">pub async fn </span>fetch_coins&lt;<span class="lifetime">&#39;a</span>&gt;(
+    <span class="kw">pub async fn </span>await_fetch_notes&lt;<span class="lifetime">&#39;a</span>&gt;(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        dbtx: <span class="kw-2">&amp;mut </span>DatabaseTransaction&lt;<span class="lifetime">&#39;a</span>&gt;,
+        outpoint: <span class="kw-2">&amp;</span>OutPoint,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;OutPoint&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>total_time = Duration::ZERO;
+        <span class="kw">let </span>retry_duration = Duration::from_millis(<span class="number">200</span>);
+
+        <span class="kw">loop </span>{
+            <span class="kw">match </span><span class="self">self</span>.fetch_notes(dbtx, <span class="kw-2">*</span>outpoint).<span class="kw">await </span>{
+                <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; {
+                    <span class="kw">break </span><span class="prelude-val">Ok</span>(<span class="kw-2">*</span>outpoint);
+                }
+                <span class="comment">// TODO: make mint error more expressive (currently any HTTP error) and maybe use
+                // custom return type instead of error for retrying
+                </span><span class="prelude-val">Err</span>(e) <span class="kw">if </span>e.is_retryable() &amp;&amp; total_time &lt; MINT_E_CASH_FETCH_TIMEOUT =&gt; {
+                    <span class="macro">trace!</span>(<span class="string">&quot;Mint returned retryable error: {:?}&quot;</span>, e);
+                    fedimint_core::task::sleep(retry_duration).<span class="kw">await
+                </span>}
+                <span class="prelude-val">Err</span>(e) =&gt; {
+                    <span class="macro">warn!</span>(<span class="string">&quot;Mint returned error: {:?}&quot;</span>, e);
+                    <span class="kw">break </span><span class="prelude-val">Err</span>(e);
+                }
+            }
+            total_time += retry_duration;
+        }
+    }
+
+    <span class="kw">pub async fn </span>fetch_notes&lt;<span class="lifetime">&#39;a</span>&gt;(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         dbtx: <span class="kw-2">&amp;mut </span>DatabaseTransaction&lt;<span class="lifetime">&#39;a</span>&gt;,
         outpoint: OutPoint,
@@ -1311,36 +1445,36 @@
         <span class="kw">let </span>issuance = <span class="self">self
             </span>.context
             .db
-            .begin_transaction(ModuleRegistry::default())
-            .get_value(<span class="kw-2">&amp;</span>OutputFinalizationKey(outpoint))
+            .begin_transaction()
             .<span class="kw">await
-            </span>.expect(<span class="string">&quot;DB error&quot;</span>)
-            .ok_or(MintClientError::FinalizationError(
-                CoinFinalizationError::UnknownIssuance,
+            </span>.get_value(<span class="kw-2">&amp;</span>OutputFinalizationKey(outpoint))
+            .<span class="kw">await
+            </span>.ok_or(MintClientError::FinalizationError(
+                NoteFinalizationError::UnknownIssuance,
             ))<span class="question-mark">?</span>;
 
         <span class="kw">let </span>bsig = <span class="self">self
             </span>.context
             .api
-            .fetch_output_outcome::&lt;MintOutputOutcome&gt;(outpoint)
+            .fetch_output_outcome::&lt;OutputOutcome&gt;(outpoint, <span class="kw-2">&amp;</span><span class="self">self</span>.context.decoders)
             .<span class="kw">await</span><span class="question-mark">?
+            </span>.ok_or(MintClientError::OutputNotReadyYet(outpoint))<span class="question-mark">?
+            </span>.try_into_variant::&lt;MintOutputOutcome&gt;()<span class="question-mark">?
             </span>.as_ref()
             .cloned()
             .ok_or(MintClientError::OutputNotReadyYet(outpoint))<span class="question-mark">?</span>;
 
-        <span class="kw">let </span>coins = issuance.finalize(bsig, <span class="kw-2">&amp;</span><span class="self">self</span>.config.tbs_pks)<span class="question-mark">?</span>;
+        <span class="kw">let </span>notes = issuance.finalize(bsig, <span class="kw-2">&amp;</span><span class="self">self</span>.config.tbs_pks)<span class="question-mark">?</span>;
 
-        <span class="kw">for </span>(amount, coin) <span class="kw">in </span>coins.into_iter() {
-            <span class="kw">let </span>key = CoinKey {
+        <span class="kw">for </span>(amount, note) <span class="kw">in </span>notes.into_iter() {
+            <span class="kw">let </span>key = NoteKey {
                 amount,
-                nonce: coin.note.<span class="number">0</span>.clone(),
+                nonce: note.note.<span class="number">0</span>,
             };
-            <span class="kw">let </span>value = coin;
-            dbtx.insert_new_entry(<span class="kw-2">&amp;</span>key, <span class="kw-2">&amp;</span>value).<span class="kw">await</span>.expect(<span class="string">&quot;DB Error&quot;</span>);
+            <span class="kw">let </span>value = note;
+            dbtx.insert_new_entry(<span class="kw-2">&amp;</span>key, <span class="kw-2">&amp;</span>value).<span class="kw">await</span>;
         }
-        dbtx.remove_entry(<span class="kw-2">&amp;</span>OutputFinalizationKey(outpoint))
-            .<span class="kw">await
-            </span>.expect(<span class="string">&quot;DB Error&quot;</span>);
+        dbtx.remove_entry(<span class="kw-2">&amp;</span>OutputFinalizationKey(outpoint)).<span class="kw">await</span>;
 
         <span class="prelude-val">Ok</span>(())
     }
@@ -1348,78 +1482,70 @@
     <span class="kw">pub async fn </span>list_active_issuances(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;(OutPoint, NoteIssuanceRequests)&gt; {
         <span class="self">self</span>.context
             .db
-            .begin_transaction(ModuleRegistry::default())
-            .find_by_prefix(<span class="kw-2">&amp;</span>OutputFinalizationKeyPrefix)
+            .begin_transaction()
             .<span class="kw">await
-            </span>.map(|res| {
-                <span class="kw">let </span>(OutputFinalizationKey(outpoint), cfd) = res.expect(<span class="string">&quot;DB error&quot;</span>);
-                (outpoint, cfd)
-            })
+            </span>.find_by_prefix(<span class="kw-2">&amp;</span>OutputFinalizationKeyPrefix)
+            .<span class="kw">await
+            </span>.map(|(OutputFinalizationKey(outpoint), cfd)| (outpoint, cfd))
             .collect()
-    }
+            .<span class="kw">await
+    </span>}
 
-    <span class="kw">pub async fn </span>fetch_all_coins(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;<span class="prelude-ty">Result</span>&lt;OutPoint&gt;&gt; {
-        <span class="kw">let </span>active_issuances = <span class="self">self</span>.list_active_issuances().<span class="kw">await</span>;
-        <span class="kw">if </span>active_issuances.is_empty() {
-            <span class="kw">return </span>Vec::new();
+    <span class="kw">pub async fn </span>fetch_all_notes(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;<span class="prelude-ty">Result</span>&lt;OutPoint&gt;&gt; {
+        <span class="kw">let </span>active_issuances = <span class="kw-2">&amp;</span><span class="self">self</span>.list_active_issuances().<span class="kw">await</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>results = <span class="macro">vec!</span>[];
+
+        <span class="attr">#[cfg(not(target_family = <span class="string">&quot;wasm&quot;</span>))]
+        </span><span class="kw">let </span><span class="kw-2">mut </span>futures = FuturesUnordered::&lt;Pin&lt;Box&lt;<span class="kw">dyn </span>Future&lt;Output = <span class="kw">_</span>&gt; + Send&gt;&gt;&gt;::new();
+        <span class="attr">#[cfg(target_family = <span class="string">&quot;wasm&quot;</span>)]
+        </span><span class="kw">let </span><span class="kw-2">mut </span>futures = FuturesUnordered::&lt;Pin&lt;Box&lt;<span class="kw">dyn </span>Future&lt;Output = <span class="kw">_</span>&gt;&gt;&gt;&gt;::new();
+        <span class="kw">for </span>(outpoint, <span class="kw">_</span>) <span class="kw">in </span>active_issuances {
+            futures.push(Box::pin(<span class="kw">async </span>{
+                <span class="kw">let </span><span class="kw-2">mut </span>dbtx = <span class="self">self</span>.context.db.begin_transaction().<span class="kw">await</span>;
+                <span class="kw">let </span>res = <span class="self">self</span>.await_fetch_notes(<span class="kw-2">&amp;mut </span>dbtx, outpoint).<span class="kw">await</span>;
+                dbtx.commit_tx().<span class="kw">await</span>;
+                res
+            }))
         }
 
-        <span class="kw">let </span>stream = active_issuances
-            .into_iter()
-            .map(|(out_point, <span class="kw">_</span>)| <span class="kw">async move </span>{
-                <span class="kw">let </span><span class="kw-2">mut </span>dbtx = <span class="self">self</span>.context.db.begin_transaction(ModuleRegistry::default());
-                <span class="kw">loop </span>{
-                    <span class="kw">match </span><span class="self">self</span>.fetch_coins(<span class="kw-2">&amp;mut </span>dbtx, out_point).<span class="kw">await </span>{
-                        <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; {
-                            dbtx.commit_tx().<span class="kw">await</span>.expect(<span class="string">&quot;DB Error&quot;</span>);
-                            <span class="kw">return </span><span class="prelude-val">Ok</span>(out_point);
-                        }
-                        <span class="comment">// TODO: make mint error more expressive (currently any HTTP error) and maybe use custom return type instead of error for retrying
-                        </span><span class="prelude-val">Err</span>(e) <span class="kw">if </span>e.is_retryable() =&gt; {
-                            <span class="macro">trace!</span>(<span class="string">&quot;Mint returned retryable error: {:?}&quot;</span>, e);
-                            fedimint_api::task::sleep(Duration::from_secs(<span class="number">1</span>)).<span class="kw">await
-                        </span>}
-                        <span class="prelude-val">Err</span>(e) =&gt; {
-                            <span class="macro">warn!</span>(<span class="string">&quot;Mint returned error: {:?}&quot;</span>, e);
-                            <span class="kw">return </span><span class="prelude-val">Err</span>(e);
-                        }
-                    }
-                }
-            })
-            .collect::&lt;FuturesUnordered&lt;<span class="kw">_</span>&gt;&gt;();
-        stream.collect::&lt;Vec&lt;<span class="prelude-ty">Result</span>&lt;<span class="kw">_</span>&gt;&gt;&gt;().<span class="kw">await
-    </span>}
+        <span class="kw">while let </span><span class="prelude-val">Some</span>(result) = futures.next().<span class="kw">await </span>{
+            results.push(result);
+        }
+
+        results
+    }
 }
 
 <span class="kw">impl </span>Extend&lt;(Amount, NoteIssuanceRequest)&gt; <span class="kw">for </span>NoteIssuanceRequests {
     <span class="kw">fn </span>extend&lt;T: IntoIterator&lt;Item = (Amount, NoteIssuanceRequest)&gt;&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, iter: T) {
-        <span class="self">self</span>.coins.extend(iter)
+        <span class="self">self</span>.notes.extend(iter)
     }
 }
 
 <span class="kw">impl </span>NoteIssuanceRequests {
-    <span class="doccomment">/// Finalize the issuance request using a [`OutputOutcome`] from the mint containing the blind
-    /// signatures for all coins in this `IssuanceRequest`. It also takes the mint&#39;s
-    /// [`AggregatePublicKey`] to validate the supplied blind signatures.
+    <span class="doccomment">/// Finalize the issuance request using a [`MintOutputBlindSignatures`] from
+    /// the mint containing the blind signatures for all notes in this
+    /// `IssuanceRequest`. It also takes the mint&#39;s [`AggregatePublicKey`]
+    /// to validate the supplied blind signatures.
     </span><span class="kw">pub fn </span>finalize(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        bsigs: OutputOutcome,
+        bsigs: MintOutputBlindSignatures,
         mint_pub_key: <span class="kw-2">&amp;</span>Tiered&lt;AggregatePublicKey&gt;,
-    ) -&gt; std::result::Result&lt;TieredMulti&lt;SpendableNote&gt;, CoinFinalizationError&gt; {
-        <span class="kw">if </span>!<span class="self">self</span>.coins.structural_eq(<span class="kw-2">&amp;</span>bsigs.<span class="number">0</span>) {
-            <span class="kw">return </span><span class="prelude-val">Err</span>(CoinFinalizationError::WrongMintAnswer);
+    ) -&gt; std::result::Result&lt;TieredMulti&lt;SpendableNote&gt;, NoteFinalizationError&gt; {
+        <span class="kw">if </span>!<span class="self">self</span>.notes.structural_eq(<span class="kw-2">&amp;</span>bsigs.<span class="number">0</span>) {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(NoteFinalizationError::WrongMintAnswer);
         }
 
-        <span class="self">self</span>.coins
+        <span class="self">self</span>.notes
             .iter_items()
             .zip(bsigs.<span class="number">0</span>)
             .enumerate()
-            .map(|(idx, ((amt, coin_req), (_amt, bsig)))| {
+            .map(|(idx, ((amt, note_req), (_amt, bsig)))| {
                 <span class="prelude-val">Ok</span>((
                     amt,
-                    <span class="kw">match </span>coin_req.finalize(bsig, <span class="kw-2">*</span>mint_pub_key.tier(<span class="kw-2">&amp;</span>amt)<span class="question-mark">?</span>) {
-                        <span class="prelude-val">Err</span>(CoinFinalizationError::InvalidSignature) =&gt; {
-                            <span class="prelude-val">Err</span>(CoinFinalizationError::InvalidSignatureAtIdx(idx))
+                    <span class="kw">match </span>note_req.finalize(bsig, <span class="kw-2">*</span>mint_pub_key.tier(<span class="kw-2">&amp;</span>amt)<span class="question-mark">?</span>) {
+                        <span class="prelude-val">Err</span>(NoteFinalizationError::InvalidSignature) =&gt; {
+                            <span class="prelude-val">Err</span>(NoteFinalizationError::InvalidSignatureAtIdx(idx))
                         }
                         other =&gt; other,
                     }<span class="question-mark">?</span>,
@@ -1428,18 +1554,18 @@
             .collect()
     }
 
-    <span class="kw">pub fn </span>coin_count(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
-        <span class="self">self</span>.coins.item_count()
+    <span class="kw">pub fn </span>note_count(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="self">self</span>.notes.count_items()
     }
 
-    <span class="kw">pub fn </span>coin_amount(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Amount {
-        <span class="self">self</span>.coins.total_amount()
+    <span class="kw">pub fn </span>note_amount(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Amount {
+        <span class="self">self</span>.notes.total_amount()
     }
 }
 
 <span class="kw">impl </span>NoteIssuanceRequest {
-    <span class="doccomment">/// Generate a request session for a single coin and returns it plus the corresponding blinded
-    /// message
+    <span class="doccomment">/// Generate a request session for a single note and returns it plus the
+    /// corresponding blinded message
     </span><span class="kw">fn </span>new&lt;C&gt;(ctx: <span class="kw-2">&amp;</span>Secp256k1&lt;C&gt;, secret: DerivableSecret) -&gt; (NoteIssuanceRequest, BlindNonce)
     <span class="kw">where
         </span>C: Signing,
@@ -1465,7 +1591,7 @@
 <span class="kw">type </span><span class="prelude-ty">Result</span>&lt;T&gt; = std::result::Result&lt;T, MintClientError&gt;;
 
 <span class="attr">#[derive(Error, Debug)]
-</span><span class="kw">pub enum </span>CoinFinalizationError {
+</span><span class="kw">pub enum </span>NoteFinalizationError {
     <span class="attr">#[error(<span class="string">&quot;The returned answer does not fit the request&quot;</span>)]
     </span>WrongMintAnswer,
     <span class="attr">#[error(<span class="string">&quot;The blind signature&quot;</span>)]
@@ -1483,25 +1609,31 @@
 <span class="attr">#[derive(Error, Debug)]
 </span><span class="kw">pub enum </span>MintClientError {
     <span class="attr">#[error(<span class="string">&quot;Error querying federation: {0}&quot;</span>)]
-    </span>ApiError(<span class="attr">#[from] </span>ApiError),
+    </span>ApiError(<span class="attr">#[from] </span>MemberError),
     <span class="attr">#[error(<span class="string">&quot;Could not finalize issuance request: {0}&quot;</span>)]
-    </span>FinalizationError(<span class="attr">#[from] </span>CoinFinalizationError),
-    <span class="attr">#[error(<span class="string">&quot;The client&#39;s wallet has not enough coins or they are not in the right denomination&quot;</span>)]
-    </span>NotEnoughCoins,
+    </span>FinalizationError(<span class="attr">#[from] </span>NoteFinalizationError),
+    <span class="attr">#[error(<span class="string">&quot;Insufficient balance. Amount requested={0} Mint balance={1}&quot;</span>)]
+    </span>InsufficientBalance(Amount, Amount),
     <span class="attr">#[error(<span class="string">&quot;The transaction outcome received from the mint did not contain a result for output {0} yet&quot;</span>)]
     </span>OutputNotReadyYet(OutPoint),
+    <span class="attr">#[error(<span class="string">&quot;Output outcome error: {0}&quot;</span>)]
+    </span>OutputOutcomeError(<span class="attr">#[from] </span>OutputOutcomeError),
     <span class="attr">#[error(<span class="string">&quot;The transaction outcome returned by the mint contains too few outputs (output {0})&quot;</span>)]
     </span>InvalidOutcomeWrongStructure(OutPoint),
     <span class="attr">#[error(<span class="string">&quot;The transaction outcome returned by the mint has an invalid type (output {0})&quot;</span>)]
     </span>InvalidOutcomeType(OutPoint),
-    <span class="attr">#[error(<span class="string">&quot;One of the coins meant to be spent is unspendable&quot;</span>)]
-    </span>ReceivedUspendableCoin,
+    <span class="attr">#[error(<span class="string">&quot;One of the notes meant to be spent is unspendable&quot;</span>)]
+    </span>ReceivedUspendableNote,
 }
 
 <span class="kw">impl </span>MintClientError {
-    <span class="doccomment">/// Returns `true` if queried outpoint isn&#39;t ready yet but may become ready later
+    <span class="doccomment">/// Returns `true` if queried outpoint isn&#39;t ready yet but may become ready
+    /// later
     </span><span class="kw">pub fn </span>is_retryable(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
         <span class="kw">match </span><span class="self">self </span>{
+            MintClientError::OutputOutcomeError(OutputOutcomeError::Federation(e)) =&gt; {
+                e.is_retryable()
+            }
             MintClientError::ApiError(e) =&gt; e.is_retryable(),
             MintClientError::OutputNotReadyYet(<span class="kw">_</span>) =&gt; <span class="bool-val">true</span>,
             <span class="kw">_ </span>=&gt; <span class="bool-val">false</span>,
@@ -1509,164 +1641,94 @@
     }
 }
 
-<span class="kw">impl </span>From&lt;InvalidAmountTierError&gt; <span class="kw">for </span>CoinFinalizationError {
+<span class="kw">impl </span>From&lt;InvalidAmountTierError&gt; <span class="kw">for </span>NoteFinalizationError {
     <span class="kw">fn </span>from(e: InvalidAmountTierError) -&gt; <span class="self">Self </span>{
-        CoinFinalizationError::InvalidAmountTier(e.<span class="number">0</span>)
-    }
-}
-
-<span class="comment">// TODO: remove once rust-bitcoin/rust-secp256k1#491 is fixed
-</span><span class="kw">fn </span>deserialize_key_pair&lt;<span class="lifetime">&#39;de</span>, D: serde::Deserializer&lt;<span class="lifetime">&#39;de</span>&gt;&gt;(
-    d: D,
-) -&gt; std::result::Result&lt;KeyPair, D::Error&gt; {
-    <span class="kw">if </span>d.is_human_readable() {
-        <span class="kw">let </span>hex_bytes: Cow&lt;<span class="lifetime">&#39;_</span>, str&gt; = Deserialize::deserialize(d)<span class="question-mark">?</span>;
-        <span class="kw">let </span>bytes = hex::decode(hex_bytes.as_ref()).map_err(|<span class="kw">_</span>| D::Error::custom(<span class="string">&quot;Invalid hex&quot;</span>))<span class="question-mark">?</span>;
-        KeyPair::from_seckey_slice(secp256k1_zkp::SECP256K1, <span class="kw-2">&amp;</span>bytes)
-            .map_err(|<span class="kw">_</span>| D::Error::custom(<span class="string">&quot;Not a valid private key&quot;</span>))
-    } <span class="kw">else </span>{
-        <span class="kw">let </span>bytes: [u8; <span class="number">32</span>] = Deserialize::deserialize(d)<span class="question-mark">?</span>;
-        KeyPair::from_seckey_slice(secp256k1_zkp::SECP256K1, <span class="kw-2">&amp;</span>bytes)
-            .map_err(|<span class="kw">_</span>| D::Error::custom(<span class="string">&quot;Not a valid private key&quot;</span>))
+        NoteFinalizationError::InvalidAmountTier(e.<span class="number">0</span>)
     }
 }
 
 <span class="attr">#[cfg(test)]
 </span><span class="kw">mod </span>tests {
-    <span class="kw">use </span>std::collections::HashSet;
+    <span class="kw">use </span>std::collections::{BTreeMap, HashSet};
     <span class="kw">use </span>std::sync::Arc;
 
-    <span class="kw">use </span>async_trait::async_trait;
     <span class="kw">use </span>bitcoin::hashes::Hash;
-    <span class="kw">use </span>bitcoin::Address;
-    <span class="kw">use </span>fedimint_api::backup::SignedBackupRequest;
-    <span class="kw">use </span>fedimint_api::config::ModuleConfigGenParams;
-    <span class="kw">use </span>fedimint_api::db::mem_impl::MemDatabase;
-    <span class="kw">use </span>fedimint_api::db::Database;
-    <span class="kw">use </span>fedimint_api::encoding::ModuleRegistry;
-    <span class="kw">use </span>fedimint_api::{Amount, OutPoint, Tiered, TransactionId};
-    <span class="kw">use </span>fedimint_core::epoch::EpochHistory;
-    <span class="kw">use </span>fedimint_core::modules::ln::contracts::incoming::IncomingContractOffer;
-    <span class="kw">use </span>fedimint_core::modules::ln::contracts::ContractId;
-    <span class="kw">use </span>fedimint_core::modules::ln::{ContractAccount, LightningGateway};
-    <span class="kw">use </span>fedimint_core::modules::mint::config::MintClientConfig;
-    <span class="kw">use </span>fedimint_core::modules::mint::{Mint, MintConfigGenerator, MintOutput};
-    <span class="kw">use </span>fedimint_core::modules::wallet::PegOutFees;
+    <span class="kw">use </span>fedimint_core::api::WsFederationApi;
+    <span class="kw">use </span>fedimint_core::config::ConfigGenParams;
+    <span class="kw">use </span>fedimint_core::core::{
+        DynOutputOutcome, ModuleInstanceId, LEGACY_HARDCODED_INSTANCE_ID_MINT,
+    };
+    <span class="kw">use </span>fedimint_core::db::mem_impl::MemDatabase;
+    <span class="kw">use </span>fedimint_core::db::Database;
+    <span class="kw">use </span>fedimint_core::module::registry::ModuleDecoderRegistry;
     <span class="kw">use </span>fedimint_core::outcome::{SerdeOutputOutcome, TransactionStatus};
-    <span class="kw">use </span>fedimint_core::transaction::legacy::Input;
+    <span class="kw">use </span>fedimint_core::{Amount, OutPoint, ServerModule, Tiered, TransactionId};
+    <span class="kw">use </span>fedimint_mint_server::{Mint, MintGen, MintGenParams};
     <span class="kw">use </span>fedimint_testing::FakeFed;
     <span class="kw">use </span>futures::executor::block_on;
-    <span class="kw">use </span>threshold_crypto::PublicKey;
+    <span class="kw">use </span>tokio::sync::Mutex;
 
-    <span class="kw">use </span><span class="kw">crate</span>::api::{IFederationApi, WsFederationApi};
+    <span class="kw">use </span><span class="kw">crate</span>::api::fake::FederationApiFaker;
     <span class="kw">use </span><span class="kw">crate</span>::mint::db::NextECashNoteIndexKey;
     <span class="kw">use </span><span class="kw">crate</span>::mint::MintClient;
+    <span class="kw">use </span><span class="kw">crate</span>::modules::mint::config::MintClientConfig;
+    <span class="kw">use </span><span class="kw">crate</span>::modules::mint::MintOutput;
+    <span class="kw">use </span><span class="kw">crate</span>::transaction::legacy::Input;
     <span class="kw">use crate</span>::{
-        BlindNonce, ClientContext, DerivableSecret, LegacyTransaction, TransactionBuilder,
+        module_decode_stubs, BlindNonce, ClientContext, DerivableSecret, TransactionBuilder,
+        MINT_SECRET_CHILD_ID,
     };
 
     <span class="kw">type </span>Fed = FakeFed&lt;Mint&gt;;
 
-    <span class="attr">#[derive(Debug)]
-    </span><span class="kw">struct </span>FakeApi {
-        mint: Arc&lt;tokio::sync::Mutex&lt;Fed&gt;&gt;,
-    }
-
-    <span class="attr">#[async_trait]
-    </span><span class="kw">impl </span>IFederationApi <span class="kw">for </span>FakeApi {
-        <span class="kw">async fn </span>fetch_tx_outcome(
-            <span class="kw-2">&amp;</span><span class="self">self</span>,
-            tx: TransactionId,
-        ) -&gt; <span class="kw">crate</span>::api::Result&lt;TransactionStatus&gt; {
-            <span class="kw">let </span>mint = <span class="self">self</span>.mint.lock().<span class="kw">await</span>;
-            <span class="prelude-val">Ok</span>(TransactionStatus::Accepted {
-                epoch: <span class="number">0</span>,
-                outputs: <span class="macro">vec!</span>[SerdeOutputOutcome::from(
-                    <span class="kw-2">&amp;</span>(mint
-                        .output_outcome(OutPoint {
-                            txid: tx,
-                            out_idx: <span class="number">0</span>,
-                        })
-                        .<span class="kw">await
-                        </span>.unwrap()
-                        .into()),
-                )],
-            })
-        }
-
-        <span class="kw">async fn </span>submit_transaction(
-            <span class="kw-2">&amp;</span><span class="self">self</span>,
-            _tx: LegacyTransaction,
-        ) -&gt; <span class="kw">crate</span>::api::Result&lt;TransactionId&gt; {
-            <span class="macro">unimplemented!</span>()
-        }
-
-        <span class="kw">async fn </span>fetch_contract(
-            <span class="kw-2">&amp;</span><span class="self">self</span>,
-            _contract: ContractId,
-        ) -&gt; <span class="kw">crate</span>::api::Result&lt;ContractAccount&gt; {
-            <span class="macro">unimplemented!</span>()
-        }
-
-        <span class="kw">async fn </span>fetch_consensus_block_height(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">crate</span>::api::Result&lt;u64&gt; {
-            <span class="macro">unimplemented!</span>()
-        }
-
-        <span class="kw">async fn </span>fetch_offer(
-            <span class="kw-2">&amp;</span><span class="self">self</span>,
-            _payment_hash: bitcoin::hashes::sha256::Hash,
-        ) -&gt; <span class="kw">crate</span>::api::Result&lt;IncomingContractOffer&gt; {
-            <span class="macro">unimplemented!</span>();
-        }
-
-        <span class="kw">async fn </span>fetch_peg_out_fees(
-            <span class="kw-2">&amp;</span><span class="self">self</span>,
-            _address: <span class="kw-2">&amp;</span>Address,
-            _amount: <span class="kw-2">&amp;</span>bitcoin::Amount,
-        ) -&gt; <span class="kw">crate</span>::api::Result&lt;<span class="prelude-ty">Option</span>&lt;PegOutFees&gt;&gt; {
-            <span class="macro">unimplemented!</span>();
-        }
-
-        <span class="kw">async fn </span>fetch_gateways(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">crate</span>::api::Result&lt;Vec&lt;LightningGateway&gt;&gt; {
-            <span class="macro">unimplemented!</span>()
-        }
-
-        <span class="kw">async fn </span>register_gateway(<span class="kw-2">&amp;</span><span class="self">self</span>, _gateway: LightningGateway) -&gt; <span class="kw">crate</span>::api::Result&lt;()&gt; {
-            <span class="macro">unimplemented!</span>()
-        }
-
-        <span class="kw">async fn </span>fetch_epoch_history(
-            <span class="kw-2">&amp;</span><span class="self">self</span>,
-            _epoch: u64,
-            _pk: PublicKey,
-        ) -&gt; <span class="kw">crate</span>::api::Result&lt;EpochHistory&gt; {
-            <span class="macro">unimplemented!</span>()
-        }
-
-        <span class="kw">async fn </span>fetch_last_epoch(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">crate</span>::api::Result&lt;u64&gt; {
-            <span class="macro">unimplemented!</span>()
-        }
-
-        <span class="kw">async fn </span>offer_exists(
-            <span class="kw-2">&amp;</span><span class="self">self</span>,
-            _payment_hash: bitcoin::hashes::sha256::Hash,
-        ) -&gt; <span class="kw">crate</span>::api::Result&lt;bool&gt; {
-            <span class="macro">unimplemented!</span>()
-        }
-
-        <span class="kw">async fn </span>upload_ecash_backup(
-            <span class="kw-2">&amp;</span><span class="self">self</span>,
-            _request: <span class="kw-2">&amp;</span>SignedBackupRequest,
-        ) -&gt; <span class="kw">crate</span>::api::Result&lt;()&gt; {
-            <span class="macro">unimplemented!</span>()
-        }
-
-        <span class="kw">async fn </span>download_ecash_backup(
-            <span class="kw-2">&amp;</span><span class="self">self</span>,
-            _id: <span class="kw-2">&amp;</span>secp256k1::XOnlyPublicKey,
-        ) -&gt; <span class="kw">crate</span>::api::Result&lt;Vec&lt;u8&gt;&gt; {
-            <span class="macro">unimplemented!</span>()
-        }
+    <span class="kw">async fn </span>make_test_mint_fed(
+        module_id: ModuleInstanceId,
+        fed: Arc&lt;Mutex&lt;FakeFed&lt;Mint&gt;&gt;&gt;,
+    ) -&gt; FederationApiFaker&lt;tokio::sync::Mutex&lt;FakeFed&lt;Mint&gt;&gt;&gt; {
+        <span class="kw">let </span>members = fed
+            .lock()
+            .<span class="kw">await
+            </span>.members
+            .iter()
+            .map(|(peer_id, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>)| <span class="kw-2">*</span>peer_id)
+            .collect();
+        FederationApiFaker::new(fed, members)
+            .with(
+                <span class="string">&quot;/fetch_transaction&quot;</span>,
+                <span class="kw">move </span>|mint: Arc&lt;Mutex&lt;FakeFed&lt;Mint&gt;&gt;&gt;, tx: TransactionId| <span class="kw">async move </span>{
+                    <span class="kw">let </span>mint = mint.lock().<span class="kw">await</span>;
+                    <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(TransactionStatus::Accepted {
+                        epoch: <span class="number">0</span>,
+                        outputs: <span class="macro">vec!</span>[SerdeOutputOutcome::from(<span class="kw-2">&amp;</span>DynOutputOutcome::from_typed(
+                            module_id,
+                            mint.output_outcome(OutPoint {
+                                txid: tx,
+                                out_idx: <span class="number">0</span>,
+                            })
+                            .<span class="kw">await
+                            </span>.unwrap(),
+                        ))],
+                    }))
+                },
+            )
+            .with(
+                <span class="string">&quot;/wait_transaction&quot;</span>,
+                <span class="kw">move </span>|mint: Arc&lt;Mutex&lt;FakeFed&lt;Mint&gt;&gt;&gt;, tx: TransactionId| <span class="kw">async move </span>{
+                    <span class="kw">let </span>mint = mint.lock().<span class="kw">await</span>;
+                    <span class="prelude-val">Ok</span>(TransactionStatus::Accepted {
+                        epoch: <span class="number">0</span>,
+                        outputs: <span class="macro">vec!</span>[SerdeOutputOutcome::from(<span class="kw-2">&amp;</span>DynOutputOutcome::from_typed(
+                            module_id,
+                            mint.output_outcome(OutPoint {
+                                txid: tx,
+                                out_idx: <span class="number">0</span>,
+                            })
+                            .<span class="kw">await
+                            </span>.unwrap(),
+                        ))],
+                    })
+                },
+            )
     }
 
     <span class="kw">async fn </span>new_mint_and_client() -&gt; (
@@ -1674,26 +1736,36 @@
         MintClientConfig,
         ClientContext,
     ) {
+        <span class="kw">let </span>module_id = LEGACY_HARDCODED_INSTANCE_ID_MINT;
         <span class="kw">let </span>fed = Arc::new(tokio::sync::Mutex::new(
             FakeFed::&lt;Mint&gt;::new(
                 <span class="number">4</span>,
                 |cfg, _db| <span class="kw">async move </span>{ <span class="prelude-val">Ok</span>(Mint::new(cfg.to_typed().unwrap())) },
-                <span class="kw-2">&amp;</span>ModuleConfigGenParams {
-                    mint_amounts: <span class="macro">vec!</span>[Amount::from_sat(<span class="number">1</span>), Amount::from_sat(<span class="number">10</span>)],
-                    ..ModuleConfigGenParams::fake_config_gen_params()
-                },
-                <span class="kw-2">&amp;</span>MintConfigGenerator,
+                <span class="kw-2">&amp;</span>ConfigGenParams::new().attach(MintGenParams {
+                    mint_amounts: <span class="macro">vec!</span>[
+                        Amount::from_sats(<span class="number">1</span>),
+                        Amount::from_sats(<span class="number">10</span>),
+                        Amount::from_sats(<span class="number">20</span>),
+                    ],
+                }),
+                <span class="kw-2">&amp;</span>MintGen,
+                module_id,
             )
             .<span class="kw">await
             </span>.unwrap(),
         ));
 
-        <span class="kw">let </span>api = FakeApi { mint: fed.clone() };
+        <span class="kw">let </span>api = make_test_mint_fed(module_id, fed.clone()).<span class="kw">await</span>;
 
         <span class="kw">let </span>client_config = fed.lock().<span class="kw">await</span>.client_cfg().clone();
 
         <span class="kw">let </span>client_context = ClientContext {
-            db: MemDatabase::new().into(),
+            decoders: ModuleDecoderRegistry::from_iter([(
+                module_id,
+                &lt;Mint <span class="kw">as </span>ServerModule&gt;::decoder(),
+            )]),
+            module_gens: Default::default(),
+            db: Database::new(MemDatabase::new(), module_decode_stubs()),
             api: api.into(),
             secp: secp256k1_zkp::Secp256k1::new(),
         };
@@ -1701,7 +1773,7 @@
         (fed, client_config.cast().unwrap(), client_context)
     }
 
-    <span class="kw">async fn </span>issue_tokens&lt;<span class="lifetime">&#39;a</span>&gt;(
+    <span class="kw">async fn </span>issue_notes&lt;<span class="lifetime">&#39;a</span>&gt;(
         fed: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>tokio::sync::Mutex&lt;Fed&gt;,
         client: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>MintClient,
         client_db: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Database,
@@ -1710,9 +1782,9 @@
         <span class="kw">let </span>txid = TransactionId::from_inner([<span class="number">0x42</span>; <span class="number">32</span>]);
         <span class="kw">let </span>out_point = OutPoint { txid, out_idx: <span class="number">0 </span>};
 
-        <span class="kw">let </span><span class="kw-2">mut </span>dbtx = client_db.begin_transaction(ModuleRegistry::default());
+        <span class="kw">let </span><span class="kw-2">mut </span>dbtx = client_db.begin_transaction().<span class="kw">await</span>;
         client
-            .receive_coins(amt, <span class="kw-2">&amp;mut </span>dbtx, |output| <span class="kw">async </span>{
+            .receive_notes(amt, <span class="kw-2">&amp;mut </span>dbtx, |output| <span class="kw">async </span>{
                 <span class="comment">// Agree on output
                 </span><span class="kw">let </span><span class="kw-2">mut </span>fed = block_on(fed.lock());
                 block_on(fed.consensus_round(<span class="kw-2">&amp;</span>[], <span class="kw-2">&amp;</span>[(out_point, MintOutput(output))]));
@@ -1722,9 +1794,9 @@
                 out_point
             })
             .<span class="kw">await</span>;
-        dbtx.commit_tx().<span class="kw">await</span>.expect(<span class="string">&quot;DB Error&quot;</span>);
+        dbtx.commit_tx().<span class="kw">await</span>;
 
-        client.fetch_all_coins().<span class="kw">await</span>;
+        client.fetch_all_notes().<span class="kw">await</span>;
     }
 
     <span class="attr">#[test_log::test(tokio::test)]
@@ -1736,18 +1808,18 @@
             epoch_pk: threshold_crypto::SecretKey::random().public_key(),
             config: client_config,
             context: context.clone(),
-            secret: DerivableSecret::new(<span class="kw-2">&amp;</span>[], <span class="kw-2">&amp;</span>[]),
+            secret: DerivableSecret::new_root(<span class="kw-2">&amp;</span>[], <span class="kw-2">&amp;</span>[]).child_key(MINT_SECRET_CHILD_ID),
         };
 
-        <span class="kw">const </span>ISSUE_AMOUNT: Amount = Amount::from_sat(<span class="number">12</span>);
-        issue_tokens(<span class="kw-2">&amp;</span>fed, <span class="kw-2">&amp;</span>client, <span class="kw-2">&amp;</span>context.db, ISSUE_AMOUNT).<span class="kw">await</span>;
+        <span class="kw">const </span>ISSUE_AMOUNT: Amount = Amount::from_sats(<span class="number">12</span>);
+        issue_notes(<span class="kw-2">&amp;</span>fed, <span class="kw-2">&amp;</span>client, <span class="kw-2">&amp;</span>context.db, ISSUE_AMOUNT).<span class="kw">await</span>;
 
-        <span class="macro">assert_eq!</span>(client.coins().<span class="kw">await</span>.total_amount(), ISSUE_AMOUNT)
+        <span class="macro">assert_eq!</span>(client.notes().<span class="kw">await</span>.total_amount(), ISSUE_AMOUNT)
     }
 
     <span class="attr">#[test_log::test(tokio::test)]
     </span><span class="kw">async fn </span>create_input() {
-        <span class="kw">const </span>SPEND_AMOUNT: Amount = Amount::from_sat(<span class="number">21</span>);
+        <span class="kw">const </span>SPEND_AMOUNT: Amount = Amount::from_sats(<span class="number">21</span>);
 
         <span class="kw">let </span>(fed, client_config, client_context) = new_mint_and_client().<span class="kw">await</span>;
 
@@ -1756,29 +1828,32 @@
             epoch_pk: threshold_crypto::SecretKey::random().public_key(),
             config: client_config,
             context: context.clone(),
-            secret: DerivableSecret::new(<span class="kw-2">&amp;</span>[], <span class="kw-2">&amp;</span>[]),
+            secret: DerivableSecret::new_root(<span class="kw-2">&amp;</span>[], <span class="kw-2">&amp;</span>[]).child_key(MINT_SECRET_CHILD_ID),
         };
 
-        issue_tokens(<span class="kw-2">&amp;</span>fed, <span class="kw-2">&amp;</span>client, <span class="kw-2">&amp;</span>context.db, SPEND_AMOUNT * <span class="number">2</span>).<span class="kw">await</span>;
+        issue_notes(<span class="kw-2">&amp;</span>fed, <span class="kw-2">&amp;</span>client, <span class="kw-2">&amp;</span>context.db, SPEND_AMOUNT * <span class="number">2</span>).<span class="kw">await</span>;
 
         <span class="comment">// Spending works
-        </span><span class="kw">let </span>dbtx = client
-            .context
-            .db
-            .begin_transaction(ModuleRegistry::default());
+        </span><span class="kw">let </span><span class="kw-2">mut </span>dbtx = client.context.db.begin_transaction().<span class="kw">await</span>;
         <span class="kw">let </span><span class="kw-2">mut </span>builder = TransactionBuilder::default();
         <span class="kw">let </span>secp = <span class="kw-2">&amp;</span>client.context.secp;
         <span class="kw">let </span>_tbs_pks = <span class="kw-2">&amp;</span>client.config.tbs_pks;
         <span class="kw">let </span>rng = rand::rngs::OsRng;
-        <span class="kw">let </span>coins = client.select_coins(SPEND_AMOUNT).<span class="kw">await</span>.unwrap();
-        <span class="kw">let </span>(spend_keys, ecash_input) = MintClient::ecash_input(coins.clone()).unwrap();
+        <span class="kw">let </span>notes = client.select_notes(SPEND_AMOUNT).<span class="kw">await</span>.unwrap();
+        <span class="kw">let </span>(spend_keys, ecash_input) = MintClient::ecash_input(notes.clone()).unwrap();
 
         builder.input(<span class="kw-2">&amp;mut </span>spend_keys.clone(), ecash_input.clone());
         <span class="kw">let </span>client = <span class="kw-2">&amp;</span>client;
         builder
-            .build_with_change(client.clone(), rng, <span class="macro">vec!</span>[Amount::from_sat(<span class="number">0</span>)], secp)
+            .build_with_change(
+                client.clone(),
+                <span class="kw-2">&amp;mut </span>dbtx,
+                rng,
+                <span class="macro">vec!</span>[Amount::from_sats(<span class="number">0</span>)],
+                secp,
+            )
             .<span class="kw">await</span>;
-        dbtx.commit_tx().<span class="kw">await</span>.expect(<span class="string">&quot;DB Error&quot;</span>);
+        dbtx.commit_tx().<span class="kw">await</span>;
 
         <span class="kw">if let </span>Input::Mint(input) = ecash_input {
             <span class="kw">let </span>meta = fed.lock().<span class="kw">await</span>.verify_input(<span class="kw-2">&amp;</span>input).<span class="kw">await</span>.unwrap();
@@ -1797,27 +1872,30 @@
                 .<span class="kw">await</span>;
 
             <span class="comment">// The right amount of money is left
-            </span><span class="macro">assert_eq!</span>(client.coins().<span class="kw">await</span>.total_amount(), SPEND_AMOUNT);
+            </span><span class="macro">assert_eq!</span>(client.notes().<span class="kw">await</span>.total_amount(), SPEND_AMOUNT);
 
             <span class="comment">// Double spends aren&#39;t possible
             </span><span class="macro">assert!</span>(fed.lock().<span class="kw">await</span>.verify_input(<span class="kw-2">&amp;</span>input).<span class="kw">await</span>.is_err());
         }
 
         <span class="comment">// We can exactly spend the remainder
-        </span><span class="kw">let </span>dbtx = client
-            .context
-            .db
-            .begin_transaction(ModuleRegistry::default());
+        </span><span class="kw">let </span><span class="kw-2">mut </span>dbtx = client.context.db.begin_transaction().<span class="kw">await</span>;
         <span class="kw">let </span><span class="kw-2">mut </span>builder = TransactionBuilder::default();
-        <span class="kw">let </span>coins = client.select_coins(SPEND_AMOUNT).<span class="kw">await</span>.unwrap();
+        <span class="kw">let </span>notes = client.select_notes(SPEND_AMOUNT).<span class="kw">await</span>.unwrap();
         <span class="kw">let </span>rng = rand::rngs::OsRng;
-        <span class="kw">let </span>(spend_keys, ecash_input) = MintClient::ecash_input(coins).unwrap();
+        <span class="kw">let </span>(spend_keys, ecash_input) = MintClient::ecash_input(notes).unwrap();
 
         builder.input(<span class="kw-2">&amp;mut </span>spend_keys.clone(), ecash_input.clone());
         builder
-            .build_with_change(client.clone(), rng, <span class="macro">vec!</span>[Amount::from_sat(<span class="number">0</span>)], secp)
+            .build_with_change(
+                client.clone(),
+                <span class="kw-2">&amp;mut </span>dbtx,
+                rng,
+                <span class="macro">vec!</span>[Amount::from_sats(<span class="number">0</span>)],
+                secp,
+            )
             .<span class="kw">await</span>;
-        dbtx.commit_tx().<span class="kw">await</span>.expect(<span class="string">&quot;DB Error&quot;</span>);
+        dbtx.commit_tx().<span class="kw">await</span>;
 
         <span class="kw">if let </span>Input::Mint(input) = ecash_input {
             <span class="kw">let </span>meta = fed.lock().<span class="kw">await</span>.verify_input(<span class="kw-2">&amp;</span>input).<span class="kw">await</span>.unwrap();
@@ -1831,32 +1909,41 @@
             );
 
             <span class="comment">// No money is left
-            </span><span class="macro">assert_eq!</span>(client.coins().<span class="kw">await</span>.total_amount(), Amount::ZERO);
+            </span><span class="macro">assert_eq!</span>(client.notes().<span class="kw">await</span>.total_amount(), Amount::ZERO);
         }
     }
 
     <span class="attr">#[allow(clippy::needless_collect)]
-    #[tokio::test]
+    #[tokio::test(flavor = <span class="string">&quot;multi_thread&quot;</span>)]
     </span><span class="kw">async fn </span>test_parallel_issuance() {
         <span class="kw">const </span>ITERATIONS: usize = <span class="number">10_000</span>;
 
         <span class="kw">let </span>db = fedimint_rocksdb::RocksDb::open(tempfile::tempdir().unwrap()).unwrap();
+
+        <span class="kw">let </span>module_id = LEGACY_HARDCODED_INSTANCE_ID_MINT;
 
         <span class="kw">let </span>client: MintClient = MintClient {
             epoch_pk: threshold_crypto::SecretKey::random().public_key(),
             config: MintClientConfig {
                 tbs_pks: Tiered::from_iter([]),
                 fee_consensus: Default::default(),
+                peer_tbs_pks: BTreeMap::default(),
+                max_notes_per_denomination: <span class="number">0</span>,
             },
             context: Arc::new(ClientContext {
-                db: db.into(),
+                decoders: ModuleDecoderRegistry::from_iter([(
+                    module_id,
+                    &lt;Mint <span class="kw">as </span>ServerModule&gt;::decoder(),
+                )]),
+                module_gens: Default::default(),
+                db: Database::new(db, module_decode_stubs()),
                 api: WsFederationApi::new(<span class="macro">vec!</span>[]).into(),
                 secp: Default::default(),
             }),
-            secret: DerivableSecret::new(<span class="kw-2">&amp;</span>[], <span class="kw-2">&amp;</span>[]),
+            secret: DerivableSecret::new_root(<span class="kw-2">&amp;</span>[], <span class="kw-2">&amp;</span>[]).child_key(MINT_SECRET_CHILD_ID),
         };
         <span class="kw">let </span>client_copy = client.clone();
-        <span class="kw">let </span>amount = Amount::from_milli_sats(<span class="number">1</span>);
+        <span class="kw">let </span>amount = Amount::from_msats(<span class="number">1</span>);
 
         <span class="kw">let </span>issuance_thread = <span class="kw">move </span>|| {
             (<span class="number">0</span>..ITERATIONS)
@@ -1864,10 +1951,11 @@
                     |<span class="kw">_</span>| {
                         <span class="kw">let </span>client = client_copy.clone();
                         block_on(<span class="kw">async </span>{
+                            <span class="kw">let </span><span class="kw-2">mut </span>dbtx = client.context.db.begin_transaction().<span class="kw">await</span>;
                             <span class="kw">let </span>(<span class="kw">_</span>, nonce) = client
-                                .new_ecash_note(secp256k1_zkp::SECP256K1, amount)
+                                .new_ecash_note(secp256k1_zkp::SECP256K1, amount, <span class="kw-2">&amp;mut </span>dbtx)
                                 .<span class="kw">await</span>;
-                            <span class="prelude-val">Some</span>(nonce)
+                            dbtx.commit_tx_result().<span class="kw">await</span>.map(|<span class="kw">_</span>| nonce).ok()
                         })
                     }
                 })
@@ -1883,7 +1971,7 @@
                 <span class="kw">let </span>output = t.join().unwrap();
                 <span class="comment">// Most threads will have produces far less than ITERATIONS items notes due to
                 // database transactions failing
-                </span><span class="macro">dbg!</span>(output.len());
+                </span>output.len();
                 output
             })
             .collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;();
@@ -1897,14 +1985,14 @@
         <span class="kw">let </span>last_idx = client
             .context
             .db
-            .begin_transaction(ModuleRegistry::default())
-            .get_value(<span class="kw-2">&amp;</span>NextECashNoteIndexKey(amount))
+            .begin_transaction()
             .<span class="kw">await
-            </span>.expect(<span class="string">&quot;DB error&quot;</span>)
-            .unwrap_or(<span class="number">0</span>);
+            </span>.get_value(<span class="kw-2">&amp;</span>NextECashNoteIndexKey(amount))
+            .<span class="kw">await
+            </span>.unwrap_or(<span class="number">0</span>);
         <span class="comment">// Ensure we didn&#39;t skip any keys
         </span><span class="macro">assert_eq!</span>(last_idx, result_count <span class="kw">as </span>u64);
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="mint_client" data-themes="" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (b28d30e1e 2022-12-06)" data-search-js="search-444266647c4dba98.js" data-settings-js="settings-bebeae96e00e4617.js" data-settings-css="settings-af96d9e2fc13e081.css" ></div></body></html>
+</section></main><div id="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="mint_client" data-themes="" data-resource-suffix="" data-rustdoc-version="1.69.0-nightly (f3126500f 2023-02-02)" data-search-js="search-98d53477a794af0b.js" data-settings-js="settings-f0c5c39777a9a2f6.js" data-settings-css="settings-0bcba95ff279c1db.css" ></div></body></html>
