@@ -986,10 +986,25 @@
 <a href="#986" id="986">986</a>
 <a href="#987" id="987">987</a>
 <a href="#988" id="988">988</a>
+<a href="#989" id="989">989</a>
+<a href="#990" id="990">990</a>
+<a href="#991" id="991">991</a>
+<a href="#992" id="992">992</a>
+<a href="#993" id="993">993</a>
+<a href="#994" id="994">994</a>
+<a href="#995" id="995">995</a>
+<a href="#996" id="996">996</a>
+<a href="#997" id="997">997</a>
+<a href="#998" id="998">998</a>
+<a href="#999" id="999">999</a>
+<a href="#1000" id="1000">1000</a>
+<a href="#1001" id="1001">1001</a>
+<a href="#1002" id="1002">1002</a>
+<a href="#1003" id="1003">1003</a>
+<a href="#1004" id="1004">1004</a>
 </pre><pre class="rust"><code><span class="kw">pub mod </span>audit;
 <span class="kw">pub mod </span>interconnect;
 <span class="kw">pub mod </span>registry;
-
 <span class="kw">use </span>std::collections::{BTreeMap, HashSet};
 <span class="kw">use </span>std::ffi::OsString;
 <span class="kw">use </span>std::fmt::Debug;
@@ -1012,7 +1027,9 @@
     Decoder, DecoderBuilder, Input, ModuleConsensusItem, ModuleInstanceId, ModuleKind, Output,
     OutputOutcome,
 };
-<span class="kw">use </span><span class="kw">crate</span>::db::{Database, DatabaseVersion, MigrationMap, ModuleDatabaseTransaction};
+<span class="kw">use </span><span class="kw">crate</span>::db::{
+    Database, DatabaseTransaction, DatabaseVersion, MigrationMap, ModuleDatabaseTransaction,
+};
 <span class="kw">use </span><span class="kw">crate</span>::encoding::{Decodable, DecodeError, Encodable};
 <span class="kw">use </span><span class="kw">crate</span>::module::audit::Audit;
 <span class="kw">use </span><span class="kw">crate</span>::module::interconnect::ModuleInterconect;
@@ -1086,6 +1103,15 @@
             params: <span class="self">self</span>.params,
         }
     }
+
+    <span class="kw">pub fn </span>to_typed&lt;T: serde::de::DeserializeOwned&gt;(
+        <span class="self">self</span>,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;ApiRequest&lt;T&gt;, serde_json::Error&gt; {
+        <span class="prelude-val">Ok</span>(ApiRequest {
+            auth: <span class="self">self</span>.auth,
+            params: serde_json::from_value::&lt;T&gt;(<span class="self">self</span>.params)<span class="question-mark">?</span>,
+        })
+    }
 }
 
 <span class="doccomment">/// Authentication uses the hashed user password in PHC format
@@ -1122,20 +1148,44 @@
 
 <span class="doccomment">/// State made available to all API endpoints for handling a request
 </span><span class="kw">pub struct </span>ApiEndpointContext&lt;<span class="lifetime">&#39;a</span>&gt; {
-    dbtx: ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;a</span>, ModuleInstanceId&gt;,
+    dbtx: DatabaseTransaction&lt;<span class="lifetime">&#39;a</span>&gt;,
     has_auth: bool,
+    module_id: <span class="prelude-ty">Option</span>&lt;ModuleInstanceId&gt;,
 }
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; ApiEndpointContext&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">pub fn </span>new(
+        has_auth: bool,
+        dbtx: DatabaseTransaction&lt;<span class="lifetime">&#39;a</span>&gt;,
+        module_id: <span class="prelude-ty">Option</span>&lt;ModuleInstanceId&gt;,
+    ) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            has_auth,
+            dbtx,
+            module_id,
+        }
+    }
+
     <span class="doccomment">/// Database tx handle, will be committed
-    </span><span class="kw">pub fn </span>dbtx(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;a</span>, ModuleInstanceId&gt; {
-        <span class="kw-2">&amp;mut </span><span class="self">self</span>.dbtx
+    </span><span class="kw">pub fn </span>dbtx(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;_</span>, ModuleInstanceId&gt; {
+        <span class="kw">match </span><span class="self">self</span>.module_id {
+            <span class="prelude-val">None </span>=&gt; <span class="self">self</span>.dbtx.get_isolated(),
+            <span class="prelude-val">Some</span>(id) =&gt; <span class="self">self</span>.dbtx.with_module_prefix(id),
+        }
     }
 
     <span class="doccomment">/// Whether the request was authenticated as the guardian who controls this
     /// fedimint server
     </span><span class="kw">pub fn </span>has_auth(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
         <span class="self">self</span>.has_auth
+    }
+
+    <span class="doccomment">/// Attempts to commit the dbtx or returns an ApiError
+    </span><span class="kw">pub async fn </span>commit_tx_result(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;(), ApiError&gt; {
+        <span class="self">self</span>.dbtx.commit_tx_result().<span class="kw">await</span>.map_err(|_err| ApiError {
+            code: <span class="number">500</span>,
+            message: <span class="string">&quot;API server error when writing to database&quot;</span>.to_string(),
+        })
     }
 }
 
@@ -1153,7 +1203,6 @@
         state: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">Self</span>::State,
         context: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>ApiEndpointContext&lt;<span class="lifetime">&#39;b</span>&gt;,
         request: <span class="self">Self</span>::Param,
-        has_auth: bool,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Response, ApiError&gt;;
 }
 
@@ -1194,7 +1243,6 @@
                 <span class="macro-nonterminal">$state</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">Self</span>::State,
                 <span class="macro-nonterminal">$context</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="macro-nonterminal">$crate::module::ApiEndpointContext</span>&lt;<span class="lifetime">&#39;b</span>&gt;,
                 <span class="macro-nonterminal">$param</span>: <span class="self">Self</span>::Param,
-                _has_auth: bool,
             ) -&gt; ::std::result::Result&lt;<span class="self">Self</span>::Response, <span class="macro-nonterminal">$crate::module::ApiError</span>&gt; {
                 <span class="macro-nonterminal">$body
             </span>}
@@ -1213,13 +1261,7 @@
     Pin&lt;Box&lt;<span class="macro">maybe_add_send!</span>(<span class="kw">dyn </span>Future&lt;Output = <span class="prelude-ty">Result</span>&lt;serde_json::Value, ApiError&gt;&gt; + <span class="lifetime">&#39;a</span>)&gt;&gt;;
 <span class="kw">type </span>HandlerFn&lt;M&gt; = Box&lt;
     <span class="macro">maybe_add_send_sync!</span>(
-        <span class="kw">dyn for</span>&lt;<span class="lifetime">&#39;a</span>&gt; Fn(
-            <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>M,
-            fedimint_core::db::DatabaseTransaction&lt;<span class="lifetime">&#39;a</span>&gt;,
-            serde_json::Value,
-            <span class="prelude-ty">Option</span>&lt;ModuleInstanceId&gt;,
-            ApiAuth,
-        ) -&gt; HandlerFnReturn&lt;<span class="lifetime">&#39;a</span>&gt;
+        <span class="kw">dyn for</span>&lt;<span class="lifetime">&#39;a</span>&gt; Fn(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>M, ApiEndpointContext&lt;<span class="lifetime">&#39;a</span>&gt;, ApiRequestErased) -&gt; HandlerFnReturn&lt;<span class="lifetime">&#39;a</span>&gt;
     ),
 &gt;;
 
@@ -1253,9 +1295,8 @@
         )]
         </span><span class="kw">async fn </span>handle_request&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>, E&gt;(
             state: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>E::State,
-            dbtx: fedimint_core::db::ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;b</span>, ModuleInstanceId&gt;,
+            context: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>ApiEndpointContext&lt;<span class="lifetime">&#39;b</span>&gt;,
             request: ApiRequest&lt;E::Param&gt;,
-            api_auth: ApiAuth,
         ) -&gt; <span class="prelude-ty">Result</span>&lt;E::Response, ApiError&gt;
         <span class="kw">where
             </span>E: TypedApiEndpoint,
@@ -1263,9 +1304,7 @@
             E::Response: Debug,
         {
             <span class="macro">tracing::trace!</span>(target: <span class="string">&quot;fedimint_server::request&quot;</span>, <span class="question-mark">?</span>request, <span class="string">&quot;received request&quot;</span>);
-            <span class="kw">let </span>has_auth = request.auth == <span class="prelude-val">Some</span>(api_auth);
-            <span class="kw">let </span><span class="kw-2">mut </span>context = ApiEndpointContext { dbtx, has_auth };
-            <span class="kw">let </span>result = E::handle(state, <span class="kw-2">&amp;mut </span>context, request.params, has_auth).<span class="kw">await</span>;
+            <span class="kw">let </span>result = E::handle(state, context, request.params).<span class="kw">await</span>;
             <span class="kw">if let </span><span class="prelude-val">Err</span>(error) = <span class="kw-2">&amp;</span>result {
                 <span class="macro">tracing::trace!</span>(target: <span class="string">&quot;fedimint_server::request&quot;</span>, <span class="question-mark">?</span>error, <span class="string">&quot;error&quot;</span>);
             }
@@ -1274,27 +1313,16 @@
 
         ApiEndpoint {
             path: E::PATH,
-            handler: Box::new(|m, <span class="kw-2">mut </span>dbtx, param, module_instance_id, api_auth| {
+            handler: Box::new(|m, <span class="kw-2">mut </span>context, request| {
                 Box::pin(<span class="kw">async move </span>{
-                    <span class="kw">let </span>params = serde_json::from_value(param)
+                    <span class="kw">let </span>request = request
+                        .to_typed()
                         .map_err(|e| ApiError::bad_request(e.to_string()))<span class="question-mark">?</span>;
 
-                    <span class="kw">let </span>ret = <span class="kw">match </span>module_instance_id {
-                        <span class="prelude-val">Some</span>(module_instance_id) =&gt; {
-                            <span class="kw">let </span>module_dbtx = dbtx.with_module_prefix(module_instance_id);
-                            handle_request::&lt;E&gt;(m, module_dbtx, params, api_auth).<span class="kw">await</span><span class="question-mark">?
-                        </span>}
-                        <span class="prelude-val">None </span>=&gt; {
-                            handle_request::&lt;E&gt;(m, dbtx.get_isolated(), params, api_auth).<span class="kw">await</span><span class="question-mark">?
-                        </span>}
-                    };
+                    <span class="kw">let </span>ret = handle_request::&lt;E&gt;(m, <span class="kw-2">&amp;mut </span>context, request).<span class="kw">await</span><span class="question-mark">?</span>;
 
-                    dbtx.commit_tx_result().<span class="kw">await</span>.map_err(|_err| {
-                        fedimint_core::module::ApiError {
-                            code: <span class="number">500</span>,
-                            message: <span class="string">&quot;Internal Server Error&quot;</span>.to_string(),
-                        }
-                    })<span class="question-mark">?</span>;
+                    context.commit_tx_result().<span class="kw">await</span><span class="question-mark">?</span>;
+
                     <span class="prelude-val">Ok</span>(serde_json::to_value(ret).expect(<span class="string">&quot;encoding error&quot;</span>))
                 })
             }),
@@ -1398,7 +1426,7 @@
         task_group: <span class="kw-2">&amp;mut </span>TaskGroup,
     ) -&gt; anyhow::Result&lt;DynServerModule&gt;;
 
-    <span class="doccomment">/// Retreives the `MigrationMap` from the module to be applied to the
+    <span class="doccomment">/// Retrieves the `MigrationMap` from the module to be applied to the
     /// database before the module is initialized. The `MigrationMap` is
     /// indexed on the from version.
     </span><span class="kw">fn </span>get_database_migrations(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; MigrationMap;
@@ -1471,7 +1499,7 @@
 /// Any breaking change to the module&#39;s consensus rules require incrementing it.
 ///
 /// A module instance can run only in one consensus version, which must be the
-/// same accross all corresponding instances on other nodes of the federation.
+/// same across all corresponding instances on other nodes of the federation.
 ///
 /// When [`CoreConsensusVersion`] changes, this can but is not requires to be
 /// a breaking change for each module&#39;s [`ModuleConsensusVersion`].
@@ -1479,13 +1507,13 @@
 /// Incrementing the module&#39;s consensus version can be considered an in-place
 /// upgrade path, similar to a blockchain hard-fork consensus upgrade.
 ///
-/// As of time of writting this comment there are no plans to support any kind
+/// As of time of writing this comment there are no plans to support any kind
 /// of &quot;soft-forks&quot; which mean a consensus minor version. As the set of
 /// federation member&#39;s is closed and limited, it is always preferable to
 /// synchronize upgrade and avoid cross-version incompatibilities.
 ///
 /// For many modules it might be preferable to implement a new [`ModuleKind`]
-/// &quot;versions&quot; (to be implemented at the time of writting this comment), and
+/// &quot;versions&quot; (to be implemented at the time of writing this comment), and
 /// by running two instances of the module at the same time (each of different
 /// `ModuleKind` version), allow users to slowly migrate to a new one.
 /// This avoids complex and error-prone server-side consensus-migration logic.
@@ -1501,14 +1529,14 @@
 ///
 /// * The client needs API version support for the [`ModuleConsensusVersion`]
 ///   that the server is currently running with.
-/// * Within that [`ModuleConsensusVersion`] during handshake negotation process
-///   client and server must find at least one `Api::major` version where
-///   client&#39;s `minor` is lower or equal server&#39;s `major` version.
+/// * Within that [`ModuleConsensusVersion`] during handshake negotiation
+///   process client and server must find at least one `Api::major` version
+///   where client&#39;s `minor` is lower or equal server&#39;s `major` version.
 ///
 /// A practical module implementation needs to implement large range of version
-/// backward compatibility on both client and server side to accomodate end user
-/// client devices receiving updates at a pace hard to control, and technical
-/// and coordination challanges of upgrading servers.
+/// backward compatibility on both client and server side to accommodate end
+/// user client devices receiving updates at a pace hard to control, and
+/// technical and coordination challenges of upgrading servers.
 </span><span class="attr">#[derive(Debug, Copy, Clone)]
 </span><span class="kw">pub struct </span>ApiVersion {
     <span class="doccomment">/// Major API version
@@ -1566,6 +1594,10 @@
     /// checking purposes.
     </span><span class="kw">fn </span>versions(<span class="kw-2">&amp;</span><span class="self">self</span>, core: CoreConsensusVersion) -&gt; <span class="kw-2">&amp;</span>[ModuleConsensusVersion];
 
+    <span class="kw">fn </span>kind() -&gt; ModuleKind {
+        &lt;<span class="self">Self </span><span class="kw">as </span>ExtendsCommonModuleGen&gt;::Common::KIND
+    }
+
     <span class="doccomment">/// Initialize the [`DynServerModule`] instance from its config
     </span><span class="kw">async fn </span>init(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
@@ -1575,7 +1607,7 @@
         task_group: <span class="kw-2">&amp;mut </span>TaskGroup,
     ) -&gt; anyhow::Result&lt;DynServerModule&gt;;
 
-    <span class="doccomment">/// Retreives the `MigrationMap` from the module to be applied to the
+    <span class="doccomment">/// Retrieves the `MigrationMap` from the module to be applied to the
     /// database before the module is initialized. The `MigrationMap` is
     /// indexed on the from version.
     </span><span class="kw">fn </span>get_database_migrations(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; MigrationMap {
@@ -1943,7 +1975,7 @@
 /// module to complete its distributed initialization inside the federation.
 </span><span class="attr">#[non_exhaustive]
 </span><span class="kw">pub struct </span>PeerHandle&lt;<span class="lifetime">&#39;a</span>&gt; {
-    <span class="comment">// TODO: this whole type should be a part of a `fedimint-server` and fields here inaccesible
+    <span class="comment">// TODO: this whole type should be a part of a `fedimint-server` and fields here inaccessible
     // to outside crates, but until `ServerModule` is not in `fedimint-server` this is impossible
     </span><span class="attr">#[doc(hidden)]
     </span><span class="kw">pub </span>connections: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>MuxPeerConnections&lt;ModuleInstanceId, DkgPeerMsg&gt;,
