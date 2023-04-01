@@ -326,11 +326,7 @@ impl ServerModule for Lightning {
 
         // We force new epochs only if invoice expires, or we have decryption share
         // (more than just round_ci item)
-        if 1 < items.len()
-            || (outgoing_contracts
-                .first()
-                .map_or(false, |c| c.invoice.is_expired()))
-        {
+        if items.len() > 1 || outgoing_contracts.iter().any(|c| c.invoice.is_expired()) {
             ConsensusProposal::Trigger(items)
         } else {
             ConsensusProposal::Contribute(items)
@@ -949,7 +945,7 @@ impl Lightning {
     // # Panics
     /// * If proposals is empty
     async fn process_clock_time_proposals(&self, mut proposals: Vec<u64>) -> u64 {
-        assert!(!proposals.is_empty());
+        assert!(!proposals.is_empty(), "proposals is empty");
 
         proposals.sort();
 
