@@ -1130,36 +1130,121 @@
 <a href="#1130" id="1130">1130</a>
 <a href="#1131" id="1131">1131</a>
 <a href="#1132" id="1132">1132</a>
+<a href="#1133" id="1133">1133</a>
+<a href="#1134" id="1134">1134</a>
+<a href="#1135" id="1135">1135</a>
+<a href="#1136" id="1136">1136</a>
+<a href="#1137" id="1137">1137</a>
+<a href="#1138" id="1138">1138</a>
+<a href="#1139" id="1139">1139</a>
+<a href="#1140" id="1140">1140</a>
+<a href="#1141" id="1141">1141</a>
+<a href="#1142" id="1142">1142</a>
+<a href="#1143" id="1143">1143</a>
+<a href="#1144" id="1144">1144</a>
+<a href="#1145" id="1145">1145</a>
+<a href="#1146" id="1146">1146</a>
+<a href="#1147" id="1147">1147</a>
+<a href="#1148" id="1148">1148</a>
+<a href="#1149" id="1149">1149</a>
+<a href="#1150" id="1150">1150</a>
+<a href="#1151" id="1151">1151</a>
+<a href="#1152" id="1152">1152</a>
+<a href="#1153" id="1153">1153</a>
+<a href="#1154" id="1154">1154</a>
+<a href="#1155" id="1155">1155</a>
+<a href="#1156" id="1156">1156</a>
+<a href="#1157" id="1157">1157</a>
+<a href="#1158" id="1158">1158</a>
+<a href="#1159" id="1159">1159</a>
+<a href="#1160" id="1160">1160</a>
+<a href="#1161" id="1161">1161</a>
+<a href="#1162" id="1162">1162</a>
+<a href="#1163" id="1163">1163</a>
+<a href="#1164" id="1164">1164</a>
+<a href="#1165" id="1165">1165</a>
+<a href="#1166" id="1166">1166</a>
+<a href="#1167" id="1167">1167</a>
+<a href="#1168" id="1168">1168</a>
+<a href="#1169" id="1169">1169</a>
+<a href="#1170" id="1170">1170</a>
+<a href="#1171" id="1171">1171</a>
+<a href="#1172" id="1172">1172</a>
+<a href="#1173" id="1173">1173</a>
+<a href="#1174" id="1174">1174</a>
+<a href="#1175" id="1175">1175</a>
+<a href="#1176" id="1176">1176</a>
+<a href="#1177" id="1177">1177</a>
+<a href="#1178" id="1178">1178</a>
+<a href="#1179" id="1179">1179</a>
+<a href="#1180" id="1180">1180</a>
+<a href="#1181" id="1181">1181</a>
+<a href="#1182" id="1182">1182</a>
+<a href="#1183" id="1183">1183</a>
+<a href="#1184" id="1184">1184</a>
+<a href="#1185" id="1185">1185</a>
+<a href="#1186" id="1186">1186</a>
+<a href="#1187" id="1187">1187</a>
+<a href="#1188" id="1188">1188</a>
+<a href="#1189" id="1189">1189</a>
+<a href="#1190" id="1190">1190</a>
+<a href="#1191" id="1191">1191</a>
+<a href="#1192" id="1192">1192</a>
+<a href="#1193" id="1193">1193</a>
+<a href="#1194" id="1194">1194</a>
+<a href="#1195" id="1195">1195</a>
+<a href="#1196" id="1196">1196</a>
+<a href="#1197" id="1197">1197</a>
+<a href="#1198" id="1198">1198</a>
+<a href="#1199" id="1199">1199</a>
+<a href="#1200" id="1200">1200</a>
+<a href="#1201" id="1201">1201</a>
+<a href="#1202" id="1202">1202</a>
+<a href="#1203" id="1203">1203</a>
+<a href="#1204" id="1204">1204</a>
+<a href="#1205" id="1205">1205</a>
+<a href="#1206" id="1206">1206</a>
+<a href="#1207" id="1207">1207</a>
+<a href="#1208" id="1208">1208</a>
+<a href="#1209" id="1209">1209</a>
+<a href="#1210" id="1210">1210</a>
+<a href="#1211" id="1211">1211</a>
+<a href="#1212" id="1212">1212</a>
+<a href="#1213" id="1213">1213</a>
+<a href="#1214" id="1214">1214</a>
+<a href="#1215" id="1215">1215</a>
+<a href="#1216" id="1216">1216</a>
+<a href="#1217" id="1217">1217</a>
+<a href="#1218" id="1218">1218</a>
+<a href="#1219" id="1219">1219</a>
 </pre><pre class="rust"><code><span class="kw">use </span>std::borrow::Cow;
-<span class="kw">use </span>std::collections::{BTreeMap, BTreeSet};
+<span class="kw">use </span>std::collections::{BTreeMap, BTreeSet, HashMap};
 <span class="kw">use </span>std::fmt::{<span class="self">self</span>, Debug, Display, Formatter};
 <span class="kw">use </span>std::io::{Cursor, Read};
 <span class="kw">use </span>std::pin::Pin;
 <span class="kw">use </span>std::str::FromStr;
 <span class="kw">use </span>std::sync::Arc;
-<span class="kw">use </span>std::time::Duration;
+<span class="kw">use </span>std::time::{Duration, SystemTime};
 <span class="kw">use </span>std::{cmp, result};
 
-<span class="kw">use </span>anyhow::ensure;
+<span class="kw">use </span>anyhow::{anyhow, ensure};
 <span class="kw">use </span>bech32::Variant::Bech32m;
 <span class="kw">use </span>bech32::{FromBase32, ToBase32};
-<span class="kw">use </span>bitcoin::consensus::ReadExt;
+<span class="kw">use </span>bitcoin::secp256k1;
 <span class="kw">use </span>bitcoin_hashes::sha256;
-<span class="kw">use </span>fedimint_core::config::{
-    ApiEndpoint, ClientConfig, CommonModuleGenRegistry, ConfigResponse, FederationId,
-};
-<span class="kw">use </span>fedimint_core::core::DynOutputOutcome;
+<span class="kw">use </span>fedimint_core::config::{ClientConfig, ClientConfigResponse, FederationId};
+<span class="kw">use </span>fedimint_core::core::ModuleInstanceId;
+<span class="kw">use </span>fedimint_core::encoding::Encodable;
 <span class="kw">use </span>fedimint_core::fmt_utils::AbbreviateDebug;
 <span class="kw">use </span>fedimint_core::module::registry::ModuleDecoderRegistry;
 <span class="kw">use </span>fedimint_core::task::{sleep, MaybeSend, MaybeSync, RwLock, RwLockWriteGuard};
 <span class="kw">use </span>fedimint_core::{
     apply, async_trait_maybe_send, dyn_newtype_define, NumPeers, OutPoint, PeerId, TransactionId,
 };
+<span class="kw">use </span>fedimint_derive::Decodable;
 <span class="kw">use </span>fedimint_logging::LOG_NET_API;
 <span class="kw">use </span>futures::stream::FuturesUnordered;
 <span class="kw">use </span>futures::{Future, StreamExt};
-<span class="attr">#[cfg(not(target_family = <span class="string">&quot;wasm&quot;</span>))]
-</span><span class="kw">use </span>jsonrpsee_core::client::CertificateStore;
 <span class="kw">use </span>jsonrpsee_core::client::ClientT;
 <span class="kw">use </span>jsonrpsee_core::Error <span class="kw">as </span>JsonRpcError;
 <span class="attr">#[cfg(target_family = <span class="string">&quot;wasm&quot;</span>)]
@@ -1173,15 +1258,17 @@
 <span class="kw">use </span>tracing::{debug, error, instrument, trace};
 <span class="kw">use </span>url::Url;
 
+<span class="kw">use </span><span class="kw">crate</span>::backup::ClientBackupSnapshot;
+<span class="kw">use </span><span class="kw">crate</span>::core::backup::SignedBackupRequest;
+<span class="kw">use </span><span class="kw">crate</span>::core::{Decoder, OutputOutcome};
 <span class="kw">use </span><span class="kw">crate</span>::epoch::{SerdeEpochHistory, SignedEpochOutcome};
-<span class="kw">use </span><span class="kw">crate</span>::module::{ApiAuth, ApiRequestErased};
+<span class="kw">use </span><span class="kw">crate</span>::module::ApiRequestErased;
 <span class="kw">use </span><span class="kw">crate</span>::outcome::TransactionStatus;
 <span class="kw">use </span><span class="kw">crate</span>::query::{
     CurrentConsensus, EventuallyConsistent, QueryStep, QueryStrategy, UnionResponses,
-    VerifiableResponse,
+    UnionResponsesSingle, VerifiableResponse,
 };
 <span class="kw">use </span><span class="kw">crate</span>::transaction::{SerdeTransaction, Transaction};
-<span class="kw">use </span><span class="kw">crate</span>::CoreError;
 
 <span class="kw">pub type </span>MemberResult&lt;T&gt; = result::Result&lt;T, MemberError&gt;;
 
@@ -1207,9 +1294,11 @@
             MemberError::ResponseDeserialization(<span class="kw">_</span>) =&gt; <span class="bool-val">false</span>,
             MemberError::InvalidPeerId { peer_id: <span class="kw">_ </span>} =&gt; <span class="bool-val">false</span>,
             MemberError::Rpc(rpc_e) =&gt; <span class="kw">match </span>rpc_e {
-                JsonRpcError::Transport(<span class="kw">_</span>) =&gt; <span class="bool-val">true</span>,
-                JsonRpcError::Internal(<span class="kw">_</span>) =&gt; <span class="bool-val">true</span>,
-                JsonRpcError::Call(jsonrpsee_types::error::CallError::Custom(e)) =&gt; e.code() == <span class="number">404</span>,
+                <span class="comment">// TODO: Does this cover all retryable cases?
+                </span>JsonRpcError::Transport(<span class="kw">_</span>) =&gt; <span class="bool-val">true</span>,
+                JsonRpcError::MaxSlotsExceeded =&gt; <span class="bool-val">true</span>,
+                JsonRpcError::RequestTimeout =&gt; <span class="bool-val">true</span>,
+                JsonRpcError::Call(e) =&gt; e.code() == <span class="number">404</span>,
                 <span class="kw">_ </span>=&gt; <span class="bool-val">false</span>,
             },
             MemberError::InvalidResponse(<span class="kw">_</span>) =&gt; <span class="bool-val">false</span>,
@@ -1250,7 +1339,7 @@
     <span class="attr">#[error(<span class="string">&quot;Federation error: {0}&quot;</span>)]
     </span>Federation(<span class="attr">#[from] </span>FederationError),
     <span class="attr">#[error(<span class="string">&quot;Core error: {0}&quot;</span>)]
-    </span>Core(<span class="attr">#[from] </span>CoreError),
+    </span>Core(<span class="attr">#[from] </span>anyhow::Error),
     <span class="attr">#[error(<span class="string">&quot;Transaction rejected: {0}&quot;</span>)]
     </span>Rejected(String),
     <span class="attr">#[error(<span class="string">&quot;Invalid output index {out_idx}, larger than {outputs_num} in the transaction&quot;</span>)]
@@ -1270,6 +1359,8 @@
     /// API call to the federation would be inconvenient.
     </span><span class="kw">fn </span>all_members(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>BTreeSet&lt;PeerId&gt;;
 
+    <span class="kw">fn </span>with_module(<span class="kw-2">&amp;</span><span class="self">self</span>, id: ModuleInstanceId) -&gt; DynFederationApi;
+
     <span class="doccomment">/// Make request to a specific federation member by `peer_id`
     </span><span class="kw">async fn </span>request_raw(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
@@ -1277,10 +1368,6 @@
         method: <span class="kw-2">&amp;</span>str,
         params: <span class="kw-2">&amp;</span>[Value],
     ) -&gt; result::Result&lt;Value, jsonrpsee_core::Error&gt;;
-}
-
-<span class="kw">pub trait </span>DynTryIntoOutcome: Sized {
-    <span class="kw">fn </span>try_into_outcome(common_outcome: DynOutputOutcome) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, CoreError&gt;;
 }
 
 <span class="doccomment">/// An extension trait allowing to making federation-wide API call on top
@@ -1443,7 +1530,8 @@
 </span><span class="kw">impl</span>&lt;T: <span class="question-mark">?</span>Sized&gt; FederationApiExt <span class="kw">for </span>T <span class="kw">where </span>T: IFederationApi {}
 
 <span class="macro">dyn_newtype_define! </span>{
-    <span class="kw">pub </span>DynFederationApi(Arc&lt;IFederationApi&gt;)
+    <span class="attr">#[derive(Clone)]
+    </span><span class="kw">pub </span>DynFederationApi(Arc&lt;IFederationApi&gt;)
 }
 
 <span class="kw">impl </span>AsRef&lt;<span class="kw">dyn </span>IFederationApi + <span class="lifetime">&#39;static</span>&gt; <span class="kw">for </span>DynFederationApi {
@@ -1473,35 +1561,44 @@
     <span class="kw">async fn </span>fetch_output_outcome&lt;R&gt;(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         out_point: OutPoint,
-        decoders: <span class="kw-2">&amp;</span>ModuleDecoderRegistry,
+        module_decoder: <span class="kw-2">&amp;</span>Decoder,
     ) -&gt; OutputOutcomeResult&lt;<span class="prelude-ty">Option</span>&lt;R&gt;&gt;
     <span class="kw">where
-        </span>R: DynTryIntoOutcome + MaybeSend;
+        </span>R: OutputOutcome;
 
-    <span class="kw">async fn </span>await_output_outcome&lt;R: DynTryIntoOutcome + MaybeSend&gt;(
+    <span class="kw">async fn </span>await_output_outcome&lt;R&gt;(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         outpoint: OutPoint,
         timeout: Duration,
-        decoders: <span class="kw-2">&amp;</span>ModuleDecoderRegistry,
-    ) -&gt; OutputOutcomeResult&lt;R&gt;;
+        module_decoder: <span class="kw-2">&amp;</span>Decoder,
+    ) -&gt; OutputOutcomeResult&lt;R&gt;
+    <span class="kw">where
+        </span>R: OutputOutcome;
 
     <span class="doccomment">/// Fetch client configuration info only if verified against a federation id
     </span><span class="kw">async fn </span>download_client_config(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        id: <span class="kw-2">&amp;</span>FederationId,
-        module_gens: CommonModuleGenRegistry,
+        info: <span class="kw-2">&amp;</span>WsClientConnectInfo,
     ) -&gt; FederationResult&lt;ClientConfig&gt;;
 
     <span class="doccomment">/// Fetches the server consensus hash if enough peers agree on it
     </span><span class="kw">async fn </span>consensus_config_hash(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; FederationResult&lt;sha256::Hash&gt;;
+
+    <span class="kw">async fn </span>upload_backup(<span class="kw-2">&amp;</span><span class="self">self</span>, request: <span class="kw-2">&amp;</span>SignedBackupRequest) -&gt; FederationResult&lt;()&gt;;
+
+    <span class="kw">async fn </span>download_backup(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        id: <span class="kw-2">&amp;</span>secp256k1::XOnlyPublicKey,
+    ) -&gt; FederationResult&lt;Vec&lt;ClientBackupSnapshot&gt;&gt;;
 }
+
 <span class="kw">fn </span>map_tx_outcome_outpoint&lt;R&gt;(
     tx_outcome: TransactionStatus,
     out_point: OutPoint,
-    decoders: <span class="kw-2">&amp;</span>ModuleDecoderRegistry,
+    module_decoder: <span class="kw-2">&amp;</span>Decoder,
 ) -&gt; OutputOutcomeResult&lt;R&gt;
 <span class="kw">where
-    </span>R: DynTryIntoOutcome + MaybeSend,
+    </span>R: OutputOutcome + MaybeSend,
 {
     <span class="kw">match </span>tx_outcome {
         TransactionStatus::Rejected(e) =&gt; <span class="prelude-val">Err</span>(OutputOutcomeError::Rejected(e)),
@@ -1515,12 +1612,17 @@
                     out_idx: out_point.out_idx,
                 })
                 .and_then(|output| {
-                    R::try_into_outcome(
-                        output
-                            .try_into_inner(decoders)
-                            .map_err(|e| OutputOutcomeError::ResponseDeserialization(e.into()))<span class="question-mark">?</span>,
-                    )
-                    .map_err(OutputOutcomeError::Core)
+
+
+                    <span class="kw">let </span>dyn_outcome = output
+                        .try_into_inner_known_module_kind(module_decoder)
+                        .map_err(|e| OutputOutcomeError::ResponseDeserialization(e.into()))<span class="question-mark">?</span>;
+
+                    <span class="kw">let </span>source_instance = dyn_outcome.module_instance_id();
+                    dyn_outcome.as_any().downcast_ref().cloned().ok_or_else(|| {
+                        <span class="kw">let </span>target_type = std::any::type_name::&lt;R&gt;();
+                        OutputOutcomeError::ResponseDeserialization(<span class="macro">anyhow!</span>(<span class="string">&quot;Could not downcast output outcome with instance id {source_instance} to {target_type}&quot;</span>))
+                    })
                 })
         }
     }
@@ -1534,7 +1636,7 @@
     <span class="doccomment">/// Submit a transaction for inclusion
     </span><span class="kw">async fn </span>submit_transaction(<span class="kw-2">&amp;</span><span class="self">self</span>, tx: Transaction) -&gt; FederationResult&lt;TransactionId&gt; {
         <span class="self">self</span>.request_current_consensus(
-            <span class="string">&quot;/transaction&quot;</span>.to_owned(),
+            <span class="string">&quot;transaction&quot;</span>.to_owned(),
             ApiRequestErased::new(<span class="kw-2">&amp;</span>SerdeTransaction::from(<span class="kw-2">&amp;</span>tx)),
         )
         .<span class="kw">await
@@ -1545,13 +1647,13 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         tx: <span class="kw-2">&amp;</span>TransactionId,
     ) -&gt; FederationResult&lt;<span class="prelude-ty">Option</span>&lt;TransactionStatus&gt;&gt; {
-        <span class="self">self</span>.request_current_consensus(<span class="string">&quot;/fetch_transaction&quot;</span>.to_owned(), ApiRequestErased::new(tx))
+        <span class="self">self</span>.request_current_consensus(<span class="string">&quot;fetch_transaction&quot;</span>.to_owned(), ApiRequestErased::new(tx))
             .<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Await the outcome of an entire transaction
     </span><span class="kw">async fn </span>await_tx_outcome(<span class="kw-2">&amp;</span><span class="self">self</span>, tx: <span class="kw-2">&amp;</span>TransactionId) -&gt; FederationResult&lt;TransactionStatus&gt; {
-        <span class="self">self</span>.request_current_consensus(<span class="string">&quot;/wait_transaction&quot;</span>.to_owned(), ApiRequestErased::new(tx))
+        <span class="self">self</span>.request_current_consensus(<span class="string">&quot;wait_transaction&quot;</span>.to_owned(), ApiRequestErased::new(tx))
             .<span class="kw">await
     </span>}
 
@@ -1600,7 +1702,7 @@
 
         <span class="self">self</span>.request_with_strategy::&lt;SerdeEpochHistory, <span class="kw">_</span>&gt;(
             qs,
-            <span class="string">&quot;/fetch_epoch_history&quot;</span>.to_owned(),
+            <span class="string">&quot;fetch_epoch_history&quot;</span>.to_owned(),
             ApiRequestErased::new(epoch),
         )
         .<span class="kw">await
@@ -1608,7 +1710,7 @@
 
     <span class="kw">async fn </span>fetch_epoch_count(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; FederationResult&lt;u64&gt; {
         <span class="self">self</span>.request_eventually_consistent(
-            <span class="string">&quot;/fetch_epoch_count&quot;</span>.to_owned(),
+            <span class="string">&quot;fetch_epoch_count&quot;</span>.to_owned(),
             ApiRequestErased::default(),
         )
         .<span class="kw">await
@@ -1617,28 +1719,31 @@
     <span class="kw">async fn </span>fetch_output_outcome&lt;R&gt;(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         out_point: OutPoint,
-        decoders: <span class="kw-2">&amp;</span>ModuleDecoderRegistry,
+        module_decoder: <span class="kw-2">&amp;</span>Decoder,
     ) -&gt; OutputOutcomeResult&lt;<span class="prelude-ty">Option</span>&lt;R&gt;&gt;
     <span class="kw">where
-        </span>R: DynTryIntoOutcome + MaybeSend,
+        </span>R: OutputOutcome,
     {
         <span class="prelude-val">Ok</span>(<span class="self">self
             </span>.fetch_tx_outcome(<span class="kw-2">&amp;</span>out_point.txid)
             .<span class="kw">await</span><span class="question-mark">?
-            </span>.map(<span class="kw">move </span>|tx_outcome| map_tx_outcome_outpoint(tx_outcome, out_point, decoders))
+            </span>.map(<span class="kw">move </span>|tx_outcome| map_tx_outcome_outpoint(tx_outcome, out_point, module_decoder))
             .transpose()<span class="question-mark">?</span>)
     }
 
     <span class="comment">// TODO should become part of the API
-    </span><span class="kw">async fn </span>await_output_outcome&lt;R: DynTryIntoOutcome + MaybeSend&gt;(
+    </span><span class="kw">async fn </span>await_output_outcome&lt;R&gt;(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         outpoint: OutPoint,
         timeout: Duration,
-        decoders: <span class="kw-2">&amp;</span>ModuleDecoderRegistry,
-    ) -&gt; OutputOutcomeResult&lt;R&gt; {
+        module_decoder: <span class="kw-2">&amp;</span>Decoder,
+    ) -&gt; OutputOutcomeResult&lt;R&gt;
+    <span class="kw">where
+        </span>R: OutputOutcome,
+    {
         fedimint_core::task::timeout(timeout, <span class="kw">async move </span>{
             <span class="kw">let </span>tx_outcome = <span class="self">self</span>.await_tx_outcome(<span class="kw-2">&amp;</span>outpoint.txid).<span class="kw">await</span><span class="question-mark">?</span>;
-            map_tx_outcome_outpoint(tx_outcome, outpoint, decoders)
+            map_tx_outcome_outpoint(tx_outcome, outpoint, module_decoder)
         })
         .<span class="kw">await
         </span>.map_err(|<span class="kw">_</span>| OutputOutcomeError::Timeout(timeout))<span class="question-mark">?
@@ -1646,43 +1751,68 @@
 
     <span class="kw">async fn </span>download_client_config(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        id: <span class="kw-2">&amp;</span>FederationId,
-        module_gens: CommonModuleGenRegistry,
+        info: <span class="kw-2">&amp;</span>WsClientConnectInfo,
     ) -&gt; FederationResult&lt;ClientConfig&gt; {
-        <span class="kw">let </span>id = id.clone();
+        <span class="kw">let </span>id = info.id;
         <span class="kw">let </span>qs = VerifiableResponse::new(
             <span class="self">self</span>.all_members().total(),
             <span class="bool-val">false</span>,
-            <span class="kw">move </span>|config: <span class="kw-2">&amp;</span>ConfigResponse| {
-                <span class="kw">let </span>hash = config.client.consensus_hash(<span class="kw-2">&amp;</span>module_gens).expect(<span class="string">&quot;Hashes&quot;</span>);
-
-                <span class="kw">if let </span><span class="prelude-val">Some</span>(sig) = <span class="kw-2">&amp;</span>config.client_hash_signature {
-                    id.<span class="number">0</span>.verify(sig, hash)
-                } <span class="kw">else </span>{
-                    <span class="bool-val">false
-                </span>}
+            <span class="kw">move </span>|config: <span class="kw-2">&amp;</span>ClientConfigResponse| {
+                <span class="kw">let </span>hash = config.client_config.consensus_hash();
+                id.<span class="number">0</span>.verify(<span class="kw-2">&amp;</span>config.signature.<span class="number">0</span>, hash)
             },
         );
 
-        <span class="self">self</span>.request_with_strategy(qs, <span class="string">&quot;/config&quot;</span>.to_owned(), ApiRequestErased::default())
-            .<span class="kw">await
-            </span>.map(|cfg| cfg.client)
+        <span class="self">self</span>.request_with_strategy(
+            qs,
+            <span class="string">&quot;config&quot;</span>.to_owned(),
+            ApiRequestErased::new(info.to_string()),
+        )
+        .<span class="kw">await
+        </span>.map(|cfg: ClientConfigResponse| cfg.client_config)
     }
 
     <span class="kw">async fn </span>consensus_config_hash(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; FederationResult&lt;sha256::Hash&gt; {
-        <span class="self">self</span>.request_current_consensus(<span class="string">&quot;/config&quot;</span>.to_owned(), ApiRequestErased::default())
+        <span class="self">self</span>.request_current_consensus(<span class="string">&quot;config_hash&quot;</span>.to_owned(), ApiRequestErased::default())
             .<span class="kw">await
-            </span>.map(|cfg: ConfigResponse| cfg.consensus_hash)
+    </span>}
+
+    <span class="kw">async fn </span>upload_backup(<span class="kw-2">&amp;</span><span class="self">self</span>, request: <span class="kw-2">&amp;</span>SignedBackupRequest) -&gt; FederationResult&lt;()&gt; {
+        <span class="self">self</span>.request_with_strategy(
+            CurrentConsensus::new(<span class="self">self</span>.all_members().threshold()),
+            <span class="string">&quot;backup&quot;</span>.to_owned(),
+            ApiRequestErased::new(request),
+        )
+        .<span class="kw">await
+    </span>}
+
+    <span class="kw">async fn </span>download_backup(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        id: <span class="kw-2">&amp;</span>secp256k1::XOnlyPublicKey,
+    ) -&gt; FederationResult&lt;Vec&lt;ClientBackupSnapshot&gt;&gt; {
+        <span class="prelude-val">Ok</span>(<span class="self">self
+            </span>.request_with_strategy(
+                UnionResponsesSingle::&lt;<span class="prelude-ty">Option</span>&lt;ClientBackupSnapshot&gt;&gt;::new(
+                    <span class="self">self</span>.all_members().threshold(),
+                ),
+                <span class="string">&quot;recover&quot;</span>.to_owned(),
+                ApiRequestErased::new(id),
+            )
+            .<span class="kw">await</span><span class="question-mark">?
+            </span>.into_iter()
+            .flatten()
+            .collect())
     }
 }
 
 <span class="doccomment">/// Mint API client that will try to run queries against all `members` expecting
 /// equal results from at least `min_eq_results` of them. Members that return
 /// differing results are returned as a member faults list.
-</span><span class="attr">#[derive(Debug)]
+</span><span class="attr">#[derive(Debug, Clone)]
 </span><span class="kw">pub struct </span>WsFederationApi&lt;C = WsClient&gt; {
     peers: BTreeSet&lt;PeerId&gt;,
-    members: Vec&lt;FederationMember&lt;C&gt;&gt;,
+    members: Arc&lt;Vec&lt;FederationMember&lt;C&gt;&gt;&gt;,
+    module_id: <span class="prelude-ty">Option</span>&lt;ModuleInstanceId&gt;,
 }
 
 <span class="attr">#[derive(Debug)]
@@ -1695,37 +1825,22 @@
 <span class="doccomment">/// Information required for client to construct [`WsFederationApi`] instance
 ///
 /// Can be used to download the configs and bootstrap a client
-</span><span class="attr">#[derive(Clone, Debug, Eq, PartialEq)]
+</span><span class="attr">#[derive(Clone, Debug, Eq, PartialEq, Encodable)]
 </span><span class="kw">pub struct </span>WsClientConnectInfo {
-    <span class="doccomment">/// Urls that support the federation API (expected to be in PeerId order)
-    </span><span class="kw">pub </span>urls: Vec&lt;Url&gt;,
+    <span class="doccomment">/// Url to reach an API that we can download configs from
+    </span><span class="kw">pub </span>url: Url,
+    <span class="doccomment">/// Config download token (might only be used a certain number of times)
+    </span><span class="kw">pub </span>download_token: ClientConfigDownloadToken,
     <span class="doccomment">/// Authentication id for the federation
     </span><span class="kw">pub </span>id: FederationId,
 }
 
-<span class="kw">impl </span>WsClientConnectInfo {
-    <span class="kw">pub fn </span>new(id: <span class="kw-2">&amp;</span>FederationId, api: <span class="kw-2">&amp;</span>BTreeMap&lt;PeerId, ApiEndpoint&gt;) -&gt; <span class="self">Self </span>{
-        <span class="self">Self </span>{
-            urls: api
-                .iter()
-                .map(|(<span class="kw">_</span>, endpoint)| endpoint.url.clone())
-                .collect(),
-            id: id.clone(),
-        }
-    }
+<span class="doccomment">/// Size of a download token
+</span><span class="kw">const </span>CONFIG_DOWNLOAD_TOKEN_BYTES: usize = <span class="number">12</span>;
 
-    <span class="doccomment">/// Construct from a config using only a number of peers where one is
-    /// expected to be honest
-    ///
-    /// Minimizes the serialized size of the connect info
-    </span><span class="kw">pub fn </span>from_honest_peers(config: <span class="kw-2">&amp;</span>ClientConfig) -&gt; <span class="self">Self </span>{
-        <span class="kw">let </span>all = config.api_endpoints.clone();
-        <span class="kw">let </span>num_honest = all.one_honest();
-        <span class="kw">let </span>honest: BTreeMap&lt;<span class="kw">_</span>, <span class="kw">_</span>&gt; = all.into_iter().take(num_honest).collect();
-
-        WsClientConnectInfo::new(<span class="kw-2">&amp;</span>config.federation_id, <span class="kw-2">&amp;</span>honest)
-    }
-}
+<span class="doccomment">/// Allows a client to download the config
+</span><span class="attr">#[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize, Encodable, Decodable)]
+</span><span class="kw">pub struct </span>ClientConfigDownloadToken(<span class="kw">pub </span>[u8; CONFIG_DOWNLOAD_TOKEN_BYTES]);
 
 <span class="doccomment">/// We can represent client connect info as a bech32 string for compactness and
 /// error-checking
@@ -1746,23 +1861,23 @@
         <span class="macro">ensure!</span>(variant == Bech32m, <span class="string">&quot;Expected Bech32m encoding&quot;</span>);
 
         <span class="kw">let </span>bytes: Vec&lt;u8&gt; = Vec::&lt;u8&gt;::from_base32(<span class="kw-2">&amp;</span>data)<span class="question-mark">?</span>;
-        <span class="kw">let </span>total_len = bytes.len() <span class="kw">as </span>u64;
         <span class="kw">let </span><span class="kw-2">mut </span>cursor = Cursor::new(bytes);
         <span class="kw">let </span><span class="kw-2">mut </span>id_bytes = [<span class="number">0</span>; PK_SIZE];
         cursor.read_exact(<span class="kw-2">&amp;mut </span>id_bytes)<span class="question-mark">?</span>;
 
-        <span class="kw">let </span><span class="kw-2">mut </span>urls = <span class="macro">vec!</span>[];
-        <span class="kw">while </span>cursor.position() &lt; total_len {
-            <span class="kw">let </span>len = cursor.read_u16()<span class="question-mark">? </span><span class="kw">as </span>usize;
-            <span class="kw">let </span><span class="kw-2">mut </span>url_bytes = <span class="macro">vec!</span>[<span class="number">0</span>; len];
-            cursor.read_exact(<span class="kw-2">&amp;mut </span>url_bytes)<span class="question-mark">?</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>url_len = [<span class="number">0</span>; <span class="number">2</span>];
+        cursor.read_exact(<span class="kw-2">&amp;mut </span>url_len)<span class="question-mark">?</span>;
+        <span class="kw">let </span>url_len = u16::from_be_bytes(url_len).into();
+        <span class="kw">let </span><span class="kw-2">mut </span>url_bytes = <span class="macro">vec!</span>[<span class="number">0</span>; url_len];
+        cursor.read_exact(<span class="kw-2">&amp;mut </span>url_bytes)<span class="question-mark">?</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>download_token = [<span class="number">0</span>; CONFIG_DOWNLOAD_TOKEN_BYTES];
+        cursor.read_exact(<span class="kw-2">&amp;mut </span>download_token)<span class="question-mark">?</span>;
 
-            <span class="kw">let </span>url = std::str::from_utf8(<span class="kw-2">&amp;</span>url_bytes)<span class="question-mark">?</span>;
-            urls.push(url.parse()<span class="question-mark">?</span>);
-        }
+        <span class="kw">let </span>url = std::str::from_utf8(<span class="kw-2">&amp;</span>url_bytes)<span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
-            urls,
+            url: url.parse()<span class="question-mark">?</span>,
+            download_token: ClientConfigDownloadToken(download_token),
             id: FederationId(PublicKey::from_bytes(id_bytes)<span class="question-mark">?</span>),
         })
     }
@@ -1773,11 +1888,10 @@
     <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, formatter: <span class="kw-2">&amp;mut </span>Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
         <span class="kw">let </span><span class="kw-2">mut </span>data = <span class="macro">vec!</span>[];
         data.extend(<span class="self">self</span>.id.<span class="number">0</span>.to_bytes());
-        <span class="kw">for </span>url <span class="kw">in </span><span class="kw-2">&amp;</span><span class="self">self</span>.urls {
-            <span class="kw">let </span>url_bytes = url.as_str().as_bytes();
-            data.extend((url_bytes.len() <span class="kw">as </span>u16).to_le_bytes());
-            data.extend(url.as_str().as_bytes());
-        }
+        <span class="kw">let </span>url_bytes = <span class="self">self</span>.url.as_str().as_bytes();
+        data.extend((url_bytes.len() <span class="kw">as </span>u16).to_be_bytes());
+        data.extend(url_bytes);
+        data.extend(<span class="kw-2">&amp;</span><span class="self">self</span>.download_token.<span class="number">0</span>);
         <span class="kw">let </span>encode =
             bech32::encode(BECH32_HRP, data.to_base32(), Bech32m).map_err(|<span class="kw">_</span>| fmt::Error)<span class="question-mark">?</span>;
 
@@ -1804,16 +1918,21 @@
     }
 }
 
-<span class="kw">impl </span>From&lt;<span class="kw-2">&amp;</span>ClientConfig&gt; <span class="kw">for </span>WsClientConnectInfo {
-    <span class="kw">fn </span>from(config: <span class="kw-2">&amp;</span>ClientConfig) -&gt; <span class="self">Self </span>{
-        WsClientConnectInfo::new(<span class="kw-2">&amp;</span>config.federation_id, <span class="kw-2">&amp;</span>config.api_endpoints)
-    }
-}
-
 <span class="attr">#[apply(<span class="macro">async_trait_maybe_send!</span>)]
-</span><span class="kw">impl</span>&lt;C: JsonRpcClient + Debug + MaybeSend + MaybeSync&gt; IFederationApi <span class="kw">for </span>WsFederationApi&lt;C&gt; {
+</span><span class="kw">impl</span>&lt;C: JsonRpcClient + Debug + MaybeSend + MaybeSync + <span class="lifetime">&#39;static</span>&gt; IFederationApi
+    <span class="kw">for </span>WsFederationApi&lt;C&gt;
+{
     <span class="kw">fn </span>all_members(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>BTreeSet&lt;PeerId&gt; {
         <span class="kw-2">&amp;</span><span class="self">self</span>.peers
+    }
+
+    <span class="kw">fn </span>with_module(<span class="kw-2">&amp;</span><span class="self">self</span>, id: ModuleInstanceId) -&gt; DynFederationApi {
+        WsFederationApi {
+            peers: <span class="self">self</span>.peers.clone(),
+            members: <span class="self">self</span>.members.clone(),
+            module_id: <span class="prelude-val">Some</span>(id),
+        }
+        .into()
     }
 
     <span class="kw">async fn </span>request_raw(
@@ -1828,7 +1947,11 @@
             .find(|m| m.peer_id == peer_id)
             .ok_or_else(|| JsonRpcError::Custom(<span class="macro">format!</span>(<span class="string">&quot;Invalid peer_id: {peer_id}&quot;</span>)))<span class="question-mark">?</span>;
 
-        member.request(method, params).<span class="kw">await
+        <span class="kw">let </span>method = <span class="kw">match </span><span class="self">self</span>.module_id {
+            <span class="prelude-val">None </span>=&gt; method.to_string(),
+            <span class="prelude-val">Some</span>(id) =&gt; <span class="macro">format!</span>(<span class="string">&quot;module_{id}_{method}&quot;</span>),
+        };
+        member.request(<span class="kw-2">&amp;</span>method, params).<span class="kw">await
     </span>}
 }
 
@@ -1843,7 +1966,7 @@
     <span class="kw">async fn </span>connect(url: <span class="kw-2">&amp;</span>Url) -&gt; result::Result&lt;<span class="self">Self</span>, JsonRpcError&gt; {
         <span class="attr">#[cfg(not(target_family = <span class="string">&quot;wasm&quot;</span>))]
         </span><span class="kw">return </span>WsClientBuilder::default()
-            .certificate_store(CertificateStore::WebPki)
+            .use_webpki_rustls()
             .build(url_to_string_with_default_port(url)) <span class="comment">// Hack for default ports, see fn docs
             </span>.<span class="kw">await</span>;
 
@@ -1866,22 +1989,22 @@
 
     <span class="doccomment">/// Creates a new API client from a client config
     </span><span class="kw">pub fn </span>from_config(config: <span class="kw-2">&amp;</span>ClientConfig) -&gt; <span class="self">Self </span>{
-        <span class="self">Self</span>::from_urls(<span class="kw-2">&amp;</span>config.into())
+        <span class="self">Self</span>::new(
+            config
+                .api_endpoints
+                .iter()
+                .map(|(id, peer)| (<span class="kw-2">*</span>id, peer.url.clone()))
+                .collect(),
+        )
     }
 
-    <span class="doccomment">/// Creates a new API client from connection info
-    </span><span class="kw">pub fn </span>from_urls(connection: <span class="kw-2">&amp;</span>WsClientConnectInfo) -&gt; <span class="self">Self </span>{
+    <span class="doccomment">/// Creates a new API client from a connect info, assumes they are in peer
+    /// id order
+    </span><span class="kw">pub fn </span>from_connect_info(info: <span class="kw-2">&amp;</span>[WsClientConnectInfo]) -&gt; <span class="self">Self </span>{
         <span class="self">Self</span>::new(
-            connection
-                .urls
-                .iter()
+            info.iter()
                 .enumerate()
-                .map(|(id, url)| {
-                    <span class="comment">// FIXME: potentially wrong could download actual PeerId later, but doesn&#39;t
-                    // matter in practice
-                    </span><span class="kw">let </span>peer_id = PeerId::from(id <span class="kw">as </span>u16);
-                    (peer_id, url.clone())
-                })
+                .map(|(id, connect)| (PeerId::from(id <span class="kw">as </span>u16), connect.url.clone()))
                 .collect(),
         )
     }
@@ -1896,48 +2019,27 @@
     </span><span class="kw">pub fn </span>new_with_client(members: Vec&lt;(PeerId, Url)&gt;) -&gt; <span class="self">Self </span>{
         WsFederationApi {
             peers: members.iter().map(|m| m.<span class="number">0</span>).collect(),
-            members: members
-                .into_iter()
-                .map(|(peer_id, url)| {
-                    <span class="macro">assert!</span>(
-                        url.port_or_known_default().is_some(),
-                        <span class="string">&quot;API client requires a port&quot;
-                    </span>);
-                    <span class="macro">assert!</span>(url.host().is_some(), <span class="string">&quot;API client requires a target host&quot;</span>);
+            members: Arc::new(
+                members
+                    .into_iter()
+                    .map(|(peer_id, url)| {
+                        <span class="macro">assert!</span>(
+                            url.port_or_known_default().is_some(),
+                            <span class="string">&quot;API client requires a port&quot;
+                        </span>);
+                        <span class="macro">assert!</span>(url.host().is_some(), <span class="string">&quot;API client requires a target host&quot;</span>);
 
-                    FederationMember {
-                        peer_id,
-                        url,
-                        client: RwLock::new(<span class="prelude-val">None</span>),
-                    }
-                })
-                .collect(),
+                        FederationMember {
+                            peer_id,
+                            url,
+                            client: RwLock::new(<span class="prelude-val">None</span>),
+                        }
+                    })
+                    .collect(),
+            ),
+            module_id: <span class="prelude-val">None</span>,
         }
     }
-}
-
-<span class="doccomment">/// For a guardian to communicate with their server
-</span><span class="kw">pub struct </span>WsAuthenticatedApi {
-    inner: DynFederationApi,
-    auth: ApiAuth,
-}
-
-<span class="kw">impl </span>WsAuthenticatedApi {
-    <span class="kw">pub fn </span>new(url: Url, our_id: PeerId, auth: ApiAuth) -&gt; <span class="self">Self </span>{
-        <span class="self">Self </span>{
-            inner: WsFederationApi::new(<span class="macro">vec!</span>[(our_id, url)]).into(),
-            auth,
-        }
-    }
-
-    <span class="kw">pub async fn </span>signal_upgrade(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; FederationResult&lt;()&gt; {
-        <span class="self">self</span>.inner
-            .request_current_consensus(
-                <span class="string">&quot;/upgrade&quot;</span>.to_owned(),
-                ApiRequestErased::default().with_auth(<span class="kw-2">&amp;</span><span class="self">self</span>.auth),
-            )
-            .<span class="kw">await
-    </span>}
 }
 
 <span class="attr">#[derive(Debug)]
@@ -2017,6 +2119,75 @@
 
 <span class="kw">impl</span>&lt;C: JsonRpcClient&gt; WsFederationApi&lt;C&gt; {}
 
+<span class="doccomment">/// The status of a server, including how it views its peers
+</span><span class="attr">#[derive(Debug, Clone, Default, Serialize, Deserialize, PartialEq, Eq)]
+</span><span class="kw">pub struct </span>ConsensusStatus {
+    <span class="doccomment">/// The last contribution that this server has made to the consensus, it&#39;s
+    /// equivalent to [`PeerConsensusStatus::last_contribution`] and
+    /// [`ConsensusContribution::value`]
+    </span><span class="kw">pub </span>last_contribution: u64,
+    <span class="kw">pub </span>status_by_peer: HashMap&lt;PeerId, PeerConsensusStatus&gt;,
+    <span class="kw">pub </span>peers_online: u64,
+    <span class="kw">pub </span>peers_offline: u64,
+    <span class="doccomment">/// This should always be 0 if everything is okay, so a monitoring tool
+    /// should generate an alert if this is not the case.
+    </span><span class="kw">pub </span>peers_flagged: u64,
+}
+
+<span class="attr">#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
+</span><span class="kw">pub struct </span>PeerConsensusStatus {
+    <span class="kw">pub </span>last_contribution: <span class="prelude-ty">Option</span>&lt;u64&gt;,
+    <span class="kw">pub </span>last_contribution_timestamp_seconds: <span class="prelude-ty">Option</span>&lt;u64&gt;,
+    <span class="kw">pub </span>connection_status: PeerConnectionStatus,
+    <span class="doccomment">/// Indicates that this peer needs attention from the operator. For instance
+    /// it may be suffering too many disconnections or it hasn&#39;t contributed for
+    /// the consensus in a long time
+    </span><span class="kw">pub </span>flagged: bool,
+}
+
+<span class="attr">#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
+</span><span class="kw">pub enum </span>PeerConnectionStatus {
+    <span class="attr">#[default]
+    </span>Disconnected,
+    Connected,
+}
+
+<span class="doccomment">/// Tracks the consensus contribution for a peer
+</span><span class="attr">#[derive(Debug, Clone, Copy)]
+</span><span class="kw">pub struct </span>ConsensusContribution {
+    <span class="doccomment">/// Using HBBFT this is the epoch count. In general it should be an
+    /// increasing number
+    </span><span class="kw">pub </span>value: u64,
+    <span class="doccomment">/// When the contribution was received
+    </span><span class="kw">pub </span>time: SystemTime,
+}
+
+<span class="doccomment">/// The state of the server returned via APIs
+</span><span class="attr">#[derive(Debug, Clone, Default, Serialize, Deserialize, Eq, PartialEq)]
+</span><span class="kw">pub enum </span>ServerStatus {
+    <span class="doccomment">/// Server needs a password to read configs
+    </span><span class="attr">#[default]
+    </span>AwaitingPassword,
+    <span class="doccomment">/// Waiting for peers to share the config gen params
+    </span>SharingConfigGenParams,
+    <span class="doccomment">/// Ready to run config gen once all peers are ready
+    </span>ReadyForConfigGen,
+    <span class="doccomment">/// We failed running config gen
+    </span>ConfigGenFailed,
+    <span class="doccomment">/// Config is generated, peers should verify the config
+    </span>VerifyingConfigs,
+    <span class="doccomment">/// Restarted from a planned upgrade (requires action to start)
+    </span>Upgrading,
+    <span class="doccomment">/// Consensus is running
+    </span>ConsensusRunning,
+}
+
+<span class="attr">#[derive(Debug, Clone, Deserialize, Serialize, PartialEq, Eq)]
+</span><span class="kw">pub struct </span>StatusResponse {
+    <span class="kw">pub </span>server: ServerStatus,
+    <span class="kw">pub </span>consensus: <span class="prelude-ty">Option</span>&lt;ConsensusStatus&gt;,
+}
+
 <span class="attr">#[cfg(test)]
 </span><span class="kw">mod </span>tests {
     <span class="kw">use </span>std::collections::HashSet;
@@ -2031,6 +2202,8 @@
     <span class="kw">use </span>jsonrpsee_core::params::BatchRequestBuilder;
     <span class="kw">use </span>jsonrpsee_core::traits::ToRpcParams;
     <span class="kw">use </span>once_cell::sync::Lazy;
+    <span class="kw">use </span>rand::rngs::OsRng;
+    <span class="kw">use </span>rand::Rng;
     <span class="kw">use </span>serde::de::DeserializeOwned;
     <span class="kw">use </span>tracing::error;
 
@@ -2247,8 +2420,9 @@
     <span class="attr">#[test]
     </span><span class="kw">fn </span>converts_connect_string() {
         <span class="kw">let </span>connect = WsClientConnectInfo {
-            urls: <span class="macro">vec!</span>[<span class="string">&quot;ws://test1&quot;</span>.parse().unwrap(), <span class="string">&quot;ws://test2&quot;</span>.parse().unwrap()],
+            url: <span class="string">&quot;ws://test1&quot;</span>.parse().unwrap(),
             id: FederationId::dummy(),
+            download_token: ClientConfigDownloadToken(OsRng::default().gen()),
         };
 
         <span class="kw">let </span>bech32 = connect.to_string();

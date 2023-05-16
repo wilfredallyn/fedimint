@@ -444,20 +444,13 @@
 <a href="#444" id="444">444</a>
 <a href="#445" id="445">445</a>
 <a href="#446" id="446">446</a>
-<a href="#447" id="447">447</a>
-<a href="#448" id="448">448</a>
-<a href="#449" id="449">449</a>
-<a href="#450" id="450">450</a>
-<a href="#451" id="451">451</a>
-<a href="#452" id="452">452</a>
-<a href="#453" id="453">453</a>
 </pre><pre class="rust"><code><span class="doccomment">//! Fedimint Core Server module interface
 //!
 //! Fedimint supports externally implemented modules.
 //!
 //! This (Rust) module defines common interoperability types
 //! and functionality that are only used on the server side.
-</span><span class="kw">use </span>std::collections::HashSet;
+</span><span class="kw">use </span>std::collections::BTreeSet;
 <span class="kw">use </span>std::sync::Arc;
 
 <span class="kw">use </span>fedimint_core::module::audit::Audit;
@@ -468,8 +461,8 @@
 <span class="kw">use </span><span class="kw">crate</span>::db::ModuleDatabaseTransaction;
 <span class="kw">use </span><span class="kw">crate</span>::maybe_add_send_sync;
 <span class="kw">use </span><span class="kw">crate</span>::module::{
-    ApiEndpoint, ApiEndpointContext, ApiRequestErased, ApiVersion, ConsensusProposal, InputMeta,
-    ModuleCommon, ModuleConsensusVersion, ModuleError, ServerModule, TransactionItemAmount,
+    ApiEndpoint, ApiEndpointContext, ApiRequestErased, ConsensusProposal, InputMeta, ModuleCommon,
+    ModuleError, ServerModule, SupportedModuleApiVersions, TransactionItemAmount,
 };
 <span class="kw">use </span><span class="kw">crate</span>::task::{MaybeSend, MaybeSync};
 
@@ -508,31 +501,31 @@
     <span class="doccomment">/// Returns the decoder belonging to the server module
     </span><span class="kw">fn </span>decoder(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Decoder;
 
-    <span class="kw">fn </span>versions(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (ModuleConsensusVersion, <span class="kw-2">&amp;</span>[ApiVersion]);
+    <span class="kw">fn </span>supported_api_versions(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SupportedModuleApiVersions;
 
     <span class="doccomment">/// Blocks until a new `consensus_proposal` is available.
-    </span><span class="kw">async fn </span>await_consensus_proposal(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;_</span>, ModuleInstanceId&gt;,
-    );
+    </span><span class="kw">async fn </span>await_consensus_proposal(<span class="kw-2">&amp;</span><span class="self">self</span>, dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;_</span>&gt;);
 
     <span class="doccomment">/// This module&#39;s contribution to the next consensus proposal
     </span><span class="kw">async fn </span>consensus_proposal(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;_</span>, ModuleInstanceId&gt;,
+        dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;_</span>&gt;,
         module_instance_id: ModuleInstanceId,
     ) -&gt; ConsensusProposal&lt;DynModuleConsensusItem&gt;;
 
-    <span class="doccomment">/// This function is called once before transaction processing starts. All
-    /// module consensus items of this round are supplied as
+    <span class="doccomment">/// This function is called once before transaction processing starts.
+    ///
+    /// All module consensus items of this round are supplied as
     /// `consensus_items`. The database transaction will be committed to the
     /// database after all other modules ran `begin_consensus_epoch`, so the
-    /// results are available when processing transactions.
+    /// results are available when processing transactions. Returns any
+    /// peers that need to be dropped.
     </span><span class="kw">async fn </span>begin_consensus_epoch&lt;<span class="lifetime">&#39;a</span>&gt;(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;a</span>, ModuleInstanceId&gt;,
+        dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;a</span>&gt;,
         consensus_items: Vec&lt;(PeerId, DynModuleConsensusItem)&gt;,
-    );
+        consensus_peers: <span class="kw-2">&amp;</span>BTreeSet&lt;PeerId&gt;,
+    ) -&gt; Vec&lt;PeerId&gt;;
 
     <span class="doccomment">/// Some modules may have slow to verify inputs that would block transaction
     /// processing. If the slow part of verification can be modeled as a
@@ -549,7 +542,7 @@
     </span><span class="kw">async fn </span>validate_input&lt;<span class="lifetime">&#39;a</span>&gt;(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         interconnect: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw">dyn </span>ModuleInterconect,
-        dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;_</span>, ModuleInstanceId&gt;,
+        dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;_</span>&gt;,
         verification_cache: <span class="kw-2">&amp;</span>DynVerificationCache,
         input: <span class="kw-2">&amp;</span>DynInput,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;InputMeta, ModuleError&gt;;
@@ -565,7 +558,7 @@
     </span><span class="kw">async fn </span>apply_input&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>, <span class="lifetime">&#39;c</span>&gt;(
         <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>,
         interconnect: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw">dyn </span>ModuleInterconect,
-        dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;c</span>, ModuleInstanceId&gt;,
+        dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;c</span>&gt;,
         input: <span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span>DynInput,
         verification_cache: <span class="kw-2">&amp;</span>DynVerificationCache,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;InputMeta, ModuleError&gt;;
@@ -577,7 +570,7 @@
     /// them and merely generate a warning.
     </span><span class="kw">async fn </span>validate_output(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;_</span>, ModuleInstanceId&gt;,
+        dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;_</span>&gt;,
         output: <span class="kw-2">&amp;</span>DynOutput,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;TransactionItemAmount, ModuleError&gt;;
 
@@ -595,7 +588,7 @@
     /// once all transactions have been processed.
     </span><span class="kw">async fn </span>apply_output&lt;<span class="lifetime">&#39;a</span>&gt;(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;a</span>, ModuleInstanceId&gt;,
+        dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;a</span>&gt;,
         output: <span class="kw-2">&amp;</span>DynOutput,
         out_point: OutPoint,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;TransactionItemAmount, ModuleError&gt;;
@@ -608,8 +601,8 @@
     /// returns a list of peers to drop if any are misbehaving.
     </span><span class="kw">async fn </span>end_consensus_epoch&lt;<span class="lifetime">&#39;a</span>&gt;(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        consensus_peers: <span class="kw-2">&amp;</span>HashSet&lt;PeerId&gt;,
-        dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;a</span>, ModuleInstanceId&gt;,
+        consensus_peers: <span class="kw-2">&amp;</span>BTreeSet&lt;PeerId&gt;,
+        dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;a</span>&gt;,
     ) -&gt; Vec&lt;PeerId&gt;;
 
     <span class="doccomment">/// Retrieve the current status of the output. Depending on the module this
@@ -618,7 +611,7 @@
     /// output is unknown, **NOT** if it is just not ready yet.
     </span><span class="kw">async fn </span>output_status(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;_</span>, ModuleInstanceId&gt;,
+        dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;_</span>&gt;,
         out_point: OutPoint,
         module_instance_id: ModuleInstanceId,
     ) -&gt; <span class="prelude-ty">Option</span>&lt;DynOutputOutcome&gt;;
@@ -628,11 +621,7 @@
     ///
     /// Summing over all modules, if liabilities &gt; assets then an error has
     /// occurred in the database and consensus should halt.
-    </span><span class="kw">async fn </span>audit(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;_</span>, ModuleInstanceId&gt;,
-        audit: <span class="kw-2">&amp;mut </span>Audit,
-    );
+    </span><span class="kw">async fn </span>audit(<span class="kw-2">&amp;</span><span class="self">self</span>, dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;_</span>&gt;, audit: <span class="kw-2">&amp;mut </span>Audit);
 
     <span class="doccomment">/// Returns a list of custom API endpoints defined by the module. These are
     /// made available both to users as well as to other modules. They thus
@@ -659,22 +648,19 @@
         <span class="self">self
     </span>}
 
-    <span class="kw">fn </span>versions(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (ModuleConsensusVersion, <span class="kw-2">&amp;</span>[ApiVersion]) {
-        &lt;<span class="self">Self </span><span class="kw">as </span>ServerModule&gt;::versions(<span class="self">self</span>)
+    <span class="kw">fn </span>supported_api_versions(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SupportedModuleApiVersions {
+        &lt;<span class="self">Self </span><span class="kw">as </span>ServerModule&gt;::supported_api_versions(<span class="self">self</span>)
     }
 
     <span class="doccomment">/// Blocks until a new `consensus_proposal` is available.
-    </span><span class="kw">async fn </span>await_consensus_proposal(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;_</span>, ModuleInstanceId&gt;,
-    ) {
+    </span><span class="kw">async fn </span>await_consensus_proposal(<span class="kw-2">&amp;</span><span class="self">self</span>, dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;_</span>&gt;) {
         &lt;<span class="self">Self </span><span class="kw">as </span>ServerModule&gt;::await_consensus_proposal(<span class="self">self</span>, dbtx).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// This module&#39;s contribution to the next consensus proposal
     </span><span class="kw">async fn </span>consensus_proposal(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;_</span>, ModuleInstanceId&gt;,
+        dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;_</span>&gt;,
         module_instance_id: ModuleInstanceId,
     ) -&gt; ConsensusProposal&lt;DynModuleConsensusItem&gt; {
         &lt;<span class="self">Self </span><span class="kw">as </span>ServerModule&gt;::consensus_proposal(<span class="self">self</span>, dbtx)
@@ -682,16 +668,19 @@
             </span>.map(|v| DynModuleConsensusItem::from_typed(module_instance_id, v))
     }
 
-    <span class="doccomment">/// This function is called once before transaction processing starts. All
-    /// module consensus items of this round are supplied as
+    <span class="doccomment">/// This function is called once before transaction processing starts.
+    ///
+    /// All module consensus items of this round are supplied as
     /// `consensus_items`. The database transaction will be committed to the
     /// database after all other modules ran `begin_consensus_epoch`, so the
-    /// results are available when processing transactions.
+    /// results are available when processing transactions. Returns any
+    /// peers that need to be dropped.
     </span><span class="kw">async fn </span>begin_consensus_epoch&lt;<span class="lifetime">&#39;a</span>&gt;(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;a</span>, ModuleInstanceId&gt;,
+        dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;a</span>&gt;,
         consensus_items: Vec&lt;(PeerId, DynModuleConsensusItem)&gt;,
-    ) {
+        consensus_peers: <span class="kw-2">&amp;</span>BTreeSet&lt;PeerId&gt;,
+    ) -&gt; Vec&lt;PeerId&gt; {
         &lt;<span class="self">Self </span><span class="kw">as </span>ServerModule&gt;::begin_consensus_epoch(
             <span class="self">self</span>,
             dbtx,
@@ -709,6 +698,7 @@
                     )
                 })
                 .collect(),
+            consensus_peers
         )
         .<span class="kw">await
     </span>}
@@ -738,7 +728,7 @@
     </span><span class="kw">async fn </span>validate_input&lt;<span class="lifetime">&#39;a</span>&gt;(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         interconnect: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw">dyn </span>ModuleInterconect,
-        dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;_</span>, ModuleInstanceId&gt;,
+        dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;_</span>&gt;,
         verification_cache: <span class="kw-2">&amp;</span>DynVerificationCache,
         input: <span class="kw-2">&amp;</span>DynInput,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;InputMeta, ModuleError&gt; {
@@ -770,7 +760,7 @@
     </span><span class="kw">async fn </span>apply_input&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>, <span class="lifetime">&#39;c</span>&gt;(
         <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>,
         interconnect: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw">dyn </span>ModuleInterconect,
-        dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;c</span>, ModuleInstanceId&gt;,
+        dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;c</span>&gt;,
         input: <span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span>DynInput,
         verification_cache: <span class="kw-2">&amp;</span>DynVerificationCache,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;InputMeta, ModuleError&gt; {
@@ -798,7 +788,7 @@
     /// them and merely generate a warning.
     </span><span class="kw">async fn </span>validate_output(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;_</span>, ModuleInstanceId&gt;,
+        dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;_</span>&gt;,
         output: <span class="kw-2">&amp;</span>DynOutput,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;TransactionItemAmount, ModuleError&gt; {
         &lt;<span class="self">Self </span><span class="kw">as </span>ServerModule&gt;::validate_output(
@@ -826,7 +816,7 @@
     /// once all transactions have been processed.
     </span><span class="kw">async fn </span>apply_output&lt;<span class="lifetime">&#39;a</span>&gt;(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;a</span>, ModuleInstanceId&gt;,
+        dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;a</span>&gt;,
         output: <span class="kw-2">&amp;</span>DynOutput,
         out_point: OutPoint,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;TransactionItemAmount, ModuleError&gt; {
@@ -850,8 +840,8 @@
     /// returns a list of peers to drop if any are misbehaving.
     </span><span class="kw">async fn </span>end_consensus_epoch&lt;<span class="lifetime">&#39;a</span>&gt;(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        consensus_peers: <span class="kw-2">&amp;</span>HashSet&lt;PeerId&gt;,
-        dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;a</span>, ModuleInstanceId&gt;,
+        consensus_peers: <span class="kw-2">&amp;</span>BTreeSet&lt;PeerId&gt;,
+        dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;a</span>&gt;,
     ) -&gt; Vec&lt;PeerId&gt; {
         &lt;<span class="self">Self </span><span class="kw">as </span>ServerModule&gt;::end_consensus_epoch(<span class="self">self</span>, consensus_peers, dbtx).<span class="kw">await
     </span>}
@@ -862,7 +852,7 @@
     /// output is unknown, **NOT** if it is just not ready yet.
     </span><span class="kw">async fn </span>output_status(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;_</span>, ModuleInstanceId&gt;,
+        dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;_</span>&gt;,
         out_point: OutPoint,
         module_instance_id: ModuleInstanceId,
     ) -&gt; <span class="prelude-ty">Option</span>&lt;DynOutputOutcome&gt; {
@@ -876,11 +866,7 @@
     ///
     /// Summing over all modules, if liabilities &gt; assets then an error has
     /// occurred in the database and consensus should halt.
-    </span><span class="kw">async fn </span>audit(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;_</span>, ModuleInstanceId&gt;,
-        audit: <span class="kw-2">&amp;mut </span>Audit,
-    ) {
+    </span><span class="kw">async fn </span>audit(<span class="kw-2">&amp;</span><span class="self">self</span>, dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;_</span>&gt;, audit: <span class="kw-2">&amp;mut </span>Audit) {
         &lt;<span class="self">Self </span><span class="kw">as </span>ServerModule&gt;::audit(<span class="self">self</span>, dbtx, audit).<span class="kw">await
     </span>}
 

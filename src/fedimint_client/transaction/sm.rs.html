@@ -407,6 +407,82 @@
 <a href="#407" id="407">407</a>
 <a href="#408" id="408">408</a>
 <a href="#409" id="409">409</a>
+<a href="#410" id="410">410</a>
+<a href="#411" id="411">411</a>
+<a href="#412" id="412">412</a>
+<a href="#413" id="413">413</a>
+<a href="#414" id="414">414</a>
+<a href="#415" id="415">415</a>
+<a href="#416" id="416">416</a>
+<a href="#417" id="417">417</a>
+<a href="#418" id="418">418</a>
+<a href="#419" id="419">419</a>
+<a href="#420" id="420">420</a>
+<a href="#421" id="421">421</a>
+<a href="#422" id="422">422</a>
+<a href="#423" id="423">423</a>
+<a href="#424" id="424">424</a>
+<a href="#425" id="425">425</a>
+<a href="#426" id="426">426</a>
+<a href="#427" id="427">427</a>
+<a href="#428" id="428">428</a>
+<a href="#429" id="429">429</a>
+<a href="#430" id="430">430</a>
+<a href="#431" id="431">431</a>
+<a href="#432" id="432">432</a>
+<a href="#433" id="433">433</a>
+<a href="#434" id="434">434</a>
+<a href="#435" id="435">435</a>
+<a href="#436" id="436">436</a>
+<a href="#437" id="437">437</a>
+<a href="#438" id="438">438</a>
+<a href="#439" id="439">439</a>
+<a href="#440" id="440">440</a>
+<a href="#441" id="441">441</a>
+<a href="#442" id="442">442</a>
+<a href="#443" id="443">443</a>
+<a href="#444" id="444">444</a>
+<a href="#445" id="445">445</a>
+<a href="#446" id="446">446</a>
+<a href="#447" id="447">447</a>
+<a href="#448" id="448">448</a>
+<a href="#449" id="449">449</a>
+<a href="#450" id="450">450</a>
+<a href="#451" id="451">451</a>
+<a href="#452" id="452">452</a>
+<a href="#453" id="453">453</a>
+<a href="#454" id="454">454</a>
+<a href="#455" id="455">455</a>
+<a href="#456" id="456">456</a>
+<a href="#457" id="457">457</a>
+<a href="#458" id="458">458</a>
+<a href="#459" id="459">459</a>
+<a href="#460" id="460">460</a>
+<a href="#461" id="461">461</a>
+<a href="#462" id="462">462</a>
+<a href="#463" id="463">463</a>
+<a href="#464" id="464">464</a>
+<a href="#465" id="465">465</a>
+<a href="#466" id="466">466</a>
+<a href="#467" id="467">467</a>
+<a href="#468" id="468">468</a>
+<a href="#469" id="469">469</a>
+<a href="#470" id="470">470</a>
+<a href="#471" id="471">471</a>
+<a href="#472" id="472">472</a>
+<a href="#473" id="473">473</a>
+<a href="#474" id="474">474</a>
+<a href="#475" id="475">475</a>
+<a href="#476" id="476">476</a>
+<a href="#477" id="477">477</a>
+<a href="#478" id="478">478</a>
+<a href="#479" id="479">479</a>
+<a href="#480" id="480">480</a>
+<a href="#481" id="481">481</a>
+<a href="#482" id="482">482</a>
+<a href="#483" id="483">483</a>
+<a href="#484" id="484">484</a>
+<a href="#485" id="485">485</a>
 </pre><pre class="rust"><code><span class="doccomment">//! State machine for submitting transactions
 
 </span><span class="kw">use </span>std::time::{Duration, SystemTime};
@@ -418,12 +494,14 @@
 <span class="kw">use </span>fedimint_core::time::now;
 <span class="kw">use </span>fedimint_core::transaction::Transaction;
 <span class="kw">use </span>fedimint_core::TransactionId;
+<span class="kw">use </span>serde::{Deserialize, Serialize};
+<span class="kw">use </span>thiserror::Error;
 <span class="kw">use </span>tracing::warn;
 
 <span class="kw">use </span><span class="kw">crate</span>::sm::{Context, DynContext, OperationId, OperationState, State, StateTransition};
 <span class="kw">use crate</span>::{DynGlobalClientContext, DynState};
 
-<span class="comment">// TODO: how to preven collisions? Generally reserve some range for custom IDs?
+<span class="comment">// TODO: how to prevent collisions? Generally reserve some range for custom IDs?
 </span><span class="doccomment">/// Reserved module instance id used for client-internal state machines
 </span><span class="kw">pub const </span>TRANSACTION_SUBMISSION_MODULE_INSTANCE: ModuleInstanceId = <span class="number">0xffff</span>;
 
@@ -487,9 +565,16 @@
     /// **This state is final**
     </span>Rejected {
         txid: TransactionId,
-        <span class="comment">// TODO: enable again after awaiting DB prefix writes becomes available
-        //error: String
-    </span>},
+        error: TxSubmissionError,
+    },
+}
+
+<span class="attr">#[derive(Debug, Error, Clone, Eq, PartialEq, Serialize, Deserialize, Decodable, Encodable)]
+</span><span class="kw">pub enum </span>TxSubmissionError {
+    <span class="attr">#[error(<span class="string">&quot;Tx submission rejected: {0}&quot;</span>)]
+    </span>SubmitRejected(String),
+    <span class="attr">#[error(<span class="string">&quot;Tx rejected by consensus: {0}&quot;</span>)]
+    </span>ConsensusRejected(String),
 }
 
 <span class="kw">impl </span>State <span class="kw">for </span>TxSubmissionStates {
@@ -526,12 +611,15 @@
                                 };
 
                                 <span class="kw">match </span>res {
-                                    <span class="prelude-val">Ok</span>(()) =&gt; TxSubmissionStates::Created {
+                                    <span class="prelude-val">Ok</span>(txid) =&gt; TxSubmissionStates::Created {
                                         txid,
                                         tx,
                                         next_submission: next_submission + RESUBMISSION_INTERVAL,
                                     },
-                                    <span class="prelude-val">Err</span>(_e) =&gt; TxSubmissionStates::Rejected { txid },
+                                    <span class="prelude-val">Err</span>(error) =&gt; TxSubmissionStates::Rejected {
+                                        txid,
+                                        error: TxSubmissionError::SubmitRejected(error),
+                                    },
                                 }
                             })
                         },
@@ -542,7 +630,10 @@
                             Box::pin(<span class="kw">async move </span>{
                                 <span class="kw">match </span>res {
                                     <span class="prelude-val">Ok</span>(_epoch) =&gt; TxSubmissionStates::Accepted { txid },
-                                    <span class="prelude-val">Err</span>(_error) =&gt; TxSubmissionStates::Rejected { txid },
+                                    <span class="prelude-val">Err</span>(error) =&gt; TxSubmissionStates::Rejected {
+                                        txid,
+                                        error: TxSubmissionError::ConsensusRejected(error),
+                                    },
                                 }
                             })
                         },
@@ -575,8 +666,8 @@
     tx: Transaction,
     next_submission: SystemTime,
     context: DynGlobalClientContext,
-) -&gt; <span class="prelude-ty">Result</span>&lt;(), String&gt; {
-    tokio::time::sleep(
+) -&gt; <span class="prelude-ty">Result</span>&lt;TransactionId, String&gt; {
+    fedimint_core::task::sleep(
         next_submission
             .duration_since(now())
             .unwrap_or(Duration::ZERO),
@@ -587,8 +678,7 @@
         .api()
         .submit_transaction(tx)
         .<span class="kw">await
-        </span>.map(|<span class="kw">_</span>| ())
-        .map_err(|e| e.to_string())
+        </span>.map_err(|e| e.to_string())
 }
 
 <span class="kw">async fn </span>trigger_created_accepted(
@@ -625,37 +715,42 @@
     <span class="kw">use </span>std::time::{Duration, SystemTime};
 
     <span class="kw">use </span>async_trait::async_trait;
-    <span class="kw">use </span>fedimint_core::api::{IFederationApi, JsonRpcResult};
-    <span class="kw">use </span>fedimint_core::core::IntoDynInstance;
+    <span class="kw">use </span>fedimint_core::api::{DynFederationApi, IFederationApi, JsonRpcResult};
+    <span class="kw">use </span>fedimint_core::config::ClientConfig;
+    <span class="kw">use </span>fedimint_core::core::{IntoDynInstance, ModuleInstanceId, ModuleKind};
     <span class="kw">use </span>fedimint_core::db::mem_impl::MemDatabase;
-    <span class="kw">use </span>fedimint_core::db::{Database, DatabaseTransaction};
+    <span class="kw">use </span>fedimint_core::db::Database;
     <span class="kw">use </span>fedimint_core::module::registry::ModuleDecoderRegistry;
     <span class="kw">use </span>fedimint_core::module::ApiRequestErased;
     <span class="kw">use </span>fedimint_core::task::TaskGroup;
     <span class="kw">use </span>fedimint_core::transaction::SerdeTransaction;
-    <span class="kw">use </span>fedimint_core::{PeerId, TransactionId};
+    <span class="kw">use </span>fedimint_core::util::BoxStream;
+    <span class="kw">use </span>fedimint_core::{maybe_add_send_sync, OutPoint, PeerId, TransactionId};
     <span class="kw">use </span>rand::thread_rng;
     <span class="kw">use </span>serde_json::Value;
     <span class="kw">use </span>tokio::sync::Mutex;
     <span class="kw">use </span>tokio::time::{sleep, timeout};
 
-    <span class="kw">use </span><span class="kw">crate</span>::sm::{ActiveState, DynState, Executor, InactiveState, OperationId, OperationState};
+    <span class="kw">use </span><span class="kw">crate</span>::sm::{ClientSMDatabaseTransaction, Executor, Notifier, OperationId, OperationState};
     <span class="kw">use </span><span class="kw">crate</span>::transaction::{
         tx_submission_sm_decoder, TransactionBuilder, TxSubmissionContext, TxSubmissionStates,
         TRANSACTION_SUBMISSION_MODULE_INSTANCE,
     };
-    <span class="kw">use crate</span>::{DynGlobalClientContext, IGlobalClientContext};
+    <span class="kw">use crate</span>::{
+        DynGlobalClientContext, IGlobalClientContext, IState, InstancelessDynClientInput,
+        InstancelessDynClientOutput,
+    };
 
-    <span class="attr">#[derive(Debug)]
+    <span class="attr">#[derive(Debug, Clone)]
     </span><span class="kw">struct </span>FakeApiClient {
-        txns: Mutex&lt;Vec&lt;TransactionId&gt;&gt;,
+        txns: Arc&lt;Mutex&lt;Vec&lt;TransactionId&gt;&gt;&gt;,
         fake_peers: BTreeSet&lt;PeerId&gt;,
     }
 
     <span class="kw">impl </span>Default <span class="kw">for </span>FakeApiClient {
         <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
             FakeApiClient {
-                txns: Mutex::new(<span class="macro">vec!</span>[]),
+                txns: Arc::new(Mutex::new(<span class="macro">vec!</span>[])),
                 fake_peers: <span class="macro">vec!</span>[PeerId::from(<span class="number">0</span>)].into_iter().collect(),
             }
         }
@@ -667,6 +762,10 @@
             <span class="kw-2">&amp;</span><span class="self">self</span>.fake_peers
         }
 
+        <span class="kw">fn </span>with_module(<span class="kw-2">&amp;</span><span class="self">self</span>, _id: ModuleInstanceId) -&gt; DynFederationApi {
+            <span class="macro">unimplemented!</span>()
+        }
+
         <span class="kw">async fn </span>request_raw(
             <span class="kw-2">&amp;</span><span class="self">self</span>,
             _peer_id: PeerId,
@@ -674,7 +773,7 @@
             params: <span class="kw-2">&amp;</span>[Value],
         ) -&gt; JsonRpcResult&lt;Value&gt; {
             <span class="kw">match </span>method {
-                <span class="string">&quot;/transaction&quot; </span>=&gt; {
+                <span class="string">&quot;transaction&quot; </span>=&gt; {
                     <span class="kw">let </span>api_req: ApiRequestErased =
                         serde_json::from_value(params[<span class="number">0</span>].clone()).unwrap();
                     <span class="kw">let </span>serde_tx: SerdeTransaction =
@@ -685,7 +784,7 @@
 
                     <span class="prelude-val">Ok</span>(serde_json::to_value(tx.tx_hash()).unwrap())
                 }
-                <span class="string">&quot;/wait_transaction&quot; </span>=&gt; {
+                <span class="string">&quot;wait_transaction&quot; </span>=&gt; {
                     <span class="kw">let </span>api_req: ApiRequestErased =
                         serde_json::from_value(params[<span class="number">0</span>].clone()).unwrap();
                     <span class="kw">let </span>txid: TransactionId = serde_json::from_value(api_req.params).unwrap();
@@ -713,24 +812,15 @@
 
     <span class="kw">struct </span>FakeGlobalContext {
         api: FakeApiClient,
+        <span class="doccomment">/// Clone of API wrapped as dyn API (avoids a lot of casting)
+        </span>dyn_api: DynFederationApi,
         executor: Executor&lt;DynGlobalClientContext&gt;,
     }
 
-    <span class="kw">impl </span>Debug <span class="kw">for </span>FakeGlobalContext {
-        <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; std::fmt::Result {
-            <span class="macro">write!</span>(f, <span class="string">&quot;FakeGlobalContext({:?})&quot;</span>, <span class="self">self</span>.api)
-        }
-    }
-
-    <span class="attr">#[async_trait]
-    </span><span class="kw">impl </span>IGlobalClientContext <span class="kw">for </span>FakeGlobalContext {
-        <span class="kw">fn </span>api(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>(<span class="kw">dyn </span>IFederationApi + <span class="lifetime">&#39;static</span>) {
-            <span class="kw-2">&amp;</span><span class="self">self</span>.api
-        }
-
+    <span class="kw">impl </span>FakeGlobalContext {
         <span class="kw">async fn </span>finalize_and_submit_transaction(
             <span class="kw-2">&amp;</span><span class="self">self</span>,
-            dbtx: <span class="kw-2">&amp;mut </span>DatabaseTransaction&lt;<span class="lifetime">&#39;_</span>&gt;,
+            dbtx: <span class="kw-2">&amp;mut </span>ClientSMDatabaseTransaction&lt;<span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;_</span>&gt;,
             operation_id: OperationId,
             tx_builder: TransactionBuilder,
         ) -&gt; anyhow::Result&lt;TransactionId&gt; {
@@ -749,21 +839,72 @@
             }
             .into_dyn(TRANSACTION_SUBMISSION_MODULE_INSTANCE);
             <span class="self">self</span>.executor
-                .add_state_machines_dbtx(dbtx, <span class="macro">vec!</span>[tx_submission_sm])
+                .add_state_machines_dbtx(dbtx.global_tx(), <span class="macro">vec!</span>[tx_submission_sm])
                 .<span class="kw">await</span><span class="question-mark">?</span>;
 
             <span class="prelude-val">Ok</span>(txid)
         }
+    }
 
-        <span class="kw">async fn </span>await_active_state(<span class="kw-2">&amp;</span><span class="self">self</span>, state: DynState&lt;DynGlobalClientContext&gt;) -&gt; ActiveState {
-            <span class="self">self</span>.executor.await_active_state(state).<span class="kw">await
-        </span>}
+    <span class="kw">impl </span>Debug <span class="kw">for </span>FakeGlobalContext {
+        <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; std::fmt::Result {
+            <span class="macro">write!</span>(f, <span class="string">&quot;FakeGlobalContext({:?})&quot;</span>, <span class="self">self</span>.api)
+        }
+    }
 
-        <span class="kw">async fn </span>await_inactive_state(
+    <span class="attr">#[async_trait]
+    </span><span class="kw">impl </span>IGlobalClientContext <span class="kw">for </span>FakeGlobalContext {
+        <span class="kw">fn </span>api(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>DynFederationApi {
+            <span class="kw-2">&amp;</span><span class="self">self</span>.dyn_api
+        }
+
+        <span class="kw">fn </span>client_config(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>ClientConfig {
+            <span class="macro">unimplemented!</span>()
+        }
+
+        <span class="kw">fn </span>decoders(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>ModuleDecoderRegistry {
+            <span class="macro">unimplemented!</span>()
+        }
+
+        <span class="kw">fn </span>module_api(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; DynFederationApi {
+            <span class="macro">unimplemented!</span>()
+        }
+
+        <span class="kw">async fn </span>claim_input_dyn(
             <span class="kw-2">&amp;</span><span class="self">self</span>,
-            state: DynState&lt;DynGlobalClientContext&gt;,
-        ) -&gt; InactiveState {
-            <span class="self">self</span>.executor.await_inactive_state(state).<span class="kw">await
+            _dbtx: <span class="kw-2">&amp;mut </span>ClientSMDatabaseTransaction&lt;<span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;_</span>&gt;,
+            _input: InstancelessDynClientInput,
+        ) -&gt; (TransactionId, <span class="prelude-ty">Option</span>&lt;OutPoint&gt;) {
+            <span class="macro">unimplemented!</span>()
+        }
+
+        <span class="kw">async fn </span>fund_output_dyn(
+            <span class="kw-2">&amp;</span><span class="self">self</span>,
+            _dbtx: <span class="kw-2">&amp;mut </span>ClientSMDatabaseTransaction&lt;<span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;_</span>&gt;,
+            _output: InstancelessDynClientOutput,
+        ) -&gt; anyhow::Result&lt;(TransactionId, <span class="prelude-ty">Option</span>&lt;OutPoint&gt;)&gt; {
+            <span class="macro">unimplemented!</span>()
+        }
+
+        <span class="kw">async fn </span>add_state_machine_dyn(
+            <span class="kw-2">&amp;</span><span class="self">self</span>,
+            _dbtx: <span class="kw-2">&amp;mut </span>ClientSMDatabaseTransaction&lt;<span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;_</span>&gt;,
+            _sm: Box&lt;<span class="macro">maybe_add_send_sync!</span>(<span class="kw">dyn </span>IState&lt;DynGlobalClientContext&gt;)&gt;,
+        ) -&gt; anyhow::Result&lt;()&gt; {
+            <span class="macro">unimplemented!</span>()
+        }
+
+        <span class="kw">async fn </span>transaction_update_stream(
+            <span class="kw-2">&amp;</span><span class="self">self</span>,
+            operation_id: OperationId,
+        ) -&gt; BoxStream&lt;OperationState&lt;TxSubmissionStates&gt;&gt; {
+            <span class="self">self</span>.executor
+                .notifier()
+                .module_notifier::&lt;OperationState&lt;TxSubmissionStates&gt;&gt;(
+                    TRANSACTION_SUBMISSION_MODULE_INSTANCE,
+                )
+                .subscribe(operation_id)
+                .<span class="kw">await
         </span>}
     }
 
@@ -774,6 +915,7 @@
             MemDatabase::new(),
             ModuleDecoderRegistry::new([(
                 TRANSACTION_SUBMISSION_MODULE_INSTANCE,
+                ModuleKind::from_static_str(<span class="string">&quot;test_transaction_submission&quot;</span>),
                 tx_submission_sm_decoder(),
             )]),
         );
@@ -782,30 +924,40 @@
 
         <span class="kw">let </span><span class="kw-2">mut </span>executor_builder = Executor::&lt;DynGlobalClientContext&gt;::builder();
         executor_builder.with_module(TRANSACTION_SUBMISSION_MODULE_INSTANCE, TxSubmissionContext);
-        <span class="kw">let </span>executor = executor_builder.build(db.clone()).<span class="kw">await</span>;
+        <span class="kw">let </span>executor = executor_builder
+            .build(db.clone(), Notifier::new(db.clone()))
+            .<span class="kw">await</span>;
 
+        <span class="kw">let </span>fake_api = FakeApiClient::default();
         <span class="kw">let </span>context = Arc::new(FakeGlobalContext {
-            api: Default::default(),
+            api: fake_api.clone(),
+            dyn_api: DynFederationApi::from(fake_api),
             executor: executor.clone(),
         });
         <span class="kw">let </span>dyn_context = DynGlobalClientContext::from(context.clone());
+        <span class="kw">let </span>dyn_context_gen_clone = dyn_context.clone();
+        executor
+            .start_executor(<span class="kw-2">&amp;mut </span>tg, Arc::new(<span class="kw">move </span>|<span class="kw">_</span>, <span class="kw">_</span>| dyn_context_gen_clone.clone()))
+            .<span class="kw">await</span>;
 
-        executor.start_executor(<span class="kw-2">&amp;mut </span>tg, dyn_context.clone()).<span class="kw">await</span>;
-
-        <span class="kw">let </span>operation_id = [<span class="number">0x42</span>; <span class="number">32</span>];
+        <span class="kw">let </span>operation_id = OperationId([<span class="number">0x42</span>; <span class="number">32</span>]);
 
         <span class="kw">let </span>tx_builder = TransactionBuilder::new();
 
         <span class="kw">let </span><span class="kw-2">mut </span>dbtx = db.begin_transaction().<span class="kw">await</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>client_tx = ClientSMDatabaseTransaction::new(<span class="kw-2">&amp;mut </span>dbtx, <span class="number">0</span>);
         <span class="kw">let </span>txid = context
-            .finalize_and_submit_transaction(<span class="kw-2">&amp;mut </span>dbtx, operation_id, tx_builder)
+            .finalize_and_submit_transaction(<span class="kw-2">&amp;mut </span>client_tx, operation_id, tx_builder)
             .<span class="kw">await
             </span>.unwrap();
         dbtx.commit_tx().<span class="kw">await</span>;
 
         timeout(Duration::from_secs(<span class="number">5</span>), <span class="kw">async move </span>{
-            dyn_context.await_tx_accepted(operation_id, txid).<span class="kw">await
-        </span>})
+            dyn_context
+                .await_tx_accepted(operation_id, txid)
+                .<span class="kw">await
+                </span>.expect(<span class="string">&quot;Transaction was not accepted&quot;</span>)
+        })
         .<span class="kw">await
         </span>.unwrap();
 

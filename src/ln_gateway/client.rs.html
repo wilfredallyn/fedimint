@@ -220,13 +220,17 @@
 <a href="#220" id="220">220</a>
 <a href="#221" id="221">221</a>
 <a href="#222" id="222">222</a>
+<a href="#223" id="223">223</a>
+<a href="#224" id="224">224</a>
+<a href="#225" id="225">225</a>
 </pre><pre class="rust"><code><span class="kw">use </span>std::fmt::Debug;
 <span class="kw">use </span>std::fs::File;
 <span class="kw">use </span>std::path::{Path, PathBuf};
 <span class="kw">use </span>std::sync::Arc;
 
 <span class="kw">use </span>async_trait::async_trait;
-<span class="kw">use </span>fedimint_client::module::gen::{ClientModuleGenRegistry, ClientModuleGenRegistryExt};
+<span class="kw">use </span>fedimint_client::module::gen::ClientModuleGenRegistry;
+<span class="kw">use </span>fedimint_client_legacy::{module_decode_stubs, Client, GatewayClientConfig};
 <span class="kw">use </span>fedimint_core::api::{
     DynFederationApi, GlobalFederationApi, WsClientConnectInfo, WsFederationApi,
 };
@@ -235,7 +239,6 @@
 <span class="kw">use </span>fedimint_core::db::Database;
 <span class="kw">use </span>fedimint_core::dyn_newtype_define;
 <span class="kw">use </span>fedimint_core::module::registry::ModuleDecoderRegistry;
-<span class="kw">use </span>mint_client::{module_decode_stubs, Client, GatewayClientConfig};
 <span class="kw">use </span>secp256k1::{KeyPair, PublicKey};
 <span class="kw">use </span>tracing::{debug, warn};
 <span class="kw">use </span>url::Url;
@@ -347,7 +350,7 @@
         decoders: ModuleDecoderRegistry,
         module_gens: ClientModuleGenRegistry,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Client&lt;GatewayClientConfig&gt;&gt; {
-        <span class="kw">let </span>federation_id = config.client_config.federation_id.clone();
+        <span class="kw">let </span>federation_id = config.client_config.federation_id;
 
         <span class="kw">let </span>db = <span class="self">self</span>.db_factory.create_database(
             federation_id,
@@ -364,13 +367,12 @@
         connect: WsClientConnectInfo,
         mint_channel_id: u64,
         node_pubkey: PublicKey,
-        module_gens: ClientModuleGenRegistry,
+        <span class="comment">// TODO: delme
+        </span>_module_gens: ClientModuleGenRegistry,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;GatewayClientConfig&gt; {
-        <span class="kw">let </span>api: DynFederationApi = WsFederationApi::from_urls(<span class="kw-2">&amp;</span>connect).into();
+        <span class="kw">let </span>api: DynFederationApi = WsFederationApi::from_connect_info(<span class="kw-2">&amp;</span>[connect.clone()]).into();
 
-        <span class="kw">let </span>client_config = api
-            .download_client_config(<span class="kw-2">&amp;</span>connect.id, module_gens.to_common())
-            .<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let </span>client_config = api.download_client_config(<span class="kw-2">&amp;</span>connect).<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="kw">let </span><span class="kw-2">mut </span>rng = rand::rngs::OsRng;
         <span class="kw">let </span>ctx = secp256k1::Secp256k1::new();
@@ -405,8 +407,12 @@
         </span>}
 
         <span class="macro">debug!</span>(<span class="string">&quot;Saving gateway cfg in {}&quot;</span>, path.display());
-        <span class="kw">let </span>file = File::create(path).expect(<span class="string">&quot;Could not create gateway cfg file&quot;</span>);
-        serde_json::to_writer_pretty(file, <span class="kw-2">&amp;</span>config).expect(<span class="string">&quot;Could not write gateway cfg&quot;</span>);
+        <span class="kw">let </span>file = File::options()
+            .create_new(<span class="bool-val">true</span>)
+            .write(<span class="bool-val">true</span>)
+            .open(path)
+            .map_err(anyhow::Error::from)<span class="question-mark">?</span>;
+        serde_json::to_writer_pretty(file, <span class="kw-2">&amp;</span>config).map_err(anyhow::Error::from)<span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(())
     }

@@ -1402,25 +1402,64 @@
 <a href="#1402" id="1402">1402</a>
 <a href="#1403" id="1403">1403</a>
 <a href="#1404" id="1404">1404</a>
-</pre><pre class="rust"><code><span class="kw">use </span>std::collections::{BTreeMap, BTreeSet, HashMap, HashSet};
-<span class="kw">use </span>std::ffi::OsString;
+<a href="#1405" id="1405">1405</a>
+<a href="#1406" id="1406">1406</a>
+<a href="#1407" id="1407">1407</a>
+<a href="#1408" id="1408">1408</a>
+<a href="#1409" id="1409">1409</a>
+<a href="#1410" id="1410">1410</a>
+<a href="#1411" id="1411">1411</a>
+<a href="#1412" id="1412">1412</a>
+<a href="#1413" id="1413">1413</a>
+<a href="#1414" id="1414">1414</a>
+<a href="#1415" id="1415">1415</a>
+<a href="#1416" id="1416">1416</a>
+<a href="#1417" id="1417">1417</a>
+<a href="#1418" id="1418">1418</a>
+<a href="#1419" id="1419">1419</a>
+<a href="#1420" id="1420">1420</a>
+<a href="#1421" id="1421">1421</a>
+<a href="#1422" id="1422">1422</a>
+<a href="#1423" id="1423">1423</a>
+<a href="#1424" id="1424">1424</a>
+<a href="#1425" id="1425">1425</a>
+<a href="#1426" id="1426">1426</a>
+<a href="#1427" id="1427">1427</a>
+<a href="#1428" id="1428">1428</a>
+<a href="#1429" id="1429">1429</a>
+<a href="#1430" id="1430">1430</a>
+<a href="#1431" id="1431">1431</a>
+<a href="#1432" id="1432">1432</a>
+<a href="#1433" id="1433">1433</a>
+<a href="#1434" id="1434">1434</a>
+<a href="#1435" id="1435">1435</a>
+<a href="#1436" id="1436">1436</a>
+<a href="#1437" id="1437">1437</a>
+<a href="#1438" id="1438">1438</a>
+<a href="#1439" id="1439">1439</a>
+<a href="#1440" id="1440">1440</a>
+<a href="#1441" id="1441">1441</a>
+<a href="#1442" id="1442">1442</a>
+<a href="#1443" id="1443">1443</a>
+<a href="#1444" id="1444">1444</a>
+<a href="#1445" id="1445">1445</a>
+<a href="#1446" id="1446">1446</a>
+</pre><pre class="rust"><code><span class="kw">use </span>std::collections::{BTreeMap, BTreeSet, HashMap};
 <span class="kw">use </span>std::iter::FromIterator;
 <span class="kw">use </span>std::ops::Sub;
 
+<span class="kw">use </span>anyhow::bail;
 <span class="kw">use </span>fedimint_core::config::{
-    ConfigGenParams, DkgResult, ModuleConfigResponse, ModuleGenParams, ServerModuleConfig,
-    TypedServerModuleConfig, TypedServerModuleConsensusConfig,
+    ClientModuleConfig, ConfigGenModuleParams, DkgResult, ServerModuleConfig,
+    ServerModuleConsensusConfig, TypedServerModuleConfig, TypedServerModuleConsensusConfig,
 };
-<span class="kw">use </span>fedimint_core::core::ModuleInstanceId;
 <span class="kw">use </span>fedimint_core::db::{Database, DatabaseVersion, ModuleDatabaseTransaction};
-<span class="kw">use </span>fedimint_core::encoding::Encodable;
-<span class="kw">use </span>fedimint_core::module::__reexports::serde_json;
 <span class="kw">use </span>fedimint_core::module::audit::Audit;
 <span class="kw">use </span>fedimint_core::module::interconnect::ModuleInterconect;
 <span class="kw">use </span>fedimint_core::module::{
-    api_endpoint, ApiEndpoint, ApiError, ApiVersion, ConsensusProposal, CoreConsensusVersion,
+    api_endpoint, ApiEndpoint, ApiError, ConsensusProposal, CoreConsensusVersion,
     ExtendsCommonModuleGen, InputMeta, IntoModuleError, ModuleConsensusVersion, ModuleError,
-    PeerHandle, ServerModuleGen, TransactionItemAmount,
+    PeerHandle, ServerModuleGen, SupportedModuleApiVersions, TransactionItemAmount,
 };
 <span class="kw">use </span>fedimint_core::server::DynServerModule;
 <span class="kw">use </span>fedimint_core::task::{MaybeSend, TaskGroup};
@@ -1431,7 +1470,8 @@
 };
 <span class="kw">pub use </span>fedimint_mint_common <span class="kw">as </span>common;
 <span class="kw">use </span>fedimint_mint_common::config::{
-    FeeConsensus, MintConfig, MintConfigConsensus, MintConfigPrivate,
+    FeeConsensus, MintClientConfig, MintConfig, MintConfigConsensus, MintConfigLocal,
+    MintConfigPrivate, MintGenParams,
 };
 <span class="kw">use </span>fedimint_mint_common::db::{
     DbKeyPrefix, ECashUserBackupSnapshot, EcashBackupKey, EcashBackupKeyPrefix, MintAuditItemKey,
@@ -1452,7 +1492,6 @@
 <span class="kw">use </span>rayon::iter::{IntoParallelIterator, ParallelIterator};
 <span class="kw">use </span>rayon::prelude::ParallelBridge;
 <span class="kw">use </span>secp256k1_zkp::SECP256K1;
-<span class="kw">use </span>serde::{Deserialize, Serialize};
 <span class="kw">use </span>strum::IntoEnumIterator;
 <span class="kw">use </span>tbs::{
     combine_valid_shares, dealer_keygen, sign_blinded_msg, verify_blind_share, Aggregatable,
@@ -1460,13 +1499,6 @@
 };
 <span class="kw">use </span>threshold_crypto::group::Curve;
 <span class="kw">use </span>tracing::{debug, error, info, warn};
-
-<span class="attr">#[derive(Debug, Clone, Serialize, Deserialize)]
-</span><span class="kw">pub struct </span>MintGenParams {
-    <span class="kw">pub </span>mint_amounts: Vec&lt;Amount&gt;,
-}
-
-<span class="kw">impl </span>ModuleGenParams <span class="kw">for </span>MintGenParams {}
 
 <span class="attr">#[derive(Debug, Clone)]
 </span><span class="kw">pub struct </span>MintGen;
@@ -1487,7 +1519,6 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         cfg: ServerModuleConfig,
         _db: Database,
-        _env: <span class="kw-2">&amp;</span>BTreeMap&lt;OsString, OsString&gt;,
         _task_group: <span class="kw-2">&amp;mut </span>TaskGroup,
     ) -&gt; anyhow::Result&lt;DynServerModule&gt; {
         <span class="prelude-val">Ok</span>(Mint::new(cfg.to_typed()<span class="question-mark">?</span>).into())
@@ -1496,13 +1527,14 @@
     <span class="kw">fn </span>trusted_dealer_gen(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         peers: <span class="kw-2">&amp;</span>[PeerId],
-        params: <span class="kw-2">&amp;</span>ConfigGenParams,
+        params: <span class="kw-2">&amp;</span>ConfigGenModuleParams,
     ) -&gt; BTreeMap&lt;PeerId, ServerModuleConfig&gt; {
         <span class="kw">let </span>params = params
             .to_typed::&lt;MintGenParams&gt;()
             .expect(<span class="string">&quot;Invalid mint params&quot;</span>);
 
         <span class="kw">let </span>tbs_keys = params
+            .consensus
             .mint_amounts
             .iter()
             .map(|<span class="kw-2">&amp;</span>amount| {
@@ -1515,11 +1547,13 @@
             .iter()
             .map(|<span class="kw-2">&amp;</span>peer| {
                 <span class="kw">let </span>config = MintConfig {
+                    local: MintConfigLocal,
                     consensus: MintConfigConsensus {
                         peer_tbs_pks: peers
                             .iter()
                             .map(|<span class="kw-2">&amp;</span>key_peer| {
                                 <span class="kw">let </span>keys = params
+                                    .consensus
                                     .mint_amounts
                                     .iter()
                                     .map(|amount| {
@@ -1534,6 +1568,7 @@
                     },
                     private: MintConfigPrivate {
                         tbs_sks: params
+                            .consensus
                             .mint_amounts
                             .iter()
                             .map(|amount| (<span class="kw-2">*</span>amount, tbs_keys[amount].<span class="number">2</span>[peer.to_usize()]))
@@ -1553,13 +1588,15 @@
     <span class="kw">async fn </span>distributed_gen(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         peers: <span class="kw-2">&amp;</span>PeerHandle,
-        params: <span class="kw-2">&amp;</span>ConfigGenParams,
+        params: <span class="kw-2">&amp;</span>ConfigGenModuleParams,
     ) -&gt; DkgResult&lt;ServerModuleConfig&gt; {
         <span class="kw">let </span>params = params
             .to_typed::&lt;MintGenParams&gt;()
             .expect(<span class="string">&quot;Invalid mint gen params&quot;</span>);
 
-        <span class="kw">let </span>g2 = peers.run_dkg_multi_g2(params.mint_amounts.to_vec()).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let </span>g2 = peers
+            .run_dkg_multi_g2(params.consensus.mint_amounts.to_vec())
+            .<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="kw">let </span>amounts_keys = g2
             .into_iter()
@@ -1567,6 +1604,7 @@
             .collect::&lt;HashMap&lt;<span class="kw">_</span>, <span class="kw">_</span>&gt;&gt;();
 
         <span class="kw">let </span>server = MintConfig {
+            local: MintConfigLocal,
             private: MintConfigPrivate {
                 tbs_sks: amounts_keys
                     .iter()
@@ -1584,7 +1622,7 @@
                                 <span class="kw">let </span>pks = PublicKeyShare(pks.evaluate(scalar(peer)).to_affine());
                                 (<span class="kw-2">*</span>amount, pks)
                             })
-                            .collect::&lt;Tiered&lt;PublicKeyShare&gt;&gt;();
+                            .collect::&lt;Tiered&lt;<span class="kw">_</span>&gt;&gt;();
 
                         (<span class="kw-2">*</span>peer, pks)
                     })
@@ -1597,25 +1635,71 @@
         <span class="prelude-val">Ok</span>(server.to_erased())
     }
 
-    <span class="kw">fn </span>to_config_response(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        config: serde_json::Value,
-    ) -&gt; anyhow::Result&lt;ModuleConfigResponse&gt; {
-        <span class="kw">let </span>config = serde_json::from_value::&lt;MintConfigConsensus&gt;(config)<span class="question-mark">?</span>;
+    <span class="kw">fn </span>validate_config(<span class="kw-2">&amp;</span><span class="self">self</span>, identity: <span class="kw-2">&amp;</span>PeerId, config: ServerModuleConfig) -&gt; anyhow::Result&lt;()&gt; {
+        <span class="kw">let </span>config = config.to_typed::&lt;MintConfig&gt;()<span class="question-mark">?</span>;
+        <span class="kw">let </span>sks: BTreeMap&lt;Amount, PublicKeyShare&gt; = config
+            .private
+            .tbs_sks
+            .iter()
+            .map(|(amount, sk)| (amount, sk.to_pub_key_share()))
+            .collect();
+        <span class="kw">let </span>pks: BTreeMap&lt;Amount, PublicKeyShare&gt; = config
+            .consensus
+            .peer_tbs_pks
+            .get(identity)
+            .unwrap()
+            .as_map()
+            .iter()
+            .map(|(k, v)| (<span class="kw-2">*</span>k, <span class="kw-2">*</span>v))
+            .collect();
+        <span class="kw">if </span>sks != pks {
+            <span class="macro">bail!</span>(<span class="string">&quot;Mint private key doesn&#39;t match pubkey share&quot;</span>);
+        }
+        <span class="kw">if </span>!sks.keys().contains(<span class="kw-2">&amp;</span>Amount::from_msats(<span class="number">1</span>)) {
+            <span class="macro">bail!</span>(<span class="string">&quot;No msat 1 denomination&quot;</span>);
+        }
 
-        <span class="prelude-val">Ok</span>(ModuleConfigResponse {
-            client: config.to_client_config(),
-            consensus_hash: config.consensus_hash()<span class="question-mark">?</span>,
-        })
+        <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">fn </span>validate_config(<span class="kw-2">&amp;</span><span class="self">self</span>, identity: <span class="kw-2">&amp;</span>PeerId, config: ServerModuleConfig) -&gt; anyhow::Result&lt;()&gt; {
-        config.to_typed::&lt;MintConfig&gt;()<span class="question-mark">?</span>.validate_config(identity)
+    <span class="kw">fn </span>get_client_config(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        config: <span class="kw-2">&amp;</span>ServerModuleConsensusConfig,
+    ) -&gt; anyhow::Result&lt;ClientModuleConfig&gt; {
+        <span class="kw">let </span>config = MintConfigConsensus::from_erased(config)<span class="question-mark">?</span>;
+        <span class="kw">let </span>pub_keys = TieredMultiZip::new(
+            config
+                .peer_tbs_pks
+                .values()
+                .map(|keys| keys.iter())
+                .collect(),
+        )
+        .map(|(amt, keys)| {
+            <span class="comment">// TODO: avoid this through better aggregation API allowing references or
+            </span><span class="kw">let </span>agg_key = keys
+                .into_iter()
+                .copied()
+                .collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;()
+                .aggregate(config.peer_tbs_pks.threshold());
+            (amt, agg_key)
+        });
+
+        <span class="prelude-val">Ok</span>(ClientModuleConfig::from_typed(
+            config.kind(),
+            config.version(),
+            <span class="kw-2">&amp;</span>MintClientConfig {
+                tbs_pks: Tiered::from_iter(pub_keys),
+                fee_consensus: config.fee_consensus.clone(),
+                peer_tbs_pks: config.peer_tbs_pks.clone(),
+                max_notes_per_denomination: config.max_notes_per_denomination,
+            },
+        )
+        .expect(<span class="string">&quot;Serialization can&#39;t fail&quot;</span>))
     }
 
     <span class="kw">async fn </span>dump_database(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;_</span>, ModuleInstanceId&gt;,
+        dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;_</span>&gt;,
         prefix_names: Vec&lt;String&gt;,
     ) -&gt; Box&lt;<span class="kw">dyn </span>Iterator&lt;Item = (String, Box&lt;<span class="kw">dyn </span>erased_serde::Serialize + Send&gt;)&gt; + <span class="lifetime">&#39;_</span>&gt; {
         <span class="kw">let </span><span class="kw-2">mut </span>mint: BTreeMap&lt;String, Box&lt;<span class="kw">dyn </span>erased_serde::Serialize + Send&gt;&gt; = BTreeMap::new();
@@ -1697,25 +1781,19 @@
     <span class="kw">type </span>Gen = MintGen;
     <span class="kw">type </span>VerificationCache = VerifiedNotes;
 
-    <span class="kw">async fn </span>await_consensus_proposal(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;_</span>, ModuleInstanceId&gt;,
-    ) {
+    <span class="kw">async fn </span>await_consensus_proposal(<span class="kw-2">&amp;</span><span class="self">self</span>, dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;_</span>&gt;) {
         <span class="kw">if </span>!<span class="self">self</span>.consensus_proposal(dbtx).<span class="kw">await</span>.forces_new_epoch() {
             std::future::pending().<span class="kw">await
         </span>}
     }
 
-    <span class="kw">fn </span>versions(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (ModuleConsensusVersion, <span class="kw-2">&amp;</span>[ApiVersion]) {
-        (
-            ModuleConsensusVersion(<span class="number">0</span>),
-            <span class="kw-2">&amp;</span>[ApiVersion { major: <span class="number">0</span>, minor: <span class="number">0 </span>}],
-        )
+    <span class="kw">fn </span>supported_api_versions(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SupportedModuleApiVersions {
+        SupportedModuleApiVersions::from_raw(<span class="number">0</span>, <span class="number">0</span>, <span class="kw-2">&amp;</span>[(<span class="number">0</span>, <span class="number">0</span>)])
     }
 
     <span class="kw">async fn </span>consensus_proposal(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;_</span>, ModuleInstanceId&gt;,
+        dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;_</span>&gt;,
     ) -&gt; ConsensusProposal&lt;MintConsensusItem&gt; {
         ConsensusProposal::new_auto_trigger(
             dbtx.find_by_prefix(<span class="kw-2">&amp;</span>ProposedPartialSignaturesKeyPrefix)
@@ -1731,9 +1809,10 @@
 
     <span class="kw">async fn </span>begin_consensus_epoch&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt;(
         <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>,
-        dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;b</span>, ModuleInstanceId&gt;,
+        dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;b</span>&gt;,
         consensus_items: Vec&lt;(PeerId, MintConsensusItem)&gt;,
-    ) {
+        _consensus_peers: <span class="kw-2">&amp;</span>BTreeSet&lt;PeerId&gt;,
+    ) -&gt; Vec&lt;PeerId&gt; {
         <span class="kw">for </span>(peer, consensus_item) <span class="kw">in </span>consensus_items {
             <span class="self">self</span>.process_partial_signature(
                 dbtx,
@@ -1743,6 +1822,7 @@
             )
             .<span class="kw">await
         </span>}
+        <span class="macro">vec!</span>[]
     }
 
     <span class="kw">fn </span>build_verification_cache&lt;<span class="lifetime">&#39;a</span>&gt;(
@@ -1774,7 +1854,7 @@
     <span class="kw">async fn </span>validate_input&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt;(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         _interconnect: <span class="kw-2">&amp;</span><span class="kw">dyn </span>ModuleInterconect,
-        dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;b</span>, ModuleInstanceId&gt;,
+        dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;b</span>&gt;,
         verification_cache: <span class="kw-2">&amp;</span><span class="self">Self</span>::VerificationCache,
         input: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>MintInput,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;InputMeta, ModuleError&gt; {
@@ -1809,7 +1889,7 @@
     <span class="kw">async fn </span>apply_input&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>, <span class="lifetime">&#39;c</span>&gt;(
         <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>,
         interconnect: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw">dyn </span>ModuleInterconect,
-        dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;c</span>, ModuleInstanceId&gt;,
+        dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;c</span>&gt;,
         input: <span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span>MintInput,
         cache: <span class="kw-2">&amp;</span><span class="self">Self</span>::VerificationCache,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;InputMeta, ModuleError&gt; {
@@ -1829,13 +1909,16 @@
 
     <span class="kw">async fn </span>validate_output(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        _dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;_</span>, ModuleInstanceId&gt;,
+        _dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;_</span>&gt;,
         output: <span class="kw-2">&amp;</span>MintOutput,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;TransactionItemAmount, ModuleError&gt; {
-        <span class="kw">if </span>output.longest_tier_len() &gt; <span class="self">self</span>.cfg.consensus.max_notes_per_denomination.into() {
+        <span class="kw">let </span>max_tier = <span class="self">self</span>.cfg.private.tbs_sks.max_tier();
+        <span class="kw">if </span>output.longest_tier_except(max_tier)
+            &gt; <span class="self">self</span>.cfg.consensus.max_notes_per_denomination.into()
+        {
             <span class="kw">return </span><span class="prelude-val">Err</span>(MintError::ExceededMaxNotes(
                 <span class="self">self</span>.cfg.consensus.max_notes_per_denomination,
-                output.longest_tier_len(),
+                output.longest_tier_except(max_tier),
             ))
             .into_module_error_other();
         }
@@ -1859,7 +1942,7 @@
 
     <span class="kw">async fn </span>apply_output&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt;(
         <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>,
-        dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;b</span>, ModuleInstanceId&gt;,
+        dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;b</span>&gt;,
         output: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>MintOutput,
         out_point: OutPoint,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;TransactionItemAmount, ModuleError&gt; {
@@ -1884,8 +1967,8 @@
 
     <span class="kw">async fn </span>end_consensus_epoch&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt;(
         <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>,
-        consensus_peers: <span class="kw-2">&amp;</span>HashSet&lt;PeerId&gt;,
-        dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;b</span>, ModuleInstanceId&gt;,
+        consensus_peers: <span class="kw-2">&amp;</span>BTreeSet&lt;PeerId&gt;,
+        dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;b</span>&gt;,
     ) -&gt; Vec&lt;PeerId&gt; {
         <span class="kw">struct </span>IssuanceData {
             out_point: OutPoint,
@@ -1961,7 +2044,7 @@
                         .<span class="kw">await</span>;
                 }
                 <span class="prelude-val">Err</span>(CombineError::TooFewShares(got, <span class="kw">_</span>)) =&gt; {
-                    <span class="kw">for </span>peer <span class="kw">in </span>consensus_peers.sub(<span class="kw-2">&amp;</span>HashSet::from_iter(got)) {
+                    <span class="kw">for </span>peer <span class="kw">in </span>consensus_peers.sub(<span class="kw-2">&amp;</span>BTreeSet::from_iter(got)) {
                         <span class="macro">error!</span>(<span class="string">&quot;Dropping {:?} for not contributing shares&quot;</span>, peer);
                         drop_peers.insert(peer);
                     }
@@ -2003,7 +2086,7 @@
 
     <span class="kw">async fn </span>output_status(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;_</span>, ModuleInstanceId&gt;,
+        dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;_</span>&gt;,
         out_point: OutPoint,
     ) -&gt; <span class="prelude-ty">Option</span>&lt;MintOutputOutcome&gt; {
         <span class="kw">let </span>we_proposed = dbtx
@@ -2030,11 +2113,7 @@
         </span>}
     }
 
-    <span class="kw">async fn </span>audit(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;_</span>, ModuleInstanceId&gt;,
-        audit: <span class="kw-2">&amp;mut </span>Audit,
-    ) {
+    <span class="kw">async fn </span>audit(<span class="kw-2">&amp;</span><span class="self">self</span>, dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;_</span>&gt;, audit: <span class="kw-2">&amp;mut </span>Audit) {
         audit
             .add_items(dbtx, <span class="kw-2">&amp;</span>MintAuditItemKeyPrefix, |k, v| <span class="kw">match </span>k {
                 MintAuditItemKey::Issuance(<span class="kw">_</span>) =&gt; -(v.msats <span class="kw">as </span>i64),
@@ -2048,7 +2127,7 @@
     <span class="kw">fn </span>api_endpoints(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;ApiEndpoint&lt;<span class="self">Self</span>&gt;&gt; {
         <span class="macro">vec!</span>[
             <span class="macro">api_endpoint! </span>{
-                <span class="string">&quot;/backup&quot;</span>,
+                <span class="string">&quot;backup&quot;</span>,
                 <span class="kw">async </span>|module: <span class="kw-2">&amp;</span>Mint, context, request: SignedBackupRequest| -&gt; () {
                     module
                         .handle_backup_request(<span class="kw-2">&amp;mut </span>context.dbtx(), request).<span class="kw">await</span><span class="question-mark">?</span>;
@@ -2056,7 +2135,7 @@
                 }
             },
             <span class="macro">api_endpoint! </span>{
-                <span class="string">&quot;/recover&quot;</span>,
+                <span class="string">&quot;recover&quot;</span>,
                 <span class="kw">async </span>|module: <span class="kw-2">&amp;</span>Mint, context, id: secp256k1_zkp::XOnlyPublicKey| -&gt; <span class="prelude-ty">Option</span>&lt;ECashUserBackupSnapshot&gt; {
                     <span class="prelude-val">Ok</span>(module
                         .handle_recover_request(<span class="kw-2">&amp;mut </span>context.dbtx(), id).<span class="kw">await</span>)
@@ -2069,7 +2148,7 @@
 <span class="kw">impl </span>Mint {
     <span class="kw">async fn </span>handle_backup_request(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;_</span>, ModuleInstanceId&gt;,
+        dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;_</span>&gt;,
         request: SignedBackupRequest,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;(), ApiError&gt; {
         <span class="kw">let </span>request = request
@@ -2099,7 +2178,7 @@
 
     <span class="kw">async fn </span>handle_recover_request(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;_</span>, ModuleInstanceId&gt;,
+        dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;_</span>&gt;,
         id: secp256k1_zkp::XOnlyPublicKey,
     ) -&gt; <span class="prelude-ty">Option</span>&lt;ECashUserBackupSnapshot&gt; {
         dbtx.get_value(<span class="kw-2">&amp;</span>EcashBackupKey(id)).<span class="kw">await
@@ -2133,7 +2212,7 @@
             .consensus <span class="comment">// FIXME: make sure we use id instead of idx everywhere
             </span>.peer_tbs_pks
             .iter()
-            .find_map(|(<span class="kw-2">&amp;</span>id, pk)| <span class="kw">if </span>pk == <span class="kw-2">&amp;</span>ref_pub_key { <span class="prelude-val">Some</span>(id) } <span class="kw">else </span>{ <span class="prelude-val">None </span>})
+            .find_map(|(<span class="kw-2">&amp;</span>id, pk)| <span class="kw">if </span><span class="kw-2">*</span>pk == ref_pub_key { <span class="prelude-val">Some</span>(id) } <span class="kw">else </span>{ <span class="prelude-val">None </span>})
             .expect(<span class="string">&quot;Own key not found among pub keys.&quot;</span>);
 
         <span class="macro">assert_eq!</span>(
@@ -2162,7 +2241,7 @@
         Mint {
             cfg: cfg.clone(),
             sec_key: cfg.private.tbs_sks,
-            pub_key_shares: cfg.consensus.peer_tbs_pks,
+            pub_key_shares: cfg.consensus.peer_tbs_pks.into_iter().collect(),
             pub_key: aggregate_pub_keys,
         }
     }
@@ -2322,7 +2401,7 @@
 
     <span class="kw">async fn </span>process_partial_signature&lt;<span class="lifetime">&#39;a</span>&gt;(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;a</span>, ModuleInstanceId&gt;,
+        dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;a</span>&gt;,
         peer: PeerId,
         output_id: OutPoint,
         partial_sig: MintOutputSignatureShare,
@@ -2353,17 +2432,16 @@
 
 <span class="attr">#[cfg(test)]
 </span><span class="kw">mod </span>test {
-    <span class="kw">use </span>fedimint_core::config::{
-        ClientModuleConfig, ConfigGenParams, ServerModuleConfig, TypedServerModuleConsensusConfig,
-    };
+    <span class="kw">use </span>fedimint_core::config::{ClientModuleConfig, ConfigGenModuleParams, ServerModuleConfig};
     <span class="kw">use </span>fedimint_core::module::ServerModuleGen;
     <span class="kw">use </span>fedimint_core::{Amount, PeerId, TieredMulti};
     <span class="kw">use </span>fedimint_mint_common::config::{FeeConsensus, MintClientConfig};
     <span class="kw">use </span>tbs::{blind_message, unblind_signature, verify, AggregatePublicKey, BlindingKey, Message};
 
+    <span class="kw">use </span><span class="kw">crate</span>::common::config::MintGenParamsConsensus;
     <span class="kw">use crate</span>::{
-        BlindNonce, CombineError, Mint, MintConfig, MintConfigConsensus, MintConfigPrivate,
-        MintGen, MintGenParams, PeerErrorType,
+        BlindNonce, CombineError, Mint, MintConfig, MintConfigConsensus, MintConfigLocal,
+        MintConfigPrivate, MintGen, MintGenParams, PeerErrorType,
     };
 
     <span class="kw">const </span>THRESHOLD: usize = <span class="number">1</span>;
@@ -2373,16 +2451,17 @@
         <span class="kw">let </span>peers = (<span class="number">0</span>..MINTS <span class="kw">as </span>u16).map(PeerId::from).collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;();
         <span class="kw">let </span>mint_cfg = MintGen.trusted_dealer_gen(
             <span class="kw-2">&amp;</span>peers,
-            <span class="kw-2">&amp;</span>ConfigGenParams::from_typed(MintGenParams {
-                mint_amounts: <span class="macro">vec!</span>[Amount::from_sats(<span class="number">1</span>)],
+            <span class="kw-2">&amp;</span>ConfigGenModuleParams::from_typed(MintGenParams {
+                local: Default::default(),
+                consensus: MintGenParamsConsensus {
+                    mint_amounts: <span class="macro">vec!</span>[Amount::from_sats(<span class="number">1</span>)],
+                },
             })
             .unwrap(),
         );
-        <span class="kw">let </span>client_cfg = mint_cfg[<span class="kw-2">&amp;</span>PeerId::from(<span class="number">0</span>)]
-            .to_typed::&lt;MintConfig&gt;()
-            .unwrap()
-            .consensus
-            .to_client_config();
+        <span class="kw">let </span>client_cfg = MintGen
+            .get_client_config(<span class="kw-2">&amp;</span>mint_cfg[<span class="kw-2">&amp;</span>PeerId::from(<span class="number">0</span>)].consensus)
+            .unwrap();
 
         (mint_cfg.into_values().collect(), client_cfg)
     }
@@ -2554,6 +2633,7 @@
         <span class="kw">let </span>(mint_server_cfg2, <span class="kw">_</span>) = build_configs();
 
         Mint::new(MintConfig {
+            local: MintConfigLocal,
             consensus: MintConfigConsensus {
                 peer_tbs_pks: mint_server_cfg2[<span class="number">0</span>]
                     .to_typed::&lt;MintConfig&gt;()
@@ -2590,7 +2670,7 @@
     <span class="kw">use </span>fedimint_core::core::LEGACY_HARDCODED_INSTANCE_ID_MINT;
     <span class="kw">use </span>fedimint_core::db::{apply_migrations, DatabaseTransaction};
     <span class="kw">use </span>fedimint_core::module::registry::ModuleDecoderRegistry;
-    <span class="kw">use </span>fedimint_core::module::DynServerModuleGen;
+    <span class="kw">use </span>fedimint_core::module::{CommonModuleGen, DynServerModuleGen};
     <span class="kw">use </span>fedimint_core::{Amount, OutPoint, ServerModule, TieredMulti, TransactionId};
     <span class="kw">use </span>fedimint_mint_common::db::{
         DbKeyPrefix, ECashUserBackupSnapshot, EcashBackupKey, EcashBackupKeyPrefix,
@@ -2598,8 +2678,10 @@
         OutputOutcomeKeyPrefix, ProposedPartialSignatureKey, ProposedPartialSignaturesKeyPrefix,
         ReceivedPartialSignatureKey, ReceivedPartialSignaturesKeyPrefix,
     };
-    <span class="kw">use </span>fedimint_mint_common::{MintOutputBlindSignatures, MintOutputSignatureShare, Nonce};
-    <span class="kw">use </span>fedimint_testing::{prepare_snapshot, validate_migrations, BYTE_32, BYTE_8};
+    <span class="kw">use </span>fedimint_mint_common::{
+        MintCommonGen, MintOutputBlindSignatures, MintOutputSignatureShare, Nonce,
+    };
+    <span class="kw">use </span>fedimint_testing::db::{prepare_snapshot, validate_migrations, BYTE_32, BYTE_8};
     <span class="kw">use </span>futures::StreamExt;
     <span class="kw">use </span>rand::rngs::OsRng;
     <span class="kw">use </span>strum::IntoEnumIterator;
@@ -2695,6 +2777,7 @@
             },
             ModuleDecoderRegistry::from_iter([(
                 LEGACY_HARDCODED_INSTANCE_ID_MINT,
+                MintCommonGen::KIND,
                 &lt;Mint <span class="kw">as </span>ServerModule&gt;::decoder(),
             )]),
         )
@@ -2800,6 +2883,7 @@
             },
             ModuleDecoderRegistry::from_iter([(
                 LEGACY_HARDCODED_INSTANCE_ID_MINT,
+                MintCommonGen::KIND,
                 &lt;Mint <span class="kw">as </span>ServerModule&gt;::decoder(),
             )]),
         )

@@ -2002,13 +2002,14 @@
 <a href="#2002" id="2002">2002</a>
 <a href="#2003" id="2003">2003</a>
 <a href="#2004" id="2004">2004</a>
-</pre><pre class="rust"><code><span class="kw">use </span>std::collections::{BTreeMap, BTreeSet, HashMap, HashSet};
+<a href="#2005" id="2005">2005</a>
+</pre><pre class="rust"><code><span class="kw">use </span>std::collections::{BTreeMap, BTreeSet, HashMap};
 <span class="kw">use </span>std::convert::{Infallible, TryInto};
-<span class="kw">use </span>std::ffi::{OsStr, OsString};
 <span class="kw">use </span>std::ops::Sub;
 <span class="attr">#[cfg(not(target_family = <span class="string">&quot;wasm&quot;</span>))]
 </span><span class="kw">use </span>std::time::Duration;
 
+<span class="kw">use </span>anyhow::{bail, format_err};
 <span class="kw">use </span>bitcoin::hashes::{sha256, Hash <span class="kw">as </span>BitcoinHash, HashEngine, Hmac, HmacEngine};
 <span class="kw">use </span>bitcoin::policy::DEFAULT_MIN_RELAY_TX_FEE;
 <span class="kw">use </span>bitcoin::secp256k1::{All, Secp256k1, Verification};
@@ -2027,27 +2028,21 @@
     WalletError, WalletInput, WalletModuleTypes, WalletOutput, WalletOutputOutcome,
     CONFIRMATION_TARGET,
 };
-<span class="kw">use </span>fedimint_bitcoind::DynBitcoindRpc;
-<span class="kw">use </span>fedimint_core::bitcoin_rpc::{
-    select_bitcoin_backend_from_envs, BitcoinRpcBackendType, FM_BITCOIND_RPC_ENV,
-    FM_ELECTRUM_RPC_ENV, FM_ESPLORA_RPC_ENV,
-};
+<span class="kw">use </span>fedimint_bitcoind::{create_bitcoind, BitcoinRpcConfig, DynBitcoindRpc};
 <span class="kw">use </span>fedimint_core::config::{
-    ConfigGenParams, DkgResult, ModuleConfigResponse, ModuleGenParams, ServerModuleConfig,
-    TypedServerModuleConfig, TypedServerModuleConsensusConfig,
+    ClientModuleConfig, ConfigGenModuleParams, DkgResult, ServerModuleConfig,
+    ServerModuleConsensusConfig, TypedServerModuleConfig, TypedServerModuleConsensusConfig,
 };
-<span class="kw">use </span>fedimint_core::core::ModuleInstanceId;
 <span class="kw">use </span>fedimint_core::db::{
     Database, DatabaseTransaction, DatabaseVersion, ModuleDatabaseTransaction,
 };
 <span class="kw">use </span>fedimint_core::encoding::{Decodable, Encodable};
-<span class="kw">use </span>fedimint_core::module::__reexports::serde_json;
 <span class="kw">use </span>fedimint_core::module::audit::Audit;
 <span class="kw">use </span>fedimint_core::module::interconnect::ModuleInterconect;
 <span class="kw">use </span>fedimint_core::module::{
-    api_endpoint, ApiEndpoint, ApiVersion, ConsensusProposal, CoreConsensusVersion,
-    ExtendsCommonModuleGen, InputMeta, IntoModuleError, ModuleConsensusVersion, ModuleError,
-    PeerHandle, ServerModuleGen, TransactionItemAmount,
+    api_endpoint, ApiEndpoint, ConsensusProposal, CoreConsensusVersion, ExtendsCommonModuleGen,
+    InputMeta, IntoModuleError, ModuleConsensusVersion, ModuleError, PeerHandle, ServerModuleGen,
+    SupportedModuleApiVersions, TransactionItemAmount,
 };
 <span class="kw">use </span>fedimint_core::server::DynServerModule;
 <span class="attr">#[cfg(not(target_family = <span class="string">&quot;wasm&quot;</span>))]
@@ -2059,7 +2054,7 @@
 };
 <span class="kw">use </span>fedimint_server::config::distributedgen::PeerHandleOps;
 <span class="kw">pub use </span>fedimint_wallet_common <span class="kw">as </span>common;
-<span class="kw">use </span>fedimint_wallet_common::config::WalletConfig;
+<span class="kw">use </span>fedimint_wallet_common::config::{WalletClientConfig, WalletConfig, WalletGenParams};
 <span class="kw">use </span>fedimint_wallet_common::db::{
     BlockHashKey, BlockHashKeyPrefix, PegOutBitcoinTransaction, PegOutBitcoinTransactionPrefix,
     PegOutTxSignatureCI, PegOutTxSignatureCIPrefix, PendingTransactionKey,
@@ -2078,14 +2073,6 @@
 <span class="kw">use </span>serde::{Deserialize, Serialize};
 <span class="kw">use </span>strum::IntoEnumIterator;
 <span class="kw">use </span>tracing::{debug, error, info, instrument, trace, warn};
-
-<span class="attr">#[derive(Debug, Clone, Serialize, Deserialize)]
-</span><span class="kw">pub struct </span>WalletGenParams {
-    <span class="kw">pub </span>network: bitcoin::network::constants::Network,
-    <span class="kw">pub </span>finality_delay: u32,
-}
-
-<span class="kw">impl </span>ModuleGenParams <span class="kw">for </span>WalletGenParams {}
 
 <span class="attr">#[derive(Debug, Clone)]
 </span><span class="kw">pub struct </span>WalletGen;
@@ -2106,18 +2093,15 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         cfg: ServerModuleConfig,
         db: Database,
-        env: <span class="kw-2">&amp;</span>BTreeMap&lt;OsString, OsString&gt;,
         task_group: <span class="kw-2">&amp;mut </span>TaskGroup,
     ) -&gt; anyhow::Result&lt;DynServerModule&gt; {
-        <span class="prelude-val">Ok</span>(Wallet::new(cfg.to_typed()<span class="question-mark">?</span>, db, env, task_group)
-            .<span class="kw">await</span><span class="question-mark">?
-            </span>.into())
+        <span class="prelude-val">Ok</span>(Wallet::new(cfg.to_typed()<span class="question-mark">?</span>, db, task_group).<span class="kw">await</span><span class="question-mark">?</span>.into())
     }
 
     <span class="kw">fn </span>trusted_dealer_gen(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         peers: <span class="kw-2">&amp;</span>[PeerId],
-        params: <span class="kw-2">&amp;</span>ConfigGenParams,
+        params: <span class="kw-2">&amp;</span>ConfigGenModuleParams,
     ) -&gt; BTreeMap&lt;PeerId, ServerModuleConfig&gt; {
         <span class="kw">let </span>params = params
             .to_typed::&lt;WalletGenParams&gt;()
@@ -2140,8 +2124,8 @@
                         .collect(),
                     <span class="kw-2">*</span>sk,
                     peers.threshold(),
-                    params.network,
-                    params.finality_delay,
+                    params.consensus.network,
+                    params.consensus.finality_delay,
                 );
                 (<span class="kw-2">*</span>id, cfg)
             })
@@ -2156,7 +2140,7 @@
     <span class="kw">async fn </span>distributed_gen(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         peers: <span class="kw-2">&amp;</span>PeerHandle,
-        params: <span class="kw-2">&amp;</span>ConfigGenParams,
+        params: <span class="kw-2">&amp;</span>ConfigGenModuleParams,
     ) -&gt; DkgResult&lt;ServerModuleConfig&gt; {
         <span class="kw">let </span>params = params
             .to_typed::&lt;WalletGenParams&gt;()
@@ -2166,7 +2150,7 @@
         <span class="kw">let </span>(sk, pk) = secp.generate_keypair(<span class="kw-2">&amp;mut </span>OsRng);
         <span class="kw">let </span>our_key = CompressedPublicKey { key: pk };
         <span class="kw">let </span>peer_peg_in_keys: BTreeMap&lt;PeerId, CompressedPublicKey&gt; = peers
-            .exchange_pubkeys(our_key.key)
+            .exchange_pubkeys(<span class="string">&quot;wallet&quot;</span>.to_string(), our_key.key)
             .<span class="kw">await</span><span class="question-mark">?
             </span>.into_iter()
             .map(|(k, key)| (k, CompressedPublicKey { key }))
@@ -2176,31 +2160,51 @@
             peer_peg_in_keys,
             sk,
             peers.peer_ids().threshold(),
-            params.network,
-            params.finality_delay,
+            params.consensus.network,
+            params.consensus.finality_delay,
         );
 
         <span class="prelude-val">Ok</span>(wallet_cfg.to_erased())
     }
 
-    <span class="kw">fn </span>to_config_response(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        config: serde_json::Value,
-    ) -&gt; anyhow::Result&lt;ModuleConfigResponse&gt; {
-        <span class="kw">let </span>config = serde_json::from_value::&lt;WalletConfigConsensus&gt;(config)<span class="question-mark">?</span>;
-
-        <span class="prelude-val">Ok</span>(ModuleConfigResponse {
-            client: config.to_client_config(),
-            consensus_hash: config.consensus_hash()<span class="question-mark">?</span>,
-        })
-    }
-
     <span class="kw">fn </span>validate_config(<span class="kw-2">&amp;</span><span class="self">self</span>, identity: <span class="kw-2">&amp;</span>PeerId, config: ServerModuleConfig) -&gt; anyhow::Result&lt;()&gt; {
-        config.to_typed::&lt;WalletConfig&gt;()<span class="question-mark">?</span>.validate_config(identity)
+        <span class="kw">let </span>config = config.to_typed::&lt;WalletConfig&gt;()<span class="question-mark">?</span>;
+        <span class="kw">let </span>pubkey = secp256k1::PublicKey::from_secret_key_global(<span class="kw-2">&amp;</span>config.private.peg_in_key);
+
+        <span class="kw">if </span>config
+            .consensus
+            .peer_peg_in_keys
+            .get(identity)
+            .ok_or_else(|| <span class="macro">format_err!</span>(<span class="string">&quot;Secret key doesn&#39;t match any public key&quot;</span>))<span class="question-mark">?
+            </span>!= <span class="kw-2">&amp;</span>CompressedPublicKey::new(pubkey)
+        {
+            <span class="macro">bail!</span>(<span class="string">&quot; Bitcoin wallet private key doesn&#39;t match multisig pubkey&quot;</span>);
+        }
+
+        <span class="prelude-val">Ok</span>(())
     }
+
+    <span class="kw">fn </span>get_client_config(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        config: <span class="kw-2">&amp;</span>ServerModuleConsensusConfig,
+    ) -&gt; anyhow::Result&lt;ClientModuleConfig&gt; {
+        <span class="kw">let </span>config = WalletConfigConsensus::from_erased(config)<span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(ClientModuleConfig::from_typed(
+            config.kind(),
+            config.version(),
+            <span class="kw-2">&amp;</span>WalletClientConfig {
+                peg_in_descriptor: config.peg_in_descriptor.clone(),
+                network: config.network,
+                fee_consensus: config.fee_consensus.clone(),
+                finality_delay: config.finality_delay,
+            },
+        )
+        .expect(<span class="string">&quot;Serialization can&#39;t fail&quot;</span>))
+    }
+
     <span class="kw">async fn </span>dump_database(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;_</span>, ModuleInstanceId&gt;,
+        dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;_</span>&gt;,
         prefix_names: Vec&lt;String&gt;,
     ) -&gt; Box&lt;<span class="kw">dyn </span>Iterator&lt;Item = (String, Box&lt;<span class="kw">dyn </span>erased_serde::Serialize + Send&gt;)&gt; + <span class="lifetime">&#39;_</span>&gt; {
         <span class="kw">let </span><span class="kw-2">mut </span>wallet: BTreeMap&lt;String, Box&lt;<span class="kw">dyn </span>erased_serde::Serialize + Send&gt;&gt; = BTreeMap::new();
@@ -2281,17 +2285,11 @@
     <span class="kw">type </span>Gen = WalletGen;
     <span class="kw">type </span>VerificationCache = WalletVerificationCache;
 
-    <span class="kw">fn </span>versions(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (ModuleConsensusVersion, <span class="kw-2">&amp;</span>[ApiVersion]) {
-        (
-            ModuleConsensusVersion(<span class="number">0</span>),
-            <span class="kw-2">&amp;</span>[ApiVersion { major: <span class="number">0</span>, minor: <span class="number">0 </span>}],
-        )
+    <span class="kw">fn </span>supported_api_versions(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SupportedModuleApiVersions {
+        SupportedModuleApiVersions::from_raw(<span class="number">0</span>, <span class="number">0</span>, <span class="kw-2">&amp;</span>[(<span class="number">0</span>, <span class="number">0</span>)])
     }
 
-    <span class="kw">async fn </span>await_consensus_proposal(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;_</span>, ModuleInstanceId&gt;,
-    ) {
+    <span class="kw">async fn </span>await_consensus_proposal(<span class="kw-2">&amp;</span><span class="self">self</span>, dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;_</span>&gt;) {
         <span class="kw">while </span>!<span class="self">self</span>.consensus_proposal(dbtx).<span class="kw">await</span>.forces_new_epoch() {
             <span class="comment">// FIXME: remove after modularization finishes
             </span><span class="attr">#[cfg(not(target_family = <span class="string">&quot;wasm&quot;</span>))]
@@ -2301,7 +2299,7 @@
 
     <span class="kw">async fn </span>consensus_proposal&lt;<span class="lifetime">&#39;a</span>&gt;(
         <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>,
-        dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;_</span>, ModuleInstanceId&gt;,
+        dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;_</span>&gt;,
     ) -&gt; ConsensusProposal&lt;WalletConsensusItem&gt; {
         <span class="comment">// TODO: implement retry logic in case bitcoind is temporarily unreachable
         </span><span class="kw">let </span>our_target_height = <span class="self">self</span>.target_height().<span class="kw">await</span>;
@@ -2358,9 +2356,10 @@
 
     <span class="kw">async fn </span>begin_consensus_epoch&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt;(
         <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>,
-        dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;b</span>, ModuleInstanceId&gt;,
+        dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;b</span>&gt;,
         consensus_items: Vec&lt;(PeerId, WalletConsensusItem)&gt;,
-    ) {
+        consensus_peers: <span class="kw-2">&amp;</span>BTreeSet&lt;PeerId&gt;,
+    ) -&gt; Vec&lt;PeerId&gt; {
         <span class="macro">trace!</span>(<span class="question-mark">?</span>consensus_items, <span class="string">&quot;Received consensus proposals&quot;</span>);
 
         <span class="comment">// Separate round consensus items from signatures for peg-out tx. While
@@ -2368,43 +2367,25 @@
         // need to be available at once.
         </span><span class="kw">let </span>UnzipWalletConsensusItem {
             peg_out_signature: peg_out_signatures,
-            round_consensus,
+            round_consensus: round_items,
         } = consensus_items.into_iter().unzip_wallet_consensus_item();
 
         <span class="comment">// Save signatures to the database
         </span><span class="self">self</span>.save_peg_out_signatures(dbtx, peg_out_signatures).<span class="kw">await</span>;
 
-        <span class="comment">// FIXME: also warn on less than 1/3, that should never happen
-        // Make sure we have enough contributions to continue
-        </span><span class="kw">if </span>round_consensus.is_empty() {
-            <span class="macro">panic!</span>(<span class="string">&quot;No proposals were submitted this round&quot;</span>);
+        <span class="kw">let </span>last_height = <span class="self">self</span>.consensus_height(dbtx).<span class="kw">await</span>.unwrap_or(<span class="number">0</span>);
+
+        <span class="kw">match </span><span class="self">Self</span>::round_consensus(last_height, round_items, consensus_peers) {
+            <span class="prelude-val">Ok</span>(round_consensus) =&gt; {
+                <span class="self">self</span>.sync_up_to_consensus_height(dbtx, round_consensus.block_height)
+                    .<span class="kw">await</span>;
+
+                dbtx.insert_entry(<span class="kw-2">&amp;</span>RoundConsensusKey, <span class="kw-2">&amp;</span>round_consensus)
+                    .<span class="kw">await</span>;
+                <span class="macro">vec!</span>[]
+            }
+            <span class="prelude-val">Err</span>(dropped_peers) =&gt; dropped_peers,
         }
-
-        <span class="kw">let </span>fee_proposals = round_consensus.iter().map(|(<span class="kw">_</span>, rc)| rc.fee_rate).collect();
-        <span class="kw">let </span>fee_rate = <span class="self">self</span>.process_fee_proposals(fee_proposals).<span class="kw">await</span>;
-
-        <span class="kw">let </span>height_proposals = round_consensus
-            .iter()
-            .map(|(<span class="kw">_</span>, rc)| rc.block_height)
-            .collect();
-        <span class="kw">let </span>block_height = <span class="self">self
-            </span>.process_block_height_proposals(dbtx, height_proposals)
-            .<span class="kw">await</span>;
-
-        <span class="kw">let </span>randomness_contributions = round_consensus
-            .iter()
-            .map(|(<span class="kw">_</span>, rc)| rc.randomness)
-            .collect();
-        <span class="kw">let </span>randomness_beacon = <span class="self">self</span>.process_randomness_contributions(randomness_contributions);
-
-        <span class="kw">let </span>round_consensus = RoundConsensus {
-            block_height,
-            fee_rate,
-            randomness_beacon,
-        };
-
-        dbtx.insert_entry(<span class="kw-2">&amp;</span>RoundConsensusKey, <span class="kw-2">&amp;</span>round_consensus)
-            .<span class="kw">await</span>;
     }
 
     <span class="kw">fn </span>build_verification_cache&lt;<span class="lifetime">&#39;a</span>&gt;(
@@ -2417,7 +2398,7 @@
     <span class="kw">async fn </span>validate_input&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt;(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         _interconnect: <span class="kw-2">&amp;</span><span class="kw">dyn </span>ModuleInterconect,
-        dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;b</span>, ModuleInstanceId&gt;,
+        dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;b</span>&gt;,
         _verification_cache: <span class="kw-2">&amp;</span><span class="self">Self</span>::VerificationCache,
         input: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>WalletInput,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;InputMeta, ModuleError&gt; {
@@ -2446,7 +2427,7 @@
     <span class="kw">async fn </span>apply_input&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>, <span class="lifetime">&#39;c</span>&gt;(
         <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>,
         interconnect: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw">dyn </span>ModuleInterconect,
-        dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;c</span>, ModuleInstanceId&gt;,
+        dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;c</span>&gt;,
         input: <span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span>WalletInput,
         cache: <span class="kw-2">&amp;</span><span class="self">Self</span>::VerificationCache,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;InputMeta, ModuleError&gt; {
@@ -2469,7 +2450,7 @@
 
     <span class="kw">async fn </span>validate_output(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;_</span>, ModuleInstanceId&gt;,
+        dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;_</span>&gt;,
         output: <span class="kw-2">&amp;</span>WalletOutput,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;TransactionItemAmount, ModuleError&gt; {
         <span class="kw">let </span>fee_rate = <span class="self">self</span>.current_round_consensus(dbtx).<span class="kw">await</span>.unwrap().fee_rate;
@@ -2490,7 +2471,7 @@
 
     <span class="kw">async fn </span>apply_output&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt;(
         <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>,
-        dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;b</span>, ModuleInstanceId&gt;,
+        dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;b</span>&gt;,
         output: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>WalletOutput,
         out_point: fedimint_core::OutPoint,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;TransactionItemAmount, ModuleError&gt; {
@@ -2552,8 +2533,8 @@
 
     <span class="kw">async fn </span>end_consensus_epoch&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt;(
         <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>,
-        consensus_peers: <span class="kw-2">&amp;</span>HashSet&lt;PeerId&gt;,
-        dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;b</span>, ModuleInstanceId&gt;,
+        consensus_peers: <span class="kw-2">&amp;</span>BTreeSet&lt;PeerId&gt;,
+        dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;b</span>&gt;,
     ) -&gt; Vec&lt;PeerId&gt; {
         <span class="comment">// Sign and finalize any unsigned transactions that have signatures
         </span><span class="kw">let </span>unsigned_txs = dbtx
@@ -2568,7 +2549,7 @@
 
         <span class="kw">let </span><span class="kw-2">mut </span>drop_peers = Vec::&lt;PeerId&gt;::new();
         <span class="kw">for </span>(key, <span class="kw-2">mut </span>unsigned) <span class="kw">in </span>unsigned_txs {
-            <span class="kw">let </span>signers: HashSet&lt;PeerId&gt; = unsigned
+            <span class="kw">let </span>signers: BTreeSet&lt;PeerId&gt; = unsigned
                 .signatures
                 .iter()
                 .filter_map(|(peer, sig)| {
@@ -2608,17 +2589,13 @@
 
     <span class="kw">async fn </span>output_status(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;_</span>, ModuleInstanceId&gt;,
+        dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;_</span>&gt;,
         out_point: OutPoint,
     ) -&gt; <span class="prelude-ty">Option</span>&lt;WalletOutputOutcome&gt; {
         dbtx.get_value(<span class="kw-2">&amp;</span>PegOutBitcoinTransaction(out_point)).<span class="kw">await
     </span>}
 
-    <span class="kw">async fn </span>audit(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;_</span>, ModuleInstanceId&gt;,
-        audit: <span class="kw-2">&amp;mut </span>Audit,
-    ) {
+    <span class="kw">async fn </span>audit(<span class="kw-2">&amp;</span><span class="self">self</span>, dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;_</span>&gt;, audit: <span class="kw-2">&amp;mut </span>Audit) {
         audit
             .add_items(dbtx, <span class="kw-2">&amp;</span>UTXOPrefixKey, |<span class="kw">_</span>, v| v.amount.to_sat() <span class="kw">as </span>i64 * <span class="number">1000</span>)
             .<span class="kw">await</span>;
@@ -2639,13 +2616,13 @@
     <span class="kw">fn </span>api_endpoints(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;ApiEndpoint&lt;<span class="self">Self</span>&gt;&gt; {
         <span class="macro">vec!</span>[
             <span class="macro">api_endpoint! </span>{
-                <span class="string">&quot;/block_height&quot;</span>,
+                <span class="string">&quot;block_height&quot;</span>,
                 <span class="kw">async </span>|module: <span class="kw-2">&amp;</span>Wallet, context, _params: ()| -&gt; u32 {
                     <span class="prelude-val">Ok</span>(module.consensus_height(<span class="kw-2">&amp;mut </span>context.dbtx()).<span class="kw">await</span>.unwrap_or(<span class="number">0</span>))
                 }
             },
             <span class="macro">api_endpoint! </span>{
-                <span class="string">&quot;/peg_out_fees&quot;</span>,
+                <span class="string">&quot;peg_out_fees&quot;</span>,
                 <span class="kw">async </span>|module: <span class="kw-2">&amp;</span>Wallet, context, params: (Address, u64)| -&gt; <span class="prelude-ty">Option</span>&lt;PegOutFees&gt; {
                     <span class="kw">let </span>(address, sats) = params;
                     <span class="kw">let </span>consensus = module.current_round_consensus(<span class="kw-2">&amp;mut </span>context.dbtx()).<span class="kw">await</span>.unwrap();
@@ -2674,38 +2651,15 @@
 }
 
 <span class="kw">impl </span>Wallet {
-    <span class="attr">#[cfg(feature = <span class="string">&quot;native&quot;</span>)]
-    </span><span class="kw">pub async fn </span>new(
+    <span class="kw">pub async fn </span>new(
         cfg: WalletConfig,
         db: Database,
-        env: <span class="kw-2">&amp;</span>BTreeMap&lt;OsString, OsString&gt;,
         task_group: <span class="kw-2">&amp;mut </span>TaskGroup,
     ) -&gt; anyhow::Result&lt;Wallet&gt; {
-        <span class="kw">let </span>bitcoin_backend = select_bitcoin_backend_from_envs(
-            env.get(OsStr::new(FM_BITCOIND_RPC_ENV))
-                .map(OsString::as_os_str),
-            env.get(OsStr::new(FM_ELECTRUM_RPC_ENV))
-                .map(OsString::as_os_str),
-            env.get(OsStr::new(FM_ESPLORA_RPC_ENV))
-                .map(OsString::as_os_str),
-        )<span class="question-mark">?</span>;
-
-        <span class="kw">let </span>btc_rpc = fedimint_bitcoind::bitcoincore_rpc::make_bitcoin_rpc_backend(
-            <span class="kw-2">&amp;</span>bitcoin_backend,
-            task_group.make_handle(),
-        )<span class="question-mark">?</span>;
-
+        <span class="comment">// TODO: should come from wallet config gen params
+        </span><span class="kw">let </span>rpc_config = BitcoinRpcConfig::from_env_vars()<span class="question-mark">?</span>;
+        <span class="kw">let </span>btc_rpc = create_bitcoind(<span class="kw-2">&amp;</span>rpc_config, task_group.make_handle())<span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(<span class="self">Self</span>::new_with_bitcoind(cfg, db, btc_rpc, task_group).<span class="kw">await</span><span class="question-mark">?</span>)
-    }
-
-    <span class="attr">#[cfg(not(feature = <span class="string">&quot;native&quot;</span>))]
-    </span><span class="kw">pub async fn </span>new(
-        cfg: WalletConfig,
-        db: Database,
-        env: <span class="kw-2">&amp;</span>BTreeMap&lt;OsString, OsString&gt;,
-        task_group: <span class="kw-2">&amp;mut </span>TaskGroup,
-    ) -&gt; anyhow::Result&lt;Wallet&gt; {
-        <span class="macro">panic!</span>(<span class="string">&quot;Native cargo feature not enabled, can&#39;t initialize modules&quot;</span>)
     }
 
     <span class="kw">pub async fn </span>new_with_bitcoind(
@@ -2759,18 +2713,9 @@
         <span class="prelude-val">Ok</span>(wallet)
     }
 
-    <span class="kw">pub fn </span>process_randomness_contributions(<span class="kw-2">&amp;</span><span class="self">self</span>, randomness: Vec&lt;[u8; <span class="number">32</span>]&gt;) -&gt; [u8; <span class="number">32</span>] {
-        <span class="kw">fn </span>xor(<span class="kw-2">mut </span>lhs: [u8; <span class="number">32</span>], rhs: [u8; <span class="number">32</span>]) -&gt; [u8; <span class="number">32</span>] {
-            lhs.iter_mut().zip(rhs).for_each(|(lhs, rhs)| <span class="kw-2">*</span>lhs ^= rhs);
-            lhs
-        }
-
-        randomness.into_iter().fold([<span class="number">0</span>; <span class="number">32</span>], xor)
-    }
-
     <span class="kw">async fn </span>save_peg_out_signatures&lt;<span class="lifetime">&#39;a</span>&gt;(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;a</span>, ModuleInstanceId&gt;,
+        dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;a</span>&gt;,
         signatures: Vec&lt;(PeerId, PegOutSignatureItem)&gt;,
     ) {
         <span class="kw">let </span><span class="kw-2">mut </span>cache: BTreeMap&lt;Txid, UnsignedTransaction&gt; = dbtx
@@ -2898,48 +2843,71 @@
         })
     }
 
-    <span class="doccomment">/// # Panics
-    /// * If proposals is empty
-    </span><span class="kw">async fn </span>process_fee_proposals(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw-2">mut </span>proposals: Vec&lt;Feerate&gt;) -&gt; Feerate {
-        <span class="macro">assert!</span>(!proposals.is_empty());
+    <span class="doccomment">/// Calculates all the round items from peers, returning the same consensus
+    /// for all peers or peers that should be banned for misbehaving
+    </span><span class="kw">fn </span>round_consensus(
+        last_height: u32,
+        items: Vec&lt;(PeerId, RoundConsensusItem)&gt;,
+        consensus_peers: <span class="kw-2">&amp;</span>BTreeSet&lt;PeerId&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;RoundConsensus, Vec&lt;PeerId&gt;&gt; {
+        <span class="kw">fn </span>xor(<span class="kw-2">mut </span>lhs: [u8; <span class="number">32</span>], rhs: [u8; <span class="number">32</span>]) -&gt; [u8; <span class="number">32</span>] {
+            lhs.iter_mut().zip(rhs).for_each(|(lhs, rhs)| <span class="kw-2">*</span>lhs ^= rhs);
+            lhs
+        }
 
-        proposals.sort();
+        <span class="kw">let </span><span class="kw-2">mut </span>banned_peers = <span class="macro">vec!</span>[];
 
-        <span class="kw-2">*</span>proposals
-            .get(proposals.len() / <span class="number">2</span>)
-            .expect(<span class="string">&quot;We checked before that proposals aren&#39;t empty&quot;</span>)
-    }
+        <span class="kw">let </span><span class="kw-2">mut </span>dedup = BTreeMap::new();
+        <span class="kw">for </span>(peer, item) <span class="kw">in </span>items.into_iter() {
+            <span class="kw">if </span>dedup.insert(peer, item).is_some() {
+                <span class="macro">warn!</span>(<span class="string">&quot;Banning peer {} for multiple RoundConsensusItem&quot;</span>, peer);
+                banned_peers.push(peer);
+            }
+        }
 
-    <span class="doccomment">/// # Panics
-    /// * If proposals is empty
-    </span><span class="kw">async fn </span>process_block_height_proposals&lt;<span class="lifetime">&#39;a</span>&gt;(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;a</span>, ModuleInstanceId&gt;,
-        <span class="kw-2">mut </span>proposals: Vec&lt;u32&gt;,
-    ) -&gt; u32 {
-        <span class="macro">assert!</span>(!proposals.is_empty());
+        <span class="kw">for </span>peer <span class="kw">in </span>consensus_peers {
+            <span class="kw">if </span>dedup.get(peer).is_none() {
+                <span class="macro">warn!</span>(
+                    <span class="string">&quot;Banning peer {} for not submitting a RoundConsensusItem&quot;</span>,
+                    peer
+                );
+                banned_peers.push(<span class="kw-2">*</span>peer);
+            }
+        }
 
-        proposals.sort_unstable();
-        <span class="kw">let </span>median_proposal = proposals[proposals.len() / <span class="number">2</span>];
+        <span class="comment">// If peers misbehaved, we cannot determine this consensus round
+        </span><span class="kw">if </span>!banned_peers.is_empty() {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(banned_peers);
+        }
 
-        <span class="kw">let </span>consensus_height = <span class="self">self</span>.consensus_height(dbtx).<span class="kw">await</span>.unwrap_or(<span class="number">0</span>);
+        <span class="kw">let </span>items: Vec&lt;<span class="kw">_</span>&gt; = dedup.values().into_iter().collect();
 
-        <span class="kw">if </span>median_proposal &gt;= consensus_height {
-            <span class="macro">debug!</span>(<span class="string">&quot;Setting consensus block height to {}&quot;</span>, median_proposal);
-            <span class="self">self</span>.sync_up_to_consensus_height(dbtx, median_proposal)
-                .<span class="kw">await</span>;
-        } <span class="kw">else </span>{
+        <span class="kw">let </span><span class="kw-2">mut </span>fees: Vec&lt;<span class="kw">_</span>&gt; = items.iter().map(|item| item.fee_rate).collect();
+        fees.sort_unstable();
+        <span class="kw">let </span>fee_rate = <span class="kw-2">*</span>fees.get(fees.len() / <span class="number">2</span>).expect(<span class="string">&quot;items is non-empty&quot;</span>);
+
+        <span class="kw">let </span><span class="kw-2">mut </span>heights: Vec&lt;<span class="kw">_</span>&gt; = items.iter().map(|item| item.block_height).collect();
+        heights.sort_unstable();
+        <span class="kw">let </span>block_height = heights[heights.len() / <span class="number">2</span>];
+        <span class="kw">if </span>block_height &lt; last_height {
             <span class="macro">panic!</span>(
-                <span class="string">&quot;Median proposed consensus block height shrunk from {consensus_height} to {median_proposal}, the federation is broken&quot;
+                <span class="string">&quot;Median proposed consensus block height shrunk from {last_height} to {block_height}, the federation is broken&quot;
             </span>);
         }
 
-        median_proposal
+        <span class="kw">let </span>randoms: Vec&lt;<span class="kw">_</span>&gt; = items.iter().map(|item| item.randomness).collect();
+        <span class="kw">let </span>randomness_beacon = randoms.into_iter().fold([<span class="number">0</span>; <span class="number">32</span>], xor);
+
+        <span class="prelude-val">Ok</span>(RoundConsensus {
+            block_height,
+            fee_rate,
+            randomness_beacon,
+        })
     }
 
     <span class="kw">pub async fn </span>current_round_consensus(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;_</span>, ModuleInstanceId&gt;,
+        dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;_</span>&gt;,
     ) -&gt; <span class="prelude-ty">Option</span>&lt;RoundConsensus&gt; {
         dbtx.get_value(<span class="kw-2">&amp;</span>RoundConsensusKey).<span class="kw">await
     </span>}
@@ -2953,10 +2921,7 @@
         our_network_height.saturating_sub(<span class="self">self</span>.cfg.consensus.finality_delay)
     }
 
-    <span class="kw">pub async fn </span>consensus_height(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;_</span>, ModuleInstanceId&gt;,
-    ) -&gt; <span class="prelude-ty">Option</span>&lt;u32&gt; {
+    <span class="kw">pub async fn </span>consensus_height(<span class="kw-2">&amp;</span><span class="self">self</span>, dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;u32&gt; {
         <span class="self">self</span>.current_round_consensus(dbtx)
             .<span class="kw">await
             </span>.map(|rc| rc.block_height)
@@ -2964,7 +2929,7 @@
 
     <span class="kw">async fn </span>sync_up_to_consensus_height&lt;<span class="lifetime">&#39;a</span>&gt;(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;a</span>, ModuleInstanceId&gt;,
+        dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;a</span>&gt;,
         new_height: u32,
     ) {
         <span class="kw">let </span>old_height = <span class="self">self
@@ -3010,33 +2975,14 @@
                 .collect::&lt;HashMap&lt;<span class="kw">_</span>, <span class="kw">_</span>&gt;&gt;()
                 .<span class="kw">await</span>;
 
-            <span class="kw">match </span><span class="self">self</span>.btc_rpc.backend_type() {
-                BitcoinRpcBackendType::Bitcoind | BitcoinRpcBackendType::Esplora =&gt; {
-                    <span class="kw">if </span>!pending_transactions.is_empty() {
-                        <span class="kw">let </span>block = <span class="self">self
-                            </span>.btc_rpc
-                            .get_block(<span class="kw-2">&amp;</span>block_hash)
-                            .<span class="kw">await
-                            </span>.expect(<span class="string">&quot;bitcoin rpc failed&quot;</span>);
-                        <span class="kw">for </span>transaction <span class="kw">in </span>block.txdata {
-                            <span class="kw">if let </span><span class="prelude-val">Some</span>(pending_tx) = pending_transactions.get(<span class="kw-2">&amp;</span>transaction.txid())
-                            {
-                                <span class="self">self</span>.recognize_change_utxo(dbtx, pending_tx).<span class="kw">await</span>;
-                            }
-                        }
-                    }
-                }
-                BitcoinRpcBackendType::Electrum =&gt; {
-                    <span class="kw">for </span>transaction <span class="kw">in </span><span class="kw-2">&amp;</span>pending_transactions {
-                        <span class="kw">if </span><span class="self">self
-                            </span>.btc_rpc
-                            .was_transaction_confirmed_in(<span class="kw-2">&amp;</span>transaction.<span class="number">1</span>.tx, height <span class="kw">as </span>u64)
-                            .<span class="kw">await
-                            </span>.expect(<span class="string">&quot;bitcoin electrum rpc backend failed&quot;</span>)
-                        {
-                            <span class="self">self</span>.recognize_change_utxo(dbtx, transaction.<span class="number">1</span>).<span class="kw">await</span>;
-                        }
-                    }
+            <span class="kw">for </span>transaction <span class="kw">in </span><span class="kw-2">&amp;</span>pending_transactions {
+                <span class="kw">if </span><span class="self">self
+                    </span>.btc_rpc
+                    .was_transaction_confirmed_in(<span class="kw-2">&amp;</span>transaction.<span class="number">1</span>.tx, height <span class="kw">as </span>u64)
+                    .<span class="kw">await
+                    </span>.expect(<span class="string">&quot;bitcoin rpc backend failed&quot;</span>)
+                {
+                    <span class="self">self</span>.recognize_change_utxo(dbtx, transaction.<span class="number">1</span>).<span class="kw">await</span>;
                 }
             }
 
@@ -3052,7 +2998,7 @@
     /// in a block that we got consensus on.
     </span><span class="kw">async fn </span>recognize_change_utxo&lt;<span class="lifetime">&#39;a</span>&gt;(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;a</span>, ModuleInstanceId&gt;,
+        dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;a</span>&gt;,
         pending_tx: <span class="kw-2">&amp;</span>PendingTransaction,
     ) {
         <span class="self">self</span>.remove_rbf_transactions(dbtx, pending_tx).<span class="kw">await</span>;
@@ -3083,7 +3029,7 @@
     <span class="doccomment">/// Removes the `PendingTransaction` and any transactions tied to it via RBF
     </span><span class="kw">async fn </span>remove_rbf_transactions&lt;<span class="lifetime">&#39;a</span>&gt;(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;a</span>, ModuleInstanceId&gt;,
+        dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;a</span>&gt;,
         pending_tx: <span class="kw-2">&amp;</span>PendingTransaction,
     ) {
         <span class="kw">let </span><span class="kw-2">mut </span>all_transactions: BTreeMap&lt;Txid, PendingTransaction&gt; = dbtx
@@ -3121,7 +3067,7 @@
 
     <span class="kw">async fn </span>block_is_known(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;_</span>, ModuleInstanceId&gt;,
+        dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;_</span>&gt;,
         block_hash: BlockHash,
     ) -&gt; bool {
         dbtx.get_value(<span class="kw-2">&amp;</span>BlockHashKey(block_hash)).<span class="kw">await</span>.is_some()
@@ -3129,7 +3075,7 @@
 
     <span class="kw">async fn </span>create_peg_out_tx(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;_</span>, ModuleInstanceId&gt;,
+        dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;_</span>&gt;,
         output: <span class="kw-2">&amp;</span>WalletOutput,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;UnsignedTransaction, WalletError&gt; {
         <span class="kw">let </span>change_tweak = <span class="self">self
@@ -3169,7 +3115,7 @@
 
     <span class="kw">async fn </span>available_utxos(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;_</span>, ModuleInstanceId&gt;,
+        dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;_</span>&gt;,
     ) -&gt; Vec&lt;(UTXOKey, SpendableUTXO)&gt; {
         dbtx.find_by_prefix(<span class="kw-2">&amp;</span>UTXOPrefixKey)
             .<span class="kw">await
@@ -3179,7 +3125,7 @@
 
     <span class="kw">pub async fn </span>get_wallet_value(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;_</span>, ModuleInstanceId&gt;,
+        dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;_</span>&gt;,
     ) -&gt; bitcoin::Amount {
         <span class="kw">let </span>sat_sum = <span class="self">self
             </span>.available_utxos(dbtx)
@@ -3230,7 +3176,7 @@
                 <span class="string">&quot;Broadcasting peg-out&quot;</span>,
             );
             <span class="macro">trace!</span>(transaction = <span class="question-mark">?</span>tx);
-            <span class="kw">let _ </span>= rpc.submit_transaction(tx).<span class="kw">await</span>;
+            rpc.submit_transaction(tx).<span class="kw">await</span>;
         }
     }
 }
@@ -3582,16 +3528,70 @@
 
 <span class="attr">#[cfg(test)]
 </span><span class="kw">mod </span>tests {
+    <span class="kw">use </span>std::collections::BTreeSet;
     <span class="kw">use </span>std::str::FromStr;
 
     <span class="kw">use </span>bitcoin::Network::{Bitcoin, Testnet};
     <span class="kw">use </span>bitcoin::{Address, Amount, Network, OutPoint, Txid};
-    <span class="kw">use </span>fedimint_core::{BitcoinHash, Feerate};
-    <span class="kw">use </span>fedimint_wallet_common::{PegOut, PegOutFees, Rbf, WalletOutput};
+    <span class="kw">use </span>fedimint_core::{BitcoinHash, Feerate, PeerId};
+    <span class="kw">use </span>fedimint_wallet_common::{
+        PegOut, PegOutFees, Rbf, RoundConsensus, RoundConsensusItem, WalletOutput,
+    };
     <span class="kw">use </span>miniscript::descriptor::Wsh;
 
     <span class="kw">use </span><span class="kw">crate</span>::common::PegInDescriptor;
-    <span class="kw">use crate</span>::{CompressedPublicKey, OsRng, SpendableUTXO, StatelessWallet, UTXOKey, WalletError};
+    <span class="kw">use crate</span>::{
+        CompressedPublicKey, OsRng, SpendableUTXO, StatelessWallet, UTXOKey, Wallet, WalletError,
+    };
+
+    <span class="kw">fn </span>round_item(block_height: u32, fee_rate: u64, random: u8) -&gt; RoundConsensusItem {
+        RoundConsensusItem {
+            block_height,
+            fee_rate: Feerate {
+                sats_per_kvb: fee_rate,
+            },
+            randomness: [random; <span class="number">32</span>],
+        }
+    }
+
+    <span class="kw">fn </span>round_consensus(block_height: u32, fee_rate: u64, random: u8) -&gt; RoundConsensus {
+        RoundConsensus {
+            block_height,
+            fee_rate: Feerate {
+                sats_per_kvb: fee_rate,
+            },
+            randomness_beacon: [random; <span class="number">32</span>],
+        }
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>processes_round_consensus_items() {
+        <span class="kw">let </span>peers = <span class="kw-2">&amp;</span>BTreeSet::from([PeerId::from(<span class="number">0</span>), PeerId::from(<span class="number">1</span>), PeerId::from(<span class="number">2</span>)]);
+
+        <span class="comment">// properly selects median fees / height and xor randomness
+        </span><span class="kw">let </span>consensus = Wallet::round_consensus(
+            <span class="number">0</span>,
+            <span class="macro">vec!</span>[
+                (PeerId::from(<span class="number">0</span>), round_item(<span class="number">1</span>, <span class="number">4</span>, <span class="number">7</span>)),
+                (PeerId::from(<span class="number">1</span>), round_item(<span class="number">2</span>, <span class="number">5</span>, <span class="number">8</span>)),
+                (PeerId::from(<span class="number">2</span>), round_item(<span class="number">3</span>, <span class="number">6</span>, <span class="number">9</span>)),
+            ],
+            peers,
+        );
+        <span class="macro">assert_eq!</span>(consensus, <span class="prelude-val">Ok</span>(round_consensus(<span class="number">2</span>, <span class="number">5</span>, <span class="number">7 </span>^ <span class="number">8 </span>^ <span class="number">9</span>)));
+
+        <span class="comment">// drops peers that submit duplicate items or don&#39;t submit any
+        </span><span class="kw">let </span>consensus = Wallet::round_consensus(
+            <span class="number">0</span>,
+            <span class="macro">vec!</span>[
+                (PeerId::from(<span class="number">0</span>), round_item(<span class="number">1</span>, <span class="number">4</span>, <span class="number">7</span>)),
+                (PeerId::from(<span class="number">1</span>), round_item(<span class="number">2</span>, <span class="number">5</span>, <span class="number">8</span>)),
+                (PeerId::from(<span class="number">1</span>), round_item(<span class="number">3</span>, <span class="number">6</span>, <span class="number">9</span>)),
+            ],
+            peers,
+        );
+        <span class="macro">assert_eq!</span>(consensus, <span class="prelude-val">Err</span>(<span class="macro">vec!</span>[PeerId::from(<span class="number">1</span>), PeerId::from(<span class="number">2</span>)]));
+    }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>create_tx_should_validate_amounts() {
@@ -3707,9 +3707,9 @@
     <span class="kw">use </span>fedimint_core::core::LEGACY_HARDCODED_INSTANCE_ID_WALLET;
     <span class="kw">use </span>fedimint_core::db::{apply_migrations, DatabaseTransaction};
     <span class="kw">use </span>fedimint_core::module::registry::ModuleDecoderRegistry;
-    <span class="kw">use </span>fedimint_core::module::DynServerModuleGen;
+    <span class="kw">use </span>fedimint_core::module::{CommonModuleGen, DynServerModuleGen};
     <span class="kw">use </span>fedimint_core::{BitcoinHash, Feerate, OutPoint, ServerModule, TransactionId};
-    <span class="kw">use </span>fedimint_testing::{prepare_snapshot, validate_migrations, BYTE_20, BYTE_32};
+    <span class="kw">use </span>fedimint_testing::db::{prepare_snapshot, validate_migrations, BYTE_20, BYTE_32};
     <span class="kw">use </span>fedimint_wallet_common::db::{
         BlockHashKey, BlockHashKeyPrefix, DbKeyPrefix, PegOutBitcoinTransaction,
         PegOutBitcoinTransactionPrefix, PegOutTxSignatureCI, PegOutTxSignatureCIPrefix,
@@ -3718,7 +3718,7 @@
     };
     <span class="kw">use </span>fedimint_wallet_common::{
         PegOutFees, PendingTransaction, Rbf, RoundConsensus, SpendableUTXO, UnsignedTransaction,
-        WalletOutputOutcome,
+        WalletCommonGen, WalletOutputOutcome,
     };
     <span class="kw">use </span>futures::StreamExt;
     <span class="kw">use </span>rand::rngs::OsRng;
@@ -3889,6 +3889,7 @@
             },
             ModuleDecoderRegistry::from_iter([(
                 LEGACY_HARDCODED_INSTANCE_ID_WALLET,
+                WalletCommonGen::KIND,
                 &lt;Wallet <span class="kw">as </span>ServerModule&gt;::decoder(),
             )]),
         )
@@ -4000,6 +4001,7 @@
             },
             ModuleDecoderRegistry::from_iter([(
                 LEGACY_HARDCODED_INSTANCE_ID_WALLET,
+                WalletCommonGen::KIND,
                 &lt;Wallet <span class="kw">as </span>ServerModule&gt;::decoder(),
             )]),
         )

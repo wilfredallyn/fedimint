@@ -430,10 +430,24 @@
 <a href="#430" id="430">430</a>
 <a href="#431" id="431">431</a>
 <a href="#432" id="432">432</a>
+<a href="#433" id="433">433</a>
+<a href="#434" id="434">434</a>
+<a href="#435" id="435">435</a>
+<a href="#436" id="436">436</a>
+<a href="#437" id="437">437</a>
+<a href="#438" id="438">438</a>
+<a href="#439" id="439">439</a>
+<a href="#440" id="440">440</a>
+<a href="#441" id="441">441</a>
+<a href="#442" id="442">442</a>
 </pre><pre class="rust"><code><span class="kw">use </span>std::collections::BTreeMap;
 <span class="kw">use </span>std::path::PathBuf;
 
 <span class="kw">use </span>erased_serde::Serialize;
+<span class="kw">use </span>fedimint_client_legacy::db <span class="kw">as </span>ClientRange;
+<span class="kw">use </span>fedimint_client_legacy::ln::db <span class="kw">as </span>ClientLightningRange;
+<span class="kw">use </span>fedimint_client_legacy::mint::db <span class="kw">as </span>ClientMintRange;
+<span class="kw">use </span>fedimint_client_legacy::wallet::db <span class="kw">as </span>ClientWalletRange;
 <span class="kw">use </span>fedimint_core::config::ServerModuleGenRegistry;
 <span class="kw">use </span>fedimint_core::db::notifications::Notifications;
 <span class="kw">use </span>fedimint_core::db::{DatabaseTransaction, DatabaseVersionKey, SingleUseDatabaseTransaction};
@@ -450,10 +464,6 @@
 <span class="kw">use </span>fedimint_server::db <span class="kw">as </span>ConsensusRange;
 <span class="kw">use </span>fedimint_wallet_server::WalletGen;
 <span class="kw">use </span>futures::StreamExt;
-<span class="kw">use </span>mint_client::db <span class="kw">as </span>ClientRange;
-<span class="kw">use </span>mint_client::ln::db <span class="kw">as </span>ClientLightningRange;
-<span class="kw">use </span>mint_client::mint::db <span class="kw">as </span>ClientMintRange;
-<span class="kw">use </span>mint_client::wallet::db <span class="kw">as </span>ClientWalletRange;
 <span class="kw">use </span>strum::IntoEnumIterator;
 
 <span class="attr">#[derive(Debug, serde::Serialize)]
@@ -551,7 +561,7 @@
         <span class="kw">let </span>cfg = <span class="kw-2">&amp;</span><span class="self">self</span>.cfg;
         <span class="kw">if let </span><span class="prelude-val">Some</span>(cfg) = cfg {
             <span class="kw">for </span>(module_id, module_cfg) <span class="kw">in </span><span class="kw-2">&amp;</span>cfg.consensus.modules {
-                <span class="kw">let </span>kind = module_cfg.kind();
+                <span class="kw">let </span>kind = <span class="kw-2">&amp;</span>module_cfg.kind;
 
                 <span class="kw">let </span><span class="prelude-val">Some</span>(init) = <span class="self">self</span>.module_inits.get(kind) <span class="kw">else </span>{
                     <span class="macro">panic!</span>(<span class="string">&quot;Detected configuration for unsupported module kind: {kind}&quot;</span>)
@@ -665,6 +675,16 @@
                         consensus.insert(<span class="string">&quot;ConsensusUpgrade&quot;</span>.to_string(), Box::new(upgrade));
                     }
                 }
+                ConsensusRange::DbKeyPrefix::ClientConfigDownload =&gt; {
+                    <span class="macro">push_db_pair_items!</span>(
+                        dbtx,
+                        ConsensusRange::ClientConfigDownloadKeyPrefix,
+                        ConsensusRange::ClientConfigDownloadKey,
+                        u64,
+                        consensus,
+                        <span class="string">&quot;Client Config Download&quot;
+                    </span>);
+                }
                 <span class="comment">// Module is a global prefix for all module data
                 </span>ConsensusRange::DbKeyPrefix::Module =&gt; {}
             }
@@ -690,7 +710,7 @@
                         dbtx,
                         ClientLightningRange::ConfirmedInvoiceKeyPrefix,
                         ClientLightningRange::ConfirmedInvoiceKey,
-                        mint_client::ln::incoming::ConfirmedInvoice,
+                        fedimint_client_legacy::ln::incoming::ConfirmedInvoice,
                         ln_client,
                         <span class="string">&quot;Confirmed Invoices&quot;
                     </span>);
@@ -710,7 +730,7 @@
                         dbtx,
                         ClientLightningRange::OutgoingContractAccountKeyPrefix,
                         ClientLightningRange::OutgoingContractAccountKey,
-                        mint_client::ln::outgoing::OutgoingContractAccount,
+                        fedimint_client_legacy::ln::outgoing::OutgoingContractAccount,
                         ln_client,
                         <span class="string">&quot;Outgoing Contract Accounts&quot;
                     </span>);
@@ -720,7 +740,7 @@
                         dbtx,
                         ClientLightningRange::OutgoingPaymentKeyPrefix,
                         ClientLightningRange::OutgoingPaymentKey,
-                        mint_client::ln::outgoing::OutgoingContractData,
+                        fedimint_client_legacy::ln::outgoing::OutgoingContractData,
                         ln_client,
                         <span class="string">&quot;Outgoing Payments&quot;
                     </span>);
@@ -757,7 +777,7 @@
                         dbtx,
                         ClientMintRange::NoteKeyPrefix,
                         ClientMintRange::NoteKey,
-                        mint_client::mint::SpendableNote,
+                        fedimint_client_legacy::mint::SpendableNote,
                         mint_client,
                         <span class="string">&quot;Notes&quot;
                     </span>);
@@ -767,7 +787,7 @@
                         dbtx,
                         ClientMintRange::OutputFinalizationKeyPrefix,
                         ClientMintRange::OutputFinalizationKey,
-                        mint_client::mint::NoteIssuanceRequests,
+                        fedimint_client_legacy::mint::NoteIssuanceRequests,
                         mint_client,
                         <span class="string">&quot;Output Finalization&quot;
                     </span>);
@@ -777,7 +797,7 @@
                         dbtx,
                         ClientMintRange::PendingNotesKeyPrefix,
                         ClientMintRange::PendingNotesKey,
-                        fedimint_core::TieredMulti&lt;mint_client::mint::SpendableNote&gt;,
+                        fedimint_core::TieredMulti&lt;fedimint_client_legacy::mint::SpendableNote&gt;,
                         mint_client,
                         <span class="string">&quot;Pending Notes&quot;
                     </span>);

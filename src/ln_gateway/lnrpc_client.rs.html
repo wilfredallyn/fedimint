@@ -106,40 +106,14 @@
 <a href="#106" id="106">106</a>
 <a href="#107" id="107">107</a>
 <a href="#108" id="108">108</a>
-<a href="#109" id="109">109</a>
-<a href="#110" id="110">110</a>
-<a href="#111" id="111">111</a>
-<a href="#112" id="112">112</a>
-<a href="#113" id="113">113</a>
-<a href="#114" id="114">114</a>
-<a href="#115" id="115">115</a>
-<a href="#116" id="116">116</a>
-<a href="#117" id="117">117</a>
-<a href="#118" id="118">118</a>
-<a href="#119" id="119">119</a>
-<a href="#120" id="120">120</a>
-<a href="#121" id="121">121</a>
-<a href="#122" id="122">122</a>
-<a href="#123" id="123">123</a>
-<a href="#124" id="124">124</a>
-<a href="#125" id="125">125</a>
-<a href="#126" id="126">126</a>
-<a href="#127" id="127">127</a>
-<a href="#128" id="128">128</a>
-<a href="#129" id="129">129</a>
-<a href="#130" id="130">130</a>
-<a href="#131" id="131">131</a>
-<a href="#132" id="132">132</a>
-<a href="#133" id="133">133</a>
-<a href="#134" id="134">134</a>
-<a href="#135" id="135">135</a>
 </pre><pre class="rust"><code><span class="kw">use </span>std::fmt::Debug;
-<span class="kw">use </span>std::sync::Arc;
+<span class="kw">use </span>std::time::Duration;
 
 <span class="kw">use </span>anyhow::anyhow;
 <span class="kw">use </span>async_trait::async_trait;
-<span class="kw">use </span>fedimint_core::dyn_newtype_define;
+<span class="kw">use </span>fedimint_core::task::sleep;
 <span class="kw">use </span>futures::stream::BoxStream;
+<span class="kw">use </span>tokio_stream::wrappers::ReceiverStream;
 <span class="kw">use </span>tonic::transport::{Channel, Endpoint};
 <span class="kw">use </span>tonic::Request;
 <span class="kw">use </span>tracing::error;
@@ -147,19 +121,17 @@
 
 <span class="kw">use </span><span class="kw">crate</span>::gatewaylnrpc::gateway_lightning_client::GatewayLightningClient;
 <span class="kw">use </span><span class="kw">crate</span>::gatewaylnrpc::{
-    CompleteHtlcsRequest, CompleteHtlcsResponse, EmptyRequest, GetPubKeyResponse,
-    GetRouteHintsResponse, PayInvoiceRequest, PayInvoiceResponse, SubscribeInterceptHtlcsRequest,
-    SubscribeInterceptHtlcsResponse,
+    EmptyRequest, GetNodeInfoResponse, GetRouteHintsResponse, PayInvoiceRequest,
+    PayInvoiceResponse, RouteHtlcRequest, RouteHtlcResponse,
 };
 <span class="kw">use crate</span>::{GatewayError, <span class="prelude-ty">Result</span>};
 
-<span class="kw">pub type </span>HtlcStream&lt;<span class="lifetime">&#39;a</span>&gt; =
-    BoxStream&lt;<span class="lifetime">&#39;a</span>, std::result::Result&lt;SubscribeInterceptHtlcsResponse, tonic::Status&gt;&gt;;
+<span class="kw">pub type </span>RouteHtlcStream&lt;<span class="lifetime">&#39;a</span>&gt; = BoxStream&lt;<span class="lifetime">&#39;a</span>, std::result::Result&lt;RouteHtlcResponse, tonic::Status&gt;&gt;;
 
 <span class="attr">#[async_trait]
 </span><span class="kw">pub trait </span>ILnRpcClient: Debug + Send + Sync {
-    <span class="doccomment">/// Get the public key of the lightning node
-    </span><span class="kw">async fn </span>pubkey(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;GetPubKeyResponse&gt;;
+    <span class="doccomment">/// Get the public key and alias of the lightning node
+    </span><span class="kw">async fn </span>info(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;GetNodeInfoResponse&gt;;
 
     <span class="doccomment">/// Get route hints to the lightning node
     </span><span class="kw">async fn </span>routehints(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;GetRouteHintsResponse&gt;;
@@ -167,28 +139,10 @@
     <span class="doccomment">/// Attempt to pay an invoice using the lightning node
     </span><span class="kw">async fn </span>pay(<span class="kw-2">&amp;</span><span class="self">self</span>, invoice: PayInvoiceRequest) -&gt; <span class="prelude-ty">Result</span>&lt;PayInvoiceResponse&gt;;
 
-    <span class="doccomment">/// Subscribe to intercept htlcs that belong to a specific mint identified
-    /// by `short_channel_id`
-    </span><span class="kw">async fn </span>subscribe_htlcs&lt;<span class="lifetime">&#39;a</span>&gt;(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        subscription: SubscribeInterceptHtlcsRequest,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;HtlcStream&lt;<span class="lifetime">&#39;a</span>&gt;&gt;;
-
-    <span class="doccomment">/// Request completion of an intercepted htlc after processing and
-    /// determining an outcome
-    </span><span class="kw">async fn </span>complete_htlc(<span class="kw-2">&amp;</span><span class="self">self</span>, outcome: CompleteHtlcsRequest) -&gt; <span class="prelude-ty">Result</span>&lt;CompleteHtlcsResponse&gt;;
-}
-
-<span class="macro">dyn_newtype_define!</span>(
-    <span class="doccomment">/// Arc reference to a gateway lightning rpc client
-    </span><span class="attr">#[derive(Clone)]
-    </span><span class="kw">pub </span>DynLnRpcClient(Arc&lt;ILnRpcClient&gt;)
-);
-
-<span class="kw">impl </span>DynLnRpcClient {
-    <span class="kw">pub fn </span>new(client: Arc&lt;<span class="kw">dyn </span>ILnRpcClient + Send + Sync&gt;) -&gt; <span class="self">Self </span>{
-        DynLnRpcClient(client)
-    }
+    <span class="kw">async fn </span>route_htlcs&lt;<span class="lifetime">&#39;a</span>&gt;(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        events: ReceiverStream&lt;RouteHtlcRequest&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;RouteHtlcStream&lt;<span class="lifetime">&#39;a</span>&gt;&gt;;
 }
 
 <span class="doccomment">/// An `ILnRpcClient` that wraps around `GatewayLightningClient` for
@@ -207,65 +161,57 @@
             GatewayError::Other(<span class="macro">anyhow!</span>(<span class="string">&quot;Failed to create lnrpc endpoint from url&quot;</span>))
         })<span class="question-mark">?</span>;
 
-        <span class="kw">let </span>client = GatewayLightningClient::connect(endpoint)
-            .<span class="kw">await
-            </span>.map_err(|e| {
-                <span class="macro">error!</span>(<span class="string">&quot;Failed to connect to lnrpc server: {:?}&quot;</span>, e);
-                GatewayError::Other(<span class="macro">anyhow!</span>(<span class="string">&quot;Failed to connect to lnrpc server&quot;</span>))
-            })<span class="question-mark">?</span>;
+        <span class="kw">let </span>gw_rpc = NetworkLnRpcClient {
+            client: <span class="self">Self</span>::connect(endpoint).<span class="kw">await</span><span class="question-mark">?</span>,
+        };
+        <span class="prelude-val">Ok</span>(gw_rpc)
+    }
 
-        <span class="prelude-val">Ok</span>(<span class="self">Self </span>{ client })
+    <span class="kw">async fn </span>connect(endpoint: Endpoint) -&gt; <span class="prelude-ty">Result</span>&lt;GatewayLightningClient&lt;Channel&gt;&gt; {
+        <span class="kw">let </span>client = <span class="kw">loop </span>{
+            <span class="kw">match </span>GatewayLightningClient::connect(endpoint.clone()).<span class="kw">await </span>{
+                <span class="prelude-val">Ok</span>(client) =&gt; <span class="kw">break </span>client,
+                <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; {
+                    <span class="macro">tracing::warn!</span>(<span class="string">&quot;Couldn&#39;t connect to CLN extension, retrying in 5 seconds...&quot;</span>);
+                    sleep(Duration::from_secs(<span class="number">5</span>)).<span class="kw">await</span>;
+                }
+            }
+        };
+
+        <span class="prelude-val">Ok</span>(client)
     }
 }
 
 <span class="attr">#[async_trait]
 </span><span class="kw">impl </span>ILnRpcClient <span class="kw">for </span>NetworkLnRpcClient {
-    <span class="kw">async fn </span>pubkey(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;GetPubKeyResponse&gt; {
+    <span class="kw">async fn </span>info(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;GetNodeInfoResponse&gt; {
         <span class="kw">let </span>req = Request::new(EmptyRequest {});
-
         <span class="kw">let </span><span class="kw-2">mut </span>client = <span class="self">self</span>.client.clone();
-        <span class="kw">let </span>res = client.get_pub_key(req).<span class="kw">await</span><span class="question-mark">?</span>;
-
-        <span class="prelude-val">Ok</span>(res.into_inner())
+        <span class="kw">let </span>res = client.get_node_info(req).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">return </span><span class="prelude-val">Ok</span>(res.into_inner());
     }
 
     <span class="kw">async fn </span>routehints(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;GetRouteHintsResponse&gt; {
         <span class="kw">let </span>req = Request::new(EmptyRequest {});
-
         <span class="kw">let </span><span class="kw-2">mut </span>client = <span class="self">self</span>.client.clone();
         <span class="kw">let </span>res = client.get_route_hints(req).<span class="kw">await</span><span class="question-mark">?</span>;
-
-        <span class="prelude-val">Ok</span>(res.into_inner())
+        <span class="kw">return </span><span class="prelude-val">Ok</span>(res.into_inner());
     }
 
     <span class="kw">async fn </span>pay(<span class="kw-2">&amp;</span><span class="self">self</span>, invoice: PayInvoiceRequest) -&gt; <span class="prelude-ty">Result</span>&lt;PayInvoiceResponse&gt; {
         <span class="kw">let </span>req = Request::new(invoice);
-
         <span class="kw">let </span><span class="kw-2">mut </span>client = <span class="self">self</span>.client.clone();
         <span class="kw">let </span>res = client.pay_invoice(req).<span class="kw">await</span><span class="question-mark">?</span>;
-
-        <span class="prelude-val">Ok</span>(res.into_inner())
+        <span class="kw">return </span><span class="prelude-val">Ok</span>(res.into_inner());
     }
 
-    <span class="kw">async fn </span>subscribe_htlcs&lt;<span class="lifetime">&#39;a</span>&gt;(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        subscription: SubscribeInterceptHtlcsRequest,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;HtlcStream&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
-        <span class="kw">let </span>req = Request::new(subscription);
-
+    <span class="kw">async fn </span>route_htlcs&lt;<span class="lifetime">&#39;a</span>&gt;(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        events: ReceiverStream&lt;RouteHtlcRequest&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;RouteHtlcStream&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
         <span class="kw">let </span><span class="kw-2">mut </span>client = <span class="self">self</span>.client.clone();
-        <span class="kw">let </span>res = client.subscribe_intercept_htlcs(req).<span class="kw">await</span><span class="question-mark">?</span>;
-
-        <span class="prelude-val">Ok</span>(Box::pin(res.into_inner()))
-    }
-
-    <span class="kw">async fn </span>complete_htlc(<span class="kw-2">&amp;</span><span class="self">self</span>, outcome: CompleteHtlcsRequest) -&gt; <span class="prelude-ty">Result</span>&lt;CompleteHtlcsResponse&gt; {
-        <span class="kw">let </span>req = Request::new(outcome);
-
-        <span class="kw">let </span><span class="kw-2">mut </span>client = <span class="self">self</span>.client.clone();
-        <span class="kw">let </span>res = client.complete_htlc(req).<span class="kw">await</span><span class="question-mark">?</span>;
-
-        <span class="prelude-val">Ok</span>(res.into_inner())
+        <span class="kw">let </span>res = client.route_htlcs(events).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">return </span><span class="prelude-val">Ok</span>(Box::pin(res.into_inner()));
     }
 }
 </code></pre></div>

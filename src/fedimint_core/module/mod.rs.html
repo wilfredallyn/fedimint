@@ -1002,33 +1002,104 @@
 <a href="#1002" id="1002">1002</a>
 <a href="#1003" id="1003">1003</a>
 <a href="#1004" id="1004">1004</a>
+<a href="#1005" id="1005">1005</a>
+<a href="#1006" id="1006">1006</a>
+<a href="#1007" id="1007">1007</a>
+<a href="#1008" id="1008">1008</a>
+<a href="#1009" id="1009">1009</a>
+<a href="#1010" id="1010">1010</a>
+<a href="#1011" id="1011">1011</a>
+<a href="#1012" id="1012">1012</a>
+<a href="#1013" id="1013">1013</a>
+<a href="#1014" id="1014">1014</a>
+<a href="#1015" id="1015">1015</a>
+<a href="#1016" id="1016">1016</a>
+<a href="#1017" id="1017">1017</a>
+<a href="#1018" id="1018">1018</a>
+<a href="#1019" id="1019">1019</a>
+<a href="#1020" id="1020">1020</a>
+<a href="#1021" id="1021">1021</a>
+<a href="#1022" id="1022">1022</a>
+<a href="#1023" id="1023">1023</a>
+<a href="#1024" id="1024">1024</a>
+<a href="#1025" id="1025">1025</a>
+<a href="#1026" id="1026">1026</a>
+<a href="#1027" id="1027">1027</a>
+<a href="#1028" id="1028">1028</a>
+<a href="#1029" id="1029">1029</a>
+<a href="#1030" id="1030">1030</a>
+<a href="#1031" id="1031">1031</a>
+<a href="#1032" id="1032">1032</a>
+<a href="#1033" id="1033">1033</a>
+<a href="#1034" id="1034">1034</a>
+<a href="#1035" id="1035">1035</a>
+<a href="#1036" id="1036">1036</a>
+<a href="#1037" id="1037">1037</a>
+<a href="#1038" id="1038">1038</a>
+<a href="#1039" id="1039">1039</a>
+<a href="#1040" id="1040">1040</a>
+<a href="#1041" id="1041">1041</a>
+<a href="#1042" id="1042">1042</a>
+<a href="#1043" id="1043">1043</a>
+<a href="#1044" id="1044">1044</a>
+<a href="#1045" id="1045">1045</a>
+<a href="#1046" id="1046">1046</a>
+<a href="#1047" id="1047">1047</a>
+<a href="#1048" id="1048">1048</a>
+<a href="#1049" id="1049">1049</a>
+<a href="#1050" id="1050">1050</a>
+<a href="#1051" id="1051">1051</a>
+<a href="#1052" id="1052">1052</a>
+<a href="#1053" id="1053">1053</a>
+<a href="#1054" id="1054">1054</a>
+<a href="#1055" id="1055">1055</a>
+<a href="#1056" id="1056">1056</a>
+<a href="#1057" id="1057">1057</a>
+<a href="#1058" id="1058">1058</a>
+<a href="#1059" id="1059">1059</a>
+<a href="#1060" id="1060">1060</a>
+<a href="#1061" id="1061">1061</a>
+<a href="#1062" id="1062">1062</a>
+<a href="#1063" id="1063">1063</a>
+<a href="#1064" id="1064">1064</a>
+<a href="#1065" id="1065">1065</a>
+<a href="#1066" id="1066">1066</a>
+<a href="#1067" id="1067">1067</a>
+<a href="#1068" id="1068">1068</a>
+<a href="#1069" id="1069">1069</a>
+<a href="#1070" id="1070">1070</a>
+<a href="#1071" id="1071">1071</a>
+<a href="#1072" id="1072">1072</a>
+<a href="#1073" id="1073">1073</a>
+<a href="#1074" id="1074">1074</a>
+<a href="#1075" id="1075">1075</a>
 </pre><pre class="rust"><code><span class="kw">pub mod </span>audit;
 <span class="kw">pub mod </span>interconnect;
 <span class="kw">pub mod </span>registry;
-<span class="kw">use </span>std::collections::{BTreeMap, HashSet};
-<span class="kw">use </span>std::ffi::OsString;
+<span class="kw">use </span>std::collections::{BTreeMap, BTreeSet};
 <span class="kw">use </span>std::fmt::Debug;
 <span class="kw">use </span>std::marker::PhantomData;
 <span class="kw">use </span>std::pin::Pin;
 <span class="kw">use </span>std::sync::Arc;
 
-<span class="kw">use </span>bitcoin_hashes::sha256;
-<span class="kw">use </span>bitcoin_hashes::sha256::Hash;
 <span class="kw">use </span>futures::Future;
 <span class="kw">use </span>jsonrpsee_core::JsonValue;
 <span class="kw">use </span>secp256k1_zkp::XOnlyPublicKey;
 <span class="kw">use </span>serde::{Deserialize, Serialize};
-<span class="kw">use </span>serde_json::Value;
 <span class="kw">use </span>thiserror::Error;
 <span class="kw">use </span>tracing::instrument;
 
-<span class="kw">use </span><span class="kw">crate</span>::config::{ConfigGenParams, DkgPeerMsg, ServerModuleConfig};
+<span class="kw">use </span><span class="kw">crate</span>::config::{
+    ClientModuleConfig, ConfigGenModuleParams, DkgPeerMsg, ServerModuleConfig,
+    ServerModuleConsensusConfig,
+};
 <span class="kw">use </span><span class="kw">crate</span>::core::{
     Decoder, DecoderBuilder, Input, ModuleConsensusItem, ModuleInstanceId, ModuleKind, Output,
     OutputOutcome,
 };
 <span class="kw">use </span><span class="kw">crate</span>::db::{
-    Database, DatabaseTransaction, DatabaseVersion, MigrationMap, ModuleDatabaseTransaction,
+    Database, DatabaseKey, DatabaseKeyWithNotify, DatabaseRecord, DatabaseTransaction,
+    DatabaseVersion, MigrationMap, ModuleDatabaseTransaction,
 };
 <span class="kw">use </span><span class="kw">crate</span>::encoding::{Decodable, DecodeError, Encodable};
 <span class="kw">use </span><span class="kw">crate</span>::module::audit::Audit;
@@ -1118,7 +1189,7 @@
 </span><span class="attr">#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 </span><span class="kw">pub struct </span>ApiAuth(<span class="kw">pub </span>String);
 
-<span class="attr">#[derive(Debug)]
+<span class="attr">#[derive(Debug, Clone)]
 </span><span class="kw">pub struct </span>ApiError {
     <span class="kw">pub </span>code: i32,
     <span class="kw">pub </span>message: String,
@@ -1148,36 +1219,68 @@
 
 <span class="doccomment">/// State made available to all API endpoints for handling a request
 </span><span class="kw">pub struct </span>ApiEndpointContext&lt;<span class="lifetime">&#39;a</span>&gt; {
+    db: Database,
     dbtx: DatabaseTransaction&lt;<span class="lifetime">&#39;a</span>&gt;,
     has_auth: bool,
-    module_id: <span class="prelude-ty">Option</span>&lt;ModuleInstanceId&gt;,
+    request_auth: <span class="prelude-ty">Option</span>&lt;ApiAuth&gt;,
 }
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; ApiEndpointContext&lt;<span class="lifetime">&#39;a</span>&gt; {
-    <span class="kw">pub fn </span>new(
-        has_auth: bool,
+    <span class="doccomment">/// `db` and `dbtx` should be isolated.
+    </span><span class="kw">pub fn </span>new(
+        db: Database,
         dbtx: DatabaseTransaction&lt;<span class="lifetime">&#39;a</span>&gt;,
-        module_id: <span class="prelude-ty">Option</span>&lt;ModuleInstanceId&gt;,
+        has_auth: bool,
+        request_auth: <span class="prelude-ty">Option</span>&lt;ApiAuth&gt;,
     ) -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
-            has_auth,
+            db,
             dbtx,
-            module_id,
+            has_auth,
+            request_auth,
         }
     }
 
     <span class="doccomment">/// Database tx handle, will be committed
-    </span><span class="kw">pub fn </span>dbtx(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;_</span>, ModuleInstanceId&gt; {
-        <span class="kw">match </span><span class="self">self</span>.module_id {
-            <span class="prelude-val">None </span>=&gt; <span class="self">self</span>.dbtx.get_isolated(),
-            <span class="prelude-val">Some</span>(id) =&gt; <span class="self">self</span>.dbtx.with_module_prefix(id),
-        }
+    </span><span class="kw">pub fn </span>dbtx(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;_</span>&gt; {
+        <span class="comment">// dbtx is already isolated.
+        </span><span class="self">self</span>.dbtx.get_isolated()
+    }
+
+    <span class="doccomment">/// Returns the auth set on the request (regardless of whether it was
+    /// correct)
+    </span><span class="kw">pub fn </span>request_auth(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;ApiAuth&gt; {
+        <span class="self">self</span>.request_auth.clone()
     }
 
     <span class="doccomment">/// Whether the request was authenticated as the guardian who controls this
     /// fedimint server
     </span><span class="kw">pub fn </span>has_auth(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
         <span class="self">self</span>.has_auth
+    }
+
+    <span class="doccomment">/// Waits for key to be present in database.
+    </span><span class="kw">pub fn </span>wait_key_exists&lt;K&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, key: K) -&gt; <span class="kw">impl </span>Future&lt;Output = K::Value&gt;
+    <span class="kw">where
+        </span>K: DatabaseKey + DatabaseRecord + DatabaseKeyWithNotify,
+    {
+        <span class="kw">let </span>db = <span class="self">self</span>.db.clone();
+        <span class="comment">// self contains dbtx which is !Send
+        // try removing this and see the error.
+        </span><span class="kw">async move </span>{ db.wait_key_exists(<span class="kw-2">&amp;</span>key).<span class="kw">await </span>}
+    }
+
+    <span class="doccomment">/// Waits for key to have a value that matches.
+    </span><span class="kw">pub fn </span>wait_value_matches&lt;K&gt;(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        key: K,
+        matcher: <span class="kw">impl </span>Fn(<span class="kw-2">&amp;</span>K::Value) -&gt; bool + Copy,
+    ) -&gt; <span class="kw">impl </span>Future&lt;Output = K::Value&gt;
+    <span class="kw">where
+        </span>K: DatabaseKey + DatabaseRecord + DatabaseKeyWithNotify,
+    {
+        <span class="kw">let </span>db = <span class="self">self</span>.db.clone();
+        <span class="kw">async move </span>{ db.wait_key_check(<span class="kw-2">&amp;</span>key, |v| v.filter(matcher)).<span class="kw">await</span>.<span class="number">0 </span>}
     }
 
     <span class="doccomment">/// Attempts to commit the dbtx or returns an ApiError
@@ -1253,7 +1356,7 @@
 }
 
 <span class="kw">pub use </span>__api_endpoint <span class="kw">as </span>api_endpoint;
-<span class="kw">use </span>fedimint_core::config::{DkgResult, ModuleConfigResponse};
+<span class="kw">use </span>fedimint_core::config::DkgResult;
 
 <span class="kw">use </span><span class="self">self</span>::registry::ModuleDecoderRegistry;
 
@@ -1269,7 +1372,7 @@
 </span><span class="kw">pub struct </span>ApiEndpoint&lt;M&gt; {
     <span class="doccomment">/// Path under which the API endpoint can be reached. It should start with a
     /// `/` e.g. `/transaction`. E.g. this API endpoint would be reachable
-    /// under `/module/module_instance_id/transaction` depending on the
+    /// under `module_module_instance_id_transaction` depending on the
     /// module name returned by `[FedertionModule::api_base_name]`.
     </span><span class="kw">pub </span>path: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str,
     <span class="doccomment">/// Handler for the API call that takes the following arguments:
@@ -1372,8 +1475,6 @@
 
     <span class="kw">fn </span>module_kind(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ModuleKind;
 
-    <span class="kw">fn </span>hash_client_module(<span class="kw-2">&amp;</span><span class="self">self</span>, config: serde_json::Value) -&gt; anyhow::Result&lt;sha256::Hash&gt;;
-
     <span class="kw">fn </span>to_dyn_common(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; DynCommonModuleGen;
 }
 
@@ -1391,10 +1492,6 @@
 
     <span class="kw">fn </span>module_kind(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ModuleKind {
         T::Common::KIND
-    }
-
-    <span class="kw">fn </span>hash_client_module(<span class="kw-2">&amp;</span><span class="self">self</span>, config: Value) -&gt; anyhow::Result&lt;Hash&gt; {
-        T::Common::hash_client_module(config)
     }
 
     <span class="kw">fn </span>to_dyn_common(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; DynCommonModuleGen {
@@ -1422,7 +1519,6 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         cfg: ServerModuleConfig,
         db: Database,
-        env: <span class="kw-2">&amp;</span>BTreeMap&lt;OsString, OsString&gt;,
         task_group: <span class="kw-2">&amp;mut </span>TaskGroup,
     ) -&gt; anyhow::Result&lt;DynServerModule&gt;;
 
@@ -1434,25 +1530,25 @@
     <span class="kw">fn </span>trusted_dealer_gen(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         peers: <span class="kw-2">&amp;</span>[PeerId],
-        params: <span class="kw-2">&amp;</span>ConfigGenParams,
+        params: <span class="kw-2">&amp;</span>ConfigGenModuleParams,
     ) -&gt; BTreeMap&lt;PeerId, ServerModuleConfig&gt;;
 
     <span class="kw">async fn </span>distributed_gen(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         peers: <span class="kw-2">&amp;</span>PeerHandle,
-        params: <span class="kw-2">&amp;</span>ConfigGenParams,
+        params: <span class="kw-2">&amp;</span>ConfigGenModuleParams,
     ) -&gt; DkgResult&lt;ServerModuleConfig&gt;;
-
-    <span class="kw">fn </span>to_config_response(<span class="kw-2">&amp;</span><span class="self">self</span>, config: serde_json::Value)
-        -&gt; anyhow::Result&lt;ModuleConfigResponse&gt;;
-
-    <span class="kw">fn </span>hash_client_module(<span class="kw-2">&amp;</span><span class="self">self</span>, config: serde_json::Value) -&gt; anyhow::Result&lt;sha256::Hash&gt;;
 
     <span class="kw">fn </span>validate_config(<span class="kw-2">&amp;</span><span class="self">self</span>, identity: <span class="kw-2">&amp;</span>PeerId, config: ServerModuleConfig) -&gt; anyhow::Result&lt;()&gt;;
 
+    <span class="kw">fn </span>get_client_config(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        config: <span class="kw-2">&amp;</span>ServerModuleConsensusConfig,
+    ) -&gt; anyhow::Result&lt;ClientModuleConfig&gt;;
+
     <span class="kw">async fn </span>dump_database(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;_</span>, ModuleInstanceId&gt;,
+        dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;_</span>&gt;,
         prefix_names: Vec&lt;String&gt;,
     ) -&gt; Box&lt;<span class="kw">dyn </span>Iterator&lt;Item = (String, Box&lt;<span class="kw">dyn </span>erased_serde::Serialize + Send&gt;)&gt; + <span class="lifetime">&#39;_</span>&gt;;
 }
@@ -1491,7 +1587,7 @@
 ///
 /// See [`ModuleConsensusVersion`] for more details on how it interacts with
 /// module&#39;s consensus.
-</span><span class="attr">#[derive(Debug, Copy, Clone)]
+</span><span class="attr">#[derive(Debug, Copy, Clone, Serialize, Deserialize, Encodable)]
 </span><span class="kw">pub struct </span>CoreConsensusVersion(<span class="kw">pub </span>u32);
 
 <span class="doccomment">/// Consensus version of a specific module instance
@@ -1517,7 +1613,7 @@
 /// by running two instances of the module at the same time (each of different
 /// `ModuleKind` version), allow users to slowly migrate to a new one.
 /// This avoids complex and error-prone server-side consensus-migration logic.
-</span><span class="attr">#[derive(Debug, Copy, Clone)]
+</span><span class="attr">#[derive(Debug, Copy, Clone, PartialEq, Eq, Serialize, Deserialize, Encodable, Decodable)]
 </span><span class="kw">pub struct </span>ModuleConsensusVersion(<span class="kw">pub </span>u32);
 
 <span class="doccomment">/// Api version supported by a core server or a client/server module at a given
@@ -1537,7 +1633,7 @@
 /// backward compatibility on both client and server side to accommodate end
 /// user client devices receiving updates at a pace hard to control, and
 /// technical and coordination challenges of upgrading servers.
-</span><span class="attr">#[derive(Debug, Copy, Clone)]
+</span><span class="attr">#[derive(Debug, Copy, Clone, Serialize, Deserialize)]
 </span><span class="kw">pub struct </span>ApiVersion {
     <span class="doccomment">/// Major API version
     ///
@@ -1556,12 +1652,44 @@
     </span><span class="kw">pub </span>minor: u32,
 }
 
+<span class="attr">#[derive(Debug, Clone, Serialize, Deserialize)]
+</span><span class="kw">pub struct </span>SupportedCoreApiVersions {
+    <span class="kw">pub </span>consensus: CoreConsensusVersion,
+    <span class="kw">pub </span>api: Vec&lt;ApiVersion&gt;,
+}
+
+<span class="attr">#[derive(Debug, Clone, Serialize, Deserialize)]
+</span><span class="kw">pub struct </span>SupportedModuleApiVersions {
+    <span class="kw">pub </span>core: CoreConsensusVersion,
+    <span class="kw">pub </span>module: ModuleConsensusVersion,
+    <span class="kw">pub </span>api: Vec&lt;ApiVersion&gt;,
+}
+
+<span class="kw">impl </span>SupportedModuleApiVersions {
+    <span class="kw">pub fn </span>from_raw(core: u32, module: u32, api_versions: <span class="kw-2">&amp;</span>[(u32, u32)]) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            core: CoreConsensusVersion(core),
+            module: ModuleConsensusVersion(module),
+            api: api_versions
+                .iter()
+                .copied()
+                .map(|(major, minor)| ApiVersion { major, minor })
+                .collect(),
+        }
+    }
+}
+
+<span class="attr">#[derive(Debug, Clone, Serialize, Deserialize)]
+</span><span class="kw">pub struct </span>SupportedApiVersionsSummary {
+    <span class="kw">pub </span>core: SupportedCoreApiVersions,
+    <span class="kw">pub </span>modules: BTreeMap&lt;ModuleInstanceId, SupportedModuleApiVersions&gt;,
+}
+
 <span class="kw">pub trait </span>CommonModuleGen: Debug + Sized {
+    <span class="kw">const </span>CONSENSUS_VERSION: ModuleConsensusVersion;
     <span class="kw">const </span>KIND: ModuleKind;
 
     <span class="kw">fn </span>decoder() -&gt; Decoder;
-
-    <span class="kw">fn </span>hash_client_module(config: serde_json::Value) -&gt; anyhow::Result&lt;sha256::Hash&gt;;
 }
 
 <span class="doccomment">/// Module Generation trait with associated types
@@ -1603,7 +1731,6 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         cfg: ServerModuleConfig,
         db: Database,
-        env: <span class="kw-2">&amp;</span>BTreeMap&lt;OsString, OsString&gt;,
         task_group: <span class="kw-2">&amp;mut </span>TaskGroup,
     ) -&gt; anyhow::Result&lt;DynServerModule&gt;;
 
@@ -1617,23 +1744,26 @@
     <span class="kw">fn </span>trusted_dealer_gen(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         peers: <span class="kw-2">&amp;</span>[PeerId],
-        params: <span class="kw-2">&amp;</span>ConfigGenParams,
+        params: <span class="kw-2">&amp;</span>ConfigGenModuleParams,
     ) -&gt; BTreeMap&lt;PeerId, ServerModuleConfig&gt;;
 
     <span class="kw">async fn </span>distributed_gen(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         peer: <span class="kw-2">&amp;</span>PeerHandle,
-        params: <span class="kw-2">&amp;</span>ConfigGenParams,
+        params: <span class="kw-2">&amp;</span>ConfigGenModuleParams,
     ) -&gt; DkgResult&lt;ServerModuleConfig&gt;;
-
-    <span class="kw">fn </span>to_config_response(<span class="kw-2">&amp;</span><span class="self">self</span>, config: serde_json::Value)
-        -&gt; anyhow::Result&lt;ModuleConfigResponse&gt;;
 
     <span class="kw">fn </span>validate_config(<span class="kw-2">&amp;</span><span class="self">self</span>, identity: <span class="kw-2">&amp;</span>PeerId, config: ServerModuleConfig) -&gt; anyhow::Result&lt;()&gt;;
 
+    <span class="doccomment">/// Converts the consensus config into the client config
+    </span><span class="kw">fn </span>get_client_config(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        config: <span class="kw-2">&amp;</span>ServerModuleConsensusConfig,
+    ) -&gt; anyhow::Result&lt;ClientModuleConfig&gt;;
+
     <span class="kw">async fn </span>dump_database(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;_</span>, ModuleInstanceId&gt;,
+        dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;_</span>&gt;,
         prefix_names: Vec&lt;String&gt;,
     ) -&gt; Box&lt;<span class="kw">dyn </span>Iterator&lt;Item = (String, Box&lt;<span class="kw">dyn </span>erased_serde::Serialize + Send&gt;)&gt; + <span class="lifetime">&#39;_</span>&gt;;
 }
@@ -1655,10 +1785,9 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         cfg: ServerModuleConfig,
         db: Database,
-        env: <span class="kw-2">&amp;</span>BTreeMap&lt;OsString, OsString&gt;,
         task_group: <span class="kw-2">&amp;mut </span>TaskGroup,
     ) -&gt; anyhow::Result&lt;DynServerModule&gt; {
-        &lt;<span class="self">Self </span><span class="kw">as </span>ServerModuleGen&gt;::init(<span class="self">self</span>, cfg, db, env, task_group).<span class="kw">await
+        &lt;<span class="self">Self </span><span class="kw">as </span>ServerModuleGen&gt;::init(<span class="self">self</span>, cfg, db, task_group).<span class="kw">await
     </span>}
 
     <span class="kw">fn </span>get_database_migrations(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; MigrationMap {
@@ -1668,7 +1797,7 @@
     <span class="kw">fn </span>trusted_dealer_gen(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         peers: <span class="kw-2">&amp;</span>[PeerId],
-        params: <span class="kw-2">&amp;</span>ConfigGenParams,
+        params: <span class="kw-2">&amp;</span>ConfigGenModuleParams,
     ) -&gt; BTreeMap&lt;PeerId, ServerModuleConfig&gt; {
         &lt;<span class="self">Self </span><span class="kw">as </span>ServerModuleGen&gt;::trusted_dealer_gen(<span class="self">self</span>, peers, params)
     }
@@ -1676,29 +1805,25 @@
     <span class="kw">async fn </span>distributed_gen(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         peers: <span class="kw-2">&amp;</span>PeerHandle,
-        params: <span class="kw-2">&amp;</span>ConfigGenParams,
+        params: <span class="kw-2">&amp;</span>ConfigGenModuleParams,
     ) -&gt; DkgResult&lt;ServerModuleConfig&gt; {
         &lt;<span class="self">Self </span><span class="kw">as </span>ServerModuleGen&gt;::distributed_gen(<span class="self">self</span>, peers, params).<span class="kw">await
     </span>}
-
-    <span class="kw">fn </span>to_config_response(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        config: serde_json::Value,
-    ) -&gt; anyhow::Result&lt;ModuleConfigResponse&gt; {
-        &lt;<span class="self">Self </span><span class="kw">as </span>ServerModuleGen&gt;::to_config_response(<span class="self">self</span>, config)
-    }
-
-    <span class="kw">fn </span>hash_client_module(<span class="kw-2">&amp;</span><span class="self">self</span>, config: serde_json::Value) -&gt; anyhow::Result&lt;Hash&gt; {
-        &lt;<span class="self">Self </span><span class="kw">as </span>ExtendsCommonModuleGen&gt;::Common::hash_client_module(config)
-    }
 
     <span class="kw">fn </span>validate_config(<span class="kw-2">&amp;</span><span class="self">self</span>, identity: <span class="kw-2">&amp;</span>PeerId, config: ServerModuleConfig) -&gt; anyhow::Result&lt;()&gt; {
         &lt;<span class="self">Self </span><span class="kw">as </span>ServerModuleGen&gt;::validate_config(<span class="self">self</span>, identity, config)
     }
 
+    <span class="kw">fn </span>get_client_config(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        config: <span class="kw-2">&amp;</span>ServerModuleConsensusConfig,
+    ) -&gt; anyhow::Result&lt;ClientModuleConfig&gt; {
+        &lt;<span class="self">Self </span><span class="kw">as </span>ServerModuleGen&gt;::get_client_config(<span class="self">self</span>, config)
+    }
+
     <span class="kw">async fn </span>dump_database(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;_</span>, ModuleInstanceId&gt;,
+        dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;_</span>&gt;,
         prefix_names: Vec&lt;String&gt;,
     ) -&gt; Box&lt;<span class="kw">dyn </span>Iterator&lt;Item = (String, Box&lt;<span class="kw">dyn </span>erased_serde::Serialize + Send&gt;)&gt; + <span class="lifetime">&#39;_</span>&gt; {
         &lt;<span class="self">Self </span><span class="kw">as </span>ServerModuleGen&gt;::dump_database(<span class="self">self</span>, dbtx, prefix_names).<span class="kw">await
@@ -1811,30 +1936,30 @@
 
     <span class="doccomment">/// Module consensus version this module is running with and the API
     /// versions it supports in it
-    </span><span class="kw">fn </span>versions(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (ModuleConsensusVersion, <span class="kw-2">&amp;</span>[ApiVersion]);
+    </span><span class="kw">fn </span>supported_api_versions(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SupportedModuleApiVersions;
 
     <span class="doccomment">/// Blocks until a new `consensus_proposal` is available.
-    </span><span class="kw">async fn </span>await_consensus_proposal&lt;<span class="lifetime">&#39;a</span>&gt;(
-        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>,
-        dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;_</span>, ModuleInstanceId&gt;,
-    );
+    </span><span class="kw">async fn </span>await_consensus_proposal&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>, dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;_</span>&gt;);
 
     <span class="doccomment">/// This module&#39;s contribution to the next consensus proposal
     </span><span class="kw">async fn </span>consensus_proposal&lt;<span class="lifetime">&#39;a</span>&gt;(
         <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>,
-        dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;_</span>, ModuleInstanceId&gt;,
+        dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;_</span>&gt;,
     ) -&gt; ConsensusProposal&lt;&lt;<span class="self">Self</span>::Common <span class="kw">as </span>ModuleCommon&gt;::ConsensusItem&gt;;
 
-    <span class="doccomment">/// This function is called once before transaction processing starts. All
-    /// module consensus items of this round are supplied as
+    <span class="doccomment">/// This function is called once before transaction processing starts.
+    ///
+    /// All module consensus items of this round are supplied as
     /// `consensus_items`. The database transaction will be committed to the
     /// database after all other modules ran `begin_consensus_epoch`, so the
-    /// results are available when processing transactions.
+    /// results are available when processing transactions. Returns any
+    /// peers that need to be dropped.
     </span><span class="kw">async fn </span>begin_consensus_epoch&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt;(
         <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>,
-        dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;b</span>, ModuleInstanceId&gt;,
+        dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;b</span>&gt;,
         consensus_items: Vec&lt;(PeerId, &lt;<span class="self">Self</span>::Common <span class="kw">as </span>ModuleCommon&gt;::ConsensusItem)&gt;,
-    );
+        consensus_peers: <span class="kw-2">&amp;</span>BTreeSet&lt;PeerId&gt;,
+    ) -&gt; Vec&lt;PeerId&gt;;
 
     <span class="doccomment">/// Some modules may have slow to verify inputs that would block transaction
     /// processing. If the slow part of verification can be modeled as a
@@ -1854,7 +1979,7 @@
     </span><span class="kw">async fn </span>validate_input&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt;(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         interconnect: <span class="kw-2">&amp;</span><span class="kw">dyn </span>ModuleInterconect,
-        dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;b</span>, ModuleInstanceId&gt;,
+        dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;b</span>&gt;,
         verification_cache: <span class="kw-2">&amp;</span><span class="self">Self</span>::VerificationCache,
         input: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>&lt;<span class="self">Self</span>::Common <span class="kw">as </span>ModuleCommon&gt;::Input,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;InputMeta, ModuleError&gt;;
@@ -1870,7 +1995,7 @@
     </span><span class="kw">async fn </span>apply_input&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>, <span class="lifetime">&#39;c</span>&gt;(
         <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>,
         interconnect: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw">dyn </span>ModuleInterconect,
-        dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;c</span>, ModuleInstanceId&gt;,
+        dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;c</span>&gt;,
         input: <span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span>&lt;<span class="self">Self</span>::Common <span class="kw">as </span>ModuleCommon&gt;::Input,
         verification_cache: <span class="kw-2">&amp;</span><span class="self">Self</span>::VerificationCache,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;InputMeta, ModuleError&gt;;
@@ -1882,7 +2007,7 @@
     /// them and merely generate a warning.
     </span><span class="kw">async fn </span>validate_output(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;_</span>, ModuleInstanceId&gt;,
+        dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;_</span>&gt;,
         output: <span class="kw-2">&amp;</span>&lt;<span class="self">Self</span>::Common <span class="kw">as </span>ModuleCommon&gt;::Output,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;TransactionItemAmount, ModuleError&gt;;
 
@@ -1900,7 +2025,7 @@
     /// once all transactions have been processed.
     </span><span class="kw">async fn </span>apply_output&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt;(
         <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>,
-        dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;b</span>, ModuleInstanceId&gt;,
+        dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;b</span>&gt;,
         output: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>&lt;<span class="self">Self</span>::Common <span class="kw">as </span>ModuleCommon&gt;::Output,
         out_point: OutPoint,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;TransactionItemAmount, ModuleError&gt;;
@@ -1913,8 +2038,8 @@
     /// returns a list of peers to drop if any are misbehaving.
     </span><span class="kw">async fn </span>end_consensus_epoch&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt;(
         <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>,
-        consensus_peers: <span class="kw-2">&amp;</span>HashSet&lt;PeerId&gt;,
-        dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;b</span>, ModuleInstanceId&gt;,
+        consensus_peers: <span class="kw-2">&amp;</span>BTreeSet&lt;PeerId&gt;,
+        dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;b</span>&gt;,
     ) -&gt; Vec&lt;PeerId&gt;;
 
     <span class="doccomment">/// Retrieve the current status of the output. Depending on the module this
@@ -1923,7 +2048,7 @@
     /// output is unknown, **NOT** if it is just not ready yet.
     </span><span class="kw">async fn </span>output_status(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;_</span>, ModuleInstanceId&gt;,
+        dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;_</span>&gt;,
         out_point: OutPoint,
     ) -&gt; <span class="prelude-ty">Option</span>&lt;&lt;<span class="self">Self</span>::Common <span class="kw">as </span>ModuleCommon&gt;::OutputOutcome&gt;;
 
@@ -1932,11 +2057,7 @@
     ///
     /// Summing over all modules, if liabilities &gt; assets then an error has
     /// occurred in the database and consensus should halt.
-    </span><span class="kw">async fn </span>audit(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;_</span>, ModuleInstanceId&gt;,
-        audit: <span class="kw-2">&amp;mut </span>Audit,
-    );
+    </span><span class="kw">async fn </span>audit(<span class="kw-2">&amp;</span><span class="self">self</span>, dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;_</span>&gt;, audit: <span class="kw-2">&amp;mut </span>Audit);
 
     <span class="doccomment">/// Returns a list of custom API endpoints defined by the module. These are
     /// made available both to users as well as to other modules. They thus
@@ -1961,10 +2082,31 @@
     }
 }
 
-<span class="kw">impl</span>&lt;T: Encodable + Decodable&gt; SerdeModuleEncoding&lt;T&gt; {
+<span class="kw">impl</span>&lt;T: Encodable + Decodable + <span class="lifetime">&#39;static</span>&gt; SerdeModuleEncoding&lt;T&gt; {
     <span class="kw">pub fn </span>try_into_inner(<span class="kw-2">&amp;</span><span class="self">self</span>, modules: <span class="kw-2">&amp;</span>ModuleDecoderRegistry) -&gt; <span class="prelude-ty">Result</span>&lt;T, DecodeError&gt; {
         <span class="kw">let </span><span class="kw-2">mut </span>reader = std::io::Cursor::new(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>);
         Decodable::consensus_decode(<span class="kw-2">&amp;mut </span>reader, modules)
+    }
+
+    <span class="doccomment">/// In cases where we know exactly which module kind we expect but don&#39;t
+    /// have access to all decoders this function can be used instead.
+    ///
+    /// Note that it just assumes the decoded module instance id to be valid
+    /// since it cannot validate against the decoder registry. The lack of
+    /// access to a decoder registry also makes decoding structs impossible that
+    /// themselves contain module dyn-types (e.g. a module output containing a
+    /// fedimint transaction).
+    </span><span class="kw">pub fn </span>try_into_inner_known_module_kind(<span class="kw-2">&amp;</span><span class="self">self</span>, decoder: <span class="kw-2">&amp;</span>Decoder) -&gt; <span class="prelude-ty">Result</span>&lt;T, DecodeError&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>reader = std::io::Cursor::new(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>);
+        <span class="kw">let </span>module_instance =
+            ModuleInstanceId::consensus_decode(<span class="kw-2">&amp;mut </span>reader, <span class="kw-2">&amp;</span>ModuleDecoderRegistry::default())<span class="question-mark">?</span>;
+        <span class="comment">// No recursive module decoding is supported since we give an empty decoder
+        // registry to the decode function
+        </span>decoder.decode(
+            <span class="kw-2">&amp;mut </span>reader,
+            module_instance,
+            <span class="kw-2">&amp;</span>ModuleDecoderRegistry::default(),
+        )
     }
 }
 
@@ -1978,7 +2120,7 @@
     <span class="comment">// TODO: this whole type should be a part of a `fedimint-server` and fields here inaccessible
     // to outside crates, but until `ServerModule` is not in `fedimint-server` this is impossible
     </span><span class="attr">#[doc(hidden)]
-    </span><span class="kw">pub </span>connections: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>MuxPeerConnections&lt;ModuleInstanceId, DkgPeerMsg&gt;,
+    </span><span class="kw">pub </span>connections: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>MuxPeerConnections&lt;(ModuleInstanceId, String), DkgPeerMsg&gt;,
     <span class="attr">#[doc(hidden)]
     </span><span class="kw">pub </span>module_instance_id: ModuleInstanceId,
     <span class="attr">#[doc(hidden)]
@@ -1989,7 +2131,7 @@
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; PeerHandle&lt;<span class="lifetime">&#39;a</span>&gt; {
     <span class="kw">pub fn </span>new(
-        connections: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>MuxPeerConnections&lt;ModuleInstanceId, DkgPeerMsg&gt;,
+        connections: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>MuxPeerConnections&lt;(ModuleInstanceId, String), DkgPeerMsg&gt;,
         module_instance_id: ModuleInstanceId,
         our_id: PeerId,
         peers: Vec&lt;PeerId&gt;,

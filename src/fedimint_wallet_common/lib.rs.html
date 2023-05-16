@@ -332,28 +332,15 @@
 <a href="#332" id="332">332</a>
 <a href="#333" id="333">333</a>
 <a href="#334" id="334">334</a>
-<a href="#335" id="335">335</a>
-<a href="#336" id="336">336</a>
-<a href="#337" id="337">337</a>
-<a href="#338" id="338">338</a>
-<a href="#339" id="339">339</a>
-<a href="#340" id="340">340</a>
-<a href="#341" id="341">341</a>
-<a href="#342" id="342">342</a>
-<a href="#343" id="343">343</a>
-<a href="#344" id="344">344</a>
-<a href="#345" id="345">345</a>
 </pre><pre class="rust"><code><span class="kw">use </span>std::hash::Hasher;
 
 <span class="kw">use </span>bitcoin::hashes::hex::ToHex;
-<span class="kw">use </span>bitcoin::hashes::sha256;
 <span class="kw">use </span>bitcoin::util::psbt::raw::ProprietaryKey;
 <span class="kw">use </span>bitcoin::util::psbt::PartiallySignedTransaction;
 <span class="kw">use </span>bitcoin::{Amount, BlockHash, Network, Script, Transaction, Txid};
 <span class="kw">use </span>fedimint_core::core::{Decoder, ModuleInstanceId, ModuleKind};
 <span class="kw">use </span>fedimint_core::encoding::{Decodable, Encodable, UnzipConsensus};
-<span class="kw">use </span>fedimint_core::module::__reexports::serde_json;
-<span class="kw">use </span>fedimint_core::module::{CommonModuleGen, ModuleCommon};
+<span class="kw">use </span>fedimint_core::module::{CommonModuleGen, ModuleCommon, ModuleConsensusVersion};
 <span class="kw">use </span>fedimint_core::{plugin_types_trait_impl_common, Feerate, PeerId};
 <span class="kw">use </span>impl_tools::autoimpl;
 <span class="kw">use </span>miniscript::Descriptor;
@@ -361,7 +348,6 @@
 <span class="kw">use </span>thiserror::Error;
 <span class="kw">use </span>tracing::error;
 
-<span class="kw">use </span><span class="kw">crate</span>::config::WalletClientConfig;
 <span class="kw">use </span><span class="kw">crate</span>::db::UTXOKey;
 <span class="kw">use </span><span class="kw">crate</span>::keys::CompressedPublicKey;
 <span class="kw">use </span><span class="kw">crate</span>::txoproof::{PegInProof, PegInProofError};
@@ -372,7 +358,8 @@
 <span class="kw">pub mod </span>tweakable;
 <span class="kw">pub mod </span>txoproof;
 
-<span class="kw">const </span>KIND: ModuleKind = ModuleKind::from_static_str(<span class="string">&quot;wallet&quot;</span>);
+<span class="kw">pub const </span>KIND: ModuleKind = ModuleKind::from_static_str(<span class="string">&quot;wallet&quot;</span>);
+<span class="kw">const </span>CONSENSUS_VERSION: ModuleConsensusVersion = ModuleConsensusVersion(<span class="number">0</span>);
 
 <span class="kw">pub const </span>CONFIRMATION_TARGET: u16 = <span class="number">10</span>;
 
@@ -530,13 +517,10 @@
 </span><span class="kw">pub struct </span>WalletCommonGen;
 
 <span class="kw">impl </span>CommonModuleGen <span class="kw">for </span>WalletCommonGen {
+    <span class="kw">const </span>CONSENSUS_VERSION: ModuleConsensusVersion = CONSENSUS_VERSION;
     <span class="kw">const </span>KIND: ModuleKind = KIND;
     <span class="kw">fn </span>decoder() -&gt; Decoder {
         WalletModuleTypes::decoder()
-    }
-
-    <span class="kw">fn </span>hash_client_module(config: serde_json::Value) -&gt; anyhow::Result&lt;sha256::Hash&gt; {
-        serde_json::from_value::&lt;WalletClientConfig&gt;(config)<span class="question-mark">?</span>.consensus_hash()
     }
 }
 
@@ -591,13 +575,6 @@
 
 <span class="kw">pub struct </span>WalletModuleTypes;
 
-<span class="kw">impl </span>ModuleCommon <span class="kw">for </span>WalletModuleTypes {
-    <span class="kw">type </span>Input = WalletInput;
-    <span class="kw">type </span>Output = WalletOutput;
-    <span class="kw">type </span>OutputOutcome = WalletOutputOutcome;
-    <span class="kw">type </span>ConsensusItem = WalletConsensusItem;
-}
-
 <span class="kw">pub fn </span>proprietary_tweak_key() -&gt; ProprietaryKey {
     ProprietaryKey {
         prefix: <span class="string">b&quot;fedimint&quot;</span>.to_vec(),
@@ -624,6 +601,7 @@
 <span class="kw">impl </span>Eq <span class="kw">for </span>PegOutSignatureItem {}
 
 <span class="macro">plugin_types_trait_impl_common!</span>(
+    WalletModuleTypes,
     WalletInput,
     WalletOutput,
     WalletOutputOutcome,
@@ -678,7 +656,7 @@
     </span>ErrorFinalizingPsbt(Vec&lt;miniscript::psbt::Error&gt;),
 }
 
-<span class="comment">// FIXME: make FakeFed not require Eq
+<span class="comment">// FIXME: make tests not require Eq
 </span><span class="doccomment">/// **WARNING**: this is only intended to be used for testing
 </span><span class="kw">impl </span>PartialEq <span class="kw">for </span>WalletError {
     <span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; bool {

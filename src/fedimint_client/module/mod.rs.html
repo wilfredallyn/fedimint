@@ -249,26 +249,169 @@
 <a href="#249" id="249">249</a>
 <a href="#250" id="250">250</a>
 <a href="#251" id="251">251</a>
-</pre><pre class="rust"><code><span class="kw">use </span>std::fmt::Debug;
+<a href="#252" id="252">252</a>
+<a href="#253" id="253">253</a>
+<a href="#254" id="254">254</a>
+<a href="#255" id="255">255</a>
+<a href="#256" id="256">256</a>
+<a href="#257" id="257">257</a>
+<a href="#258" id="258">258</a>
+<a href="#259" id="259">259</a>
+<a href="#260" id="260">260</a>
+<a href="#261" id="261">261</a>
+<a href="#262" id="262">262</a>
+<a href="#263" id="263">263</a>
+<a href="#264" id="264">264</a>
+<a href="#265" id="265">265</a>
+<a href="#266" id="266">266</a>
+<a href="#267" id="267">267</a>
+<a href="#268" id="268">268</a>
+<a href="#269" id="269">269</a>
+<a href="#270" id="270">270</a>
+<a href="#271" id="271">271</a>
+<a href="#272" id="272">272</a>
+<a href="#273" id="273">273</a>
+<a href="#274" id="274">274</a>
+<a href="#275" id="275">275</a>
+<a href="#276" id="276">276</a>
+<a href="#277" id="277">277</a>
+<a href="#278" id="278">278</a>
+<a href="#279" id="279">279</a>
+<a href="#280" id="280">280</a>
+<a href="#281" id="281">281</a>
+<a href="#282" id="282">282</a>
+<a href="#283" id="283">283</a>
+<a href="#284" id="284">284</a>
+<a href="#285" id="285">285</a>
+<a href="#286" id="286">286</a>
+<a href="#287" id="287">287</a>
+<a href="#288" id="288">288</a>
+<a href="#289" id="289">289</a>
+<a href="#290" id="290">290</a>
+<a href="#291" id="291">291</a>
+<a href="#292" id="292">292</a>
+<a href="#293" id="293">293</a>
+<a href="#294" id="294">294</a>
+<a href="#295" id="295">295</a>
+<a href="#296" id="296">296</a>
+<a href="#297" id="297">297</a>
+<a href="#298" id="298">298</a>
+<a href="#299" id="299">299</a>
+<a href="#300" id="300">300</a>
+<a href="#301" id="301">301</a>
+<a href="#302" id="302">302</a>
+<a href="#303" id="303">303</a>
+<a href="#304" id="304">304</a>
+<a href="#305" id="305">305</a>
+<a href="#306" id="306">306</a>
+<a href="#307" id="307">307</a>
+<a href="#308" id="308">308</a>
+<a href="#309" id="309">309</a>
+<a href="#310" id="310">310</a>
+<a href="#311" id="311">311</a>
+<a href="#312" id="312">312</a>
+<a href="#313" id="313">313</a>
+<a href="#314" id="314">314</a>
+<a href="#315" id="315">315</a>
+<a href="#316" id="316">316</a>
+<a href="#317" id="317">317</a>
+<a href="#318" id="318">318</a>
+<a href="#319" id="319">319</a>
+<a href="#320" id="320">320</a>
+<a href="#321" id="321">321</a>
+<a href="#322" id="322">322</a>
+<a href="#323" id="323">323</a>
+<a href="#324" id="324">324</a>
+<a href="#325" id="325">325</a>
+<a href="#326" id="326">326</a>
+<a href="#327" id="327">327</a>
+<a href="#328" id="328">328</a>
+<a href="#329" id="329">329</a>
+<a href="#330" id="330">330</a>
+<a href="#331" id="331">331</a>
+<a href="#332" id="332">332</a>
+<a href="#333" id="333">333</a>
+<a href="#334" id="334">334</a>
+<a href="#335" id="335">335</a>
+<a href="#336" id="336">336</a>
+<a href="#337" id="337">337</a>
+<a href="#338" id="338">338</a>
+<a href="#339" id="339">339</a>
+<a href="#340" id="340">340</a>
+<a href="#341" id="341">341</a>
+<a href="#342" id="342">342</a>
+<a href="#343" id="343">343</a>
+<a href="#344" id="344">344</a>
+<a href="#345" id="345">345</a>
+<a href="#346" id="346">346</a>
+<a href="#347" id="347">347</a>
+<a href="#348" id="348">348</a>
+<a href="#349" id="349">349</a>
+<a href="#350" id="350">350</a>
+<a href="#351" id="351">351</a>
+<a href="#352" id="352">352</a>
+<a href="#353" id="353">353</a>
+<a href="#354" id="354">354</a>
+<a href="#355" id="355">355</a>
+<a href="#356" id="356">356</a>
+<a href="#357" id="357">357</a>
+<a href="#358" id="358">358</a>
+<a href="#359" id="359">359</a>
+<a href="#360" id="360">360</a>
+<a href="#361" id="361">361</a>
+<a href="#362" id="362">362</a>
+<a href="#363" id="363">363</a>
+<a href="#364" id="364">364</a>
+<a href="#365" id="365">365</a>
+<a href="#366" id="366">366</a>
+<a href="#367" id="367">367</a>
+<a href="#368" id="368">368</a>
+<a href="#369" id="369">369</a>
+<a href="#370" id="370">370</a>
+<a href="#371" id="371">371</a>
+<a href="#372" id="372">372</a>
+<a href="#373" id="373">373</a>
+<a href="#374" id="374">374</a>
+<a href="#375" id="375">375</a>
+<a href="#376" id="376">376</a>
+<a href="#377" id="377">377</a>
+<a href="#378" id="378">378</a>
+<a href="#379" id="379">379</a>
+<a href="#380" id="380">380</a>
+<a href="#381" id="381">381</a>
+<a href="#382" id="382">382</a>
+<a href="#383" id="383">383</a>
+<a href="#384" id="384">384</a>
+<a href="#385" id="385">385</a>
+<a href="#386" id="386">386</a>
+<a href="#387" id="387">387</a>
+<a href="#388" id="388">388</a>
+</pre><pre class="rust"><code><span class="kw">use </span>std::any::Any;
+<span class="kw">use </span>std::ffi;
+<span class="kw">use </span>std::fmt::Debug;
 <span class="kw">use </span>std::sync::Arc;
 
-<span class="kw">use </span>fedimint_core::core::{Decoder, DynInput, DynOutput, KeyPair, ModuleInstanceId};
-<span class="kw">use </span>fedimint_core::db::DatabaseTransaction;
+<span class="kw">use </span>fedimint_core::api::DynFederationApi;
+<span class="kw">use </span>fedimint_core::core::{Decoder, DynInput, DynOutput, IntoDynInstance, ModuleInstanceId};
+<span class="kw">use </span>fedimint_core::db::{DatabaseTransaction, ModuleDatabaseTransaction};
 <span class="kw">use </span>fedimint_core::module::registry::ModuleRegistry;
 <span class="kw">use </span>fedimint_core::module::{ModuleCommon, TransactionItemAmount};
 <span class="kw">use </span>fedimint_core::task::{MaybeSend, MaybeSync};
 <span class="kw">use </span>fedimint_core::{
-    apply, async_trait_maybe_send, dyn_newtype_define, maybe_add_send_sync, Amount, TransactionId,
+    apply, async_trait_maybe_send, dyn_newtype_define, maybe_add_send_sync, Amount, OutPoint,
+    TransactionId,
 };
 
-<span class="kw">use </span><span class="kw">crate</span>::sm::{Context, DynContext, DynState, State};
-<span class="kw">use </span><span class="kw">crate</span>::DynGlobalClientContext;
+<span class="kw">use </span><span class="kw">crate</span>::sm::{Context, DynContext, DynState, Executor, OperationId, State};
+<span class="kw">use </span><span class="kw">crate</span>::transaction::{ClientInput, ClientOutput};
+<span class="kw">use crate</span>::{Client, DynGlobalClientContext};
 
 <span class="kw">pub mod </span>gen;
 
 <span class="kw">pub type </span>ClientModuleRegistry = ModuleRegistry&lt;DynClientModule&gt;;
 
 <span class="doccomment">/// Fedimint module client
+</span><span class="attr">#[apply(<span class="macro">async_trait_maybe_send!</span>)]
 </span><span class="kw">pub trait </span>ClientModule: Debug + MaybeSend + MaybeSync + <span class="lifetime">&#39;static </span>{
     <span class="doccomment">/// Common module types shared between client and server
     </span><span class="kw">type </span>Common: ModuleCommon;
@@ -279,9 +422,9 @@
 
     <span class="doccomment">/// All possible states this client can submit to the executor
     </span><span class="kw">type </span>States: State&lt;
-        GlobalContext = DynGlobalClientContext,
-        ModuleContext = <span class="self">Self</span>::ModuleStateMachineContext,
-    &gt;;
+            GlobalContext = DynGlobalClientContext,
+            ModuleContext = <span class="self">Self</span>::ModuleStateMachineContext,
+        &gt; + IntoDynInstance&lt;DynType = DynState&lt;DynGlobalClientContext&gt;&gt;;
 
     <span class="kw">fn </span>decoder() -&gt; Decoder {
         <span class="kw">let </span><span class="kw-2">mut </span>decoder_builder = <span class="self">Self</span>::Common::decoder_builder();
@@ -290,6 +433,16 @@
     }
 
     <span class="kw">fn </span>context(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span>::ModuleStateMachineContext;
+
+    <span class="kw">async fn </span>handle_cli_command(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        _client: <span class="kw-2">&amp;</span>Client,
+        _args: <span class="kw-2">&amp;</span>[ffi::OsString],
+    ) -&gt; anyhow::Result&lt;serde_json::Value&gt; {
+        <span class="prelude-val">Err</span>(<span class="macro">anyhow::format_err!</span>(
+            <span class="string">&quot;This module does not implement cli commands&quot;
+        </span>))
+    }
 
     <span class="doccomment">/// Returns the amount represented by the input and the fee its processing
     /// requires
@@ -301,23 +454,99 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         output: <span class="kw-2">&amp;</span>&lt;<span class="self">Self</span>::Common <span class="kw">as </span>ModuleCommon&gt;::Output,
     ) -&gt; TransactionItemAmount;
+
+    <span class="kw">fn </span>supports_backup(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="bool-val">false
+    </span>}
+
+    <span class="kw">async fn </span>backup(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        _dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;_</span>&gt;,
+        _executor: Executor&lt;DynGlobalClientContext&gt;,
+        _api: DynFederationApi,
+        _module_instance_id: ModuleInstanceId,
+    ) -&gt; anyhow::Result&lt;Vec&lt;u8&gt;&gt; {
+        <span class="macro">anyhow::bail!</span>(<span class="string">&quot;Backup not supported&quot;</span>);
+    }
+
+    <span class="kw">async fn </span>restore(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        <span class="comment">// _dbtx: &amp;mut ModuleDatabaseTransaction&lt;&#39;_&gt;,
+        </span>_dbtx: <span class="kw-2">&amp;mut </span>DatabaseTransaction&lt;<span class="lifetime">&#39;_</span>&gt;,
+        _module_instance_id: ModuleInstanceId,
+        _executor: Executor&lt;DynGlobalClientContext&gt;,
+        _api: DynFederationApi,
+        _snapshot: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>[u8]&gt;,
+    ) -&gt; anyhow::Result&lt;()&gt; {
+        <span class="macro">anyhow::bail!</span>(<span class="string">&quot;Backup not supported&quot;</span>);
+    }
+
+    <span class="kw">async fn </span>wipe(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        _dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;_</span>&gt;,
+        _module_instance_id: ModuleInstanceId,
+        _executor: Executor&lt;DynGlobalClientContext&gt;,
+    ) -&gt; anyhow::Result&lt;()&gt; {
+        <span class="macro">anyhow::bail!</span>(<span class="string">&quot;Wiping not supported&quot;</span>);
+    }
 }
 
 <span class="doccomment">/// Type-erased version of [`ClientModule`]
+</span><span class="attr">#[apply(<span class="macro">async_trait_maybe_send!</span>)]
 </span><span class="kw">pub trait </span>IClientModule: Debug {
+    <span class="kw">fn </span>as_any(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>(<span class="macro">maybe_add_send_sync!</span>(<span class="kw">dyn </span>std::any::Any));
+
     <span class="kw">fn </span>decoder(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Decoder;
 
     <span class="kw">fn </span>context(<span class="kw-2">&amp;</span><span class="self">self</span>, instance: ModuleInstanceId) -&gt; DynContext;
 
+    <span class="kw">async fn </span>handle_cli_command(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        client: <span class="kw-2">&amp;</span>Client,
+        args: <span class="kw-2">&amp;</span>[ffi::OsString],
+    ) -&gt; anyhow::Result&lt;serde_json::Value&gt;;
+
     <span class="kw">fn </span>input_amount(<span class="kw-2">&amp;</span><span class="self">self</span>, input: <span class="kw-2">&amp;</span>DynInput) -&gt; TransactionItemAmount;
 
     <span class="kw">fn </span>output_amount(<span class="kw-2">&amp;</span><span class="self">self</span>, output: <span class="kw-2">&amp;</span>DynOutput) -&gt; TransactionItemAmount;
+
+    <span class="kw">fn </span>supports_backup(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool;
+
+    <span class="kw">async fn </span>backup(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;_</span>&gt;,
+        executor: Executor&lt;DynGlobalClientContext&gt;,
+        api: DynFederationApi,
+        module_instance_id: ModuleInstanceId,
+    ) -&gt; anyhow::Result&lt;Vec&lt;u8&gt;&gt;;
+
+    <span class="kw">async fn </span>restore(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        <span class="comment">// dbtx: &amp;mut ModuleDatabaseTransaction&lt;&#39;_&gt;,
+        </span>dbtx: <span class="kw-2">&amp;mut </span>DatabaseTransaction&lt;<span class="lifetime">&#39;_</span>&gt;,
+        module_instance_id: ModuleInstanceId,
+        executor: Executor&lt;DynGlobalClientContext&gt;,
+        api: DynFederationApi,
+        snapshot: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>[u8]&gt;,
+    ) -&gt; anyhow::Result&lt;()&gt;;
+
+    <span class="kw">async fn </span>wipe(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;_</span>&gt;,
+        module_instance_id: ModuleInstanceId,
+        executor: Executor&lt;DynGlobalClientContext&gt;,
+    ) -&gt; anyhow::Result&lt;()&gt;;
 }
 
-<span class="kw">impl</span>&lt;T&gt; IClientModule <span class="kw">for </span>T
+<span class="attr">#[apply(<span class="macro">async_trait_maybe_send!</span>)]
+</span><span class="kw">impl</span>&lt;T&gt; IClientModule <span class="kw">for </span>T
 <span class="kw">where
     </span>T: ClientModule,
 {
+    <span class="kw">fn </span>as_any(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>(<span class="macro">maybe_add_send_sync!</span>(<span class="kw">dyn </span>Any)) {
+        <span class="self">self
+    </span>}
+
     <span class="kw">fn </span>decoder(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Decoder {
         T::decoder()
     }
@@ -325,6 +554,14 @@
     <span class="kw">fn </span>context(<span class="kw-2">&amp;</span><span class="self">self</span>, instance: ModuleInstanceId) -&gt; DynContext {
         DynContext::from_typed(instance, &lt;T <span class="kw">as </span>ClientModule&gt;::context(<span class="self">self</span>))
     }
+
+    <span class="kw">async fn </span>handle_cli_command(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        client: <span class="kw-2">&amp;</span>Client,
+        args: <span class="kw-2">&amp;</span>[ffi::OsString],
+    ) -&gt; anyhow::Result&lt;serde_json::Value&gt; {
+        &lt;T <span class="kw">as </span>ClientModule&gt;::handle_cli_command(<span class="self">self</span>, client, args).<span class="kw">await
+    </span>}
 
     <span class="kw">fn </span>input_amount(<span class="kw-2">&amp;</span><span class="self">self</span>, input: <span class="kw-2">&amp;</span>DynInput) -&gt; TransactionItemAmount {
         &lt;T <span class="kw">as </span>ClientModule&gt;::input_amount(
@@ -345,6 +582,41 @@
                 .expect(<span class="string">&quot;Dispatched to correct module&quot;</span>),
         )
     }
+
+    <span class="kw">fn </span>supports_backup(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        &lt;T <span class="kw">as </span>ClientModule&gt;::supports_backup(<span class="self">self</span>)
+    }
+
+    <span class="kw">async fn </span>backup(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;_</span>&gt;,
+        executor: Executor&lt;DynGlobalClientContext&gt;,
+        api: DynFederationApi,
+        module_instance_id: ModuleInstanceId,
+    ) -&gt; anyhow::Result&lt;Vec&lt;u8&gt;&gt; {
+        &lt;T <span class="kw">as </span>ClientModule&gt;::backup(<span class="self">self</span>, dbtx, executor, api, module_instance_id).<span class="kw">await
+    </span>}
+
+    <span class="kw">async fn </span>restore(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        <span class="comment">// dbtx: &amp;mut ModuleDatabaseTransaction&lt;&#39;_&gt;,
+        </span>dbtx: <span class="kw-2">&amp;mut </span>DatabaseTransaction&lt;<span class="lifetime">&#39;_</span>&gt;,
+        module_instance_id: ModuleInstanceId,
+        executor: Executor&lt;DynGlobalClientContext&gt;,
+        api: DynFederationApi,
+        snapshot: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>[u8]&gt;,
+    ) -&gt; anyhow::Result&lt;()&gt; {
+        &lt;T <span class="kw">as </span>ClientModule&gt;::restore(<span class="self">self</span>, dbtx, module_instance_id, executor, api, snapshot).<span class="kw">await
+    </span>}
+
+    <span class="kw">async fn </span>wipe(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;_</span>&gt;,
+        module_instance_id: ModuleInstanceId,
+        executor: Executor&lt;DynGlobalClientContext&gt;,
+    ) -&gt; anyhow::Result&lt;()&gt; {
+        &lt;T <span class="kw">as </span>ClientModule&gt;::wipe(<span class="self">self</span>, dbtx, module_instance_id, executor).<span class="kw">await
+    </span>}
 }
 
 <span class="macro">dyn_newtype_define!</span>(
@@ -358,7 +630,8 @@
     }
 }
 
-<span class="kw">pub type </span>StateGenerator&lt;S&gt; = Box&lt;<span class="kw">dyn </span>Fn(TransactionId, u64) -&gt; Vec&lt;S&gt; + Send + Sync + <span class="lifetime">&#39;static</span>&gt;;
+<span class="kw">pub type </span>StateGenerator&lt;S&gt; =
+    Arc&lt;<span class="macro">maybe_add_send_sync!</span>(<span class="kw">dyn </span>Fn(TransactionId, u64) -&gt; Vec&lt;S&gt; + <span class="lifetime">&#39;static</span>)&gt;;
 
 <span class="doccomment">/// A client module that can be used as funding source and to generate arbitrary
 /// change outputs for unbalanced transactions.
@@ -383,13 +656,10 @@
     /// to create the requested input.
     </span><span class="kw">async fn </span>create_sufficient_input(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        dbtx: <span class="kw-2">&amp;mut </span>DatabaseTransaction&lt;<span class="lifetime">&#39;_</span>&gt;,
+        dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;_</span>&gt;,
+        operation_id: OperationId,
         min_amount: Amount,
-    ) -&gt; anyhow::Result&lt;(
-        Vec&lt;KeyPair&gt;,
-        &lt;<span class="self">Self</span>::Common <span class="kw">as </span>ModuleCommon&gt;::Input,
-        StateGenerator&lt;<span class="self">Self</span>::States&gt;,
-    )&gt;;
+    ) -&gt; anyhow::Result&lt;ClientInput&lt;&lt;<span class="self">Self</span>::Common <span class="kw">as </span>ModuleCommon&gt;::Input, <span class="self">Self</span>::States&gt;&gt;;
 
     <span class="doccomment">/// Creates an output of **exactly** `amount` that will pay into the
     /// holdings managed by the module.
@@ -402,12 +672,16 @@
     ///   of calling `create_change_output` and have to be injected later.
     </span><span class="kw">async fn </span>create_exact_output(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        dbtx: <span class="kw-2">&amp;mut </span>DatabaseTransaction&lt;<span class="lifetime">&#39;_</span>&gt;,
+        dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;_</span>&gt;,
+        operation_id: OperationId,
         amount: Amount,
-    ) -&gt; (
-        &lt;<span class="self">Self</span>::Common <span class="kw">as </span>ModuleCommon&gt;::Output,
-        StateGenerator&lt;<span class="self">Self</span>::States&gt;,
-    );
+    ) -&gt; ClientOutput&lt;&lt;<span class="self">Self</span>::Common <span class="kw">as </span>ModuleCommon&gt;::Output, <span class="self">Self</span>::States&gt;;
+
+    <span class="kw">async fn </span>await_primary_module_output_finalized(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        operation_id: OperationId,
+        out_point: OutPoint,
+    ) -&gt; anyhow::Result&lt;Amount&gt;;
 }
 
 <span class="doccomment">/// Type-erased version of [`PrimaryClientModule`]
@@ -417,19 +691,23 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         module_instance: ModuleInstanceId,
         dbtx: <span class="kw-2">&amp;mut </span>DatabaseTransaction&lt;<span class="lifetime">&#39;_</span>&gt;,
+        operation_id: OperationId,
         min_amount: Amount,
-    ) -&gt; anyhow::Result&lt;(
-        Vec&lt;KeyPair&gt;,
-        DynInput,
-        StateGenerator&lt;DynState&lt;DynGlobalClientContext&gt;&gt;,
-    )&gt;;
+    ) -&gt; anyhow::Result&lt;ClientInput&gt;;
 
     <span class="kw">async fn </span>create_exact_output(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         module_instance: ModuleInstanceId,
         dbtx: <span class="kw-2">&amp;mut </span>DatabaseTransaction&lt;<span class="lifetime">&#39;_</span>&gt;,
+        operation_id: OperationId,
         amount: Amount,
-    ) -&gt; (DynOutput, StateGenerator&lt;DynState&lt;DynGlobalClientContext&gt;&gt;);
+    ) -&gt; ClientOutput;
+
+    <span class="kw">async fn </span>await_primary_module_output_finalized(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        operation_id: OperationId,
+        out_point: OutPoint,
+    ) -&gt; anyhow::Result&lt;Amount&gt;;
 
     <span class="kw">fn </span>as_client(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>(<span class="macro">maybe_add_send_sync!</span>(<span class="kw">dyn </span>IClientModule + <span class="lifetime">&#39;static</span>));
 }
@@ -443,51 +721,47 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         module_instance: ModuleInstanceId,
         dbtx: <span class="kw-2">&amp;mut </span>DatabaseTransaction&lt;<span class="lifetime">&#39;_</span>&gt;,
+        operation_id: OperationId,
         min_amount: Amount,
-    ) -&gt; anyhow::Result&lt;(
-        Vec&lt;KeyPair&gt;,
-        DynInput,
-        StateGenerator&lt;DynState&lt;DynGlobalClientContext&gt;&gt;,
-    )&gt; {
-        <span class="kw">let </span>(keys, input, state_gen) = T::create_sufficient_input(<span class="self">self</span>, dbtx, min_amount).<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="kw">let </span>dyn_input = DynInput::from_typed(module_instance, input);
-        <span class="kw">let </span>dyn_states = state_gen_to_dyn(state_gen, module_instance);
-
-        <span class="prelude-val">Ok</span>((keys, dyn_input, dyn_states))
+    ) -&gt; anyhow::Result&lt;ClientInput&gt; {
+        <span class="prelude-val">Ok</span>(T::create_sufficient_input(
+            <span class="self">self</span>,
+            <span class="kw-2">&amp;mut </span>dbtx.with_module_prefix(module_instance),
+            operation_id,
+            min_amount,
+        )
+        .<span class="kw">await</span><span class="question-mark">?
+        </span>.into_dyn(module_instance))
     }
 
     <span class="kw">async fn </span>create_exact_output(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         module_instance: ModuleInstanceId,
         dbtx: <span class="kw-2">&amp;mut </span>DatabaseTransaction&lt;<span class="lifetime">&#39;_</span>&gt;,
+        operation_id: OperationId,
         amount: Amount,
-    ) -&gt; (DynOutput, StateGenerator&lt;DynState&lt;DynGlobalClientContext&gt;&gt;) {
-        <span class="kw">let </span>(output, state_gen) = T::create_exact_output(<span class="self">self</span>, dbtx, amount).<span class="kw">await</span>;
-        <span class="kw">let </span>dyn_output = DynOutput::from_typed(module_instance, output);
-        <span class="kw">let </span>dyn_states = state_gen_to_dyn(state_gen, module_instance);
-
-        (dyn_output, dyn_states)
+    ) -&gt; ClientOutput {
+        T::create_exact_output(
+            <span class="self">self</span>,
+            <span class="kw-2">&amp;mut </span>dbtx.with_module_prefix(module_instance),
+            operation_id,
+            amount,
+        )
+        .<span class="kw">await
+        </span>.into_dyn(module_instance)
     }
+
+    <span class="kw">async fn </span>await_primary_module_output_finalized(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        operation_id: OperationId,
+        out_point: OutPoint,
+    ) -&gt; anyhow::Result&lt;Amount&gt; {
+        T::await_primary_module_output_finalized(<span class="self">self</span>, operation_id, out_point).<span class="kw">await
+    </span>}
 
     <span class="kw">fn </span>as_client(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>(<span class="macro">maybe_add_send_sync!</span>(<span class="kw">dyn </span>IClientModule + <span class="lifetime">&#39;static</span>)) {
         <span class="self">self
     </span>}
-}
-
-<span class="kw">fn </span>state_gen_to_dyn&lt;S&gt;(
-    state_gen: StateGenerator&lt;S&gt;,
-    module_instance: ModuleInstanceId,
-) -&gt; StateGenerator&lt;DynState&lt;DynGlobalClientContext&gt;&gt;
-<span class="kw">where
-    </span>S: State&lt;GlobalContext = DynGlobalClientContext&gt;,
-{
-    Box::new(<span class="kw">move </span>|txid, index| {
-        <span class="kw">let </span>states = state_gen(txid, index);
-        states
-            .into_iter()
-            .map(|state| DynState::from_typed(module_instance, state))
-            .collect()
-    })
 }
 
 <span class="macro">dyn_newtype_define!</span>(

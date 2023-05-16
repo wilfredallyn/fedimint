@@ -390,6 +390,13 @@
 <a href="#390" id="390">390</a>
 <a href="#391" id="391">391</a>
 <a href="#392" id="392">392</a>
+<a href="#393" id="393">393</a>
+<a href="#394" id="394">394</a>
+<a href="#395" id="395">395</a>
+<a href="#396" id="396">396</a>
+<a href="#397" id="397">397</a>
+<a href="#398" id="398">398</a>
+<a href="#399" id="399">399</a>
 </pre><pre class="rust"><code><span class="attr">#![allow(where_clauses_object_safety)] </span><span class="comment">// https://github.com/dtolnay/async-trait/issues/228
 </span><span class="kw">extern crate </span><span class="self">self </span><span class="kw">as </span>fedimint_core;
 
@@ -402,7 +409,7 @@
 <span class="kw">use </span>bitcoin_hashes::hash_newtype;
 <span class="kw">use </span>bitcoin_hashes::sha256::Hash <span class="kw">as </span>Sha256;
 <span class="kw">pub use </span>bitcoin_hashes::Hash <span class="kw">as </span>BitcoinHash;
-<span class="kw">use </span>fedimint_core::config::ApiEndpoint;
+<span class="kw">use </span>fedimint_core::config::PeerUrl;
 <span class="kw">pub use </span>macro_rules_attribute::apply;
 <span class="kw">pub use </span>module::ServerModule;
 <span class="kw">use </span>serde::{Deserialize, Serialize};
@@ -414,8 +421,10 @@
 <span class="kw">use </span><span class="kw">crate</span>::encoding::{Decodable, DecodeError, Encodable};
 <span class="kw">use </span><span class="kw">crate</span>::module::registry::ModuleDecoderRegistry;
 
+<span class="attr">#[cfg(not(target_family = <span class="string">&quot;wasm&quot;</span>))]
+</span><span class="kw">pub mod </span>admin_client;
 <span class="kw">pub mod </span>api;
-<span class="kw">pub mod </span>bitcoin_rpc;
+<span class="kw">pub mod </span>backup;
 <span class="kw">pub mod </span>cancellable;
 <span class="kw">pub mod </span>config;
 <span class="kw">pub mod </span>core;
@@ -433,7 +442,9 @@
 <span class="kw">pub mod </span>tiered;
 <span class="kw">pub mod </span>tiered_multi;
 <span class="kw">pub mod </span>time;
+<span class="kw">pub mod </span>timing;
 <span class="kw">pub mod </span>transaction;
+<span class="kw">pub mod </span>txoproof;
 <span class="kw">pub mod </span>util;
 
 <span class="macro">hash_newtype!</span>(
@@ -523,7 +534,20 @@
 <span class="doccomment">/// `OutPoint` represents a globally unique output in a transaction
 ///
 /// Hence, a transaction ID and the output index is required.
-</span><span class="attr">#[derive(Debug, Clone, Copy, Eq, PartialEq, Hash, Deserialize, Serialize, Encodable, Decodable)]
+</span><span class="attr">#[derive(
+    Debug,
+    Clone,
+    Copy,
+    Eq,
+    PartialEq,
+    PartialOrd,
+    Ord,
+    Hash,
+    Deserialize,
+    Serialize,
+    Encodable,
+    Decodable,
+)]
 </span><span class="kw">pub struct </span>OutPoint {
     <span class="doccomment">/// The referenced transaction ID
     </span><span class="kw">pub </span>txid: TransactionId,
@@ -558,7 +582,7 @@
     }
 }
 
-<span class="kw">impl </span>NumPeers <span class="kw">for </span>Vec&lt;ApiEndpoint&gt; {
+<span class="kw">impl </span>NumPeers <span class="kw">for </span>Vec&lt;PeerUrl&gt; {
     <span class="kw">fn </span>total(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
         <span class="self">self</span>.len()
     }
@@ -771,16 +795,6 @@
 </span><span class="kw">pub enum </span>CoreError {
     <span class="attr">#[error(<span class="string">&quot;Mismatching outcome variant: expected {0}, got {1}&quot;</span>)]
     </span>MismatchingVariant(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str, <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str),
-    <span class="attr">#[error(<span class="string">&quot;Pending preimage decryption&quot;</span>)]
-    </span>PendingPreimage,
-}
-
-<span class="kw">impl </span>CoreError {
-    <span class="doccomment">/// Returns `true` if queried outpoint isn&#39;t ready yet but may become ready
-    /// later
-    </span><span class="kw">pub fn </span>is_retryable(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
-        <span class="macro">matches!</span>(<span class="self">self</span>, CoreError::PendingPreimage)
-    }
 }
 </code></pre></div>
 </section></main><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="fedimint_core" data-themes="" data-resource-suffix="" data-rustdoc-version="1.69.0-nightly (f3126500f 2023-02-02)" data-search-js="search-98d53477a794af0b.js" data-settings-js="settings-f0c5c39777a9a2f6.js" data-settings-css="settings-0bcba95ff279c1db.css" ></div></body></html>

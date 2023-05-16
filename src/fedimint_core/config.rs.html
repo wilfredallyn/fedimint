@@ -778,10 +778,6 @@
 <a href="#778" id="778">778</a>
 <a href="#779" id="779">779</a>
 <a href="#780" id="780">780</a>
-<a href="#781" id="781">781</a>
-<a href="#782" id="782">782</a>
-<a href="#783" id="783">783</a>
-<a href="#784" id="784">784</a>
 </pre><pre class="rust"><code><span class="kw">use </span>std::collections::BTreeMap;
 <span class="kw">use </span>std::fmt::{Debug, Display};
 <span class="kw">use </span>std::hash::Hash;
@@ -795,21 +791,24 @@
 <span class="kw">use </span>bitcoin_hashes::sha256::{Hash <span class="kw">as </span>Sha256, HashEngine};
 <span class="kw">use </span>bitcoin_hashes::{hex, sha256};
 <span class="kw">use </span>fedimint_core::cancellable::Cancelled;
-<span class="kw">use </span>fedimint_core::core::{
-    ModuleInstanceId, ModuleKind, LEGACY_HARDCODED_INSTANCE_ID_LN,
-    LEGACY_HARDCODED_INSTANCE_ID_MINT, LEGACY_HARDCODED_INSTANCE_ID_WALLET,
-};
+<span class="kw">use </span>fedimint_core::core::{ModuleInstanceId, ModuleKind};
 <span class="kw">use </span>fedimint_core::encoding::Encodable;
+<span class="kw">use </span>fedimint_core::epoch::SerdeSignature;
+<span class="kw">use </span>fedimint_core::module::registry::ModuleRegistry;
 <span class="kw">use </span>fedimint_core::{BitcoinHash, ModuleDecoderRegistry};
 <span class="kw">use </span>serde::de::DeserializeOwned;
+<span class="kw">use </span>serde::ser::SerializeMap;
 <span class="kw">use </span>serde::{Deserialize, Deserializer, Serialize, Serializer};
 <span class="kw">use </span>tbs::{serde_impl, Scalar};
 <span class="kw">use </span>thiserror::Error;
 <span class="kw">use </span>threshold_crypto::group::{Curve, Group, GroupEncoding};
-<span class="kw">use </span>threshold_crypto::{G1Projective, G2Projective, Signature};
+<span class="kw">use </span>threshold_crypto::{G1Projective, G2Projective};
 <span class="kw">use </span>url::Url;
 
-<span class="kw">use </span><span class="kw">crate</span>::module::{DynCommonModuleGen, DynServerModuleGen, IDynCommonModuleGen};
+<span class="kw">use </span><span class="kw">crate</span>::encoding::Decodable;
+<span class="kw">use </span><span class="kw">crate</span>::module::{
+    DynCommonModuleGen, DynServerModuleGen, IDynCommonModuleGen, ModuleConsensusVersion,
+};
 <span class="kw">use </span><span class="kw">crate</span>::task::{MaybeSend, MaybeSync};
 <span class="kw">use crate</span>::{maybe_add_send_sync, PeerId};
 
@@ -877,11 +876,10 @@
 }
 
 <span class="attr">#[derive(Debug, Clone, Eq, PartialEq, Hash, Serialize, Deserialize, Encodable)]
-</span><span class="kw">pub struct </span>ApiEndpoint {
-    <span class="doccomment">/// The peer&#39;s API websocket network address and port (e.g.
-    /// `ws://10.42.0.10:5000`)
+</span><span class="kw">pub struct </span>PeerUrl {
+    <span class="doccomment">/// The peer&#39;s public URL (e.g. `wss://fedimint-server-1:5000`)
     </span><span class="kw">pub </span>url: Url,
-    <span class="doccomment">/// human-readable name
+    <span class="doccomment">/// The peer&#39;s name
     </span><span class="kw">pub </span>name: String,
 }
 
@@ -893,26 +891,23 @@
     <span class="comment">// Stable and unique id and threshold pubkey of the federation for authenticating configs
     </span><span class="kw">pub </span>federation_id: FederationId,
     <span class="doccomment">/// API endpoints for each federation member
-    </span><span class="kw">pub </span>api_endpoints: BTreeMap&lt;PeerId, ApiEndpoint&gt;,
+    </span><span class="kw">pub </span>api_endpoints: BTreeMap&lt;PeerId, PeerUrl&gt;,
     <span class="doccomment">/// Threshold pubkey for authenticating epoch history
     </span><span class="kw">pub </span>epoch_pk: threshold_crypto::PublicKey,
     <span class="doccomment">/// Configs from other client modules
-    </span><span class="attr">#[encodable_ignore]
     </span><span class="kw">pub </span>modules: BTreeMap&lt;ModuleInstanceId, ClientModuleConfig&gt;,
     <span class="comment">// TODO: make it a String -&gt; serde_json::Value map?
     </span><span class="doccomment">/// Additional config the federation wants to transmit to the clients
     </span><span class="kw">pub </span>meta: BTreeMap&lt;String, String&gt;,
 }
 
-<span class="doccomment">/// The API response for configuration requests
+<span class="doccomment">/// The API response for client config requests, signed by the Federation
 </span><span class="attr">#[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
-</span><span class="kw">pub struct </span>ConfigResponse {
+</span><span class="kw">pub struct </span>ClientConfigResponse {
     <span class="doccomment">/// The client config
-    </span><span class="kw">pub </span>client: ClientConfig,
-    <span class="doccomment">/// Hash of the consensus config (for validating against peers)
-    </span><span class="kw">pub </span>consensus_hash: sha256::Hash,
-    <span class="doccomment">/// Auth key signature of the client config hash if it exists
-    </span><span class="kw">pub </span>client_hash_signature: <span class="prelude-ty">Option</span>&lt;Signature&gt;,
+    </span><span class="kw">pub </span>client_config: ClientConfig,
+    <span class="doccomment">/// Auth key signature over the `client_config`
+    </span><span class="kw">pub </span>signature: SerdeSignature,
 }
 
 <span class="doccomment">/// The federation id is a copy of the authentication threshold public key of
@@ -920,7 +915,7 @@
 ///
 /// Stable id so long as guardians membership does not change
 /// Unique id so long as guardians do not all collude
-</span><span class="attr">#[derive(Debug, Serialize, Deserialize, Clone, Eq, Hash, PartialEq, Encodable)]
+</span><span class="attr">#[derive(Debug, Copy, Serialize, Deserialize, Clone, Eq, Hash, PartialEq, Encodable, Decodable)]
 </span><span class="kw">pub struct </span>FederationId(<span class="kw">pub </span>threshold_crypto::PublicKey);
 
 <span class="kw">impl </span>Display <span class="kw">for </span>FederationId {
@@ -957,40 +952,30 @@
 
 <span class="kw">impl </span>ClientConfig {
     <span class="doccomment">/// Returns the consensus hash for a given client config
-    </span><span class="kw">pub fn </span>consensus_hash(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        module_config_gens: <span class="kw-2">&amp;</span>CommonModuleGenRegistry,
-    ) -&gt; anyhow::Result&lt;sha256::Hash&gt; {
-        <span class="kw">let </span>modules: BTreeMap&lt;ModuleInstanceId, sha256::Hash&gt; = <span class="self">self
-            </span>.modules
-            .iter()
-            .map(|(module_instance_id, v)| {
-                <span class="kw">let </span>kind = v.kind();
-                <span class="prelude-val">Ok</span>((
-                    <span class="kw-2">*</span>module_instance_id,
-                    module_config_gens
-                        .get(kind)
-                        .map(|gen| gen.hash_client_module(v.value().clone()))
-                        .unwrap_or(<span class="prelude-val">Ok</span>(v.consensus_hash))<span class="question-mark">?</span>,
-                ))
-            })
-            .collect::&lt;anyhow::Result&lt;<span class="kw">_</span>&gt;&gt;()<span class="question-mark">?</span>;
-
+    </span><span class="kw">pub fn </span>consensus_hash(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; sha256::Hash {
         <span class="kw">let </span><span class="kw-2">mut </span>engine = HashEngine::default();
-        <span class="self">self</span>.consensus_encode(<span class="kw-2">&amp;mut </span>engine)<span class="question-mark">?</span>;
-        <span class="kw">for </span>(k, v) <span class="kw">in </span>modules.iter() {
-            k.consensus_encode(<span class="kw-2">&amp;mut </span>engine)<span class="question-mark">?</span>;
-            v.consensus_encode(<span class="kw-2">&amp;mut </span>engine)<span class="question-mark">?</span>;
-        }
-
-        <span class="prelude-val">Ok</span>(sha256::Hash::from_engine(engine))
+        <span class="self">self</span>.consensus_encode(<span class="kw-2">&amp;mut </span>engine)
+            .expect(<span class="string">&quot;Consensus hashing should never fail&quot;</span>);
+        sha256::Hash::from_engine(engine)
     }
 
-    <span class="kw">pub fn </span>get_module&lt;T: DeserializeOwned&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, id: ModuleInstanceId) -&gt; anyhow::Result&lt;T&gt; {
+    <span class="kw">pub fn </span>get_module&lt;T: Decodable&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, id: ModuleInstanceId) -&gt; anyhow::Result&lt;T&gt; {
         <span class="kw">if let </span><span class="prelude-val">Some</span>(client_cfg) = <span class="self">self</span>.modules.get(<span class="kw-2">&amp;</span>id) {
-            <span class="prelude-val">Ok</span>(serde_json::from_value(client_cfg.value().clone())<span class="question-mark">?</span>)
+            <span class="prelude-val">Ok</span>(Decodable::consensus_decode(
+                <span class="kw-2">&amp;mut &amp;</span>client_cfg.config[..],
+                <span class="kw-2">&amp;</span>Default::default(),
+            )<span class="question-mark">?</span>)
         } <span class="kw">else </span>{
-            <span class="prelude-val">Err</span>(<span class="macro">format_err!</span>(<span class="string">&quot;Client config for module id: {id} not found&quot;</span>))
+            <span class="prelude-val">Err</span>(<span class="macro">format_err!</span>(<span class="string">&quot;Client config for module id {id} not found&quot;</span>))
+        }
+    }
+
+    <span class="comment">// TODO: rename this and one above
+    </span><span class="kw">pub fn </span>get_module_cfg(<span class="kw-2">&amp;</span><span class="self">self</span>, id: ModuleInstanceId) -&gt; anyhow::Result&lt;ClientModuleConfig&gt; {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(client_cfg) = <span class="self">self</span>.modules.get(<span class="kw-2">&amp;</span>id) {
+            <span class="prelude-val">Ok</span>(client_cfg.clone())
+        } <span class="kw">else </span>{
+            <span class="prelude-val">Err</span>(<span class="macro">format_err!</span>(<span class="string">&quot;Client config for module id {id} not found&quot;</span>))
         }
     }
 
@@ -1001,7 +986,7 @@
     /// mint, wallet, ln module code in the client, this is useful, but
     /// please write any new code that avoids assumptions about available
     /// modules.
-    </span><span class="kw">pub fn </span>get_first_module_by_kind&lt;T: DeserializeOwned&gt;(
+    </span><span class="kw">pub fn </span>get_first_module_by_kind&lt;T: Decodable&gt;(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         kind: <span class="kw">impl </span>Into&lt;ModuleKind&gt;,
     ) -&gt; anyhow::Result&lt;(ModuleInstanceId, T)&gt; {
@@ -1009,8 +994,28 @@
         <span class="kw">let </span><span class="prelude-val">Some</span>((id, module_cfg)) = <span class="self">self</span>.modules.iter().find(|(<span class="kw">_</span>, v)| v.is_kind(<span class="kw-2">&amp;</span>kind)) <span class="kw">else </span>{
             <span class="macro">anyhow::bail!</span>(<span class="string">&quot;Module kind {kind} not found&quot;</span>)
         };
+        <span class="prelude-val">Ok</span>((
+            <span class="kw-2">*</span>id,
+            T::consensus_decode(<span class="kw-2">&amp;mut &amp;</span>module_cfg.config[..], <span class="kw-2">&amp;</span>Default::default())<span class="question-mark">?</span>,
+        ))
+    }
 
-        <span class="prelude-val">Ok</span>((<span class="kw-2">*</span>id, serde_json::from_value(module_cfg.value().clone())<span class="question-mark">?</span>))
+    <span class="comment">// TODO: rename this and above
+    </span><span class="kw">pub fn </span>get_first_module_by_kind_cfg(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        kind: <span class="kw">impl </span>Into&lt;ModuleKind&gt;,
+    ) -&gt; anyhow::Result&lt;(ModuleInstanceId, ClientModuleConfig)&gt; {
+        <span class="kw">let </span>kind: ModuleKind = kind.into();
+        <span class="self">self</span>.modules
+            .iter()
+            .find(|(<span class="kw">_</span>, v)| v.is_kind(<span class="kw-2">&amp;</span>kind))
+            .map(|(id, v)| (<span class="kw-2">*</span>id, v.clone()))
+            .ok_or_else(|| <span class="macro">anyhow::format_err!</span>(<span class="string">&quot;Module kind {kind} not found&quot;</span>))
+    }
+
+    <span class="doccomment">/// Federation name from config metadata (if set)
+    </span><span class="kw">pub fn </span>federation_name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt; {
+        <span class="self">self</span>.meta.get(META_FEDERATION_NAME_KEY).map(|x| <span class="kw-2">&amp;**</span>x)
     }
 }
 
@@ -1025,12 +1030,12 @@
 
 <span class="doccomment">/// Module **generation** (so passed to dkg, not to the module itself) config
 /// parameters
-</span><span class="attr">#[derive(Debug, Clone, Default)]
-</span><span class="kw">pub struct </span>ConfigGenParams(serde_json::Value);
+</span><span class="attr">#[derive(Debug, Clone, Default, Eq, PartialEq)]
+</span><span class="kw">pub struct </span>ConfigGenModuleParams(serde_json::Value);
 
 <span class="kw">pub type </span>ServerModuleGenRegistry = ModuleGenRegistry&lt;DynServerModuleGen&gt;;
 
-<span class="kw">impl </span>ConfigGenParams {
+<span class="kw">impl </span>ConfigGenModuleParams {
     <span class="doccomment">/// Null value, used as a config gen parameters for module gens that don&#39;t
     /// need any parameters
     </span><span class="kw">pub fn </span>null() -&gt; <span class="self">Self </span>{
@@ -1050,11 +1055,43 @@
 <span class="kw">pub type </span>CommonModuleGenRegistry = ModuleGenRegistry&lt;DynCommonModuleGen&gt;;
 
 <span class="doccomment">/// Configs for each module&#39;s DKG
-///
-/// Note: in the future, we should make this one a
-/// `ModuleRegistry&lt;ConfigGenParams&gt;`, as each module **instance** will need a
-/// distinct config for dkg.
-</span><span class="kw">pub type </span>ServerModuleGenParamsRegistry = ModuleGenRegistry&lt;ConfigGenParams&gt;;
+</span><span class="kw">pub type </span>ServerModuleGenParamsRegistry = ModuleRegistry&lt;ConfigGenModuleParams&gt;;
+
+<span class="kw">impl </span>Eq <span class="kw">for </span>ServerModuleGenParamsRegistry {}
+
+<span class="kw">impl </span>PartialEq <span class="kw">for </span>ServerModuleGenParamsRegistry {
+    <span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; bool {
+        <span class="self">self</span>.iter_modules().eq(other.iter_modules())
+    }
+}
+
+<span class="kw">impl </span>Serialize <span class="kw">for </span>ServerModuleGenParamsRegistry {
+    <span class="kw">fn </span>serialize&lt;S: Serializer&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, serializer: S) -&gt; <span class="prelude-ty">Result</span>&lt;S::Ok, S::Error&gt; {
+        <span class="kw">let </span>modules: Vec&lt;<span class="kw">_</span>&gt; = <span class="self">self</span>.iter_modules().collect();
+        <span class="kw">let </span><span class="kw-2">mut </span>serializer = serializer.serialize_map(<span class="prelude-val">Some</span>(modules.len()))<span class="question-mark">?</span>;
+        <span class="kw">for </span>(id, kind, params) <span class="kw">in </span>modules.into_iter() {
+            serializer.serialize_key(<span class="kw-2">&amp;</span>id)<span class="question-mark">?</span>;
+            serializer.serialize_value(<span class="kw-2">&amp;</span>(kind.clone(), params.<span class="number">0</span>.clone()))<span class="question-mark">?</span>;
+        }
+        serializer.end()
+    }
+}
+
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>&gt; Deserialize&lt;<span class="lifetime">&#39;de</span>&gt; <span class="kw">for </span>ServerModuleGenParamsRegistry {
+    <span class="kw">fn </span>deserialize&lt;D&gt;(deserializer: D) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, D::Error&gt;
+    <span class="kw">where
+        </span>D: Deserializer&lt;<span class="lifetime">&#39;de</span>&gt;,
+    {
+        <span class="kw">let </span>json: BTreeMap&lt;ModuleInstanceId, (ModuleKind, serde_json::Value)&gt; =
+            Deserialize::deserialize(deserializer)<span class="question-mark">?</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>params = BTreeMap::new();
+
+        <span class="kw">for </span>(id, (kind, value)) <span class="kw">in </span>json {
+            params.insert(id, (kind, ConfigGenModuleParams(value)));
+        }
+        <span class="prelude-val">Ok</span>(ModuleRegistry::from(params))
+    }
+}
 
 <span class="kw">impl</span>&lt;M&gt; From&lt;Vec&lt;M&gt;&gt; <span class="kw">for </span>ModuleGenRegistry&lt;M&gt;
 <span class="kw">where
@@ -1098,60 +1135,20 @@
     <span class="kw">pub fn </span>get(<span class="kw-2">&amp;</span><span class="self">self</span>, k: <span class="kw-2">&amp;</span>ModuleKind) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>M&gt; {
         <span class="self">self</span>.<span class="number">0</span>.get(k)
     }
-
-    <span class="doccomment">/// Return legacy initialization order. See [`LegacyInitOrderIter`].
-    </span><span class="kw">pub fn </span>legacy_init_order_iter(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; LegacyInitOrderIter&lt;M&gt;
-    <span class="kw">where
-        </span>M: Clone,
-    {
-        <span class="kw">for </span>hardcoded_module <span class="kw">in </span>[<span class="string">&quot;mint&quot;</span>, <span class="string">&quot;ln&quot;</span>, <span class="string">&quot;wallet&quot;</span>] {
-            <span class="kw">if </span>!<span class="self">self
-                </span>.<span class="number">0
-                </span>.contains_key(<span class="kw-2">&amp;</span>ModuleKind::from_static_str(hardcoded_module))
-            {
-                <span class="macro">panic!</span>(<span class="string">&quot;Missing {hardcoded_module} module&quot;</span>);
-            }
-        }
-
-        LegacyInitOrderIter {
-            next_id: <span class="number">0</span>,
-            rest: <span class="self">self</span>.<span class="number">0</span>.clone(),
-        }
-    }
 }
 
-<span class="kw">impl </span>ModuleGenRegistry&lt;ConfigGenParams&gt; {
-    <span class="kw">pub fn </span>attach_config_gen_params&lt;T&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, kind: ModuleKind, gen: T) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self
-    </span><span class="kw">where
-        </span>T: ModuleGenParams,
-    {
-        <span class="kw">if </span><span class="self">self
-            </span>.<span class="number">0
-            </span>.insert(
-                kind.clone(),
-                ConfigGenParams::from_typed(gen).expect(<span class="string">&quot;Invalid config gen params for {kind}&quot;</span>),
-            )
-            .is_some()
-        {
-            <span class="macro">panic!</span>(<span class="string">&quot;Can&#39;t insert module of same kind twice: {kind}&quot;</span>);
-        }
-        <span class="self">self
-    </span>}
-
-    <span class="kw">pub fn </span>with_config_gen_params&lt;T&gt;(<span class="kw-2">mut </span><span class="self">self</span>, kind: ModuleKind, gen: T) -&gt; <span class="self">Self
-    </span><span class="kw">where
-        </span>T: ModuleGenParams,
-    {
-        <span class="kw">if </span><span class="self">self
-            </span>.<span class="number">0
-            </span>.insert(
-                kind.clone(),
-                ConfigGenParams::from_typed(gen).expect(<span class="string">&quot;Invalid config gen params for {kind}&quot;</span>),
-            )
-            .is_some()
-        {
-            <span class="macro">panic!</span>(<span class="string">&quot;Can&#39;t insert module of same kind twice: {kind}&quot;</span>);
-        }
+<span class="kw">impl </span>ModuleRegistry&lt;ConfigGenModuleParams&gt; {
+    <span class="kw">pub fn </span>attach_config_gen_params&lt;T: ModuleGenParams&gt;(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        id: ModuleInstanceId,
+        kind: ModuleKind,
+        gen: T,
+    ) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+        <span class="self">self</span>.register_module(
+            id,
+            kind,
+            ConfigGenModuleParams::from_typed(gen).expect(<span class="string">&quot;Invalid config gen params for {kind}&quot;</span>),
+        );
         <span class="self">self
     </span>}
 }
@@ -1181,62 +1178,28 @@
                 <span class="macro">anyhow::bail!</span>(<span class="string">&quot;Detected configuration for unsupported module kind: {kind}&quot;</span>)
             };
 
-            modules.insert(id, init.as_ref().decoder());
+            modules.insert(id, (kind.clone(), init.as_ref().decoder()));
         }
-        <span class="prelude-val">Ok</span>(ModuleDecoderRegistry::from_iter(modules))
+        <span class="prelude-val">Ok</span>(ModuleDecoderRegistry::from(modules))
     }
 }
 
-<span class="doccomment">/// Iterate over module generators in a legacy, hardcoded order: ln, mint,
-/// wallet, rest... Returning each `kind` exactly once, so that
-/// `LEGACY_HARDCODED_` constants correspond to correct module kind.
-///
-/// We would like to get rid of it eventually, but old client and test code
-/// assumes it in multiple places, and it will take work to fix it, while we
-/// want new code to not assume this 1:1 relationship.
-</span><span class="kw">pub struct </span>LegacyInitOrderIter&lt;M&gt; {
-    <span class="doccomment">/// Counter of what module id will this returned value get assigned
-    </span>next_id: ModuleInstanceId,
-    rest: BTreeMap&lt;ModuleKind, M&gt;,
-}
-
-<span class="kw">impl</span>&lt;M&gt; Iterator <span class="kw">for </span>LegacyInitOrderIter&lt;M&gt; {
-    <span class="kw">type </span>Item = (ModuleKind, M);
-
-    <span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt; {
-        <span class="kw">let </span>ret = <span class="kw">match </span><span class="self">self</span>.next_id {
-            LEGACY_HARDCODED_INSTANCE_ID_LN =&gt; {
-                <span class="kw">let </span>kind = ModuleKind::from_static_str(<span class="string">&quot;ln&quot;</span>);
-                <span class="prelude-val">Some</span>((
-                    kind.clone(),
-                    <span class="self">self</span>.rest.remove(<span class="kw-2">&amp;</span>kind).expect(<span class="string">&quot;checked in constructor&quot;</span>),
-                ))
-            }
-            LEGACY_HARDCODED_INSTANCE_ID_MINT =&gt; {
-                <span class="kw">let </span>kind = ModuleKind::from_static_str(<span class="string">&quot;mint&quot;</span>);
-                <span class="prelude-val">Some</span>((
-                    kind.clone(),
-                    <span class="self">self</span>.rest.remove(<span class="kw-2">&amp;</span>kind).expect(<span class="string">&quot;checked in constructor&quot;</span>),
-                ))
-            }
-            LEGACY_HARDCODED_INSTANCE_ID_WALLET =&gt; {
-                <span class="kw">let </span>kind = ModuleKind::from_static_str(<span class="string">&quot;wallet&quot;</span>);
-                <span class="prelude-val">Some</span>((
-                    kind.clone(),
-                    <span class="self">self</span>.rest.remove(<span class="kw-2">&amp;</span>kind).expect(<span class="string">&quot;checked in constructor&quot;</span>),
-                ))
-            }
-            <span class="kw">_ </span>=&gt; <span class="self">self</span>.rest.pop_first(),
-        };
-
-        <span class="kw">if </span>ret.is_some() {
-            <span class="self">self</span>.next_id += <span class="number">1</span>;
-        }
-        ret
-    }
-}
+<span class="doccomment">/// Empty struct for if there are no params
+</span><span class="attr">#[derive(Debug, Default, Clone, Serialize, Deserialize)]
+</span><span class="kw">pub struct </span>EmptyGenParams;
 
 <span class="kw">pub trait </span>ModuleGenParams: serde::Serialize + serde::de::DeserializeOwned {
+    <span class="doccomment">/// Locally configurable parameters for config generation
+    </span><span class="kw">type </span>Local: DeserializeOwned + Serialize;
+    <span class="doccomment">/// Consensus parameters for config generation
+    </span><span class="kw">type </span>Consensus: DeserializeOwned + Serialize;
+
+    <span class="doccomment">/// Assemble from the distinct parts
+    </span><span class="kw">fn </span>from_parts(local: <span class="self">Self</span>::Local, consensus: <span class="self">Self</span>::Consensus) -&gt; <span class="self">Self</span>;
+
+    <span class="doccomment">/// Split the config into its distinct parts
+    </span><span class="kw">fn </span>to_parts(<span class="self">self</span>) -&gt; (<span class="self">Self</span>::Local, <span class="self">Self</span>::Consensus);
+
     <span class="kw">fn </span>from_json&lt;P: ModuleGenParams&gt;(value: serde_json::Value) -&gt; anyhow::Result&lt;<span class="self">Self</span>&gt; {
         serde_json::from_value(value)
             .map_err(|e| anyhow::Error::new(e).context(<span class="string">&quot;Invalid module gen params&quot;</span>))
@@ -1247,13 +1210,12 @@
     }
 }
 
-<span class="doccomment">/// Response from the API for this particular module
-</span><span class="attr">#[derive(Debug, Clone, Serialize, Deserialize)]
-</span><span class="kw">pub struct </span>ModuleConfigResponse {
-    <span class="doccomment">/// The client configuration
-    </span><span class="kw">pub </span>client: ClientModuleConfig,
-    <span class="doccomment">/// Hash of the consensus configuration
-    </span><span class="kw">pub </span>consensus_hash: sha256::Hash,
+<span class="attr">#[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize, Encodable, Decodable)]
+</span><span class="kw">pub struct </span>ServerModuleConsensusConfig {
+    <span class="kw">pub </span>kind: ModuleKind,
+    <span class="kw">pub </span>version: ModuleConsensusVersion,
+    <span class="attr">#[serde(with = <span class="string">&quot;::hex::serde&quot;</span>)]
+    </span><span class="kw">pub </span>config: Vec&lt;u8&gt;,
 }
 
 <span class="doccomment">/// Config for the client-side of a particular Federation module
@@ -1261,22 +1223,24 @@
 /// Since modules are (tbd.) pluggable into Federations,
 /// it needs to be some form of an abstract type-erased-like
 /// value.
-</span><span class="attr">#[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
+</span><span class="attr">#[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize, Encodable, Decodable)]
 </span><span class="kw">pub struct </span>ClientModuleConfig {
-    kind: ModuleKind,
-    consensus_hash: sha256::Hash,
-    config: serde_json::Value,
+    <span class="kw">pub </span>kind: ModuleKind,
+    <span class="kw">pub </span>version: ModuleConsensusVersion,
+    <span class="attr">#[serde(with = <span class="string">&quot;::hex::serde&quot;</span>)]
+    </span><span class="kw">pub </span>config: Vec&lt;u8&gt;,
 }
 
 <span class="kw">impl </span>ClientModuleConfig {
     <span class="kw">pub fn </span>from_typed&lt;T: Encodable + Serialize&gt;(
         kind: ModuleKind,
+        version: ModuleConsensusVersion,
         value: <span class="kw-2">&amp;</span>T,
     ) -&gt; anyhow::Result&lt;<span class="self">Self</span>&gt; {
         <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
             kind,
-            consensus_hash: value.consensus_hash()<span class="question-mark">?</span>,
-            config: serde_json::to_value(value)<span class="question-mark">?</span>,
+            version,
+            config: value.consensus_encode_to_vec()<span class="question-mark">?</span>,
         })
     }
 
@@ -1288,14 +1252,17 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>.kind
     }
 
-    <span class="kw">pub fn </span>value(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>serde_json::Value {
+    <span class="kw">pub fn </span>value(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[u8] {
         <span class="kw-2">&amp;</span><span class="self">self</span>.config
     }
 }
 
 <span class="kw">impl </span>ClientModuleConfig {
     <span class="kw">pub fn </span>cast&lt;T: TypedClientModuleConfig&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; anyhow::Result&lt;T&gt; {
-        <span class="prelude-val">Ok</span>(serde_json::from_value(<span class="self">self</span>.config.clone())<span class="question-mark">?</span>)
+        <span class="prelude-val">Ok</span>(T::consensus_decode(
+            <span class="kw-2">&amp;mut &amp;</span><span class="self">self</span>.config[..],
+            <span class="kw-2">&amp;</span>Default::default(),
+        )<span class="question-mark">?</span>)
     }
 }
 
@@ -1306,22 +1273,30 @@
 </span><span class="kw">pub struct </span>ServerModuleConfig {
     <span class="kw">pub </span>local: JsonWithKind,
     <span class="kw">pub </span>private: JsonWithKind,
-    <span class="kw">pub </span>consensus: JsonWithKind,
+    <span class="kw">pub </span>consensus: ServerModuleConsensusConfig,
+    <span class="kw">pub </span>consensus_json: JsonWithKind,
 }
 
 <span class="kw">impl </span>ServerModuleConfig {
-    <span class="kw">pub fn </span>from(local: JsonWithKind, private: JsonWithKind, consensus: JsonWithKind) -&gt; <span class="self">Self </span>{
+    <span class="kw">pub fn </span>from(
+        local: JsonWithKind,
+        private: JsonWithKind,
+        consensus: ServerModuleConsensusConfig,
+        consensus_json: JsonWithKind,
+    ) -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
             local,
             private,
             consensus,
+            consensus_json,
         }
     }
 
     <span class="kw">pub fn </span>to_typed&lt;T: TypedServerModuleConfig&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; anyhow::Result&lt;T&gt; {
         <span class="kw">let </span>local = serde_json::from_value(<span class="self">self</span>.local.value().clone())<span class="question-mark">?</span>;
         <span class="kw">let </span>private = serde_json::from_value(<span class="self">self</span>.private.value().clone())<span class="question-mark">?</span>;
-        <span class="kw">let </span>consensus = serde_json::from_value(<span class="self">self</span>.consensus.value().clone())<span class="question-mark">?</span>;
+        <span class="kw">let </span>consensus =
+            &lt;T::Consensus&gt;::consensus_decode(<span class="kw-2">&amp;mut &amp;</span><span class="self">self</span>.consensus.config[..], <span class="kw-2">&amp;</span>Default::default())<span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(TypedServerModuleConfig::from_parts(
             local, private, consensus,
@@ -1330,12 +1305,22 @@
 }
 
 <span class="doccomment">/// Consensus-critical part of a server side module config
-</span><span class="kw">pub trait </span>TypedServerModuleConsensusConfig: DeserializeOwned + Serialize + Encodable {
-    <span class="doccomment">/// Derive client side config for this module (type-erased)
-    </span><span class="kw">fn </span>to_client_config(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ClientModuleConfig;
+</span><span class="kw">pub trait </span>TypedServerModuleConsensusConfig:
+    DeserializeOwned + Serialize + Encodable + Decodable
+{
+    <span class="kw">fn </span>kind(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ModuleKind;
+
+    <span class="kw">fn </span>version(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ModuleConsensusVersion;
+
+    <span class="kw">fn </span>from_erased(erased: <span class="kw-2">&amp;</span>ServerModuleConsensusConfig) -&gt; anyhow::Result&lt;<span class="self">Self</span>&gt; {
+        <span class="prelude-val">Ok</span>(<span class="self">Self</span>::consensus_decode(
+            <span class="kw-2">&amp;mut &amp;</span>erased.config[..],
+            <span class="kw-2">&amp;</span>Default::default(),
+        )<span class="question-mark">?</span>)
+    }
 }
 
-<span class="doccomment">/// Module (server side) config
+<span class="doccomment">/// Module (server side) config, typed
 </span><span class="kw">pub trait </span>TypedServerModuleConfig: DeserializeOwned + Serialize {
     <span class="doccomment">/// Local non-consensus, not security-sensitive settings
     </span><span class="kw">type </span>Local: DeserializeOwned + Serialize;
@@ -1364,25 +1349,32 @@
                 kind.clone(),
                 serde_json::to_value(private).expect(<span class="string">&quot;serialization can&#39;t fail&quot;</span>),
             ),
-            consensus: JsonWithKind::new(
+            consensus: ServerModuleConsensusConfig {
+                kind: consensus.kind(),
+                version: consensus.version(),
+                config: consensus
+                    .consensus_encode_to_vec()
+                    .expect(<span class="string">&quot;serialization can&#39;t fail&quot;</span>),
+            },
+            consensus_json: JsonWithKind::new(
                 kind,
                 serde_json::to_value(consensus).expect(<span class="string">&quot;serialization can&#39;t fail&quot;</span>),
             ),
         }
     }
-
-    <span class="doccomment">/// Validate the config
-    </span><span class="kw">fn </span>validate_config(<span class="kw-2">&amp;</span><span class="self">self</span>, identity: <span class="kw-2">&amp;</span>PeerId) -&gt; anyhow::Result&lt;()&gt;;
 }
 
 <span class="doccomment">/// Typed client side module config
 </span><span class="kw">pub trait </span>TypedClientModuleConfig:
-    DeserializeOwned + Serialize + Encodable + MaybeSend + MaybeSync
+    DeserializeOwned + Serialize + Decodable + Encodable + MaybeSend + MaybeSync
 {
     <span class="kw">fn </span>kind(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ModuleKind;
 
+    <span class="kw">fn </span>version(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ModuleConsensusVersion;
+
     <span class="kw">fn </span>to_erased(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ClientModuleConfig {
-        ClientModuleConfig::from_typed(<span class="self">self</span>.kind(), <span class="self">self</span>).expect(<span class="string">&quot;serialization can&#39;t fail&quot;</span>)
+        ClientModuleConfig::from_typed(<span class="self">self</span>.kind(), <span class="self">self</span>.version(), <span class="self">self</span>)
+            .expect(<span class="string">&quot;serialization can&#39;t fail&quot;</span>)
     }
 }
 
@@ -1391,7 +1383,7 @@
 </span><span class="attr">#[derive(Serialize, Deserialize, Debug, Clone)]
 </span><span class="kw">pub enum </span>DkgPeerMsg {
     PublicKey(secp256k1::PublicKey),
-    DistributedGen((String, SupportedDkgMessage)),
+    DistributedGen(SupportedDkgMessage),
     <span class="comment">// Dkg completed on our side
     </span>Done,
 }
