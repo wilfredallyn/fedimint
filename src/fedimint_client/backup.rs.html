@@ -427,6 +427,13 @@
 <a href="#427" id="427">427</a>
 <a href="#428" id="428">428</a>
 <a href="#429" id="429">429</a>
+<a href="#430" id="430">430</a>
+<a href="#431" id="431">431</a>
+<a href="#432" id="432">432</a>
+<a href="#433" id="433">433</a>
+<a href="#434" id="434">434</a>
+<a href="#435" id="435">435</a>
+<a href="#436" id="436">436</a>
 </pre><pre class="rust"><code><span class="kw">use </span>std::cmp::Reverse;
 <span class="kw">use </span>std::collections::BTreeMap;
 
@@ -642,6 +649,7 @@
     <span class="doccomment">/// Wipe the client state (including module state)
     </span><span class="kw">pub async fn </span>wipe_state(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="kw">let </span><span class="kw-2">mut </span>dbtx = <span class="self">self</span>.db().begin_transaction().<span class="kw">await</span>;
+        <span class="macro">info!</span>(target: LOG_CLIENT, <span class="string">&quot;Wiping client state&quot;</span>);
         <span class="kw">for </span>(id, kind, module) <span class="kw">in </span><span class="self">self</span>.inner.modules.iter_modules() {
             <span class="kw">if </span>!module.supports_backup() {
                 <span class="kw">continue</span>;
@@ -684,6 +692,9 @@
             }
         }
         dbtx.commit_tx().<span class="kw">await</span>;
+
+        <span class="macro">debug!</span>(target: LOG_CLIENT, <span class="string">&quot;Wiping client state complete&quot;</span>);
+
         <span class="prelude-val">Ok</span>(())
     }
 
@@ -856,5 +867,8 @@
         get_client_root_secret_encoding::&lt;S&gt;(<span class="self">self</span>.db()).<span class="kw">await
     </span>}
 }
+
+<span class="attr">#[cfg(test)]
+</span><span class="kw">mod </span>tests;
 </code></pre></div>
 </section></main><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="fedimint_client" data-themes="" data-resource-suffix="" data-rustdoc-version="1.69.0-nightly (f3126500f 2023-02-02)" data-search-js="search-98d53477a794af0b.js" data-settings-js="settings-f0c5c39777a9a2f6.js" data-settings-css="settings-0bcba95ff279c1db.css" ></div></body></html>

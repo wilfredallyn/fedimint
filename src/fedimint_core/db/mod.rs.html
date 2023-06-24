@@ -2471,6 +2471,35 @@
 <a href="#2471" id="2471">2471</a>
 <a href="#2472" id="2472">2472</a>
 <a href="#2473" id="2473">2473</a>
+<a href="#2474" id="2474">2474</a>
+<a href="#2475" id="2475">2475</a>
+<a href="#2476" id="2476">2476</a>
+<a href="#2477" id="2477">2477</a>
+<a href="#2478" id="2478">2478</a>
+<a href="#2479" id="2479">2479</a>
+<a href="#2480" id="2480">2480</a>
+<a href="#2481" id="2481">2481</a>
+<a href="#2482" id="2482">2482</a>
+<a href="#2483" id="2483">2483</a>
+<a href="#2484" id="2484">2484</a>
+<a href="#2485" id="2485">2485</a>
+<a href="#2486" id="2486">2486</a>
+<a href="#2487" id="2487">2487</a>
+<a href="#2488" id="2488">2488</a>
+<a href="#2489" id="2489">2489</a>
+<a href="#2490" id="2490">2490</a>
+<a href="#2491" id="2491">2491</a>
+<a href="#2492" id="2492">2492</a>
+<a href="#2493" id="2493">2493</a>
+<a href="#2494" id="2494">2494</a>
+<a href="#2495" id="2495">2495</a>
+<a href="#2496" id="2496">2496</a>
+<a href="#2497" id="2497">2497</a>
+<a href="#2498" id="2498">2498</a>
+<a href="#2499" id="2499">2499</a>
+<a href="#2500" id="2500">2500</a>
+<a href="#2501" id="2501">2501</a>
+<a href="#2502" id="2502">2502</a>
 </pre><pre class="rust"><code><span class="kw">use </span>std::collections::BTreeMap;
 <span class="kw">use </span>std::error::Error;
 <span class="kw">use </span>std::fmt::Debug;
@@ -2492,7 +2521,7 @@
 <span class="kw">use </span><span class="kw">crate</span>::encoding::{Decodable, Encodable};
 <span class="kw">use </span><span class="kw">crate</span>::fmt_utils::AbbreviateHexBytes;
 <span class="kw">use </span><span class="kw">crate</span>::task::{MaybeSend, MaybeSync};
-<span class="kw">use crate</span>::{async_trait_maybe_send, maybe_add_send};
+<span class="kw">use crate</span>::{async_trait_maybe_send, maybe_add_send, timing};
 
 <span class="kw">pub mod </span>mem_impl;
 <span class="kw">pub mod </span>notifications;
@@ -2708,22 +2737,30 @@
             <span class="kw">let </span><span class="kw-2">mut </span>dbtx = <span class="self">self</span>.begin_transaction().<span class="kw">await</span>;
 
             <span class="kw">match </span>tx_fn(<span class="kw-2">&amp;mut </span>dbtx).<span class="kw">await </span>{
-                <span class="prelude-val">Ok</span>(val) =&gt; <span class="kw">match </span>dbtx.commit_tx_result().<span class="kw">await </span>{
-                    <span class="prelude-val">Ok</span>(()) =&gt; {
-                        <span class="kw">return </span><span class="prelude-val">Ok</span>(val);
-                    }
-                    <span class="prelude-val">Err</span>(err) =&gt; {
-                        <span class="kw">if </span>max_attempts
-                            .map(|max_att| max_att &lt;= curr_attempts)
-                            .unwrap_or(<span class="bool-val">false</span>)
-                        {
-                            <span class="kw">return </span><span class="prelude-val">Err</span>(AutocommitError::CommitFailed {
-                                attempts: curr_attempts,
-                                last_error: err,
-                            });
+                <span class="prelude-val">Ok</span>(val) =&gt; {
+                    <span class="kw">let </span>_timing <span class="comment">/* logs on drop */ </span>= timing::TimeReporter::new(<span class="string">&quot;autocmmit - commit_tx&quot;</span>);
+
+                    <span class="kw">match </span>dbtx.commit_tx_result().<span class="kw">await </span>{
+                        <span class="prelude-val">Ok</span>(()) =&gt; {
+                            <span class="kw">return </span><span class="prelude-val">Ok</span>(val);
+                        }
+                        <span class="prelude-val">Err</span>(err) =&gt; {
+                            <span class="macro">warn!</span>(
+                                target: LOG_DB,
+                                curr_attempts, <span class="string">&quot;Database commit failed in an autocommit block&quot;
+                            </span>);
+                            <span class="kw">if </span>max_attempts
+                                .map(|max_att| max_att &lt;= curr_attempts)
+                                .unwrap_or(<span class="bool-val">false</span>)
+                            {
+                                <span class="kw">return </span><span class="prelude-val">Err</span>(AutocommitError::CommitFailed {
+                                    attempts: curr_attempts,
+                                    last_error: err,
+                                });
+                            }
                         }
                     }
-                },
+                }
                 <span class="prelude-val">Err</span>(err) =&gt; {
                     <span class="kw">return </span><span class="prelude-val">Err</span>(AutocommitError::ClosureError {
                         attempts: curr_attempts,
@@ -4138,9 +4175,30 @@
     <span class="kw">pub async fn </span>verify_insert_elements(db: Database) {
         <span class="kw">let </span><span class="kw-2">mut </span>dbtx = db.begin_transaction().<span class="kw">await</span>;
         <span class="macro">assert!</span>(dbtx.insert_entry(<span class="kw-2">&amp;</span>TestKey(<span class="number">1</span>), <span class="kw-2">&amp;</span>TestVal(<span class="number">2</span>)).<span class="kw">await</span>.is_none());
-
         <span class="macro">assert!</span>(dbtx.insert_entry(<span class="kw-2">&amp;</span>TestKey(<span class="number">2</span>), <span class="kw-2">&amp;</span>TestVal(<span class="number">3</span>)).<span class="kw">await</span>.is_none());
+        dbtx.commit_tx().<span class="kw">await</span>;
 
+        <span class="comment">// Test values were persisted
+        </span><span class="kw">let </span><span class="kw-2">mut </span>dbtx = db.begin_transaction().<span class="kw">await</span>;
+        <span class="macro">assert_eq!</span>(dbtx.get_value(<span class="kw-2">&amp;</span>TestKey(<span class="number">1</span>)).<span class="kw">await</span>, <span class="prelude-val">Some</span>(TestVal(<span class="number">2</span>)));
+        <span class="macro">assert_eq!</span>(dbtx.get_value(<span class="kw-2">&amp;</span>TestKey(<span class="number">2</span>)).<span class="kw">await</span>, <span class="prelude-val">Some</span>(TestVal(<span class="number">3</span>)));
+        dbtx.commit_tx().<span class="kw">await</span>;
+
+        <span class="comment">// Test overwrites work as expected
+        </span><span class="kw">let </span><span class="kw-2">mut </span>dbtx = db.begin_transaction().<span class="kw">await</span>;
+        <span class="macro">assert_eq!</span>(
+            dbtx.insert_entry(<span class="kw-2">&amp;</span>TestKey(<span class="number">1</span>), <span class="kw-2">&amp;</span>TestVal(<span class="number">4</span>)).<span class="kw">await</span>,
+            <span class="prelude-val">Some</span>(TestVal(<span class="number">2</span>))
+        );
+        <span class="macro">assert_eq!</span>(
+            dbtx.insert_entry(<span class="kw-2">&amp;</span>TestKey(<span class="number">2</span>), <span class="kw-2">&amp;</span>TestVal(<span class="number">5</span>)).<span class="kw">await</span>,
+            <span class="prelude-val">Some</span>(TestVal(<span class="number">3</span>))
+        );
+        dbtx.commit_tx().<span class="kw">await</span>;
+
+        <span class="kw">let </span><span class="kw-2">mut </span>dbtx = db.begin_transaction().<span class="kw">await</span>;
+        <span class="macro">assert_eq!</span>(dbtx.get_value(<span class="kw-2">&amp;</span>TestKey(<span class="number">1</span>)).<span class="kw">await</span>, <span class="prelude-val">Some</span>(TestVal(<span class="number">4</span>)));
+        <span class="macro">assert_eq!</span>(dbtx.get_value(<span class="kw-2">&amp;</span>TestKey(<span class="number">2</span>)).<span class="kw">await</span>, <span class="prelude-val">Some</span>(TestVal(<span class="number">5</span>)));
         dbtx.commit_tx().<span class="kw">await</span>;
     }
 

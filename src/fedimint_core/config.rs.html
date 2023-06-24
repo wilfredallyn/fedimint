@@ -778,7 +778,55 @@
 <a href="#778" id="778">778</a>
 <a href="#779" id="779">779</a>
 <a href="#780" id="780">780</a>
-</pre><pre class="rust"><code><span class="kw">use </span>std::collections::BTreeMap;
+<a href="#781" id="781">781</a>
+<a href="#782" id="782">782</a>
+<a href="#783" id="783">783</a>
+<a href="#784" id="784">784</a>
+<a href="#785" id="785">785</a>
+<a href="#786" id="786">786</a>
+<a href="#787" id="787">787</a>
+<a href="#788" id="788">788</a>
+<a href="#789" id="789">789</a>
+<a href="#790" id="790">790</a>
+<a href="#791" id="791">791</a>
+<a href="#792" id="792">792</a>
+<a href="#793" id="793">793</a>
+<a href="#794" id="794">794</a>
+<a href="#795" id="795">795</a>
+<a href="#796" id="796">796</a>
+<a href="#797" id="797">797</a>
+<a href="#798" id="798">798</a>
+<a href="#799" id="799">799</a>
+<a href="#800" id="800">800</a>
+<a href="#801" id="801">801</a>
+<a href="#802" id="802">802</a>
+<a href="#803" id="803">803</a>
+<a href="#804" id="804">804</a>
+<a href="#805" id="805">805</a>
+<a href="#806" id="806">806</a>
+<a href="#807" id="807">807</a>
+<a href="#808" id="808">808</a>
+<a href="#809" id="809">809</a>
+<a href="#810" id="810">810</a>
+<a href="#811" id="811">811</a>
+<a href="#812" id="812">812</a>
+<a href="#813" id="813">813</a>
+<a href="#814" id="814">814</a>
+<a href="#815" id="815">815</a>
+<a href="#816" id="816">816</a>
+<a href="#817" id="817">817</a>
+<a href="#818" id="818">818</a>
+<a href="#819" id="819">819</a>
+<a href="#820" id="820">820</a>
+<a href="#821" id="821">821</a>
+<a href="#822" id="822">822</a>
+<a href="#823" id="823">823</a>
+<a href="#824" id="824">824</a>
+<a href="#825" id="825">825</a>
+<a href="#826" id="826">826</a>
+<a href="#827" id="827">827</a>
+<a href="#828" id="828">828</a>
+</pre><pre class="rust"><code><span class="kw">use </span>std::collections::{BTreeMap, BTreeSet};
 <span class="kw">use </span>std::fmt::{Debug, Display};
 <span class="kw">use </span>std::hash::Hash;
 <span class="kw">use </span>std::ops::Mul;
@@ -875,7 +923,7 @@
     }
 }
 
-<span class="attr">#[derive(Debug, Clone, Eq, PartialEq, Hash, Serialize, Deserialize, Encodable)]
+<span class="attr">#[derive(Debug, Clone, Eq, PartialEq, Hash, Serialize, Deserialize, Encodable, Decodable)]
 </span><span class="kw">pub struct </span>PeerUrl {
     <span class="doccomment">/// The peer&#39;s public URL (e.g. `wss://fedimint-server-1:5000`)
     </span><span class="kw">pub </span>url: Url,
@@ -886,7 +934,7 @@
 <span class="doccomment">/// Total client config
 ///
 /// This includes global settings and client-side module configs.
-</span><span class="attr">#[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize, Encodable)]
+</span><span class="attr">#[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize, Encodable, Decodable)]
 </span><span class="kw">pub struct </span>ClientConfig {
     <span class="comment">// Stable and unique id and threshold pubkey of the federation for authenticating configs
     </span><span class="kw">pub </span>federation_id: FederationId,
@@ -894,11 +942,11 @@
     </span><span class="kw">pub </span>api_endpoints: BTreeMap&lt;PeerId, PeerUrl&gt;,
     <span class="doccomment">/// Threshold pubkey for authenticating epoch history
     </span><span class="kw">pub </span>epoch_pk: threshold_crypto::PublicKey,
-    <span class="doccomment">/// Configs from other client modules
-    </span><span class="kw">pub </span>modules: BTreeMap&lt;ModuleInstanceId, ClientModuleConfig&gt;,
     <span class="comment">// TODO: make it a String -&gt; serde_json::Value map?
     </span><span class="doccomment">/// Additional config the federation wants to transmit to the clients
     </span><span class="kw">pub </span>meta: BTreeMap&lt;String, String&gt;,
+    <span class="doccomment">/// Configs from other client modules
+    </span><span class="kw">pub </span>modules: BTreeMap&lt;ModuleInstanceId, ClientModuleConfig&gt;,
 }
 
 <span class="doccomment">/// The API response for client config requests, signed by the Federation
@@ -915,7 +963,20 @@
 ///
 /// Stable id so long as guardians membership does not change
 /// Unique id so long as guardians do not all collude
-</span><span class="attr">#[derive(Debug, Copy, Serialize, Deserialize, Clone, Eq, Hash, PartialEq, Encodable, Decodable)]
+</span><span class="attr">#[derive(
+    Debug,
+    Copy,
+    Serialize,
+    Deserialize,
+    Clone,
+    Eq,
+    Hash,
+    PartialEq,
+    Encodable,
+    Decodable,
+    Ord,
+    PartialOrd,
+)]
 </span><span class="kw">pub struct </span>FederationId(<span class="kw">pub </span>threshold_crypto::PublicKey);
 
 <span class="kw">impl </span>Display <span class="kw">for </span>FederationId {
@@ -934,6 +995,24 @@
 
     <span class="kw">fn </span>try_from_bytes(bytes: [u8; <span class="number">48</span>]) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt; {
         <span class="prelude-val">Some</span>(<span class="self">Self</span>(threshold_crypto::PublicKey::from_bytes(bytes).ok()<span class="question-mark">?</span>))
+    }
+
+    <span class="doccomment">/// Converts a federation id to a public key to which we know but discard
+    /// the private key.
+    ///
+    /// Clients MUST never use this private key for any signing operations!
+    ///
+    /// That is ok because we only use the public key for adding a route
+    /// hint to LN invoices that tells fedimint clients that the invoice can
+    /// only be paid internally. Since no LN node with that pub key can exist
+    /// other LN senders will know that they cannot pay the invoice.
+    </span><span class="kw">pub fn </span>to_fake_ln_pub_key(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        secp: <span class="kw-2">&amp;</span>secp256k1::Secp256k1&lt;secp256k1_zkp::All&gt;,
+    ) -&gt; anyhow::Result&lt;secp256k1::PublicKey&gt; {
+        <span class="kw">let </span>bytes = &lt;Sha256 <span class="kw">as </span>bitcoin_hashes::Hash&gt;::hash(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>.to_bytes()[..]);
+        <span class="kw">let </span>sk = secp256k1::SecretKey::from_slice(<span class="kw-2">&amp;</span>bytes)<span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(secp256k1::PublicKey::from_secret_key(secp, <span class="kw-2">&amp;</span>sk))
     }
 }
 
@@ -1028,33 +1107,51 @@
     }
 }
 
-<span class="doccomment">/// Module **generation** (so passed to dkg, not to the module itself) config
-/// parameters
-</span><span class="attr">#[derive(Debug, Clone, Default, Eq, PartialEq)]
-</span><span class="kw">pub struct </span>ConfigGenModuleParams(serde_json::Value);
+<span class="doccomment">/// Type erased `ModuleGenParams` used to generate the `ServerModuleConfig`
+/// during config gen
+</span><span class="attr">#[derive(Debug, Clone, Default, Eq, PartialEq, Serialize, Deserialize)]
+</span><span class="kw">pub struct </span>ConfigGenModuleParams {
+    <span class="kw">pub </span>local: <span class="prelude-ty">Option</span>&lt;serde_json::Value&gt;,
+    <span class="kw">pub </span>consensus: <span class="prelude-ty">Option</span>&lt;serde_json::Value&gt;,
+}
 
 <span class="kw">pub type </span>ServerModuleGenRegistry = ModuleGenRegistry&lt;DynServerModuleGen&gt;;
 
 <span class="kw">impl </span>ConfigGenModuleParams {
-    <span class="doccomment">/// Null value, used as a config gen parameters for module gens that don&#39;t
-    /// need any parameters
-    </span><span class="kw">pub fn </span>null() -&gt; <span class="self">Self </span>{
-        <span class="self">Self</span>(jsonrpsee_core::JsonValue::Null)
+    <span class="kw">pub fn </span>new(local: <span class="prelude-ty">Option</span>&lt;serde_json::Value&gt;, consensus: <span class="prelude-ty">Option</span>&lt;serde_json::Value&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{ local, consensus }
     }
 
-    <span class="kw">pub fn </span>to_typed&lt;P: ModuleGenParams&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; anyhow::Result&lt;P&gt; {
-        serde_json::from_value(<span class="self">self</span>.<span class="number">0</span>.clone())
+    <span class="doccomment">/// Converts the JSON into typed version, errors unless both `local` and
+    /// `consensus` values are defined
+    </span><span class="kw">pub fn </span>to_typed&lt;P: ModuleGenParams&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; anyhow::Result&lt;P&gt; {
+        <span class="prelude-val">Ok</span>(P::from_parts(
+            <span class="self">Self</span>::parse(<span class="string">&quot;local&quot;</span>, <span class="self">self</span>.local.clone())<span class="question-mark">?</span>,
+            <span class="self">Self</span>::parse(<span class="string">&quot;consensus&quot;</span>, <span class="self">self</span>.consensus.clone())<span class="question-mark">?</span>,
+        ))
+    }
+
+    <span class="kw">fn </span>parse&lt;P: DeserializeOwned&gt;(
+        name: <span class="kw-2">&amp;</span>str,
+        json: <span class="prelude-ty">Option</span>&lt;serde_json::Value&gt;,
+    ) -&gt; anyhow::Result&lt;P&gt; {
+        <span class="kw">let </span>json = json.ok_or(<span class="macro">format_err!</span>(<span class="string">&quot;{name} config gen params missing&quot;</span>))<span class="question-mark">?</span>;
+        serde_json::from_value(json)
             .map_err(|e| anyhow::Error::new(e).context(<span class="string">&quot;Invalid module params&quot;</span>))
     }
 
     <span class="kw">pub fn </span>from_typed&lt;P: ModuleGenParams&gt;(p: P) -&gt; anyhow::Result&lt;<span class="self">Self</span>&gt; {
-        <span class="prelude-val">Ok</span>(<span class="self">Self</span>(serde_json::to_value(p)<span class="question-mark">?</span>))
+        <span class="kw">let </span>(local, consensus) = p.to_parts();
+        <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
+            local: <span class="prelude-val">Some</span>(serde_json::to_value(local)<span class="question-mark">?</span>),
+            consensus: <span class="prelude-val">Some</span>(serde_json::to_value(consensus)<span class="question-mark">?</span>),
+        })
     }
 }
 
 <span class="kw">pub type </span>CommonModuleGenRegistry = ModuleGenRegistry&lt;DynCommonModuleGen&gt;;
 
-<span class="doccomment">/// Configs for each module&#39;s DKG
+<span class="doccomment">/// Registry that contains the config gen params for all modules
 </span><span class="kw">pub type </span>ServerModuleGenParamsRegistry = ModuleRegistry&lt;ConfigGenModuleParams&gt;;
 
 <span class="kw">impl </span>Eq <span class="kw">for </span>ServerModuleGenParamsRegistry {}
@@ -1071,7 +1168,7 @@
         <span class="kw">let </span><span class="kw-2">mut </span>serializer = serializer.serialize_map(<span class="prelude-val">Some</span>(modules.len()))<span class="question-mark">?</span>;
         <span class="kw">for </span>(id, kind, params) <span class="kw">in </span>modules.into_iter() {
             serializer.serialize_key(<span class="kw-2">&amp;</span>id)<span class="question-mark">?</span>;
-            serializer.serialize_value(<span class="kw-2">&amp;</span>(kind.clone(), params.<span class="number">0</span>.clone()))<span class="question-mark">?</span>;
+            serializer.serialize_value(<span class="kw-2">&amp;</span>(kind.clone(), params.clone()))<span class="question-mark">?</span>;
         }
         serializer.end()
     }
@@ -1082,12 +1179,12 @@
     <span class="kw">where
         </span>D: Deserializer&lt;<span class="lifetime">&#39;de</span>&gt;,
     {
-        <span class="kw">let </span>json: BTreeMap&lt;ModuleInstanceId, (ModuleKind, serde_json::Value)&gt; =
+        <span class="kw">let </span>json: BTreeMap&lt;ModuleInstanceId, (ModuleKind, ConfigGenModuleParams)&gt; =
             Deserialize::deserialize(deserializer)<span class="question-mark">?</span>;
         <span class="kw">let </span><span class="kw-2">mut </span>params = BTreeMap::new();
 
-        <span class="kw">for </span>(id, (kind, value)) <span class="kw">in </span>json {
-            params.insert(id, (kind, ConfigGenModuleParams(value)));
+        <span class="kw">for </span>(id, (kind, module)) <span class="kw">in </span>json {
+            params.insert(id, (kind, module));
         }
         <span class="prelude-val">Ok</span>(ModuleRegistry::from(params))
     }
@@ -1130,6 +1227,10 @@
         <span class="kw">if </span><span class="self">self</span>.<span class="number">0</span>.insert(kind.clone(), gen).is_some() {
             <span class="macro">panic!</span>(<span class="string">&quot;Can&#39;t insert module of same kind twice: {kind}&quot;</span>);
         }
+    }
+
+    <span class="kw">pub fn </span>kinds(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; BTreeSet&lt;ModuleKind&gt; {
+        <span class="self">self</span>.<span class="number">0</span>.keys().cloned().collect()
     }
 
     <span class="kw">pub fn </span>get(<span class="kw-2">&amp;</span><span class="self">self</span>, k: <span class="kw-2">&amp;</span>ModuleKind) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>M&gt; {
@@ -1186,7 +1287,7 @@
 
 <span class="doccomment">/// Empty struct for if there are no params
 </span><span class="attr">#[derive(Debug, Default, Clone, Serialize, Deserialize)]
-</span><span class="kw">pub struct </span>EmptyGenParams;
+</span><span class="kw">pub struct </span>EmptyGenParams {}
 
 <span class="kw">pub trait </span>ModuleGenParams: serde::Serialize + serde::de::DeserializeOwned {
     <span class="doccomment">/// Locally configurable parameters for config generation
@@ -1199,15 +1300,6 @@
 
     <span class="doccomment">/// Split the config into its distinct parts
     </span><span class="kw">fn </span>to_parts(<span class="self">self</span>) -&gt; (<span class="self">Self</span>::Local, <span class="self">Self</span>::Consensus);
-
-    <span class="kw">fn </span>from_json&lt;P: ModuleGenParams&gt;(value: serde_json::Value) -&gt; anyhow::Result&lt;<span class="self">Self</span>&gt; {
-        serde_json::from_value(value)
-            .map_err(|e| anyhow::Error::new(e).context(<span class="string">&quot;Invalid module gen params&quot;</span>))
-    }
-
-    <span class="kw">fn </span>to_json(p: <span class="self">Self</span>) -&gt; anyhow::Result&lt;serde_json::Value&gt; {
-        <span class="prelude-val">Ok</span>(serde_json::to_value(p)<span class="question-mark">?</span>)
-    }
 }
 
 <span class="attr">#[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize, Encodable, Decodable)]
@@ -1400,6 +1492,10 @@
     <span class="doccomment">/// Error running DKG
     </span><span class="attr">#[error(<span class="string">&quot;Running DKG failed due to {0}&quot;</span>)]
     </span>Failed(<span class="attr">#[from] </span>anyhow::Error),
+    <span class="attr">#[error(<span class="string">&quot;The module was not found {0}&quot;</span>)]
+    </span>ModuleNotFound(ModuleKind),
+    <span class="attr">#[error(<span class="string">&quot;Params for modules were not found {0:?}&quot;</span>)]
+    </span>ParamsNotFound(BTreeSet&lt;ModuleKind&gt;),
 }
 
 <span class="doccomment">/// Supported (by Fedimint&#39;s code) `DkgMessage&lt;T&gt;` types

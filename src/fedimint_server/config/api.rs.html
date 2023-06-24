@@ -869,6 +869,92 @@
 <a href="#869" id="869">869</a>
 <a href="#870" id="870">870</a>
 <a href="#871" id="871">871</a>
+<a href="#872" id="872">872</a>
+<a href="#873" id="873">873</a>
+<a href="#874" id="874">874</a>
+<a href="#875" id="875">875</a>
+<a href="#876" id="876">876</a>
+<a href="#877" id="877">877</a>
+<a href="#878" id="878">878</a>
+<a href="#879" id="879">879</a>
+<a href="#880" id="880">880</a>
+<a href="#881" id="881">881</a>
+<a href="#882" id="882">882</a>
+<a href="#883" id="883">883</a>
+<a href="#884" id="884">884</a>
+<a href="#885" id="885">885</a>
+<a href="#886" id="886">886</a>
+<a href="#887" id="887">887</a>
+<a href="#888" id="888">888</a>
+<a href="#889" id="889">889</a>
+<a href="#890" id="890">890</a>
+<a href="#891" id="891">891</a>
+<a href="#892" id="892">892</a>
+<a href="#893" id="893">893</a>
+<a href="#894" id="894">894</a>
+<a href="#895" id="895">895</a>
+<a href="#896" id="896">896</a>
+<a href="#897" id="897">897</a>
+<a href="#898" id="898">898</a>
+<a href="#899" id="899">899</a>
+<a href="#900" id="900">900</a>
+<a href="#901" id="901">901</a>
+<a href="#902" id="902">902</a>
+<a href="#903" id="903">903</a>
+<a href="#904" id="904">904</a>
+<a href="#905" id="905">905</a>
+<a href="#906" id="906">906</a>
+<a href="#907" id="907">907</a>
+<a href="#908" id="908">908</a>
+<a href="#909" id="909">909</a>
+<a href="#910" id="910">910</a>
+<a href="#911" id="911">911</a>
+<a href="#912" id="912">912</a>
+<a href="#913" id="913">913</a>
+<a href="#914" id="914">914</a>
+<a href="#915" id="915">915</a>
+<a href="#916" id="916">916</a>
+<a href="#917" id="917">917</a>
+<a href="#918" id="918">918</a>
+<a href="#919" id="919">919</a>
+<a href="#920" id="920">920</a>
+<a href="#921" id="921">921</a>
+<a href="#922" id="922">922</a>
+<a href="#923" id="923">923</a>
+<a href="#924" id="924">924</a>
+<a href="#925" id="925">925</a>
+<a href="#926" id="926">926</a>
+<a href="#927" id="927">927</a>
+<a href="#928" id="928">928</a>
+<a href="#929" id="929">929</a>
+<a href="#930" id="930">930</a>
+<a href="#931" id="931">931</a>
+<a href="#932" id="932">932</a>
+<a href="#933" id="933">933</a>
+<a href="#934" id="934">934</a>
+<a href="#935" id="935">935</a>
+<a href="#936" id="936">936</a>
+<a href="#937" id="937">937</a>
+<a href="#938" id="938">938</a>
+<a href="#939" id="939">939</a>
+<a href="#940" id="940">940</a>
+<a href="#941" id="941">941</a>
+<a href="#942" id="942">942</a>
+<a href="#943" id="943">943</a>
+<a href="#944" id="944">944</a>
+<a href="#945" id="945">945</a>
+<a href="#946" id="946">946</a>
+<a href="#947" id="947">947</a>
+<a href="#948" id="948">948</a>
+<a href="#949" id="949">949</a>
+<a href="#950" id="950">950</a>
+<a href="#951" id="951">951</a>
+<a href="#952" id="952">952</a>
+<a href="#953" id="953">953</a>
+<a href="#954" id="954">954</a>
+<a href="#955" id="955">955</a>
+<a href="#956" id="956">956</a>
+<a href="#957" id="957">957</a>
 </pre><pre class="rust"><code><span class="kw">use </span>std::collections::BTreeMap;
 <span class="kw">use </span>std::net::SocketAddr;
 <span class="kw">use </span>std::path::PathBuf;
@@ -883,7 +969,9 @@
     ConfigGenParamsResponse, PeerServerParams, WsAdminClient,
 };
 <span class="kw">use </span>fedimint_core::api::{ServerStatus, StatusResponse};
-<span class="kw">use </span>fedimint_core::config::ServerModuleGenRegistry;
+<span class="kw">use </span>fedimint_core::config::{
+    ConfigGenModuleParams, ServerModuleGenParamsRegistry, ServerModuleGenRegistry,
+};
 <span class="kw">use </span>fedimint_core::core::ModuleInstanceId;
 <span class="kw">use </span>fedimint_core::db::Database;
 <span class="kw">use </span>fedimint_core::encoding::Encodable;
@@ -1004,40 +1092,49 @@
         <span class="prelude-val">Ok</span>(state.settings.default_params.clone())
     }
 
-    <span class="doccomment">/// Sets the config gen params, should only be called by the leader
-    </span><span class="kw">pub async fn </span>set_config_gen_params(<span class="kw-2">&amp;</span><span class="self">self</span>, requested: ConfigGenParamsRequest) -&gt; ApiResult&lt;()&gt; {
+    <span class="doccomment">/// Sets and validates the config gen params
+    ///
+    /// The leader passes consensus params, everyone passes local params
+    </span><span class="kw">pub async fn </span>set_config_gen_params(<span class="kw-2">&amp;</span><span class="self">self</span>, request: ConfigGenParamsRequest) -&gt; ApiResult&lt;()&gt; {
+        <span class="self">self</span>.get_consensus_config_gen_params(<span class="kw-2">&amp;</span>request).<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="kw">let </span><span class="kw-2">mut </span>state = <span class="self">self</span>.require_status(ServerStatus::SharingConfigGenParams)<span class="question-mark">?</span>;
-        state.requested_params = <span class="prelude-val">Some</span>(requested);
+        state.requested_params = <span class="prelude-val">Some</span>(request);
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="doccomment">/// Gets the consensus config gen params,
-    </span><span class="kw">pub async fn </span>get_consensus_config_gen_params(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ApiResult&lt;ConfigGenParamsResponse&gt; {
+    <span class="kw">fn </span>get_requested_params(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ApiResult&lt;ConfigGenParamsRequest&gt; {
+        <span class="kw">let </span>state = <span class="self">self</span>.state.lock().expect(<span class="string">&quot;lock poisoned&quot;</span>).clone();
+        state.requested_params.ok_or(ApiError::bad_request(
+            <span class="string">&quot;Config params were not set on this guardian&quot;</span>.to_string(),
+        ))
+    }
+
+    <span class="doccomment">/// Gets the consensus config gen params
+    </span><span class="kw">pub async fn </span>get_consensus_config_gen_params(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        request: <span class="kw-2">&amp;</span>ConfigGenParamsRequest,
+    ) -&gt; ApiResult&lt;ConfigGenParamsResponse&gt; {
         <span class="kw">let </span>state = <span class="self">self</span>.state.lock().expect(<span class="string">&quot;lock poisoned&quot;</span>).clone();
         <span class="kw">let </span>local = state.local.clone();
 
-        <span class="comment">// if we have a leader get it from the leader instead
-        </span><span class="kw">if let </span><span class="prelude-val">Some</span>(url) = local.and_then(|local| local.leader_api_url) {
-            <span class="kw">let </span>client = WsAdminClient::new(url.clone(), PeerId::from(<span class="number">0</span>), state.auth()<span class="question-mark">?</span>);
-            <span class="kw">let </span>response = client
-                .get_consensus_config_gen_params()
-                .<span class="kw">await
-                </span>.map_err(|<span class="kw">_</span>| ApiError::not_found(<span class="string">&quot;Unable to get params from leader&quot;</span>.to_string()))<span class="question-mark">?</span>;
-            <span class="kw">let </span>params = state.get_config_gen_params(response.consensus)<span class="question-mark">?</span>;
-            <span class="kw">return </span><span class="prelude-val">Ok</span>(ConfigGenParamsResponse {
-                consensus: params.consensus,
-                our_current_id: params.local.our_id,
-            });
-        }
-
-        <span class="kw">let </span>state = <span class="self">self</span>.state.lock().expect(<span class="string">&quot;lock poisoned&quot;</span>);
-        <span class="kw">let </span>consensus = ConfigGenParamsConsensus {
-            peers: state.get_peer_info(),
-            requested: state.get_requested_params()<span class="question-mark">?</span>,
+        <span class="kw">let </span>consensus = <span class="kw">match </span>local.and_then(|local| local.leader_api_url) {
+            <span class="prelude-val">Some</span>(leader_url) =&gt; {
+                <span class="kw">let </span>client = WsAdminClient::new(leader_url.clone(), PeerId::from(<span class="number">0</span>), state.auth()<span class="question-mark">?</span>);
+                <span class="kw">let </span>response = client.get_consensus_config_gen_params().<span class="kw">await</span>;
+                response
+                    .map_err(|<span class="kw">_</span>| ApiError::not_found(<span class="string">&quot;Cannot get leader params&quot;</span>.to_string()))<span class="question-mark">?
+                    </span>.consensus
+            }
+            <span class="prelude-val">None </span>=&gt; ConfigGenParamsConsensus {
+                peers: state.get_peer_info(),
+                meta: request.meta.clone(),
+                modules: request.modules.clone(),
+            },
         };
-        <span class="kw">let </span>params = state.get_config_gen_params(consensus)<span class="question-mark">?</span>;
+
+        <span class="kw">let </span>params = state.get_config_gen_params(request, consensus.clone())<span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(ConfigGenParamsResponse {
-            consensus: params.consensus,
+            consensus,
             our_current_id: params.local.our_id,
         })
     }
@@ -1046,12 +1143,13 @@
     /// completion, calling a second time will return an error
     </span><span class="kw">pub async fn </span>run_dkg(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ApiResult&lt;()&gt; {
         <span class="comment">// Update our state to running DKG
-        </span><span class="kw">let </span>response = <span class="self">self</span>.get_consensus_config_gen_params().<span class="kw">await</span><span class="question-mark">?</span>;
+        </span><span class="kw">let </span>request = <span class="self">self</span>.get_requested_params()<span class="question-mark">?</span>;
+        <span class="kw">let </span>response = <span class="self">self</span>.get_consensus_config_gen_params(<span class="kw-2">&amp;</span>request).<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="kw">let </span>(params, registry) = {
             <span class="kw">let </span><span class="kw-2">mut </span>state = <span class="self">self</span>.require_status(ServerStatus::SharingConfigGenParams)<span class="question-mark">?</span>;
             state.status = ServerStatus::ReadyForConfigGen;
             (
-                state.get_config_gen_params(response.consensus)<span class="question-mark">?</span>,
+                state.get_config_gen_params(<span class="kw-2">&amp;</span>request, response.consensus)<span class="question-mark">?</span>,
                 state.settings.registry.clone(),
             )
         };
@@ -1293,15 +1391,12 @@
             .collect()
     }
 
-    <span class="kw">fn </span>get_requested_params(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ApiResult&lt;ConfigGenParamsRequest&gt; {
-        <span class="self">self</span>.requested_params.clone().ok_or(ApiError::bad_request(
-            <span class="string">&quot;Config params were not set&quot;</span>.to_string(),
-        ))
-    }
-
-    <span class="kw">fn </span>get_config_gen_params(
+    <span class="doccomment">/// Validates and returns the params using our `request` and `consensus`
+    /// which comes from the leader
+    </span><span class="kw">fn </span>get_config_gen_params(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        consensus: ConfigGenParamsConsensus,
+        request: <span class="kw-2">&amp;</span>ConfigGenParamsRequest,
+        <span class="kw-2">mut </span>consensus: ConfigGenParamsConsensus,
     ) -&gt; ApiResult&lt;ConfigGenParams&gt; {
         <span class="kw">let </span>local_connection = <span class="self">self</span>.local_connection()<span class="question-mark">?</span>;
 
@@ -1312,6 +1407,24 @@
             .ok_or(ApiError::bad_request(
                 <span class="string">&quot;Our TLS cert not found among peers&quot;</span>.to_string(),
             ))<span class="question-mark">?</span>;
+
+        <span class="kw">let </span><span class="kw-2">mut </span>combined_params = <span class="macro">vec!</span>[];
+        <span class="kw">let </span>default_params = <span class="self">self</span>.settings.default_params.modules.clone();
+        <span class="kw">let </span>local_params = request.modules.clone();
+        <span class="kw">let </span>consensus_params = consensus.modules.clone();
+        <span class="comment">// Use defaults in case local or consensus params are missing
+        </span><span class="kw">for </span>(id, kind, default) <span class="kw">in </span>default_params.iter_modules() {
+            <span class="kw">let </span>consensus = <span class="kw-2">&amp;</span>consensus_params.get(id).unwrap_or(default).consensus;
+            <span class="kw">let </span>local = <span class="kw-2">&amp;</span>local_params.get(id).unwrap_or(default).local;
+            <span class="kw">let </span>combined = ConfigGenModuleParams::new(local.clone(), consensus.clone());
+            <span class="comment">// Check that the params are parseable
+            </span><span class="kw">let </span>module = <span class="self">self</span>.settings.registry.get(kind).expect(<span class="string">&quot;Module exists&quot;</span>);
+            module
+                .validate_params(<span class="kw-2">&amp;</span>combined)
+                .map_err(|e| ApiError::bad_request(<span class="macro">format!</span>(<span class="string">&quot;Module params invalid {e}&quot;</span>)))<span class="question-mark">?</span>;
+            combined_params.push((id, kind.clone(), combined));
+        }
+        consensus.modules = ServerModuleGenParamsRegistry::from_iter(combined_params.into_iter());
 
         <span class="kw">let </span>local = ConfigGenParamsLocal {
             our_id: <span class="kw-2">*</span>our_id,
@@ -1420,7 +1533,8 @@
         <span class="macro">api_endpoint! </span>{
             <span class="string">&quot;get_consensus_config_gen_params&quot;</span>,
             <span class="kw">async </span>|config: <span class="kw-2">&amp;</span>ConfigGenApi, _context, _v: ()| -&gt; ConfigGenParamsResponse {
-                config.get_consensus_config_gen_params().<span class="kw">await
+                <span class="kw">let </span>request = config.get_requested_params()<span class="question-mark">?</span>;
+                config.get_consensus_config_gen_params(<span class="kw-2">&amp;</span>request).<span class="kw">await
             </span>}
         },
         <span class="macro">api_endpoint! </span>{
@@ -1472,27 +1586,35 @@
 <span class="attr">#[cfg(test)]
 </span><span class="kw">mod </span>tests {
 
-    <span class="kw">use </span>std::collections::{BTreeSet, HashSet};
+    <span class="kw">use </span>std::collections::{BTreeMap, BTreeSet, HashSet};
     <span class="kw">use </span>std::fs;
     <span class="kw">use </span>std::path::PathBuf;
     <span class="kw">use </span>std::sync::Arc;
     <span class="kw">use </span>std::time::Duration;
 
-    <span class="kw">use </span>fedimint_core::admin_client::WsAdminClient;
+    <span class="kw">use </span>fedimint_core::admin_client::{ConfigGenParamsRequest, WsAdminClient};
     <span class="kw">use </span>fedimint_core::api::{FederationResult, ServerStatus, StatusResponse};
+    <span class="kw">use </span>fedimint_core::config::{ServerModuleGenParamsRegistry, ServerModuleGenRegistry};
     <span class="kw">use </span>fedimint_core::db::mem_impl::MemDatabase;
     <span class="kw">use </span>fedimint_core::db::Database;
     <span class="kw">use </span>fedimint_core::module::registry::ModuleDecoderRegistry;
     <span class="kw">use </span>fedimint_core::module::ApiAuth;
     <span class="kw">use </span>fedimint_core::task::{sleep, TaskGroup};
-    <span class="kw">use </span>fedimint_core::PeerId;
+    <span class="kw">use </span>fedimint_core::{Amount, PeerId};
+    <span class="kw">use </span>fedimint_dummy_common::config::{
+        DummyConfig, DummyGenParams, DummyGenParamsConsensus, DummyGenParamsLocal,
+    };
+    <span class="kw">use </span>fedimint_dummy_server::DummyGen;
+    <span class="kw">use </span>fedimint_logging::TracingSetup;
     <span class="kw">use </span>fedimint_testing::fixtures::test_dir;
     <span class="kw">use </span>futures::future::join_all;
     <span class="kw">use </span>itertools::Itertools;
     <span class="kw">use </span>url::Url;
 
     <span class="kw">use </span><span class="kw">crate</span>::config::api::{ConfigGenConnectionsRequest, ConfigGenSettings};
-    <span class="kw">use </span><span class="kw">crate</span>::config::DEFAULT_MAX_CLIENT_CONNECTIONS;
+    <span class="kw">use </span><span class="kw">crate</span>::config::io::{read_server_config, PLAINTEXT_PASSWORD};
+    <span class="kw">use </span><span class="kw">crate</span>::config::{DynServerModuleGen, ServerConfig, DEFAULT_MAX_CLIENT_CONNECTIONS};
+    <span class="kw">use </span><span class="kw">crate</span>::fedimint_core::module::ServerModuleGen;
     <span class="kw">use </span><span class="kw">crate</span>::FedimintServer;
 
     <span class="doccomment">/// Helper in config API tests for simulating a guardian&#39;s client and server
@@ -1500,6 +1622,8 @@
         client: WsAdminClient,
         name: String,
         settings: ConfigGenSettings,
+        amount: Amount,
+        dir: PathBuf,
     }
 
     <span class="kw">impl </span>TestConfigApi {
@@ -1519,21 +1643,27 @@
             <span class="kw">let </span>p2p_url = <span class="macro">format!</span>(<span class="string">&quot;fedimint://127.0.0.1:{}&quot;</span>, port + <span class="number">1</span>)
                 .parse()
                 .expect(<span class="string">&quot;parses&quot;</span>);
+            <span class="kw">let </span><span class="kw-2">mut </span>modules = ServerModuleGenParamsRegistry::default();
+            modules.attach_config_gen_params(<span class="number">0</span>, DummyGen::kind(), DummyGenParams::default());
+            <span class="kw">let </span>default_params = ConfigGenParamsRequest {
+                meta: Default::default(),
+                modules,
+            };
             <span class="kw">let </span>settings = ConfigGenSettings {
                 download_token_limit: <span class="prelude-val">None</span>,
                 p2p_bind,
                 api_bind,
                 p2p_url,
                 api_url: api_url.clone(),
-                default_params: Default::default(),
+                default_params,
                 max_connections: DEFAULT_MAX_CLIENT_CONNECTIONS,
-                registry: Default::default(),
+                registry: ServerModuleGenRegistry::from(<span class="macro">vec!</span>[DynServerModuleGen::from(DummyGen)]),
             };
             <span class="kw">let </span>dir = data_dir.join(name_suffix.to_string());
             fs::create_dir_all(dir.clone()).expect(<span class="string">&quot;Unable to create test dir&quot;</span>);
 
             <span class="kw">let </span>api = FedimintServer {
-                data_dir: dir,
+                data_dir: dir.clone(),
                 settings: settings.clone(),
                 db,
             };
@@ -1547,6 +1677,8 @@
                     client,
                     name,
                     settings,
+                    amount: Amount::from_sats(port <span class="kw">as </span>u64),
+                    dir,
                 },
                 api,
             )
@@ -1607,10 +1739,38 @@
                 sleep(Duration::from_millis(<span class="number">10</span>)).<span class="kw">await</span>;
             }
         }
+
+        <span class="doccomment">/// Sets local param to name and unique consensus amount for testing
+        </span><span class="kw">async fn </span>set_config_gen_params(<span class="kw-2">&amp;</span><span class="self">self</span>) {
+            <span class="kw">let </span><span class="kw-2">mut </span>modules = ServerModuleGenParamsRegistry::default();
+            modules.attach_config_gen_params(
+                <span class="number">0</span>,
+                DummyGen::kind(),
+                DummyGenParams {
+                    local: DummyGenParamsLocal(<span class="self">self</span>.name.clone()),
+                    consensus: DummyGenParamsConsensus {
+                        tx_fee: <span class="self">self</span>.amount,
+                    },
+                },
+            );
+            <span class="kw">let </span>request = ConfigGenParamsRequest {
+                meta: BTreeMap::from([(<span class="string">&quot;test&quot;</span>.to_string(), <span class="self">self</span>.name.clone())]),
+                modules,
+            };
+
+            <span class="self">self</span>.client.set_config_gen_params(request).<span class="kw">await</span>.unwrap();
+        }
+
+        <span class="doccomment">/// reads the dummy module config from the filesystem
+        </span><span class="kw">fn </span>read_config(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ServerConfig {
+            <span class="kw">let </span>auth = fs::read_to_string(<span class="self">self</span>.dir.join(PLAINTEXT_PASSWORD));
+            read_server_config(<span class="kw-2">&amp;</span>auth.unwrap(), <span class="self">self</span>.dir.clone()).unwrap()
+        }
     }
 
     <span class="attr">#[tokio::test(flavor = <span class="string">&quot;multi_thread&quot;</span>)]
     </span><span class="kw">async fn </span>test_config_api() {
+        <span class="kw">let _ </span>= TracingSetup::default().init();
         <span class="kw">let </span>(data_dir, _maybe_tmp_dir_guard) = test_dir(<span class="string">&quot;test-config-api&quot;</span>);
 
         <span class="comment">// TODO: Choose port in common way with `fedimint_env`
@@ -1642,8 +1802,8 @@
             leader.set_connections(<span class="kw-2">&amp;</span><span class="prelude-val">None</span>).<span class="kw">await</span>.unwrap();
 
             <span class="comment">// Leader sets the config
-            </span><span class="kw">let </span>defaults = leader.client.get_default_config_gen_params().<span class="kw">await</span>.unwrap();
-            leader.client.set_config_gen_params(defaults).<span class="kw">await</span>.unwrap();
+            </span><span class="kw">let _ </span>= leader.client.get_default_config_gen_params().<span class="kw">await</span>.unwrap();
+            leader.set_config_gen_params().<span class="kw">await</span>;
 
             <span class="comment">// Setup followers and send connection info
             </span><span class="kw">for </span>follower <span class="kw">in </span><span class="kw-2">&amp;mut </span>followers {
@@ -1656,6 +1816,7 @@
                 follower.set_connections(<span class="kw-2">&amp;</span>leader_url).<span class="kw">await</span>.unwrap();
                 follower.name = <span class="macro">format!</span>(<span class="string">&quot;{}_&quot;</span>, follower.name);
                 follower.set_connections(<span class="kw-2">&amp;</span>leader_url).<span class="kw">await</span>.unwrap();
+                follower.set_config_gen_params().<span class="kw">await</span>;
             }
 
             <span class="comment">// Confirm we can get peer servers if we are the leader
@@ -1681,7 +1842,9 @@
             <span class="macro">assert_eq!</span>(ids.len(), followers.len());
 
             <span class="comment">// all peers run DKG
-            </span>followers.push(leader);
+            </span><span class="kw">let </span>leader_amount = leader.amount;
+            <span class="kw">let </span>leader_name = leader.name.clone();
+            followers.push(leader);
             <span class="kw">let </span>followers = Arc::new(followers);
             <span class="kw">let </span>(results, <span class="kw">_</span>) = <span class="macro">tokio::join!</span>(
                 join_all(followers.iter().map(|peer| peer.client.run_dkg())),
@@ -1698,6 +1861,15 @@
                 hashes.insert(peer.client.get_verify_config_hash().<span class="kw">await</span>.unwrap());
             }
             <span class="macro">assert_eq!</span>(hashes.len(), <span class="number">1</span>);
+
+            <span class="comment">// verify the local and consensus values for peers
+            </span><span class="kw">for </span>peer <span class="kw">in </span>followers.iter() {
+                <span class="kw">let </span>cfg = peer.read_config();
+                <span class="kw">let </span>dummy: DummyConfig = cfg.get_module_config_typed(<span class="number">0</span>).unwrap();
+                <span class="macro">assert_eq!</span>(dummy.consensus.tx_fee, leader_amount);
+                <span class="macro">assert_eq!</span>(dummy.local.example, peer.name);
+                <span class="macro">assert_eq!</span>(cfg.consensus.meta[<span class="string">&quot;test&quot;</span>], leader_name);
+            }
 
             <span class="comment">// start consensus
             </span><span class="kw">for </span>peer <span class="kw">in </span>followers.iter() {

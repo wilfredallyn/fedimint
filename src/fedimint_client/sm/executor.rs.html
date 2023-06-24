@@ -945,6 +945,33 @@
 <a href="#945" id="945">945</a>
 <a href="#946" id="946">946</a>
 <a href="#947" id="947">947</a>
+<a href="#948" id="948">948</a>
+<a href="#949" id="949">949</a>
+<a href="#950" id="950">950</a>
+<a href="#951" id="951">951</a>
+<a href="#952" id="952">952</a>
+<a href="#953" id="953">953</a>
+<a href="#954" id="954">954</a>
+<a href="#955" id="955">955</a>
+<a href="#956" id="956">956</a>
+<a href="#957" id="957">957</a>
+<a href="#958" id="958">958</a>
+<a href="#959" id="959">959</a>
+<a href="#960" id="960">960</a>
+<a href="#961" id="961">961</a>
+<a href="#962" id="962">962</a>
+<a href="#963" id="963">963</a>
+<a href="#964" id="964">964</a>
+<a href="#965" id="965">965</a>
+<a href="#966" id="966">966</a>
+<a href="#967" id="967">967</a>
+<a href="#968" id="968">968</a>
+<a href="#969" id="969">969</a>
+<a href="#970" id="970">970</a>
+<a href="#971" id="971">971</a>
+<a href="#972" id="972">972</a>
+<a href="#973" id="973">973</a>
+<a href="#974" id="974">974</a>
 </pre><pre class="rust"><code><span class="kw">use </span>std::collections::{BTreeMap, HashSet};
 <span class="kw">use </span>std::fmt::{Debug, Formatter};
 <span class="kw">use </span>std::io::{Error, Read, Write};
@@ -956,14 +983,15 @@
 <span class="kw">use </span>fedimint_core::core::{IntoDynInstance, ModuleInstanceId};
 <span class="kw">use </span>fedimint_core::db::{AutocommitError, Database, DatabaseKeyWithNotify, DatabaseTransaction};
 <span class="kw">use </span>fedimint_core::encoding::{Decodable, DecodeError, Encodable};
-<span class="kw">use </span>fedimint_core::maybe_add_send_sync;
+<span class="kw">use </span>fedimint_core::fmt_utils::AbbreviateJson;
 <span class="kw">use </span>fedimint_core::module::registry::ModuleDecoderRegistry;
 <span class="kw">use </span>fedimint_core::task::TaskGroup;
+<span class="kw">use </span>fedimint_core::{maybe_add_send_sync, task};
 <span class="kw">use </span>futures::future::select_all;
 <span class="kw">use </span>futures::stream::StreamExt;
 <span class="kw">use </span>tokio::select;
 <span class="kw">use </span>tokio::sync::Mutex;
-<span class="kw">use </span>tracing::{debug, error, info, warn};
+<span class="kw">use </span>tracing::{debug, error, info, trace, warn};
 
 <span class="kw">use </span><span class="kw">crate</span>::sm::notifier::Notifier;
 <span class="kw">use </span><span class="kw">crate</span>::sm::state::{DynContext, DynState};
@@ -1047,7 +1075,9 @@
                 AutocommitError::ClosureError { error, .. } =&gt; error,
             })<span class="question-mark">?</span>;
 
-        <span class="prelude-val">Ok</span>(())
+        <span class="comment">// TODO: notify subscribers to state changes?
+
+        </span><span class="prelude-val">Ok</span>(())
     }
 
     <span class="doccomment">/// Adds a number of state machines to the executor atomically with other DB
@@ -1236,12 +1266,25 @@
     ) -&gt; anyhow::Result&lt;()&gt; {
         <span class="kw">let </span>active_states = <span class="self">self</span>.get_active_states().<span class="kw">await</span>;
 
+        <span class="comment">// TODO: use DB prefix subscription instead of polling
+        </span><span class="kw">let </span>active_state_count = active_states.len();
+        <span class="kw">let </span>new_state_added = <span class="kw">async move </span>{
+            <span class="kw">loop </span>{
+                <span class="kw">let </span>new_active_states_count = <span class="self">self</span>.get_active_states().<span class="kw">await</span>.len();
+                <span class="kw">if </span>new_active_states_count &gt; active_state_count {
+                    <span class="kw">return</span>;
+                }
+                fedimint_core::task::sleep(EXECUTOR_POLL_INTERVAL).<span class="kw">await</span>;
+            }
+        };
+
         <span class="kw">if </span>active_states.is_empty() {
             <span class="comment">// FIXME: what to do in this case? Probably best to subscribe to DB eventually
             </span><span class="macro">debug!</span>(<span class="string">&quot;No state transitions available, waiting before re-trying&quot;</span>);
-            fedimint_core::task::sleep(EXECUTOR_POLL_INTERVAL).<span class="kw">await</span>;
+            task::sleep(EXECUTOR_POLL_INTERVAL).<span class="kw">await</span>;
             <span class="kw">return </span><span class="prelude-val">Ok</span>(());
         }
+        <span class="macro">trace!</span>(<span class="string">&quot;Active states: {:?}&quot;</span>, active_states);
 
         <span class="kw">let </span>transitions = active_states
             .iter()
@@ -1276,8 +1319,19 @@
             num_transitions, <span class="string">&quot;Awaiting any state transition to become ready&quot;
         </span>);
 
-        <span class="kw">let </span>((transition_outcome, state, transition_fn, meta), <span class="kw">_</span>, <span class="kw">_</span>) =
-            select_all(transitions).<span class="kw">await</span>;
+        <span class="kw">let </span>((transition_outcome, state, transition_fn, meta), <span class="kw">_</span>, <span class="kw">_</span>) = <span class="macro">select! </span>{
+            res = select_all(transitions) =&gt; res,
+            () = new_state_added =&gt; {
+                <span class="macro">debug!</span>(<span class="string">&quot;New state added, re-starting state transitions&quot;</span>);
+                <span class="kw">return </span><span class="prelude-val">Ok</span>(());
+            }
+        };
+
+        <span class="macro">debug!</span>(
+            <span class="question-mark">?</span>state,
+            transition_outcome = <span class="question-mark">?</span>AbbreviateJson(<span class="kw-2">&amp;</span>transition_outcome),
+            <span class="string">&quot;Executing state transition&quot;
+        </span>);
 
         <span class="kw">let </span>new_state = <span class="self">self
             </span>.db
@@ -1529,7 +1583,7 @@
 
 <span class="attr">#[derive(Debug, Copy, Clone, Encodable, Decodable)]
 </span><span class="kw">pub struct </span>ActiveState {
-    created_at: SystemTime,
+    <span class="kw">pub </span>created_at: SystemTime,
 }
 
 <span class="kw">impl</span>&lt;GC&gt; ::fedimint_core::db::DatabaseRecord <span class="kw">for </span>ActiveStateKey&lt;GC&gt;
@@ -1672,8 +1726,8 @@
 
 <span class="attr">#[derive(Debug, Copy, Clone, Decodable, Encodable)]
 </span><span class="kw">pub struct </span>InactiveState {
-    created_at: SystemTime,
-    exited_at: SystemTime,
+    <span class="kw">pub </span>created_at: SystemTime,
+    <span class="kw">pub </span>exited_at: SystemTime,
 }
 
 <span class="kw">impl</span>&lt;GC&gt; ::fedimint_core::db::DatabaseRecord <span class="kw">for </span>InactiveStateKey&lt;GC&gt;
@@ -1706,7 +1760,7 @@
     <span class="kw">use </span>fedimint_core::db::Database;
     <span class="kw">use </span>fedimint_core::encoding::{Decodable, Encodable};
     <span class="kw">use </span>fedimint_core::module::registry::ModuleDecoderRegistry;
-    <span class="kw">use </span>fedimint_core::task::TaskGroup;
+    <span class="kw">use </span>fedimint_core::task::{<span class="self">self</span>, TaskGroup};
     <span class="kw">use </span>tokio::sync::broadcast::Sender;
     <span class="kw">use </span>tracing::{info, trace};
 
@@ -1880,9 +1934,9 @@
         </span>);
 
         <span class="comment">// TODO build await fn+timeout or allow manual driving of executor
-        </span>tokio::time::sleep(Duration::from_secs(<span class="number">1</span>)).<span class="kw">await</span>;
+        </span>task::sleep(Duration::from_secs(<span class="number">1</span>)).<span class="kw">await</span>;
         sender.send(<span class="number">0</span>).unwrap();
-        tokio::time::sleep(Duration::from_secs(<span class="number">2</span>)).<span class="kw">await</span>;
+        task::sleep(Duration::from_secs(<span class="number">2</span>)).<span class="kw">await</span>;
 
         <span class="macro">assert!</span>(
             executor

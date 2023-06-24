@@ -129,43 +129,30 @@
 <a href="#129" id="129">129</a>
 <a href="#130" id="130">130</a>
 <a href="#131" id="131">131</a>
-<a href="#132" id="132">132</a>
-<a href="#133" id="133">133</a>
-<a href="#134" id="134">134</a>
-<a href="#135" id="135">135</a>
-<a href="#136" id="136">136</a>
-<a href="#137" id="137">137</a>
-<a href="#138" id="138">138</a>
-<a href="#139" id="139">139</a>
-<a href="#140" id="140">140</a>
 </pre><pre class="rust"><code><span class="kw">use </span>std::net::SocketAddr;
 <span class="kw">use </span>std::path::PathBuf;
 <span class="kw">use </span>std::process::exit;
-<span class="kw">use </span>std::time::Duration;
 
 <span class="kw">use </span>clap::Parser;
-<span class="kw">use </span>fedimint_client::module::gen::{ClientModuleGenRegistry, DynClientModuleGen};
-<span class="kw">use </span>fedimint_client_legacy::modules::ln::{LightningClientGen, LightningModuleTypes};
-<span class="kw">use </span>fedimint_client_legacy::modules::mint::{MintClientGen, MintModuleTypes};
-<span class="kw">use </span>fedimint_client_legacy::modules::wallet::{
-    WalletClientGen, WalletCommonGen, WalletModuleTypes,
-};
 <span class="kw">use </span>fedimint_core::core::{
     LEGACY_HARDCODED_INSTANCE_ID_LN, LEGACY_HARDCODED_INSTANCE_ID_MINT,
     LEGACY_HARDCODED_INSTANCE_ID_WALLET,
 };
+<span class="kw">use </span>fedimint_core::db::Database;
 <span class="kw">use </span>fedimint_core::module::registry::ModuleDecoderRegistry;
 <span class="kw">use </span>fedimint_core::module::{CommonModuleGen, ModuleCommon};
-<span class="kw">use </span>fedimint_core::task::TaskGroup;
 <span class="kw">use </span>fedimint_ln_client::LightningCommonGen;
+<span class="kw">use </span>fedimint_ln_common::config::GatewayFee;
+<span class="kw">use </span>fedimint_ln_common::LightningModuleTypes;
 <span class="kw">use </span>fedimint_logging::TracingSetup;
-<span class="kw">use </span>fedimint_mint_client::MintCommonGen;
-<span class="kw">use </span>ln_gateway::client::{DynGatewayClientBuilder, RocksDbFactory, StandardGatewayClientBuilder};
-<span class="kw">use </span>ln_gateway::{Gateway, LightningMode};
-<span class="kw">use </span>tracing::{error, info};
+<span class="kw">use </span>fedimint_mint_client::{MintCommonGen, MintModuleTypes};
+<span class="kw">use </span>fedimint_wallet_client::{WalletCommonGen, WalletModuleTypes};
+<span class="kw">use </span>ln_gateway::client::StandardGatewayClientBuilder;
+<span class="kw">use </span>ln_gateway::{Gateway, GatewayError, LightningMode, DEFAULT_FEES};
+<span class="kw">use </span>tracing::info;
 <span class="kw">use </span>url::Url;
 
-<span class="kw">const </span>SHUTDOWN_TIMEOUT: Duration = Duration::from_secs(<span class="number">10</span>);
+<span class="kw">const </span>DB_FILE: <span class="kw-2">&amp;</span>str = <span class="string">&quot;gatewayd.db&quot;</span>;
 
 <span class="attr">#[derive(Parser)]
 </span><span class="kw">pub struct </span>GatewayOpts {
@@ -187,6 +174,11 @@
     <span class="doccomment">/// Gateway webserver authentication password
     </span><span class="attr">#[arg(long = <span class="string">&quot;password&quot;</span>, env = <span class="string">&quot;FM_GATEWAY_PASSWORD&quot;</span>)]
     </span><span class="kw">pub </span>password: String,
+
+    <span class="doccomment">/// Configured gateway routing fees
+    /// Format: &lt;base_msat&gt;,&lt;proportional_millionths&gt;
+    </span><span class="attr">#[arg(long = <span class="string">&quot;fees&quot;</span>, env = <span class="string">&quot;FM_GATEWAY_FEES&quot;</span>)]
+    </span><span class="kw">pub </span>fees: <span class="prelude-ty">Option</span>&lt;GatewayFee&gt;,
 }
 
 <span class="doccomment">/// Fedimint Gateway Binary
@@ -214,6 +206,7 @@
         listen,
         api_addr,
         password,
+        fees,
     } = GatewayOpts::parse();
 
     <span class="macro">info!</span>(
@@ -222,11 +215,7 @@
     );
 
     <span class="comment">// Create federation client builder
-    </span><span class="kw">let </span>client_builder: DynGatewayClientBuilder =
-        StandardGatewayClientBuilder::new(data_dir.clone(), RocksDbFactory.into(), api_addr).into();
-
-    <span class="comment">// Create task group for controlled shutdown of the gateway
-    </span><span class="kw">let </span>task_group = TaskGroup::new();
+    </span><span class="kw">let </span>client_builder = StandardGatewayClientBuilder::new(data_dir.clone());
 
     <span class="comment">// Create module decoder registry
     </span><span class="kw">let </span>decoders = ModuleDecoderRegistry::from_iter([
@@ -247,20 +236,19 @@
         ),
     ]);
 
-    <span class="comment">// Create module generator registry
-    </span><span class="kw">let </span>module_gens = ClientModuleGenRegistry::from(<span class="macro">vec!</span>[
-        DynClientModuleGen::from(WalletClientGen),
-        DynClientModuleGen::from(MintClientGen),
-        DynClientModuleGen::from(LightningClientGen),
-    ]);
+    <span class="kw">let </span>gatewayd_db = Database::new(
+        fedimint_rocksdb::RocksDb::open(data_dir.join(DB_FILE))
+            .map_err(|<span class="kw">_</span>| GatewayError::DatabaseError)<span class="question-mark">?</span>,
+        decoders.clone(),
+    );
 
     <span class="comment">// Create gateway instance
     </span><span class="kw">let </span>gateway = Gateway::new(
         mode,
         client_builder,
-        decoders,
-        module_gens,
-        task_group.make_subgroup().<span class="kw">await</span>,
+        fees.unwrap_or(GatewayFee(DEFAULT_FEES)).<span class="number">0</span>,
+        gatewayd_db,
+        api_addr,
     )
     .<span class="kw">await
     </span>.unwrap_or_else(|e| {
@@ -268,13 +256,7 @@
         exit(<span class="number">1</span>)
     });
 
-    gateway.spawn_webserver(listen, password).<span class="kw">await</span>;
-    <span class="kw">if let </span><span class="prelude-val">Err</span>(e) = gateway.run(task_group.make_handle()).<span class="kw">await </span>{
-        task_group.shutdown_join_all(<span class="prelude-val">Some</span>(SHUTDOWN_TIMEOUT)).<span class="kw">await</span><span class="question-mark">?</span>;
-
-        <span class="macro">error!</span>(<span class="string">&quot;Gateway stopped with error: {}&quot;</span>, e);
-        <span class="kw">return </span><span class="prelude-val">Err</span>(e.into());
-    }
+    gateway.spawn_blocking_webserver(listen, password).<span class="kw">await</span>;
 
     <span class="prelude-val">Ok</span>(())
 }

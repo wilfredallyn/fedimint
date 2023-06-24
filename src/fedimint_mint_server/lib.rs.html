@@ -1436,14 +1436,6 @@
 <a href="#1436" id="1436">1436</a>
 <a href="#1437" id="1437">1437</a>
 <a href="#1438" id="1438">1438</a>
-<a href="#1439" id="1439">1439</a>
-<a href="#1440" id="1440">1440</a>
-<a href="#1441" id="1441">1441</a>
-<a href="#1442" id="1442">1442</a>
-<a href="#1443" id="1443">1443</a>
-<a href="#1444" id="1444">1444</a>
-<a href="#1445" id="1445">1445</a>
-<a href="#1446" id="1446">1446</a>
 </pre><pre class="rust"><code><span class="kw">use </span>std::collections::{BTreeMap, BTreeSet, HashMap};
 <span class="kw">use </span>std::iter::FromIterator;
 <span class="kw">use </span>std::ops::Sub;
@@ -1455,7 +1447,6 @@
 };
 <span class="kw">use </span>fedimint_core::db::{Database, DatabaseVersion, ModuleDatabaseTransaction};
 <span class="kw">use </span>fedimint_core::module::audit::Audit;
-<span class="kw">use </span>fedimint_core::module::interconnect::ModuleInterconect;
 <span class="kw">use </span>fedimint_core::module::{
     api_endpoint, ApiEndpoint, ApiError, ConsensusProposal, CoreConsensusVersion,
     ExtendsCommonModuleGen, InputMeta, IntoModuleError, ModuleConsensusVersion, ModuleError,
@@ -1509,6 +1500,7 @@
 
 <span class="attr">#[apply(<span class="macro">async_trait_maybe_send!</span>)]
 </span><span class="kw">impl </span>ServerModuleGen <span class="kw">for </span>MintGen {
+    <span class="kw">type </span>Params = MintGenParams;
     <span class="kw">const </span>DATABASE_VERSION: DatabaseVersion = DatabaseVersion(<span class="number">0</span>);
 
     <span class="kw">fn </span>versions(<span class="kw-2">&amp;</span><span class="self">self</span>, _core: CoreConsensusVersion) -&gt; <span class="kw-2">&amp;</span>[ModuleConsensusVersion] {
@@ -1529,9 +1521,7 @@
         peers: <span class="kw-2">&amp;</span>[PeerId],
         params: <span class="kw-2">&amp;</span>ConfigGenModuleParams,
     ) -&gt; BTreeMap&lt;PeerId, ServerModuleConfig&gt; {
-        <span class="kw">let </span>params = params
-            .to_typed::&lt;MintGenParams&gt;()
-            .expect(<span class="string">&quot;Invalid mint params&quot;</span>);
+        <span class="kw">let </span>params = <span class="self">self</span>.parse_params(params).unwrap();
 
         <span class="kw">let </span>tbs_keys = params
             .consensus
@@ -1590,9 +1580,7 @@
         peers: <span class="kw-2">&amp;</span>PeerHandle,
         params: <span class="kw-2">&amp;</span>ConfigGenModuleParams,
     ) -&gt; DkgResult&lt;ServerModuleConfig&gt; {
-        <span class="kw">let </span>params = params
-            .to_typed::&lt;MintGenParams&gt;()
-            .expect(<span class="string">&quot;Invalid mint gen params&quot;</span>);
+        <span class="kw">let </span>params = <span class="self">self</span>.parse_params(params).unwrap();
 
         <span class="kw">let </span>g2 = peers
             .run_dkg_multi_g2(params.consensus.mint_amounts.to_vec())
@@ -1853,7 +1841,6 @@
 
     <span class="kw">async fn </span>validate_input&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt;(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        _interconnect: <span class="kw-2">&amp;</span><span class="kw">dyn </span>ModuleInterconect,
         dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;b</span>&gt;,
         verification_cache: <span class="kw-2">&amp;</span><span class="self">Self</span>::VerificationCache,
         input: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>MintInput,
@@ -1879,7 +1866,7 @@
                 amount: input.total_amount(),
                 fee: <span class="self">self</span>.cfg.consensus.fee_consensus.note_spend_abs * (input.count_items() <span class="kw">as </span>u64),
             },
-            puk_keys: input
+            pub_keys: input
                 .iter_items()
                 .map(|(<span class="kw">_</span>, note)| <span class="kw-2">*</span>note.spend_key())
                 .collect(),
@@ -1888,14 +1875,11 @@
 
     <span class="kw">async fn </span>apply_input&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>, <span class="lifetime">&#39;c</span>&gt;(
         <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>,
-        interconnect: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw">dyn </span>ModuleInterconect,
         dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;c</span>&gt;,
         input: <span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span>MintInput,
         cache: <span class="kw-2">&amp;</span><span class="self">Self</span>::VerificationCache,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;InputMeta, ModuleError&gt; {
-        <span class="kw">let </span>meta = <span class="self">self
-            </span>.validate_input(interconnect, dbtx, cache, input)
-            .<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let </span>meta = <span class="self">self</span>.validate_input(dbtx, cache, input).<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="kw">for </span>(amount, note) <span class="kw">in </span>input.iter_items() {
             <span class="kw">let </span>key = NonceKey(note.<span class="number">0</span>);

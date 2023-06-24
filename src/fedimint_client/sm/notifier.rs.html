@@ -149,6 +149,34 @@
 <a href="#149" id="149">149</a>
 <a href="#150" id="150">150</a>
 <a href="#151" id="151">151</a>
+<a href="#152" id="152">152</a>
+<a href="#153" id="153">153</a>
+<a href="#154" id="154">154</a>
+<a href="#155" id="155">155</a>
+<a href="#156" id="156">156</a>
+<a href="#157" id="157">157</a>
+<a href="#158" id="158">158</a>
+<a href="#159" id="159">159</a>
+<a href="#160" id="160">160</a>
+<a href="#161" id="161">161</a>
+<a href="#162" id="162">162</a>
+<a href="#163" id="163">163</a>
+<a href="#164" id="164">164</a>
+<a href="#165" id="165">165</a>
+<a href="#166" id="166">166</a>
+<a href="#167" id="167">167</a>
+<a href="#168" id="168">168</a>
+<a href="#169" id="169">169</a>
+<a href="#170" id="170">170</a>
+<a href="#171" id="171">171</a>
+<a href="#172" id="172">172</a>
+<a href="#173" id="173">173</a>
+<a href="#174" id="174">174</a>
+<a href="#175" id="175">175</a>
+<a href="#176" id="176">176</a>
+<a href="#177" id="177">177</a>
+<a href="#178" id="178">178</a>
+<a href="#179" id="179">179</a>
 </pre><pre class="rust"><code><span class="kw">use </span>std::marker::PhantomData;
 
 <span class="kw">use </span>fedimint_core::core::ModuleInstanceId;
@@ -162,7 +190,7 @@
     ActiveModuleOperationStateKeyPrefix, ActiveStateKey, InactiveModuleOperationStateKeyPrefix,
     InactiveStateKey,
 };
-<span class="kw">use </span><span class="kw">crate</span>::sm::{DynState, GlobalContext, OperationId, State};
+<span class="kw">use </span><span class="kw">crate</span>::sm::{ActiveState, DynState, GlobalContext, InactiveState, OperationId, State};
 
 <span class="doccomment">/// State transition notifier owned by the modularized client used to inform
 /// modules of state transitions.
@@ -233,8 +261,6 @@
     /// loaded from the database are not returned in a specific order. There may
     /// also be duplications.
     </span><span class="kw">pub async fn </span>subscribe(<span class="kw-2">&amp;</span><span class="self">self</span>, operation_id: OperationId) -&gt; BoxStream&lt;<span class="lifetime">&#39;static</span>, S&gt; {
-        <span class="kw">let </span>module_instance_id = <span class="self">self</span>.module_instance;
-
         <span class="kw">let </span>to_typed_state = |state: DynState&lt;GC&gt;| {
             state
                 .as_any()
@@ -245,27 +271,16 @@
 
         <span class="comment">// It&#39;s important to start the subscription first and then query the database to
         // not lose any transitions in the meantime.
-        </span><span class="kw">let </span>new_transitions = BroadcastStream::new(<span class="self">self</span>.broadcast.subscribe())
-            .take_while(|res| {
-                <span class="kw">let </span>cont = <span class="kw">if let </span><span class="prelude-val">Err</span>(err) = res {
-                    <span class="macro">error!</span>(<span class="question-mark">?</span>err, <span class="string">&quot;ModuleNotifier stream stopped on error&quot;</span>);
-                    <span class="bool-val">false
-                </span>} <span class="kw">else </span>{
-                    <span class="bool-val">true
-                </span>};
-                std::future::ready(cont)
-            })
-            .filter_map(<span class="kw">move </span>|res| <span class="kw">async move </span>{
-                <span class="kw">let </span>state: DynState&lt;GC&gt; = res.expect(<span class="string">&quot;Stream is stopped on error&quot;</span>);
-
-                <span class="kw">if </span>state.operation_id() == operation_id
-                    &amp;&amp; state.module_instance_id() == module_instance_id
-                {
-                    <span class="prelude-val">Some</span>(to_typed_state(state))
-                } <span class="kw">else </span>{
-                    <span class="prelude-val">None
-                </span>}
-            });
+        </span><span class="kw">let </span>new_transitions =
+            <span class="self">self</span>.subscribe_all_operations()
+                .<span class="kw">await
+                </span>.filter_map(<span class="kw">move </span>|state: S| <span class="kw">async move </span>{
+                    <span class="kw">if </span>state.operation_id() == operation_id {
+                        <span class="prelude-val">Some</span>(state)
+                    } <span class="kw">else </span>{
+                        <span class="prelude-val">None
+                    </span>}
+                });
 
         <span class="kw">let </span>db_states = {
             <span class="kw">let </span><span class="kw-2">mut </span>dbtx = <span class="self">self</span>.db.begin_transaction().<span class="kw">await</span>;
@@ -276,8 +291,10 @@
                     _pd: Default::default(),
                 })
                 .<span class="kw">await
-                </span>.map(|(key, <span class="kw">_</span>): (ActiveStateKey&lt;GC&gt;, <span class="kw">_</span>)| to_typed_state(key.state))
-                .collect::&lt;Vec&lt;S&gt;&gt;()
+                </span>.map(|(key, val): (ActiveStateKey&lt;GC&gt;, ActiveState)| {
+                    (to_typed_state(key.state), val.created_at)
+                })
+                .collect::&lt;Vec&lt;(S, <span class="kw">_</span>)&gt;&gt;()
                 .<span class="kw">await</span>;
 
             <span class="kw">let </span>inactive_states = dbtx
@@ -287,17 +304,56 @@
                     _pd: Default::default(),
                 })
                 .<span class="kw">await
-                </span>.map(|(key, <span class="kw">_</span>): (InactiveStateKey&lt;GC&gt;, <span class="kw">_</span>)| to_typed_state(key.state))
-                .collect::&lt;Vec&lt;S&gt;&gt;()
+                </span>.map(|(key, val): (InactiveStateKey&lt;GC&gt;, InactiveState)| {
+                    (to_typed_state(key.state), val.created_at)
+                })
+                .collect::&lt;Vec&lt;(S, <span class="kw">_</span>)&gt;&gt;()
                 .<span class="kw">await</span>;
 
-            active_states
+            <span class="comment">// FIXME: don&#39;t rely on SystemTime for ordering and introduce a state transition
+            // index instead (dpc was right again xD)
+            </span><span class="kw">let </span><span class="kw-2">mut </span>all_states_timed = active_states
                 .into_iter()
                 .chain(inactive_states)
+                .collect::&lt;Vec&lt;(S, <span class="kw">_</span>)&gt;&gt;();
+            all_states_timed.sort_by(|(<span class="kw">_</span>, t1), (<span class="kw">_</span>, t2)| t1.cmp(t2));
+            all_states_timed
+                .into_iter()
+                .map(|(s, <span class="kw">_</span>)| s)
                 .collect::&lt;Vec&lt;S&gt;&gt;()
         };
 
         Box::pin(futures::stream::iter(db_states).chain(new_transitions))
+    }
+
+    <span class="doccomment">/// Subscribe to all state transitions belonging to the module instance.
+    </span><span class="kw">pub async fn </span>subscribe_all_operations(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; BoxStream&lt;<span class="lifetime">&#39;static</span>, S&gt; {
+        <span class="kw">let </span>module_instance_id = <span class="self">self</span>.module_instance;
+        Box::pin(
+            BroadcastStream::new(<span class="self">self</span>.broadcast.subscribe())
+                .take_while(|res| {
+                    <span class="kw">let </span>cont = <span class="kw">if let </span><span class="prelude-val">Err</span>(err) = res {
+                        <span class="macro">error!</span>(<span class="question-mark">?</span>err, <span class="string">&quot;ModuleNotifier stream stopped on error&quot;</span>);
+                        <span class="bool-val">false
+                    </span>} <span class="kw">else </span>{
+                        <span class="bool-val">true
+                    </span>};
+                    std::future::ready(cont)
+                })
+                .filter_map(<span class="kw">move </span>|res| <span class="kw">async move </span>{
+                    <span class="kw">let </span>s = res.expect(<span class="string">&quot;We filtered out errors above&quot;</span>);
+                    <span class="kw">if </span>s.module_instance_id() == module_instance_id {
+                        <span class="prelude-val">Some</span>(
+                            s.as_any()
+                                .downcast_ref::&lt;S&gt;()
+                                .expect(<span class="string">&quot;Tried to subscribe to wrong state type&quot;</span>)
+                                .clone(),
+                        )
+                    } <span class="kw">else </span>{
+                        <span class="prelude-val">None
+                    </span>}
+                }),
+        )
     }
 }
 </code></pre></div>

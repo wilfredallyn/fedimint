@@ -298,68 +298,22 @@
 <a href="#298" id="298">298</a>
 <a href="#299" id="299">299</a>
 <a href="#300" id="300">300</a>
-<a href="#301" id="301">301</a>
-<a href="#302" id="302">302</a>
-<a href="#303" id="303">303</a>
-<a href="#304" id="304">304</a>
-<a href="#305" id="305">305</a>
-<a href="#306" id="306">306</a>
-<a href="#307" id="307">307</a>
-<a href="#308" id="308">308</a>
-<a href="#309" id="309">309</a>
-<a href="#310" id="310">310</a>
-<a href="#311" id="311">311</a>
-<a href="#312" id="312">312</a>
-<a href="#313" id="313">313</a>
-<a href="#314" id="314">314</a>
-<a href="#315" id="315">315</a>
-<a href="#316" id="316">316</a>
-<a href="#317" id="317">317</a>
-<a href="#318" id="318">318</a>
-<a href="#319" id="319">319</a>
-<a href="#320" id="320">320</a>
-<a href="#321" id="321">321</a>
-<a href="#322" id="322">322</a>
-<a href="#323" id="323">323</a>
-<a href="#324" id="324">324</a>
-<a href="#325" id="325">325</a>
-<a href="#326" id="326">326</a>
-<a href="#327" id="327">327</a>
-<a href="#328" id="328">328</a>
-<a href="#329" id="329">329</a>
-<a href="#330" id="330">330</a>
-<a href="#331" id="331">331</a>
-<a href="#332" id="332">332</a>
-<a href="#333" id="333">333</a>
-<a href="#334" id="334">334</a>
-<a href="#335" id="335">335</a>
-<a href="#336" id="336">336</a>
-<a href="#337" id="337">337</a>
-<a href="#338" id="338">338</a>
-<a href="#339" id="339">339</a>
-<a href="#340" id="340">340</a>
-<a href="#341" id="341">341</a>
-<a href="#342" id="342">342</a>
-<a href="#343" id="343">343</a>
-<a href="#344" id="344">344</a>
-<a href="#345" id="345">345</a>
-<a href="#346" id="346">346</a>
-<a href="#347" id="347">347</a>
-<a href="#348" id="348">348</a>
-<a href="#349" id="349">349</a>
-<a href="#350" id="350">350</a>
-<a href="#351" id="351">351</a>
-<a href="#352" id="352">352</a>
-<a href="#353" id="353">353</a>
-<a href="#354" id="354">354</a>
 </pre><pre class="rust"><code><span class="kw">use </span>std::collections::BTreeMap;
-<span class="kw">use </span>std::ops::Range;
 
 <span class="kw">use </span>anyhow::{anyhow, Context};
+<span class="kw">use </span>bitcoincore_rpc::bitcoin::Network;
+<span class="kw">use </span>fedimint_aead::random_salt;
+<span class="kw">use </span>fedimint_core::bitcoinrpc::BitcoinRpcConfig;
 <span class="kw">use </span>fedimint_core::core::LEGACY_HARDCODED_INSTANCE_ID_WALLET;
 <span class="kw">use </span>fedimint_core::db::mem_impl::MemDatabase;
+<span class="kw">use </span>fedimint_core::util::write_new;
+<span class="kw">use </span>fedimint_core::{Amount, PeerId};
+<span class="kw">use </span>fedimint_server::config::io::{write_server_config, PLAINTEXT_PASSWORD, SALT_FILE};
+<span class="kw">use </span>fedimint_server::config::ServerConfig;
+<span class="kw">use </span>fedimint_testing::federation::local_config_gen_params;
 <span class="kw">use </span>fedimint_wallet_client::config::WalletClientConfig;
-<span class="kw">use </span>futures::future;
+<span class="kw">use </span>fedimintd::attach_default_module_gen_params;
+<span class="kw">use </span>fedimintd::fedimintd::Fedimintd <span class="kw">as </span>FedimintBuilder;
 <span class="kw">use </span>tokio::fs;
 
 <span class="kw">use super</span>::<span class="kw-2">*</span>; <span class="comment">// TODO: remove this
@@ -368,6 +322,7 @@
     <span class="comment">// client is only for internal use, use cli commands instead
     </span>client: Arc&lt;UserClient&gt;,
     members: BTreeMap&lt;usize, Fedimintd&gt;,
+    vars: BTreeMap&lt;usize, vars::Fedimintd&gt;,
     bitcoind: Bitcoind,
 }
 
@@ -375,20 +330,13 @@
     <span class="kw">pub async fn </span>new(
         process_mgr: <span class="kw-2">&amp;</span>ProcessManager,
         bitcoind: Bitcoind,
-        peer_ids: Range&lt;usize&gt;,
+        vars: BTreeMap&lt;usize, vars::Fedimintd&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>&gt; {
         <span class="kw">let </span><span class="kw-2">mut </span>members = BTreeMap::new();
-        <span class="kw">for </span>peer_id <span class="kw">in </span>peer_ids {
+        <span class="kw">for </span>(peer, var) <span class="kw">in </span><span class="kw-2">&amp;</span>vars {
             members.insert(
-                peer_id,
-                Fedimintd::new(
-                    process_mgr,
-                    bitcoind.clone(),
-                    peer_id,
-                    <span class="kw-2">&amp;</span>vars::Fedimintd::init(<span class="kw-2">&amp;</span>process_mgr.globals, peer_id, vars::UiKind::Old)
-                        .<span class="kw">await</span><span class="question-mark">?</span>,
-                )
-                .<span class="kw">await</span><span class="question-mark">?</span>,
+                <span class="kw-2">*</span>peer,
+                Fedimintd::new(process_mgr, bitcoind.clone(), <span class="kw-2">*</span>peer, var).<span class="kw">await</span><span class="question-mark">?</span>,
             );
         }
 
@@ -398,35 +346,26 @@
         <span class="kw">let </span>decoders = module_decode_stubs();
         <span class="kw">let </span>db = Database::new(MemDatabase::new(), module_decode_stubs());
         <span class="kw">let </span>module_gens = ClientModuleGenRegistry::from(<span class="macro">vec!</span>[
-            DynClientModuleGen::from(WalletClientGen),
+            DynClientModuleGen::from(WalletClientGen::default()),
             DynClientModuleGen::from(MintClientGen),
             DynClientModuleGen::from(LightningClientGen),
         ]);
         <span class="kw">let </span>client = UserClient::new(cfg, decoders, module_gens, db, Default::default()).<span class="kw">await</span>;
         <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
             members,
+            vars,
             bitcoind,
             client: Arc::new(client),
         })
     }
 
-    <span class="kw">pub async fn </span>start_server(
-        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
-        process_mgr: <span class="kw-2">&amp;</span>ProcessManager,
-        peer_id: usize,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="kw">if </span><span class="self">self</span>.members.contains_key(<span class="kw-2">&amp;</span>peer_id) {
-            <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="macro">anyhow!</span>(<span class="string">&quot;fedimintd-{} already running&quot;</span>, peer_id));
+    <span class="kw">pub async fn </span>start_server(<span class="kw-2">&amp;mut </span><span class="self">self</span>, process_mgr: <span class="kw-2">&amp;</span>ProcessManager, peer: usize) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="kw">if </span><span class="self">self</span>.members.contains_key(<span class="kw-2">&amp;</span>peer) {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="macro">anyhow!</span>(<span class="string">&quot;fedimintd-{} already running&quot;</span>, peer));
         }
         <span class="self">self</span>.members.insert(
-            peer_id,
-            Fedimintd::new(
-                process_mgr,
-                <span class="self">self</span>.bitcoind.clone(),
-                peer_id,
-                <span class="kw-2">&amp;</span>vars::Fedimintd::init(<span class="kw-2">&amp;</span>process_mgr.globals, peer_id, vars::UiKind::Old).<span class="kw">await</span><span class="question-mark">?</span>,
-            )
-            .<span class="kw">await</span><span class="question-mark">?</span>,
+            peer,
+            Fedimintd::new(process_mgr, <span class="self">self</span>.bitcoind.clone(), peer, <span class="kw-2">&amp;</span><span class="self">self</span>.vars[<span class="kw-2">&amp;</span>peer]).<span class="kw">await</span><span class="question-mark">?</span>,
         );
         <span class="prelude-val">Ok</span>(())
     }
@@ -437,10 +376,6 @@
         };
         fedimintd.kill().<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(())
-    }
-
-    <span class="kw">pub fn </span>members(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>BTreeMap&lt;usize, Fedimintd&gt; {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.members
     }
 
     <span class="kw">pub async fn </span>cmd(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Command {
@@ -472,6 +407,22 @@
         <span class="prelude-val">Ok</span>(())
     }
 
+    <span class="kw">pub async fn </span>pegin_ng(<span class="kw-2">&amp;</span><span class="self">self</span>, amt: u64) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="kw">let </span>deposit = <span class="macro">cmd!</span>(<span class="self">self</span>, <span class="string">&quot;ng&quot;</span>, <span class="string">&quot;deposit-address&quot;</span>).out_json().<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let </span>deposit_address = deposit[<span class="string">&quot;address&quot;</span>].as_str().unwrap();
+        <span class="kw">let </span>deposit_operation_id = deposit[<span class="string">&quot;operation_id&quot;</span>].as_str().unwrap();
+
+        <span class="self">self</span>.bitcoind
+            .send_to(deposit_address.to_owned(), amt)
+            .<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="self">self</span>.bitcoind.mine_blocks(<span class="number">100</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+
+        <span class="macro">cmd!</span>(<span class="self">self</span>, <span class="string">&quot;ng&quot;</span>, <span class="string">&quot;await-deposit&quot;</span>, deposit_operation_id)
+            .run()
+            .<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(())
+    }
+
     <span class="kw">pub async fn </span>pegin_gateway(<span class="kw-2">&amp;</span><span class="self">self</span>, amt: u64, gw_cln: <span class="kw-2">&amp;</span>Gatewayd) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="kw">let </span>fed_id = <span class="self">self</span>.federation_id().<span class="kw">await</span>;
         <span class="kw">let </span>pegin_addr = <span class="macro">cmd!</span>(gw_cln, <span class="string">&quot;address&quot;</span>, <span class="string">&quot;--federation-id={fed_id}&quot;</span>)
@@ -480,23 +431,18 @@
             </span>.as_str()
             .context(<span class="string">&quot;address must be a string&quot;</span>)<span class="question-mark">?
             </span>.to_owned();
-        <span class="kw">let </span>txid = <span class="self">self</span>.bitcoind.send_to(pegin_addr, amt).<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="self">self</span>.bitcoind.mine_blocks(<span class="number">11</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="self">self</span>.await_block_sync().<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="kw">let </span>(txout_proof, raw_tx) = <span class="macro">tokio::try_join!</span>(
-            <span class="self">self</span>.bitcoind.get_txout_proof(<span class="kw-2">&amp;</span>txid),
-            <span class="self">self</span>.bitcoind.get_raw_transaction(<span class="kw-2">&amp;</span>txid),
-        )<span class="question-mark">?</span>;
-        <span class="macro">cmd!</span>(
-            gw_cln,
-            <span class="string">&quot;deposit&quot;</span>,
-            <span class="string">&quot;--federation-id={fed_id}&quot;</span>,
-            <span class="string">&quot;--txout-proof={txout_proof}&quot;</span>,
-            <span class="string">&quot;--transaction={raw_tx}&quot;
-        </span>)
-        .run()
+        <span class="self">self</span>.bitcoind.send_to(pegin_addr, amt).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="self">self</span>.bitcoind.mine_blocks(<span class="number">21</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+        poll(<span class="string">&quot;gateway pegin&quot;</span>, || <span class="kw">async </span>{
+            <span class="kw">let </span>gateway_balance = <span class="macro">cmd!</span>(gw_cln, <span class="string">&quot;balance&quot;</span>, <span class="string">&quot;--federation-id={fed_id}&quot;</span>)
+                .out_json()
+                .<span class="kw">await</span><span class="question-mark">?
+                </span>.as_u64()
+                .unwrap();
+
+            <span class="prelude-val">Ok</span>(gateway_balance == (amt * <span class="number">1000</span>))
+        })
         .<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="macro">cmd!</span>(<span class="self">self</span>, <span class="string">&quot;fetch&quot;</span>).run().<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(())
     }
 
@@ -597,95 +543,41 @@
     }
 }
 
-<span class="kw">pub async fn </span>run_dkg(process_mgr: <span class="kw-2">&amp;</span>ProcessManager, servers: usize) -&gt; anyhow::Result&lt;()&gt; {
-    <span class="kw">async fn </span>create_tls(id: usize, env: <span class="kw-2">&amp;</span>vars::Fedimintd) -&gt; anyhow::Result&lt;String&gt; {
-        <span class="kw">let </span>server_name = <span class="macro">format!</span>(<span class="string">&quot;Server {id}!&quot;</span>);
+<span class="doccomment">/// Base port for devimint
+</span><span class="kw">const </span>BASE_PORT: u16 = <span class="number">8173 </span>+ <span class="number">10000</span>;
 
-        <span class="macro">cmd!</span>(
-            <span class="string">&quot;distributedgen&quot;</span>,
-            <span class="string">&quot;create-cert&quot;</span>,
-            <span class="string">&quot;--p2p-url&quot;</span>,
-            <span class="kw-2">&amp;</span>env.FM_P2P_URL,
-            <span class="string">&quot;--api-url&quot;</span>,
-            <span class="kw-2">&amp;</span>env.FM_API_URL,
-            <span class="string">&quot;--out-dir&quot;</span>,
-            utf8(<span class="kw-2">&amp;</span>env.FM_DATA_DIR),
-            <span class="string">&quot;--name={server_name}&quot;</span>,
-        )
-        .envs(env.vars())
-        .run_with_logging(<span class="macro">format!</span>(<span class="string">&quot;fedimintd-{id}&quot;</span>))
-        .<span class="kw">await</span><span class="question-mark">?</span>;
-
-        <span class="macro">info!</span>(<span class="string">&quot;TLS certs created for started {server_name}&quot;</span>);
-
-        <span class="kw">let </span>cert = fs::read_to_string(env.FM_DATA_DIR.join(<span class="string">&quot;tls-cert&quot;</span>))
-            .<span class="kw">await
-            </span>.context(<span class="string">&quot;could not read TLS cert from disk&quot;</span>)<span class="question-mark">?</span>;
-
-        <span class="prelude-val">Ok</span>(cert)
-    }
-
-    <span class="kw">async fn </span>run_distributedgen(
-        id: usize,
-        env: <span class="kw-2">&amp;</span>vars::Fedimintd,
-        certs: Vec&lt;String&gt;,
-    ) -&gt; anyhow::Result&lt;()&gt; {
-        <span class="kw">let </span>certs = certs.join(<span class="string">&quot;,&quot;</span>);
-        <span class="kw">let </span>server_name = <span class="macro">format!</span>(<span class="string">&quot;Server-{id}&quot;</span>);
-
-        <span class="macro">cmd!</span>(
-            <span class="string">&quot;distributedgen&quot;</span>,
-            <span class="string">&quot;run&quot;</span>,
-            <span class="string">&quot;--bind-p2p&quot;</span>,
-            <span class="kw-2">&amp;</span>env.FM_BIND_P2P,
-            <span class="string">&quot;--bind-api&quot;</span>,
-            <span class="kw-2">&amp;</span>env.FM_BIND_API,
-            <span class="string">&quot;--out-dir&quot;</span>,
-            utf8(<span class="kw-2">&amp;</span>env.FM_DATA_DIR),
-            <span class="string">&quot;--certs={certs}&quot;</span>,
-        )
-        .envs(env.vars())
-        .run_with_logging(<span class="macro">format!</span>(<span class="string">&quot;fedimintd-{id}&quot;</span>))
-        .<span class="kw">await
-        </span>.with_context(|| <span class="macro">format!</span>(<span class="string">&quot;dkg run for {server_name}&quot;</span>))<span class="question-mark">?</span>;
-
-        <span class="macro">info!</span>(<span class="string">&quot;DKG created for started {server_name}&quot;</span>);
-
-        <span class="prelude-val">Ok</span>(())
-    }
-
-    <span class="macro">info!</span>(<span class="string">&quot;Generated TLS certs&quot;</span>);
-    <span class="kw">let </span>fedimintd_envs = future::try_join_all(
-        (<span class="number">0</span>..servers).map(|id| vars::Fedimintd::init(<span class="kw-2">&amp;</span>process_mgr.globals, id, vars::UiKind::Old)),
-    )
-    .<span class="kw">await</span><span class="question-mark">?</span>;
-    <span class="kw">let </span>certs = future::try_join_all(
-        fedimintd_envs
-            .iter()
-            .enumerate()
-            .map(|(id, env)| create_tls(id, env)),
-    )
-    .<span class="kw">await</span><span class="question-mark">?</span>;
-
-    <span class="macro">info!</span>(
-        <span class="string">&quot;Collected TLS certs: {certs_string}&quot;</span>,
-        certs_string = certs.join(<span class="string">&quot;,&quot;</span>)
+<span class="kw">pub async fn </span>run_config_gen(
+    process_mgr: <span class="kw-2">&amp;</span>ProcessManager,
+    servers: usize,
+    write_password: bool,
+) -&gt; <span class="prelude-ty">Result</span>&lt;BTreeMap&lt;usize, vars::Fedimintd&gt;&gt; {
+    <span class="comment">// TODO: Use proper builder
+    </span><span class="kw">let </span><span class="kw-2">mut </span>fed = FedimintBuilder::new()<span class="question-mark">?</span>.with_default_modules();
+    attach_default_module_gen_params(
+        BitcoinRpcConfig::from_env_vars()<span class="question-mark">?</span>,
+        <span class="kw-2">&amp;mut </span>fed.server_gen_params,
+        Amount::from_sats(<span class="number">100_000_000</span>),
+        Network::Regtest,
+        <span class="number">10</span>,
     );
 
-    <span class="macro">info!</span>(<span class="string">&quot;running distributedgen&quot;</span>);
+    <span class="kw">let </span>peers: Vec&lt;<span class="kw">_</span>&gt; = (<span class="number">0</span>..servers).map(|id| PeerId::from(id <span class="kw">as </span>u16)).collect();
+    <span class="kw">let </span>params = local_config_gen_params(<span class="kw-2">&amp;</span>peers, BASE_PORT, fed.server_gen_params.clone())<span class="question-mark">?</span>;
+    <span class="kw">let </span>configs = ServerConfig::trusted_dealer_gen(<span class="kw-2">&amp;</span>params, fed.server_gens.clone());
+    <span class="kw">let </span><span class="kw-2">mut </span>fedimintd_envs = BTreeMap::new();
+    <span class="kw">for </span>(peer, cfg) <span class="kw">in </span>configs {
+        <span class="kw">let </span>envs = vars::Fedimintd::init(<span class="kw-2">&amp;</span>process_mgr.globals, <span class="kw-2">&amp;</span>cfg).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let </span>password = cfg.private.api_auth.<span class="number">0</span>.clone();
+        <span class="kw">let </span>data_dir = envs.FM_DATA_DIR.clone();
+        fedimintd_envs.insert(peer.to_usize(), envs);
+        write_new(data_dir.join(SALT_FILE), random_salt())<span class="question-mark">?</span>;
+        write_server_config(<span class="kw-2">&amp;</span>cfg, data_dir.clone(), <span class="kw-2">&amp;</span>password, <span class="kw-2">&amp;</span>fed.server_gens)<span class="question-mark">?</span>;
+        <span class="kw">if </span>write_password {
+            write_new(data_dir.join(PLAINTEXT_PASSWORD), <span class="kw-2">&amp;</span>password)<span class="question-mark">?</span>;
+        }
+    }
 
-    future::try_join_all(
-        fedimintd_envs
-            .iter()
-            .enumerate()
-            .map(|(id, env)| run_distributedgen(id, env, certs.clone())),
-    )
-    .<span class="kw">await</span><span class="question-mark">?</span>;
-
-    <span class="kw">let </span>out_dir = <span class="kw-2">&amp;</span>fedimintd_envs
-        .first()
-        .context(<span class="string">&quot;must run dkg with at least one peer&quot;</span>)<span class="question-mark">?
-        </span>.FM_DATA_DIR;
+    <span class="kw">let </span>out_dir = <span class="kw-2">&amp;</span>fedimintd_envs[<span class="kw-2">&amp;</span><span class="number">0</span>].FM_DATA_DIR;
     <span class="kw">let </span>cfg_dir = <span class="kw-2">&amp;</span>process_mgr.globals.FM_DATA_DIR;
     <span class="kw">let </span>out_dir = utf8(out_dir);
     <span class="kw">let </span>cfg_dir = utf8(cfg_dir);
@@ -704,7 +596,7 @@
 
     <span class="macro">info!</span>(<span class="string">&quot;DKG complete&quot;</span>);
 
-    <span class="prelude-val">Ok</span>(())
+    <span class="prelude-val">Ok</span>(fedimintd_envs)
 }
 </code></pre></div>
 </section></main><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="devimint" data-themes="" data-resource-suffix="" data-rustdoc-version="1.69.0-nightly (f3126500f 2023-02-02)" data-search-js="search-98d53477a794af0b.js" data-settings-js="settings-f0c5c39777a9a2f6.js" data-settings-css="settings-0bcba95ff279c1db.css" ></div></body></html>

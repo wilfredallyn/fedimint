@@ -771,8 +771,89 @@
 <a href="#771" id="771">771</a>
 <a href="#772" id="772">772</a>
 <a href="#773" id="773">773</a>
+<a href="#774" id="774">774</a>
+<a href="#775" id="775">775</a>
+<a href="#776" id="776">776</a>
+<a href="#777" id="777">777</a>
+<a href="#778" id="778">778</a>
+<a href="#779" id="779">779</a>
+<a href="#780" id="780">780</a>
+<a href="#781" id="781">781</a>
+<a href="#782" id="782">782</a>
+<a href="#783" id="783">783</a>
+<a href="#784" id="784">784</a>
+<a href="#785" id="785">785</a>
+<a href="#786" id="786">786</a>
+<a href="#787" id="787">787</a>
+<a href="#788" id="788">788</a>
+<a href="#789" id="789">789</a>
+<a href="#790" id="790">790</a>
+<a href="#791" id="791">791</a>
+<a href="#792" id="792">792</a>
+<a href="#793" id="793">793</a>
+<a href="#794" id="794">794</a>
+<a href="#795" id="795">795</a>
+<a href="#796" id="796">796</a>
+<a href="#797" id="797">797</a>
+<a href="#798" id="798">798</a>
+<a href="#799" id="799">799</a>
+<a href="#800" id="800">800</a>
+<a href="#801" id="801">801</a>
+<a href="#802" id="802">802</a>
+<a href="#803" id="803">803</a>
+<a href="#804" id="804">804</a>
+<a href="#805" id="805">805</a>
+<a href="#806" id="806">806</a>
+<a href="#807" id="807">807</a>
+<a href="#808" id="808">808</a>
+<a href="#809" id="809">809</a>
+<a href="#810" id="810">810</a>
+<a href="#811" id="811">811</a>
+<a href="#812" id="812">812</a>
+<a href="#813" id="813">813</a>
+<a href="#814" id="814">814</a>
+<a href="#815" id="815">815</a>
+<a href="#816" id="816">816</a>
+<a href="#817" id="817">817</a>
+<a href="#818" id="818">818</a>
+<a href="#819" id="819">819</a>
+<a href="#820" id="820">820</a>
+<a href="#821" id="821">821</a>
+<a href="#822" id="822">822</a>
+<a href="#823" id="823">823</a>
+<a href="#824" id="824">824</a>
+<a href="#825" id="825">825</a>
+<a href="#826" id="826">826</a>
+<a href="#827" id="827">827</a>
+<a href="#828" id="828">828</a>
+<a href="#829" id="829">829</a>
+<a href="#830" id="830">830</a>
+<a href="#831" id="831">831</a>
+<a href="#832" id="832">832</a>
+<a href="#833" id="833">833</a>
+<a href="#834" id="834">834</a>
+<a href="#835" id="835">835</a>
+<a href="#836" id="836">836</a>
+<a href="#837" id="837">837</a>
+<a href="#838" id="838">838</a>
+<a href="#839" id="839">839</a>
+<a href="#840" id="840">840</a>
+<a href="#841" id="841">841</a>
+<a href="#842" id="842">842</a>
+<a href="#843" id="843">843</a>
+<a href="#844" id="844">844</a>
+<a href="#845" id="845">845</a>
+<a href="#846" id="846">846</a>
+<a href="#847" id="847">847</a>
+<a href="#848" id="848">848</a>
+<a href="#849" id="849">849</a>
+<a href="#850" id="850">850</a>
+<a href="#851" id="851">851</a>
+<a href="#852" id="852">852</a>
+<a href="#853" id="853">853</a>
 </pre><pre class="rust"><code><span class="kw">use </span>std::cmp::{<span class="self">self</span>, max};
 <span class="kw">use </span>std::collections::{BTreeMap, BTreeSet, HashSet};
+<span class="kw">use </span>std::fmt;
 <span class="kw">use </span>std::ops::Range;
 
 <span class="kw">use </span>fedimint_client::sm::{OperationId, State, StateTransition};
@@ -782,19 +863,27 @@
 <span class="kw">use </span>fedimint_core::module::registry::ModuleDecoderRegistry;
 <span class="kw">use </span>fedimint_core::{Amount, NumPeers, PeerId, TransactionId};
 <span class="kw">use </span>fedimint_derive_secret::DerivableSecret;
-<span class="kw">use </span>fedimint_logging::LOG_ECASH_RECOVERY;
+<span class="kw">use </span>fedimint_logging::LOG_CLIENT_RECOVERY_MINT;
 <span class="kw">use </span>fedimint_mint_common::{MintConsensusItem, MintInput, MintOutput, Nonce};
 <span class="kw">use </span>futures::StreamExt;
 <span class="kw">use </span>tbs::{
     combine_valid_shares, verify_blind_share, AggregatePublicKey, BlindedMessage, PublicKeyShare,
 };
 <span class="kw">use </span>threshold_crypto::G1Affine;
-<span class="kw">use </span>tracing::{debug, error, info, warn};
+<span class="kw">use </span>tracing::{debug, error, info, trace, warn};
 
 <span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use </span><span class="kw">crate</span>::db::{NextECashNoteIndexKey, NoteKey};
 <span class="kw">use </span><span class="kw">crate</span>::output::{MintOutputCommon, MintOutputStatesCreated, NoteIssuanceRequest};
 <span class="kw">use </span><span class="kw">crate</span>::MintClientContext;
+
+<span class="doccomment">/// Restore will progress in chunks of a fixed epoch count,
+/// after each the current state is persisted in the database.
+/// Larger chunks introduce less &quot;pausing&quot; processing and snapshoting
+/// storage and overhead  but risk loosing more progress each time the
+/// client app is closed. Some time based, or even &quot;save on close&quot;
+/// scheme would be better, but currently not implemented.
+</span><span class="kw">const </span>PROGRESS_SNAPSHOT_EPOCHS: u64 = <span class="number">500</span>;
 
 <span class="attr">#[derive(Debug)]
 </span><span class="kw">pub struct </span>EcashRecoveryFinalState {
@@ -836,7 +925,7 @@
 /// The caller is responsible for creating it, and then feeding it in order all
 /// valid consensus items from the epoch history between time taken (or even
 /// somewhat before it) and present time.
-</span><span class="attr">#[derive(Debug, Clone, Eq, PartialEq, Decodable, Encodable, Serialize, Deserialize)]
+</span><span class="attr">#[derive(Clone, Eq, PartialEq, Decodable, Encodable, Serialize, Deserialize)]
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>MintRestoreInProgressState {
     start_epoch: u64,
     next_epoch: u64,
@@ -900,6 +989,20 @@
     </span>gap_limit: u64,
 }
 
+<span class="kw">impl </span>fmt::Debug <span class="kw">for </span>MintRestoreInProgressState {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        f.write_fmt(<span class="macro">format_args!</span>(
+            <span class="string">&quot;MintRestoreInProgressState(start: {}, next: {}, end: {}, spendable_notes_by_nonce: {}, pending_outputs: {}, pending_nonces: {})&quot;</span>,
+            <span class="self">self</span>.start_epoch,
+            <span class="self">self</span>.next_epoch,
+            <span class="self">self</span>.end_epoch,
+            <span class="self">self</span>.spendable_note_by_nonce.len(),
+            <span class="self">self</span>.pending_outputs.len(),
+            <span class="self">self</span>.pending_nonces.len()
+        ))
+    }
+}
+
 <span class="kw">impl </span>MintRestoreInProgressState {
     <span class="kw">fn </span>transitions(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
@@ -933,10 +1036,17 @@
                 <span class="kw">let </span>global_context = global_context_2.clone();
                 Box::pin(<span class="kw">async move </span>{
                     <span class="kw">if </span>new_state.is_done() {
+                        <span class="macro">debug!</span>(target: LOG_CLIENT_RECOVERY_MINT, <span class="string">&quot;Finalizing restore&quot;</span>);
                         <span class="kw">let </span>finalized = new_state.finalize();
 
                         {
                             <span class="kw">let </span><span class="kw-2">mut </span>dbtx = dbtx.module_tx();
+
+                            <span class="macro">debug!</span>(
+                                target: LOG_CLIENT_RECOVERY_MINT,
+                                len = finalized.spendable_notes.len(),
+                                <span class="string">&quot;Restoring spendable notes&quot;
+                            </span>);
                             <span class="kw">for </span>(amount, note) <span class="kw">in </span>finalized.spendable_notes {
                                 <span class="kw">let </span>key = NoteKey {
                                     amount,
@@ -945,6 +1055,12 @@
                                 dbtx.insert_new_entry(<span class="kw-2">&amp;</span>key, <span class="kw-2">&amp;</span>note).<span class="kw">await</span>;
                             }
                             <span class="kw">for </span>(amount, note_idx) <span class="kw">in </span>finalized.next_note_idx.iter() {
+                                <span class="macro">debug!</span>(
+                                    target: LOG_CLIENT_RECOVERY_MINT,
+                                    %amount,
+                                    %note_idx,
+                                    <span class="string">&quot;Restoring NextECashNodeIndex&quot;
+                                </span>);
                                 dbtx.insert_entry(
                                     <span class="kw-2">&amp;</span>NextECashNoteIndexKey(amount),
                                     <span class="kw-2">&amp;</span>note_idx.as_u64(),
@@ -952,6 +1068,12 @@
                                 .<span class="kw">await</span>;
                             }
                         }
+
+                        <span class="macro">debug!</span>(
+                            target: LOG_CLIENT_RECOVERY_MINT,
+                            len = finalized.unconfirmed_notes.len(),
+                            <span class="string">&quot;Restoring unconfigured notes state machines&quot;
+                        </span>);
 
                         <span class="kw">for </span>(out_point, note_issuance) <span class="kw">in </span>finalized.unconfirmed_notes {
                             global_context
@@ -976,6 +1098,10 @@
                             state: MintRestoreStates::Success,
                         }
                     } <span class="kw">else </span>{
+                        <span class="macro">debug!</span>(
+                            target: LOG_CLIENT_RECOVERY_MINT,
+                            <span class="string">&quot;Saving restore progress checkpoint&quot;
+                        </span>);
                         MintRestoreStateMachine {
                             operation_id: old_state_machine.operation_id,
                             state: MintRestoreStates::InProgress(new_state),
@@ -988,20 +1114,28 @@
 
     <span class="kw">async fn </span>make_progress&lt;<span class="lifetime">&#39;a</span>&gt;(
         <span class="kw-2">mut </span><span class="self">self</span>,
-        api: DynFederationApi,
+        api: DynGlobalApi,
         decoders: ModuleDecoderRegistry,
         epoch_pk: threshold_crypto::PublicKey,
         secret: DerivableSecret,
     ) -&gt; <span class="self">Self </span>{
         <span class="macro">assert_eq!</span>(secret.level(), <span class="number">2</span>);
-        <span class="kw">let </span>epoch_range =
-            <span class="self">self</span>.next_epoch..cmp::min(<span class="self">self</span>.next_epoch.wrapping_add(<span class="number">100</span>), <span class="self">self</span>.end_epoch);
+        <span class="kw">let </span>epoch_range = <span class="self">self</span>.next_epoch
+            ..cmp::min(
+                <span class="self">self</span>.next_epoch.wrapping_add(PROGRESS_SNAPSHOT_EPOCHS),
+                <span class="self">self</span>.end_epoch,
+            );
+        <span class="macro">debug!</span>(
+            target: LOG_CLIENT_RECOVERY_MINT,
+            <span class="question-mark">?</span>epoch_range,
+            <span class="string">&quot;Processing epochs&quot;
+        </span>);
         <span class="kw">let </span><span class="kw-2">mut </span>epoch_stream = <span class="self">Self</span>::fetch_epochs_stream(api, epoch_pk, decoders, epoch_range);
         <span class="kw">while let </span><span class="prelude-val">Some</span>((epoch, epoch_history)) = epoch_stream.next().<span class="kw">await </span>{
             <span class="macro">assert_eq!</span>(epoch_history.outcome.epoch, epoch);
             <span class="self">self</span>.next_epoch = epoch + <span class="number">1</span>;
 
-            <span class="macro">info!</span>(target: LOG_ECASH_RECOVERY, epoch, <span class="string">&quot;Processing epoch&quot;</span>);
+            <span class="macro">info!</span>(target: LOG_CLIENT_RECOVERY_MINT, epoch, <span class="string">&quot;Processing epoch&quot;</span>);
             <span class="kw">let </span><span class="kw-2">mut </span>processed_txs = Default::default();
             <span class="kw">for </span>(peer_id, items) <span class="kw">in </span><span class="kw-2">&amp;</span>epoch_history.outcome.items {
                 <span class="kw">for </span>item <span class="kw">in </span>items {
@@ -1025,7 +1159,7 @@
     ///
     /// TODO: could be internal to recovery_loop?
     </span><span class="kw">fn </span>fetch_epochs_stream&lt;<span class="lifetime">&#39;a</span>&gt;(
-        api: DynFederationApi,
+        api: DynGlobalApi,
         epoch_pk: threshold_crypto::PublicKey,
         decoders: ModuleDecoderRegistry,
         epoch_range: Range&lt;u64&gt;,
@@ -1039,7 +1173,7 @@
                     (
                         epoch,
                         <span class="kw">loop </span>{
-                            <span class="macro">info!</span>(target: LOG_ECASH_RECOVERY, epoch, <span class="string">&quot;Awaiting epoch&quot;</span>);
+                            <span class="macro">info!</span>(target: LOG_CLIENT_RECOVERY_MINT, epoch, <span class="string">&quot;Awaiting epoch&quot;</span>);
                             <span class="kw">match </span>api.fetch_epoch_history(epoch, epoch_pk, <span class="kw-2">&amp;</span>decoders).<span class="kw">await </span>{
                                 <span class="prelude-val">Ok</span>(o) =&gt; <span class="kw">break </span>o,
                                 <span class="prelude-val">Err</span>(e) =&gt; {
@@ -1393,21 +1527,39 @@
         rejected_txs: <span class="kw-2">&amp;</span>BTreeSet&lt;TransactionId&gt;,
         secret: <span class="kw-2">&amp;</span>DerivableSecret,
     ) {
-        <span class="macro">debug!</span>(target: LOG_ECASH_RECOVERY, <span class="question-mark">?</span>item, <span class="string">&quot;handling consensus item&quot;</span>);
+        <span class="macro">trace!</span>(
+            target: LOG_CLIENT_RECOVERY_MINT,
+            <span class="question-mark">?</span>item,
+            <span class="string">&quot;handling consensus item&quot;
+        </span>);
         <span class="comment">// assert_eq!(epoch, self.next_epoch);
         </span><span class="kw">match </span>item {
             ConsensusItem::Transaction(tx) =&gt; {
                 <span class="kw">let </span>txid = tx.tx_hash();
 
+                <span class="macro">debug!</span>(
+                    target: LOG_CLIENT_RECOVERY_MINT,
+                    tx_hash = %tx.tx_hash(),
+                    <span class="string">&quot;handling transaction&quot;
+                </span>);
+
                 <span class="kw">if </span>!processed_txs.insert(txid) {
                     <span class="comment">// Just like server side consensus, do not attempt to process the same
                     // transaction twice.
-                    </span><span class="macro">debug!</span>(target: LOG_ECASH_RECOVERY, <span class="question-mark">?</span>item, <span class="string">&quot;was already processed&quot;</span>);
+                    </span><span class="macro">debug!</span>(
+                        target: LOG_CLIENT_RECOVERY_MINT,
+                        tx_hash = %tx.tx_hash(),
+                        <span class="string">&quot;transaction was already processed&quot;
+                    </span>);
                     <span class="kw">return</span>;
                 }
 
                 <span class="kw">if </span>rejected_txs.contains(<span class="kw-2">&amp;</span>txid) {
-                    <span class="macro">debug!</span>(target: LOG_ECASH_RECOVERY, <span class="question-mark">?</span>item, <span class="string">&quot;was rejected&quot;</span>);
+                    <span class="macro">debug!</span>(
+                        target: LOG_CLIENT_RECOVERY_MINT,
+                        tx_hash = %tx.tx_hash(),
+                        <span class="string">&quot;transaction was rejected&quot;
+                    </span>);
                     <span class="comment">// Do not process invalid transactions.
                     // Consensus history contains all data proposed by each peer, even invalid (e.g.
                     // due to double spent) transactions. Precisely to save
@@ -1452,6 +1604,11 @@
                         .downcast_ref::&lt;MintConsensusItem&gt;()
                         .expect(<span class="string">&quot;mint key just checked&quot;</span>);
 
+                    <span class="macro">debug!</span>(
+                        target: LOG_CLIENT_RECOVERY_MINT,
+                        out_point = %mint_item.out_point,
+                        <span class="string">&quot;handlng mint consensus item&quot;
+                    </span>);
                     <span class="self">self</span>.handle_output_confirmation(peer_id, mint_item);
                 }
             }
@@ -1544,5 +1701,8 @@
     <span class="doccomment">/// Something went wrong, and restore failed
     </span>Failed(MintRestoreFailedState),
 }
+
+<span class="attr">#[cfg(test)]
+</span><span class="kw">mod </span>tests;
 </code></pre></div>
 </section></main><div id="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="fedimint_mint_client" data-themes="" data-resource-suffix="" data-rustdoc-version="1.69.0-nightly (f3126500f 2023-02-02)" data-search-js="search-98d53477a794af0b.js" data-settings-js="settings-f0c5c39777a9a2f6.js" data-settings-css="settings-0bcba95ff279c1db.css" ></div></body></html>

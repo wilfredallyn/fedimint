@@ -1359,93 +1359,6 @@
 <a href="#1359" id="1359">1359</a>
 <a href="#1360" id="1360">1360</a>
 <a href="#1361" id="1361">1361</a>
-<a href="#1362" id="1362">1362</a>
-<a href="#1363" id="1363">1363</a>
-<a href="#1364" id="1364">1364</a>
-<a href="#1365" id="1365">1365</a>
-<a href="#1366" id="1366">1366</a>
-<a href="#1367" id="1367">1367</a>
-<a href="#1368" id="1368">1368</a>
-<a href="#1369" id="1369">1369</a>
-<a href="#1370" id="1370">1370</a>
-<a href="#1371" id="1371">1371</a>
-<a href="#1372" id="1372">1372</a>
-<a href="#1373" id="1373">1373</a>
-<a href="#1374" id="1374">1374</a>
-<a href="#1375" id="1375">1375</a>
-<a href="#1376" id="1376">1376</a>
-<a href="#1377" id="1377">1377</a>
-<a href="#1378" id="1378">1378</a>
-<a href="#1379" id="1379">1379</a>
-<a href="#1380" id="1380">1380</a>
-<a href="#1381" id="1381">1381</a>
-<a href="#1382" id="1382">1382</a>
-<a href="#1383" id="1383">1383</a>
-<a href="#1384" id="1384">1384</a>
-<a href="#1385" id="1385">1385</a>
-<a href="#1386" id="1386">1386</a>
-<a href="#1387" id="1387">1387</a>
-<a href="#1388" id="1388">1388</a>
-<a href="#1389" id="1389">1389</a>
-<a href="#1390" id="1390">1390</a>
-<a href="#1391" id="1391">1391</a>
-<a href="#1392" id="1392">1392</a>
-<a href="#1393" id="1393">1393</a>
-<a href="#1394" id="1394">1394</a>
-<a href="#1395" id="1395">1395</a>
-<a href="#1396" id="1396">1396</a>
-<a href="#1397" id="1397">1397</a>
-<a href="#1398" id="1398">1398</a>
-<a href="#1399" id="1399">1399</a>
-<a href="#1400" id="1400">1400</a>
-<a href="#1401" id="1401">1401</a>
-<a href="#1402" id="1402">1402</a>
-<a href="#1403" id="1403">1403</a>
-<a href="#1404" id="1404">1404</a>
-<a href="#1405" id="1405">1405</a>
-<a href="#1406" id="1406">1406</a>
-<a href="#1407" id="1407">1407</a>
-<a href="#1408" id="1408">1408</a>
-<a href="#1409" id="1409">1409</a>
-<a href="#1410" id="1410">1410</a>
-<a href="#1411" id="1411">1411</a>
-<a href="#1412" id="1412">1412</a>
-<a href="#1413" id="1413">1413</a>
-<a href="#1414" id="1414">1414</a>
-<a href="#1415" id="1415">1415</a>
-<a href="#1416" id="1416">1416</a>
-<a href="#1417" id="1417">1417</a>
-<a href="#1418" id="1418">1418</a>
-<a href="#1419" id="1419">1419</a>
-<a href="#1420" id="1420">1420</a>
-<a href="#1421" id="1421">1421</a>
-<a href="#1422" id="1422">1422</a>
-<a href="#1423" id="1423">1423</a>
-<a href="#1424" id="1424">1424</a>
-<a href="#1425" id="1425">1425</a>
-<a href="#1426" id="1426">1426</a>
-<a href="#1427" id="1427">1427</a>
-<a href="#1428" id="1428">1428</a>
-<a href="#1429" id="1429">1429</a>
-<a href="#1430" id="1430">1430</a>
-<a href="#1431" id="1431">1431</a>
-<a href="#1432" id="1432">1432</a>
-<a href="#1433" id="1433">1433</a>
-<a href="#1434" id="1434">1434</a>
-<a href="#1435" id="1435">1435</a>
-<a href="#1436" id="1436">1436</a>
-<a href="#1437" id="1437">1437</a>
-<a href="#1438" id="1438">1438</a>
-<a href="#1439" id="1439">1439</a>
-<a href="#1440" id="1440">1440</a>
-<a href="#1441" id="1441">1441</a>
-<a href="#1442" id="1442">1442</a>
-<a href="#1443" id="1443">1443</a>
-<a href="#1444" id="1444">1444</a>
-<a href="#1445" id="1445">1445</a>
-<a href="#1446" id="1446">1446</a>
-<a href="#1447" id="1447">1447</a>
-<a href="#1448" id="1448">1448</a>
 </pre><pre class="rust"><code><span class="doccomment">//! # Client library for fedimintd
 //!
 //! This library provides a client interface to build module clients that can be
@@ -1521,7 +1434,8 @@
 <span class="kw">use </span>std::sync::Arc;
 
 <span class="kw">use </span>anyhow::{anyhow, bail};
-<span class="kw">use </span>fedimint_core::api::{DynFederationApi, IFederationApi, WsFederationApi};
+<span class="kw">use </span>async_stream::stream;
+<span class="kw">use </span>fedimint_core::api::{DynGlobalApi, DynModuleApi, IGlobalFederationApi, WsFederationApi};
 <span class="kw">use </span>fedimint_core::config::{ClientConfig, FederationId, ModuleGenRegistry};
 <span class="kw">use </span>fedimint_core::core::{DynInput, DynOutput, IInput, IOutput, ModuleInstanceId, ModuleKind};
 <span class="kw">use </span>fedimint_core::db::{AutocommitError, Database, DatabaseTransaction, IDatabase};
@@ -1539,22 +1453,20 @@
 <span class="kw">use </span>fedimint_derive_secret::DerivableSecret;
 <span class="kw">use </span>futures::StreamExt;
 <span class="kw">use </span>rand::thread_rng;
-<span class="kw">use </span>secp256k1_zkp::Secp256k1;
+<span class="kw">use </span>secp256k1_zkp::{PublicKey, Secp256k1};
 <span class="kw">use </span>secret::DeriveableSecretClientExt;
-<span class="kw">use </span>serde::de::DeserializeOwned;
-<span class="kw">use </span>serde::{Deserialize, Serialize};
+<span class="kw">use </span>serde::Serialize;
+<span class="kw">use </span>tracing::info;
 
 <span class="kw">use </span><span class="kw">crate</span>::backup::Metadata;
-<span class="kw">use </span><span class="kw">crate</span>::db::{
-    ChronologicalOperationLogKey, ChronologicalOperationLogKeyPrefix, ClientSecretKey,
-    OperationLogKey,
-};
+<span class="kw">use </span><span class="kw">crate</span>::db::ClientSecretKey;
 <span class="kw">use </span><span class="kw">crate</span>::module::gen::{
     ClientModuleGen, ClientModuleGenRegistry, DynClientModuleGen, IClientModuleGen,
 };
 <span class="kw">use </span><span class="kw">crate</span>::module::{
     ClientModule, ClientModuleRegistry, DynPrimaryClientModule, IClientModule, StateGenerator,
 };
+<span class="kw">use </span><span class="kw">crate</span>::oplog::OperationLog;
 <span class="kw">use </span><span class="kw">crate</span>::secret::RootSecretStrategy;
 <span class="kw">use </span><span class="kw">crate</span>::sm::executor::{
     ActiveOperationStateKeyPrefix, ContextGen, InactiveOperationStateKeyPrefix,
@@ -1575,6 +1487,8 @@
 </span><span class="kw">pub mod </span>db;
 <span class="doccomment">/// Module client interface definitions
 </span><span class="kw">pub mod </span>module;
+<span class="doccomment">/// Operation log subsystem of the client
+</span><span class="kw">pub mod </span>oplog;
 <span class="doccomment">/// Secret handling &amp; derivation
 </span><span class="kw">pub mod </span>secret;
 <span class="doccomment">/// Client state machine interfaces and executor implementation
@@ -1596,16 +1510,16 @@
 </span><span class="kw">pub trait </span>IGlobalClientContext: Debug + MaybeSend + MaybeSync + <span class="lifetime">&#39;static </span>{
     <span class="doccomment">/// Returned a reference client&#39;s module API client, so that module-specific
     /// calls can be made
-    </span><span class="kw">fn </span>module_api(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; DynFederationApi;
+    </span><span class="kw">fn </span>module_api(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; DynModuleApi;
 
     <span class="kw">fn </span>client_config(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>ClientConfig;
 
     <span class="doccomment">/// Returns a reference to the client&#39;s federation API client. The provided
-    /// interface [`IFederationApi`] typically does not provide the necessary
-    /// functionality, for this extension traits like
+    /// interface [`IGlobalFederationApi`] typically does not provide the
+    /// necessary functionality, for this extension traits like
     /// [`fedimint_core::api::GlobalFederationApi`] have to be used.
     </span><span class="comment">// TODO: Could be removed in favor of client() except for testing
-    </span><span class="kw">fn </span>api(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>DynFederationApi;
+    </span><span class="kw">fn </span>api(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>DynGlobalApi;
 
     <span class="kw">fn </span>decoders(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>ModuleDecoderRegistry;
 
@@ -1810,11 +1724,11 @@
 
 <span class="attr">#[apply(<span class="macro">async_trait_maybe_send!</span>)]
 </span><span class="kw">impl </span>IGlobalClientContext <span class="kw">for </span>ModuleGlobalClientContext {
-    <span class="kw">fn </span>module_api(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; DynFederationApi {
+    <span class="kw">fn </span>module_api(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; DynModuleApi {
         <span class="self">self</span>.api().with_module(<span class="self">self</span>.module_instance_id)
     }
 
-    <span class="kw">fn </span>api(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>DynFederationApi {
+    <span class="kw">fn </span>api(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>DynGlobalApi {
         <span class="kw-2">&amp;</span><span class="self">self</span>.client.api
     }
 
@@ -1924,12 +1838,20 @@
             .<span class="kw">await
     </span>}
 
-    <span class="kw">pub fn </span>api(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>(<span class="kw">dyn </span>IFederationApi + <span class="lifetime">&#39;static</span>) {
+    <span class="kw">pub fn </span>api(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>(<span class="kw">dyn </span>IGlobalFederationApi + <span class="lifetime">&#39;static</span>) {
         <span class="self">self</span>.inner.api.as_ref()
     }
 
     <span class="kw">pub fn </span>federation_id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; FederationId {
         <span class="self">self</span>.inner.federation_id
+    }
+
+    <span class="kw">pub fn </span>get_internal_payment_markers(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; anyhow::Result&lt;(PublicKey, u64)&gt; {
+        <span class="prelude-val">Ok</span>((
+            <span class="self">self</span>.federation_id()
+                .to_fake_ln_pub_key(<span class="kw-2">&amp;</span><span class="self">self</span>.inner.secp_ctx)<span class="question-mark">?</span>,
+            <span class="number">0</span>,
+        ))
     }
 
     <span class="kw">pub fn </span>get_meta(<span class="kw-2">&amp;</span><span class="self">self</span>, key: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;String&gt; {
@@ -1973,13 +1895,14 @@
                             .finalize_and_submit_transaction(dbtx, operation_id, tx_builder)
                             .<span class="kw">await</span><span class="question-mark">?</span>;
 
-                        <span class="self">self</span>.add_operation_log_entry(
-                            dbtx,
-                            operation_id,
-                            <span class="kw-2">&amp;</span>operation_type,
-                            operation_meta(txid, change_outpoint),
-                        )
-                        .<span class="kw">await</span>;
+                        <span class="self">self</span>.operation_log()
+                            .add_operation_log_entry(
+                                dbtx,
+                                operation_id,
+                                <span class="kw-2">&amp;</span>operation_type,
+                                operation_meta(txid, change_outpoint),
+                            )
+                            .<span class="kw">await</span>;
 
                         <span class="prelude-val">Ok</span>(txid)
                     })
@@ -2011,74 +1934,14 @@
             .<span class="kw">await
     </span>}
 
-    <span class="kw">pub async fn </span>add_operation_log_entry(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        dbtx: <span class="kw-2">&amp;mut </span>DatabaseTransaction&lt;<span class="lifetime">&#39;_</span>&gt;,
-        operation_id: OperationId,
-        operation_type: <span class="kw-2">&amp;</span>str,
-        operation_meta: <span class="kw">impl </span>serde::Serialize,
-    ) {
-        dbtx.insert_new_entry(
-            <span class="kw-2">&amp;</span>OperationLogKey { operation_id },
-            <span class="kw-2">&amp;</span>OperationLogEntry {
-                operation_type: operation_type.to_string(),
-                meta: serde_json::to_value(operation_meta)
-                    .expect(<span class="string">&quot;Can only fail if meta is not serializable&quot;</span>),
-            },
-        )
-        .<span class="kw">await</span>;
-        dbtx.insert_new_entry(
-            <span class="kw-2">&amp;</span>ChronologicalOperationLogKey {
-                creation_time: now(),
-                operation_id,
-            },
-            <span class="kw-2">&amp;</span>(),
-        )
-        .<span class="kw">await</span>;
-    }
-
-    <span class="comment">// TODO: allow fetching pages
-    </span><span class="doccomment">/// Returns the last `limit` operations.
-    </span><span class="kw">pub async fn </span>get_operations(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        limit: usize,
-    ) -&gt; Vec&lt;(ChronologicalOperationLogKey, OperationLogEntry)&gt; {
-        <span class="kw">let </span><span class="kw-2">mut </span>dbtx = <span class="self">self</span>.inner.db.begin_transaction().<span class="kw">await</span>;
-        <span class="kw">let </span>operations: Vec&lt;ChronologicalOperationLogKey&gt; = dbtx
-            .find_by_prefix_sorted_descending(<span class="kw-2">&amp;</span>ChronologicalOperationLogKeyPrefix)
-            .<span class="kw">await
-            </span>.map(|(key, <span class="kw">_</span>)| key)
-            .take(limit)
-            .collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;()
-            .<span class="kw">await</span>;
-
-        <span class="kw">let </span><span class="kw-2">mut </span>operation_entries = Vec::with_capacity(operations.len());
-
-        <span class="kw">for </span>operation <span class="kw">in </span>operations {
-            <span class="kw">let </span>entry = dbtx
-                .get_value(<span class="kw-2">&amp;</span>OperationLogKey {
-                    operation_id: operation.operation_id,
-                })
-                .<span class="kw">await
-                </span>.expect(<span class="string">&quot;Inconsistent DB&quot;</span>);
-            operation_entries.push((operation, entry));
-        }
-
-        operation_entries
-    }
-
-    <span class="kw">pub async fn </span>get_active_operations(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HashSet&lt;OperationId&gt; {
+    <span class="comment">// TODO: implement as part of OperationLog
+    </span><span class="kw">pub async fn </span>get_active_operations(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HashSet&lt;OperationId&gt; {
         <span class="self">self</span>.inner.executor.get_active_operations().<span class="kw">await
     </span>}
 
-    <span class="kw">pub async fn </span>get_operation(<span class="kw-2">&amp;</span><span class="self">self</span>, operation_id: OperationId) -&gt; <span class="prelude-ty">Option</span>&lt;OperationLogEntry&gt; {
-        <span class="self">self</span>.inner
-            .db
-            .begin_transaction()
-            .<span class="kw">await
-            </span>.get_value(<span class="kw-2">&amp;</span>OperationLogKey { operation_id })
-            .<span class="kw">await
-    </span>}
+    <span class="kw">pub fn </span>operation_log(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>OperationLog {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.inner.operation_log
+    }
 
     <span class="doccomment">/// Returns a reference to a typed module client instance by kind
     </span><span class="kw">pub fn </span>get_first_module&lt;M: ClientModule&gt;(
@@ -2150,15 +2013,47 @@
 
     <span class="doccomment">/// Waits for an output from the primary module to reach its final
     /// state.
-    </span><span class="kw">pub async fn </span>await_primary_module_output_finalized(
+    </span><span class="kw">pub async fn </span>await_primary_module_output(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         operation_id: OperationId,
         out_point: OutPoint,
     ) -&gt; anyhow::Result&lt;Amount&gt; {
         <span class="self">self</span>.inner
-            .await_primary_module_output_finalized(operation_id, out_point)
+            .await_primary_module_output(operation_id, out_point)
             .<span class="kw">await
     </span>}
+
+    <span class="doccomment">/// Returns the config with which the client was initialized.
+    </span><span class="kw">pub async fn </span>get_config(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>ClientConfig {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.inner.config
+    }
+
+    <span class="doccomment">/// Balance available to the client for spending
+    </span><span class="kw">pub async fn </span>get_balance(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Amount {
+        <span class="self">self</span>.inner
+            .primary_module
+            .get_balance(
+                <span class="self">self</span>.inner.primary_module_instance,
+                <span class="kw-2">&amp;mut </span><span class="self">self</span>.db().begin_transaction().<span class="kw">await</span>,
+            )
+            .<span class="kw">await
+    </span>}
+
+    <span class="doccomment">/// Returns a stream that yields the current client balance every time it
+    /// changes.
+    </span><span class="kw">pub async fn </span>subscribe_balance_changes(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; BoxStream&lt;<span class="lifetime">&#39;_</span>, Amount&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>balance_changes = <span class="self">self</span>.inner.primary_module.subscribe_balance_changes().<span class="kw">await</span>;
+        Box::pin(<span class="macro">stream! </span>{
+            <span class="kw">while let </span><span class="prelude-val">Some</span>(()) = balance_changes.next().<span class="kw">await </span>{
+                <span class="kw">let </span><span class="kw-2">mut </span>dbtx = <span class="self">self</span>.db().begin_transaction().<span class="kw">await</span>;
+                <span class="kw">let </span>balance = <span class="self">self</span>.inner
+                    .primary_module
+                    .get_balance(<span class="self">self</span>.inner.primary_module_instance, <span class="kw-2">&amp;mut </span>dbtx)
+                    .<span class="kw">await</span>;
+                <span class="kw">yield </span>balance;
+            }
+        })
+    }
 }
 
 <span class="doccomment">/// Resources particular to a module instance
@@ -2168,7 +2063,7 @@
     <span class="doccomment">/// Module-specific DB
     </span><span class="kw">pub </span>db: Database,
     <span class="doccomment">/// Module-specific API
-    </span><span class="kw">pub </span>api: DynFederationApi,
+    </span><span class="kw">pub </span>api: DynModuleApi,
 }
 
 <span class="kw">struct </span>ClientInner {
@@ -2182,8 +2077,9 @@
     primary_module_kind: ModuleKind,
     modules: ClientModuleRegistry,
     executor: Executor&lt;DynGlobalClientContext&gt;,
-    api: DynFederationApi,
+    api: DynGlobalApi,
     root_secret: DerivableSecret,
+    operation_log: OperationLog,
     secp_ctx: Secp256k1&lt;secp256k1_zkp::All&gt;,
 }
 
@@ -2386,13 +2282,13 @@
         active_state_exists || inactive_state_exists
     }
 
-    <span class="kw">pub async fn </span>await_primary_module_output_finalized(
+    <span class="kw">pub async fn </span>await_primary_module_output(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         operation_id: OperationId,
         out_point: OutPoint,
     ) -&gt; anyhow::Result&lt;Amount&gt; {
         <span class="self">self</span>.primary_module
-            .await_primary_module_output_finalized(operation_id, out_point)
+            .await_primary_module_output(operation_id, out_point)
             .<span class="kw">await
     </span>}
 }
@@ -2598,7 +2494,7 @@
 
         <span class="kw">let </span>notifier = Notifier::new(db.clone());
 
-        <span class="kw">let </span>api = DynFederationApi::from(WsFederationApi::from_config(<span class="kw-2">&amp;</span>config));
+        <span class="kw">let </span>api = DynGlobalApi::from(WsFederationApi::from_config(<span class="kw-2">&amp;</span>config));
 
         <span class="kw">let </span>root_secret = get_client_root_secret::&lt;S&gt;(<span class="kw-2">&amp;</span>db).<span class="kw">await</span>;
 
@@ -2611,23 +2507,31 @@
                     <span class="kw">let </span>module = <span class="self">self
                         </span>.module_gens
                         .get(<span class="kw-2">&amp;</span>kind)
-                        .ok_or(<span class="macro">anyhow!</span>(<span class="string">&quot;Unknown module kind in config&quot;</span>))<span class="question-mark">?
+                        .ok_or(<span class="macro">anyhow!</span>(
+                            <span class="string">&quot;Unknown primary module kind, cannot skip primary module&quot;
+                        </span>))<span class="question-mark">?
                         </span>.init_primary(
                             module_config,
                             db.clone(),
                             module_instance,
                             root_secret.derive_module_secret(module_instance),
                             notifier.clone(),
+                            api.clone(),
                         )
                         .<span class="kw">await</span><span class="question-mark">?</span>;
                     <span class="kw">let </span>not_replaced = primary_module.replace((kind, module)).is_none();
                     <span class="macro">assert!</span>(not_replaced, <span class="string">&quot;Each module instance can only occur once in config, so no replacement can take place here.&quot;</span>)
                 } <span class="kw">else </span>{
-                    <span class="kw">let </span>module = <span class="self">self
-                        </span>.module_gens
-                        .get(<span class="kw-2">&amp;</span>kind)
-                        .ok_or(<span class="macro">anyhow!</span>(<span class="string">&quot;Unknown module kind in config&quot;</span>))<span class="question-mark">?
-                        </span>.init(
+                    <span class="kw">let </span>module_gen = <span class="kw">match </span><span class="self">self</span>.module_gens.get(<span class="kw-2">&amp;</span>kind) {
+                        <span class="prelude-val">Some</span>(module_gen) =&gt; module_gen,
+                        <span class="prelude-val">None </span>=&gt; {
+                            <span class="macro">info!</span>(<span class="string">&quot;Module kind {kind} of instance {module_instance} not found in module gens, skipping&quot;</span>);
+                            <span class="kw">continue</span>;
+                        }
+                    };
+
+                    <span class="kw">let </span>module = module_gen
+                        .init(
                             module_config,
                             db.clone(),
                             module_instance,
@@ -2637,6 +2541,7 @@
                             // the same kind we have to use the instance id instead.
                             </span>root_secret.derive_module_secret(module_instance),
                             notifier.clone(),
+                            api.clone(),
                         )
                         .<span class="kw">await</span><span class="question-mark">?</span>;
                     modules.register_module(module_instance, kind, module);
@@ -2664,7 +2569,7 @@
         <span class="kw">let </span>client_inner = Arc::new(ClientInner {
             config: config.clone(),
             decoders,
-            db,
+            db: db.clone(),
             federation_id: config.federation_id,
             federation_meta: config.meta,
             primary_module,
@@ -2675,6 +2580,7 @@
             api,
             secp_ctx: Secp256k1::new(),
             root_secret,
+            operation_log: OperationLog::new(db),
         });
 
         <span class="prelude-val">Ok</span>(Client {
@@ -2800,8 +2706,9 @@
     <span class="kw">let </span><span class="kw-2">mut </span>modules = BTreeMap::new();
     <span class="kw">for </span>(id, kind) <span class="kw">in </span>module_kinds {
         <span class="kw">let </span><span class="prelude-val">Some</span>(init) = registry.get(kind) <span class="kw">else </span>{
-                <span class="macro">anyhow::bail!</span>(<span class="string">&quot;Detected configuration for unsupported module kind: {kind}&quot;</span>)
-            };
+            <span class="macro">info!</span>(<span class="string">&quot;Detected configuration for unsupported module kind: {kind}&quot;</span>);
+            <span class="kw">continue
+        </span>};
 
         modules.insert(
             id,
@@ -2812,87 +2719,6 @@
         );
     }
     <span class="prelude-val">Ok</span>(ModuleDecoderRegistry::from(modules))
-}
-
-<span class="attr">#[derive(Debug, Serialize, Deserialize)]
-</span><span class="kw">pub struct </span>OperationLogEntry {
-    operation_type: String,
-    meta: serde_json::Value,
-}
-
-<span class="kw">impl </span>OperationLogEntry {
-    <span class="kw">pub fn </span>operation_type(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.operation_type
-    }
-
-    <span class="kw">pub fn </span>meta&lt;M: DeserializeOwned&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; M {
-        serde_json::from_value(<span class="self">self</span>.meta.clone()).expect(<span class="string">&quot;JSON deserialization should not fail&quot;</span>)
-    }
-}
-
-<span class="kw">impl </span>Encodable <span class="kw">for </span>OperationLogEntry {
-    <span class="kw">fn </span>consensus_encode&lt;W: Write&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, writer: <span class="kw-2">&amp;mut </span>W) -&gt; <span class="prelude-ty">Result</span>&lt;usize, Error&gt; {
-        <span class="kw">let </span><span class="kw-2">mut </span>len = <span class="number">0</span>;
-        len += <span class="self">self</span>.operation_type.consensus_encode(writer)<span class="question-mark">?</span>;
-        len += serde_json::to_string(<span class="kw-2">&amp;</span><span class="self">self</span>.meta)
-            .expect(<span class="string">&quot;JSON serialization should not fail&quot;</span>)
-            .consensus_encode(writer)<span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>(len)
-    }
-}
-
-<span class="kw">impl </span>Decodable <span class="kw">for </span>OperationLogEntry {
-    <span class="kw">fn </span>consensus_decode&lt;R: Read&gt;(
-        r: <span class="kw-2">&amp;mut </span>R,
-        modules: <span class="kw-2">&amp;</span>ModuleDecoderRegistry,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, DecodeError&gt; {
-        <span class="kw">let </span>operation_type = String::consensus_decode(r, modules)<span class="question-mark">?</span>;
-        <span class="kw">let </span>meta_str = String::consensus_decode(r, modules)<span class="question-mark">?</span>;
-        <span class="kw">let </span>meta = serde_json::from_str(<span class="kw-2">&amp;</span>meta_str).map_err(DecodeError::from_err)<span class="question-mark">?</span>;
-
-        <span class="prelude-val">Ok</span>(OperationLogEntry {
-            operation_type,
-            meta,
-        })
-    }
-}
-
-<span class="attr">#[cfg(test)]
-</span><span class="kw">mod </span>tests {
-    <span class="kw">use </span>serde::{Deserialize, Serialize};
-
-    <span class="kw">use </span><span class="kw">crate</span>::OperationLogEntry;
-
-    <span class="attr">#[test]
-    </span><span class="kw">fn </span>test_operation_log_entry_serde() {
-        <span class="kw">let </span>op_log = OperationLogEntry {
-            operation_type: <span class="string">&quot;test&quot;</span>.to_string(),
-            meta: serde_json::to_value(()).unwrap(),
-        };
-
-        op_log.meta::&lt;()&gt;();
-    }
-
-    <span class="attr">#[test]
-    </span><span class="kw">fn </span>test_operation_log_entry_serde_extra_meta() {
-        <span class="attr">#[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
-        </span><span class="kw">struct </span>Meta {
-            foo: String,
-            extra_meta: serde_json::Value,
-        }
-
-        <span class="kw">let </span>meta = Meta {
-            foo: <span class="string">&quot;bar&quot;</span>.to_string(),
-            extra_meta: serde_json::to_value(()).unwrap(),
-        };
-
-        <span class="kw">let </span>op_log = OperationLogEntry {
-            operation_type: <span class="string">&quot;test&quot;</span>.to_string(),
-            meta: serde_json::to_value(meta.clone()).unwrap(),
-        };
-
-        <span class="macro">assert_eq!</span>(op_log.meta::&lt;Meta&gt;(), meta);
-    }
 }
 </code></pre></div>
 </section></main><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="fedimint_client" data-themes="" data-resource-suffix="" data-rustdoc-version="1.69.0-nightly (f3126500f 2023-02-02)" data-search-js="search-98d53477a794af0b.js" data-settings-js="settings-f0c5c39777a9a2f6.js" data-settings-css="settings-0bcba95ff279c1db.css" ></div></body></html>

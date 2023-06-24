@@ -1987,22 +1987,6 @@
 <a href="#1987" id="1987">1987</a>
 <a href="#1988" id="1988">1988</a>
 <a href="#1989" id="1989">1989</a>
-<a href="#1990" id="1990">1990</a>
-<a href="#1991" id="1991">1991</a>
-<a href="#1992" id="1992">1992</a>
-<a href="#1993" id="1993">1993</a>
-<a href="#1994" id="1994">1994</a>
-<a href="#1995" id="1995">1995</a>
-<a href="#1996" id="1996">1996</a>
-<a href="#1997" id="1997">1997</a>
-<a href="#1998" id="1998">1998</a>
-<a href="#1999" id="1999">1999</a>
-<a href="#2000" id="2000">2000</a>
-<a href="#2001" id="2001">2001</a>
-<a href="#2002" id="2002">2002</a>
-<a href="#2003" id="2003">2003</a>
-<a href="#2004" id="2004">2004</a>
-<a href="#2005" id="2005">2005</a>
 </pre><pre class="rust"><code><span class="kw">use </span>std::collections::{BTreeMap, BTreeSet, HashMap};
 <span class="kw">use </span>std::convert::{Infallible, TryInto};
 <span class="kw">use </span>std::ops::Sub;
@@ -2028,7 +2012,7 @@
     WalletError, WalletInput, WalletModuleTypes, WalletOutput, WalletOutputOutcome,
     CONFIRMATION_TARGET,
 };
-<span class="kw">use </span>fedimint_bitcoind::{create_bitcoind, BitcoinRpcConfig, DynBitcoindRpc};
+<span class="kw">use </span>fedimint_bitcoind::{create_bitcoind, DynBitcoindRpc};
 <span class="kw">use </span>fedimint_core::config::{
     ClientModuleConfig, ConfigGenModuleParams, DkgResult, ServerModuleConfig,
     ServerModuleConsensusConfig, TypedServerModuleConfig, TypedServerModuleConsensusConfig,
@@ -2038,7 +2022,6 @@
 };
 <span class="kw">use </span>fedimint_core::encoding::{Decodable, Encodable};
 <span class="kw">use </span>fedimint_core::module::audit::Audit;
-<span class="kw">use </span>fedimint_core::module::interconnect::ModuleInterconect;
 <span class="kw">use </span>fedimint_core::module::{
     api_endpoint, ApiEndpoint, ConsensusProposal, CoreConsensusVersion, ExtendsCommonModuleGen,
     InputMeta, IntoModuleError, ModuleConsensusVersion, ModuleError, PeerHandle, ServerModuleGen,
@@ -2083,6 +2066,7 @@
 
 <span class="attr">#[apply(<span class="macro">async_trait_maybe_send!</span>)]
 </span><span class="kw">impl </span>ServerModuleGen <span class="kw">for </span>WalletGen {
+    <span class="kw">type </span>Params = WalletGenParams;
     <span class="kw">const </span>DATABASE_VERSION: DatabaseVersion = DatabaseVersion(<span class="number">0</span>);
 
     <span class="kw">fn </span>versions(<span class="kw-2">&amp;</span><span class="self">self</span>, _core: CoreConsensusVersion) -&gt; <span class="kw-2">&amp;</span>[ModuleConsensusVersion] {
@@ -2103,10 +2087,7 @@
         peers: <span class="kw-2">&amp;</span>[PeerId],
         params: <span class="kw-2">&amp;</span>ConfigGenModuleParams,
     ) -&gt; BTreeMap&lt;PeerId, ServerModuleConfig&gt; {
-        <span class="kw">let </span>params = params
-            .to_typed::&lt;WalletGenParams&gt;()
-            .expect(<span class="string">&quot;Invalid wallet gen params&quot;</span>);
-
+        <span class="kw">let </span>params = <span class="self">self</span>.parse_params(params).unwrap();
         <span class="kw">let </span>secp = secp256k1::Secp256k1::new();
 
         <span class="kw">let </span>btc_pegin_keys = peers
@@ -2126,6 +2107,7 @@
                     peers.threshold(),
                     params.consensus.network,
                     params.consensus.finality_delay,
+                    params.local.bitcoin_rpc.clone(),
                 );
                 (<span class="kw-2">*</span>id, cfg)
             })
@@ -2142,10 +2124,7 @@
         peers: <span class="kw-2">&amp;</span>PeerHandle,
         params: <span class="kw-2">&amp;</span>ConfigGenModuleParams,
     ) -&gt; DkgResult&lt;ServerModuleConfig&gt; {
-        <span class="kw">let </span>params = params
-            .to_typed::&lt;WalletGenParams&gt;()
-            .expect(<span class="string">&quot;Invalid wallet params&quot;</span>);
-
+        <span class="kw">let </span>params = <span class="self">self</span>.parse_params(params).unwrap();
         <span class="kw">let </span>secp = secp256k1::Secp256k1::new();
         <span class="kw">let </span>(sk, pk) = secp.generate_keypair(<span class="kw-2">&amp;mut </span>OsRng);
         <span class="kw">let </span>our_key = CompressedPublicKey { key: pk };
@@ -2162,6 +2141,7 @@
             peers.peer_ids().threshold(),
             params.consensus.network,
             params.consensus.finality_delay,
+            params.local.bitcoin_rpc.clone(),
         );
 
         <span class="prelude-val">Ok</span>(wallet_cfg.to_erased())
@@ -2291,9 +2271,7 @@
 
     <span class="kw">async fn </span>await_consensus_proposal(<span class="kw-2">&amp;</span><span class="self">self</span>, dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;_</span>&gt;) {
         <span class="kw">while </span>!<span class="self">self</span>.consensus_proposal(dbtx).<span class="kw">await</span>.forces_new_epoch() {
-            <span class="comment">// FIXME: remove after modularization finishes
-            </span><span class="attr">#[cfg(not(target_family = <span class="string">&quot;wasm&quot;</span>))]
-            </span>sleep(Duration::from_millis(<span class="number">1000</span>)).<span class="kw">await</span>;
+            sleep(Duration::from_millis(<span class="number">1000</span>)).<span class="kw">await</span>;
         }
     }
 
@@ -2301,8 +2279,7 @@
         <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>,
         dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;_</span>&gt;,
     ) -&gt; ConsensusProposal&lt;WalletConsensusItem&gt; {
-        <span class="comment">// TODO: implement retry logic in case bitcoind is temporarily unreachable
-        </span><span class="kw">let </span>our_target_height = <span class="self">self</span>.target_height().<span class="kw">await</span>;
+        <span class="kw">let </span>our_target_height = <span class="self">self</span>.target_height().<span class="kw">await</span>;
 
         <span class="comment">// In case the wallet just got created the height is not committed to the DB yet
         // but will be set to 0 first, so we can assume that here.
@@ -2397,7 +2374,6 @@
 
     <span class="kw">async fn </span>validate_input&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt;(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        _interconnect: <span class="kw-2">&amp;</span><span class="kw">dyn </span>ModuleInterconect,
         dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;b</span>&gt;,
         _verification_cache: <span class="kw-2">&amp;</span><span class="self">Self</span>::VerificationCache,
         input: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>WalletInput,
@@ -2420,20 +2396,17 @@
                 amount: fedimint_core::Amount::from_sats(input.tx_output().value),
                 fee: <span class="self">self</span>.cfg.consensus.fee_consensus.peg_in_abs,
             },
-            puk_keys: <span class="macro">vec!</span>[<span class="kw-2">*</span>input.tweak_contract_key()],
+            pub_keys: <span class="macro">vec!</span>[<span class="kw-2">*</span>input.tweak_contract_key()],
         })
     }
 
     <span class="kw">async fn </span>apply_input&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>, <span class="lifetime">&#39;c</span>&gt;(
         <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>,
-        interconnect: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw">dyn </span>ModuleInterconect,
         dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;c</span>&gt;,
         input: <span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span>WalletInput,
         cache: <span class="kw-2">&amp;</span><span class="self">Self</span>::VerificationCache,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;InputMeta, ModuleError&gt; {
-        <span class="kw">let </span>meta = <span class="self">self
-            </span>.validate_input(interconnect, dbtx, cache, input)
-            .<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let </span>meta = <span class="self">self</span>.validate_input(dbtx, cache, input).<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="macro">debug!</span>(outpoint = %input.outpoint(), amount = %meta.amount.amount, <span class="string">&quot;Claiming peg-in&quot;</span>);
 
         dbtx.insert_new_entry(
@@ -2656,9 +2629,7 @@
         db: Database,
         task_group: <span class="kw-2">&amp;mut </span>TaskGroup,
     ) -&gt; anyhow::Result&lt;Wallet&gt; {
-        <span class="comment">// TODO: should come from wallet config gen params
-        </span><span class="kw">let </span>rpc_config = BitcoinRpcConfig::from_env_vars()<span class="question-mark">?</span>;
-        <span class="kw">let </span>btc_rpc = create_bitcoind(<span class="kw-2">&amp;</span>rpc_config, task_group.make_handle())<span class="question-mark">?</span>;
+        <span class="kw">let </span>btc_rpc = create_bitcoind(<span class="kw-2">&amp;</span>cfg.local.bitcoin_rpc, task_group.make_handle())<span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(<span class="self">Self</span>::new_with_bitcoind(cfg, db, btc_rpc, task_group).<span class="kw">await</span><span class="question-mark">?</span>)
     }
 
@@ -2880,7 +2851,7 @@
             <span class="kw">return </span><span class="prelude-val">Err</span>(banned_peers);
         }
 
-        <span class="kw">let </span>items: Vec&lt;<span class="kw">_</span>&gt; = dedup.values().into_iter().collect();
+        <span class="kw">let </span>items: Vec&lt;<span class="kw">_</span>&gt; = dedup.values().collect();
 
         <span class="kw">let </span><span class="kw-2">mut </span>fees: Vec&lt;<span class="kw">_</span>&gt; = items.iter().map(|item| item.fee_rate).collect();
         fees.sort_unstable();
@@ -2935,7 +2906,7 @@
         <span class="kw">let </span>old_height = <span class="self">self
             </span>.consensus_height(dbtx)
             .<span class="kw">await
-            </span>.unwrap_or_else(|| new_height.saturating_sub(<span class="number">10</span>));
+            </span>.unwrap_or_else(|| new_height.saturating_sub(<span class="self">self</span>.cfg.consensus.finality_delay));
         <span class="kw">if </span>new_height &lt; old_height {
             <span class="macro">info!</span>(
                 new_height,
@@ -2972,17 +2943,14 @@
                 .find_by_prefix(<span class="kw-2">&amp;</span>PendingTransactionPrefixKey)
                 .<span class="kw">await
                 </span>.map(|(key, transaction)| (key.<span class="number">0</span>, transaction))
-                .collect::&lt;HashMap&lt;<span class="kw">_</span>, <span class="kw">_</span>&gt;&gt;()
+                .collect::&lt;HashMap&lt;Txid, PendingTransaction&gt;&gt;()
                 .<span class="kw">await</span>;
 
-            <span class="kw">for </span>transaction <span class="kw">in </span><span class="kw-2">&amp;</span>pending_transactions {
-                <span class="kw">if </span><span class="self">self
-                    </span>.btc_rpc
-                    .was_transaction_confirmed_in(<span class="kw-2">&amp;</span>transaction.<span class="number">1</span>.tx, height <span class="kw">as </span>u64)
-                    .<span class="kw">await
-                    </span>.expect(<span class="string">&quot;bitcoin rpc backend failed&quot;</span>)
-                {
-                    <span class="self">self</span>.recognize_change_utxo(dbtx, transaction.<span class="number">1</span>).<span class="kw">await</span>;
+            <span class="kw">for </span>(txid, tx) <span class="kw">in </span><span class="kw-2">&amp;</span>pending_transactions {
+                <span class="kw">if let </span><span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(tx_height)) = <span class="self">self</span>.btc_rpc.get_tx_block_height(txid).<span class="kw">await </span>{
+                    <span class="kw">if </span>tx_height == height <span class="kw">as </span>u64 {
+                        <span class="self">self</span>.recognize_change_utxo(dbtx, tx).<span class="kw">await</span>;
+                    }
                 }
             }
 
