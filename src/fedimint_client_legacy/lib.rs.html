@@ -1721,6 +1721,15 @@
 <a href="#1721" id="1721">1721</a>
 <a href="#1722" id="1722">1722</a>
 <a href="#1723" id="1723">1723</a>
+<a href="#1724" id="1724">1724</a>
+<a href="#1725" id="1725">1725</a>
+<a href="#1726" id="1726">1726</a>
+<a href="#1727" id="1727">1727</a>
+<a href="#1728" id="1728">1728</a>
+<a href="#1729" id="1729">1729</a>
+<a href="#1730" id="1730">1730</a>
+<a href="#1731" id="1731">1731</a>
+<a href="#1732" id="1732">1732</a>
 </pre><pre class="rust"><code><span class="kw">pub mod </span>api;
 <span class="kw">pub mod </span>db;
 <span class="kw">pub mod </span>ln;
@@ -1763,7 +1772,7 @@
 <span class="kw">use </span>fedimint_core::module::registry::ModuleDecoderRegistry;
 <span class="kw">use </span>fedimint_core::module::{CommonModuleGen, ModuleCommon};
 <span class="kw">use </span>fedimint_core::outcome::TransactionStatus;
-<span class="kw">use </span>fedimint_core::task::{<span class="self">self</span>, sleep};
+<span class="kw">use </span>fedimint_core::task::{<span class="self">self</span>, sleep, MaybeSend};
 <span class="kw">use </span>fedimint_core::tiered::InvalidAmountTierError;
 <span class="kw">use </span>fedimint_core::txoproof::TxOutProof;
 <span class="kw">use </span>fedimint_core::{Amount, OutPoint, TieredMulti, TieredSummary, TransactionId};
@@ -1870,15 +1879,17 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         route_hints: Vec&lt;modules::ln::route_hints::RouteHint&gt;,
         time_to_live: Duration,
+        gateway_id: secp256k1::PublicKey,
     ) -&gt; LightningGateway {
         LightningGateway {
             mint_channel_id: <span class="self">self</span>.mint_channel_id,
-            gateway_pub_key: <span class="self">self</span>.redeem_key.x_only_public_key().<span class="number">0</span>,
+            gateway_redeem_key: <span class="self">self</span>.redeem_key.x_only_public_key().<span class="number">0</span>,
             node_pub_key: <span class="self">self</span>.node_pub_key,
             api: <span class="self">self</span>.api.clone(),
             route_hints,
             valid_until: fedimint_core::time::now() + time_to_live,
             fees: <span class="self">self</span>.fees,
+            gateway_id,
         }
     }
 }
@@ -1956,7 +1967,7 @@
 
 <span class="comment">// TODO: `get_module` is parsing `serde_json::Value` every time, which is not
 // best for performance
-</span><span class="kw">impl</span>&lt;T: AsRef&lt;ClientConfig&gt; + Clone + Send&gt; Client&lt;T&gt; {
+</span><span class="kw">impl</span>&lt;T: AsRef&lt;ClientConfig&gt; + Clone + MaybeSend&gt; Client&lt;T&gt; {
     <span class="kw">pub fn </span>db(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Database {
         <span class="kw-2">&amp;</span><span class="self">self</span>.context.db
     }
@@ -1968,7 +1979,8 @@
                 .as_ref()
                 .get_first_module_by_kind::&lt;LightningClientConfig&gt;(<span class="string">&quot;ln&quot;</span>)
                 .expect(<span class="string">&quot;needs lightning module client config&quot;</span>)
-                .<span class="number">1</span>,
+                .<span class="number">1
+                </span>.clone(),
             context: <span class="self">self</span>.context.clone(),
         }
     }
@@ -1980,7 +1992,8 @@
                 .as_ref()
                 .get_first_module_by_kind::&lt;MintClientConfig&gt;(<span class="string">&quot;mint&quot;</span>)
                 .expect(<span class="string">&quot;needs mint module client config&quot;</span>)
-                .<span class="number">1</span>,
+                .<span class="number">1
+                </span>.clone(),
             epoch_pk: <span class="self">self</span>.config.as_ref().epoch_pk,
             context: <span class="self">self</span>.context.clone(),
             secret: <span class="self">Self</span>::mint_secret_static(<span class="kw-2">&amp;</span><span class="self">self</span>.root_secret),
@@ -1994,7 +2007,8 @@
                 .as_ref()
                 .get_first_module_by_kind::&lt;WalletClientConfig&gt;(<span class="string">&quot;wallet&quot;</span>)
                 .expect(<span class="string">&quot;needs wallet module client config&quot;</span>)
-                .<span class="number">1</span>,
+                .<span class="number">1
+                </span>.clone(),
 
             context: <span class="self">self</span>.context.clone(),
         }
@@ -2002,6 +2016,10 @@
 
     <span class="kw">pub fn </span>config(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; T {
         <span class="self">self</span>.config.clone()
+    }
+
+    <span class="kw">pub fn </span>config_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>T {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.config
     }
 
     <span class="kw">pub async fn </span>new(
@@ -2534,22 +2552,22 @@
     /// advance.
     </span><span class="kw">pub async fn </span>switch_active_gateway(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        gateway_pub_key: <span class="prelude-ty">Option</span>&lt;secp256k1::XOnlyPublicKey&gt;,
+        gateway_id: <span class="prelude-ty">Option</span>&lt;secp256k1::PublicKey&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;LightningGateway&gt; {
         <span class="kw">let </span>gateways = <span class="self">self</span>.fetch_registered_gateways().<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="kw">if </span>gateways.is_empty() {
             <span class="macro">debug!</span>(<span class="string">&quot;Could not find any gateways&quot;</span>);
             <span class="kw">return </span><span class="prelude-val">Err</span>(ClientError::NoGateways);
         };
-        <span class="kw">let </span>gateway = <span class="kw">match </span>gateway_pub_key {
+        <span class="kw">let </span>gateway = <span class="kw">match </span>gateway_id {
             <span class="comment">// If a pubkey was provided, try to select and activate a gateway with that pubkey.
             </span><span class="prelude-val">Some</span>(pub_key) =&gt; gateways
                 .into_iter()
-                .find(|g| g.gateway_pub_key == pub_key)
+                .find(|g| g.gateway_id == pub_key)
                 .ok_or_else(|| {
                     <span class="macro">debug!</span>(
                         <span class="string">&quot;Could not find gateway with gateway public key {:?}&quot;</span>,
-                        gateway_pub_key
+                        gateway_id
                     );
                     ClientError::GatewayNotFound
                 })<span class="question-mark">?</span>,
