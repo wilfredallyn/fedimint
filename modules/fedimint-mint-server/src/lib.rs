@@ -358,6 +358,8 @@ impl ServerModule for Mint {
     ) -> anyhow::Result<()> {
         let out_point = consensus_item.out_point;
         let signatures = consensus_item.signatures;
+        // info!("out_point {:#?}", out_point); // "{:?} {:?}"
+        // info!("signatures {:#?}", signatures);
 
         if dbtx.get_value(&OutputOutcomeKey(out_point)).await.is_some() {
             bail!("Already obtained a threshold of blind signature shares")
@@ -376,11 +378,21 @@ impl ServerModule for Mint {
             .get_value(&ProposedPartialSignatureKey(out_point))
             .await
             .context("Out point for this signature share does not exist")?;
+        // info!("our_contribution {:#?}", our_contribution); // "{:?} {:?}"
 
         // check if we have received one signature per blinded note
         if !signatures.0.structural_eq(&our_contribution.0) {
             bail!("Signature share structure is invalid");
         }
+
+        let our_contrib = our_contribution.clone();
+        let debug_reference_messages: Vec<_> = our_contrib
+            .0
+            .iter_items()
+            .map(|(_amt, (msg, _sig))| msg)
+            .collect();
+
+        // info!("reference_messages {:#?}", debug_reference_messages); // "{:?} {:?}"
 
         // obtain the correct messages to be signed from our contribution
         let reference_messages = our_contribution
@@ -400,6 +412,10 @@ impl ServerModule for Mint {
         }
 
         // we save the first valid signature share by this peer
+        // info!(
+        //     "&ReceivedPartialSignatureKey(out_point, peer_id) {:#?}",
+        //     &ReceivedPartialSignatureKey(out_point, peer_id)
+        // ); // "{:?} {:?}"
         dbtx.insert_new_entry(
             &ReceivedPartialSignatureKey(out_point, peer_id),
             &signatures,
@@ -413,6 +429,12 @@ impl ServerModule for Mint {
             .map(|(key, partial_sig)| (key.1, partial_sig))
             .collect::<Vec<_>>()
             .await;
+
+        info!("signature_shares {:#?}", signature_shares); // "{:?} {:?}"
+        info!(
+            "&ReceivedPartialSignatureKeyOutputPrefix(out_point) {:#?}",
+            &ReceivedPartialSignatureKeyOutputPrefix(out_point)
+        ); // "{:?} {:?}"
 
         // check if we have enough signature shares to combine
         if signature_shares.len() < self.cfg.consensus.peer_tbs_pks.threshold() {
@@ -440,6 +462,15 @@ impl ServerModule for Mint {
             (amt, sig)
         })
         .collect::<TieredMulti<_>>();
+        info!("blind_signatures {:#?}", blind_signatures.clone()); // "{:?} {:?}"
+        info!(
+            "&OutputOutcomeKey(out_point) {:#?}",
+            &OutputOutcomeKey(out_point)
+        ); // "{:?} {:?}"
+        info!(
+            "&MintOutputBlindSignatures(blind_signatures) {:#?}",
+            &MintOutputBlindSignatures(blind_signatures.clone())
+        ); // "{:?} {:?}"
 
         dbtx.remove_by_prefix(&ReceivedPartialSignatureKeyOutputPrefix(out_point))
             .await;

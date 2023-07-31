@@ -763,8 +763,16 @@ impl MintClientModule {
                 amount_requests.push(((amt, request), (amt, blind_nonce)));
             }
         }
+
+        // info!("amount_requests {:#?}", amount_requests); // "{:?} {:?}"
         let (note_issuance, sig_req): (MultiNoteIssuanceRequest, MintOutput) =
             amount_requests.into_iter().unzip();
+
+        info!(
+            "MultiNoteIssuanceRequest note_issuance {:#?}",
+            note_issuance
+        ); // "{:?} {:?}"
+        info!("MintOutput sig_req {:#?}", sig_req); // "{:?} {:?}"
 
         let state_generator = Arc::new(move |txid, out_idx| {
             vec![MintClientStateMachines::Output(MintOutputStateMachine {
@@ -777,6 +785,9 @@ impl MintClientModule {
                 }),
             })]
         });
+
+        // info!("state_generator {:#?}", state_generator); // "{:?} {:?}"
+        // ^^^^^^^^^^^^^^^ `[closure@modules/fedimint-mint-client/src/lib.rs:774:40: 774:60]` cannot be formatted using `{:?}` because it doesn't implement `std::fmt::Debug`
 
         debug!(
             %amount,

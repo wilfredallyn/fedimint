@@ -13,7 +13,7 @@ use secp256k1::{KeyPair, Secp256k1, Signing};
 use serde::{Deserialize, Serialize};
 use tbs::{blind_message, unblind_signature, AggregatePublicKey, BlindedSignature, BlindingKey};
 use thiserror::Error;
-use tracing::error;
+use tracing::{error, info};
 
 use crate::db::NoteKey;
 use crate::{MintClientContext, SpendableNote};
@@ -125,6 +125,7 @@ impl MintOutputStatesCreated {
                     context.mint_decoder.clone(),
                 ),
                 move |dbtx, bsigs, old_state| {
+                    info!("transitions: bsigs {:#?}", bsigs); // "{:?} {:?}"
                     Box::pin(Self::transition_outcome_ready(
                         dbtx,
                         bsigs,
@@ -281,6 +282,14 @@ impl NoteIssuanceRequest {
             spend_key,
             blinding_key,
         };
+
+        // info!("spend_key {:#?}", spend_key); // "{:?} {:?}"
+        // info!("nonce {:#?}", nonce); // "{:?} {:?}"
+        // info!("spend_key {:#?}", spend_key); // "{:?} {:?}"
+        // info!("blinding_key {:#?}", blinding_key); // "{:?} {:?}"
+        // info!("blinded_nonce {:#?}", blinded_nonce); // "{:?} {:?}"
+        // info!("BlindNonce(blinded_nonce) {:#?}", BlindNonce(blinded_nonce)); // "{:?} {:?}"
+        // info!("NoteIssuanceRequest cr {:#?}", cr); // "{:?} {:?}"
 
         (cr, BlindNonce(blinded_nonce))
     }

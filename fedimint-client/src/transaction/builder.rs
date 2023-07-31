@@ -11,6 +11,8 @@ use crate::module::StateGenerator;
 use crate::sm::DynState;
 use crate::DynGlobalClientContext;
 
+use tracing::info;
+
 #[derive(Clone)]
 pub struct ClientInput<I = DynInput, S = DynState<DynGlobalClientContext>> {
     pub input: I,
@@ -89,11 +91,26 @@ impl TransactionBuilder {
                 .into_iter()
                 .map(|input| (input.input, input.keys, input.state_machines)),
         );
+        // info!("inputs {:#?}", inputs); // "{:?} {:?}"
+        // info!("input_keys {:#?}", input_keys); // "{:?} {:?}"
+
+        // info!("input_states {:#?}", input_states); // "{:?} {:?}"
+        //    error[E0277]: `dyn Fn(TransactionId, u64) -> Vec<DynState<DynGlobalClientContext>> + std::marker::Send + Sync` doesn't implement `std::fmt::Debug`
+        //    --> fedimint-client/src/transaction/builder.rs:96:37
+        //     |
+        //  96 |         info!("input_states {:#?}", input_states); // "{:?} {:?}"
+        //     |                                     ^^^^^^^^^^^^ `dyn Fn(TransactionId, u64) -> Vec<DynState<DynGlobalClientContext>> + std::marker::Send + Sync` cannot be formatted using `{:?}` because it doesn't implement `std::fmt::Debug`
+        //     |
+        //     = help: the trait `std::fmt::Debug` is not implemented for `dyn Fn(TransactionId, u64) -> Vec<DynState<DynGlobalClientContext>> + std::marker::Send + Sync`
+        //     = note: this error originates in the macro `format_args` which comes from the expansion of the macro `info` (in Nightly builds, run with -Z macro-backtrace for more info)
+
         let (outputs, output_states): (Vec<_>, Vec<_>) = self
             .outputs
             .into_iter()
             .map(|output| (output.output, output.state_machines))
             .unzip();
+        // info!("outputs {:#?}", outputs); // "{:?} {:?}"
+        // info!("output_states {:#?}", output_states); // "{:?} {:?}"
 
         let txid = Transaction::tx_hash_from_parts(&inputs, &outputs);
 
