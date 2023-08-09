@@ -119,6 +119,21 @@
 <a href="#119" id="119">119</a>
 <a href="#120" id="120">120</a>
 <a href="#121" id="121">121</a>
+<a href="#122" id="122">122</a>
+<a href="#123" id="123">123</a>
+<a href="#124" id="124">124</a>
+<a href="#125" id="125">125</a>
+<a href="#126" id="126">126</a>
+<a href="#127" id="127">127</a>
+<a href="#128" id="128">128</a>
+<a href="#129" id="129">129</a>
+<a href="#130" id="130">130</a>
+<a href="#131" id="131">131</a>
+<a href="#132" id="132">132</a>
+<a href="#133" id="133">133</a>
+<a href="#134" id="134">134</a>
+<a href="#135" id="135">135</a>
+<a href="#136" id="136">136</a>
 </pre><pre class="rust"><code><span class="kw">use </span>std::collections::BTreeMap;
 <span class="kw">use </span>std::net::SocketAddr;
 <span class="kw">use </span>std::sync::Arc;
@@ -126,6 +141,7 @@
 <span class="kw">use </span>fedimint_client::module::gen::ClientModuleGenRegistry;
 <span class="kw">use </span>fedimint_client::Client;
 <span class="kw">use </span>fedimint_client_legacy::modules::ln::config::GatewayFee;
+<span class="kw">use </span>fedimint_core::config::FederationId;
 <span class="kw">use </span>fedimint_core::db::mem_impl::MemDatabase;
 <span class="kw">use </span>fedimint_core::db::Database;
 <span class="kw">use </span>fedimint_core::module::registry::ModuleDecoderRegistry;
@@ -136,6 +152,7 @@
 <span class="kw">use </span>ln_gateway::rpc::rpc_server::run_webserver;
 <span class="kw">use </span>ln_gateway::rpc::{ConnectFedPayload, FederationInfo};
 <span class="kw">use </span>ln_gateway::Gateway;
+<span class="kw">use </span>secp256k1::PublicKey;
 <span class="kw">use </span>tempfile::TempDir;
 <span class="kw">use </span>tokio::sync::RwLock;
 <span class="kw">use </span>url::Url;
@@ -154,6 +171,10 @@
     </span>gateway: Gateway,
     <span class="doccomment">/// Temporary dir that stores the gateway config
     </span>_config_dir: <span class="prelude-ty">Option</span>&lt;TempDir&gt;,
+    <span class="comment">// Public key of the lightning node
+    </span><span class="kw">pub </span>node_pub_key: PublicKey,
+    <span class="comment">// Listening address of the lightning node
+    </span><span class="kw">pub </span>listening_addr: String,
 }
 
 <span class="kw">impl </span>GatewayTest {
@@ -167,11 +188,15 @@
         <span class="self">self</span>.gateway.remove_client(fed.id()).<span class="kw">await</span>.unwrap()
     }
 
+    <span class="kw">pub async fn </span>select_client(<span class="kw-2">&amp;</span><span class="self">self</span>, federation_id: FederationId) -&gt; Client {
+        <span class="self">self</span>.gateway.select_client(federation_id).<span class="kw">await</span>.unwrap()
+    }
+
     <span class="doccomment">/// Connects to a new federation and stores the info
     </span><span class="kw">pub async fn </span>connect_fed(<span class="kw-2">&amp;mut </span><span class="self">self</span>, fed: <span class="kw-2">&amp;</span>FederationTest) -&gt; FederationInfo {
-        <span class="kw">let </span>connect = fed.connection_code().to_string();
+        <span class="kw">let </span>invite_code = fed.invite_code().to_string();
         <span class="kw">let </span>rpc = <span class="self">self</span>.get_rpc().<span class="kw">await</span>;
-        rpc.connect_federation(ConnectFedPayload { connect })
+        rpc.connect_federation(ConnectFedPayload { invite_code })
             .<span class="kw">await
             </span>.unwrap()
     }
@@ -194,6 +219,9 @@
         <span class="comment">// Create federation client builder for the gateway
         </span><span class="kw">let </span>client_builder: StandardGatewayClientBuilder =
             StandardGatewayClientBuilder::new(path.clone(), registry, <span class="number">0</span>);
+
+        <span class="kw">let </span>listening_addr = lightning.listening_address();
+        <span class="kw">let </span>info = lightning.info().<span class="kw">await</span>.unwrap();
 
         <span class="kw">let </span><span class="kw-2">mut </span>tg = TaskGroup::new();
         <span class="comment">// Create the stream to route HTLCs. We cannot create the Gateway until the
@@ -237,6 +265,8 @@
             api: address,
             _config_dir,
             gateway,
+            node_pub_key: PublicKey::from_slice(info.pub_key.as_slice()).unwrap(),
+            listening_addr,
         }
     }
 }

@@ -201,7 +201,7 @@
 <span class="kw">use </span>fedimint_client::secret::PlainRootSecretStrategy;
 <span class="kw">use </span>fedimint_client::{Client, ClientBuilder};
 <span class="kw">use </span>fedimint_core::admin_client::{ConfigGenParamsConsensus, PeerServerParams};
-<span class="kw">use </span>fedimint_core::api::WsClientConnectInfo;
+<span class="kw">use </span>fedimint_core::api::InviteCode;
 <span class="kw">use </span>fedimint_core::config::{
     ClientConfig, FederationId, ServerModuleGenParamsRegistry, ServerModuleGenRegistry,
     META_FEDERATION_NAME_KEY,
@@ -227,7 +227,7 @@
     server_gen: ServerModuleGenRegistry,
     client_gen: ClientModuleGenRegistry,
     primary_client: ModuleInstanceId,
-    task: TaskGroup,
+    _task: TaskGroup,
 }
 
 <span class="kw">impl </span>FederationTest {
@@ -253,14 +253,14 @@
         client_builder.with_config(client_config);
         client_builder.with_database(MemDatabase::new());
         client_builder
-            .build::&lt;PlainRootSecretStrategy&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>.task.make_subgroup().<span class="kw">await</span>)
+            .build::&lt;PlainRootSecretStrategy&gt;()
             .<span class="kw">await
             </span>.expect(<span class="string">&quot;Failed to build client&quot;</span>)
     }
 
-    <span class="doccomment">/// Return first connection code for gateways
-    </span><span class="kw">pub fn </span>connection_code(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; WsClientConnectInfo {
-        <span class="self">self</span>.configs[<span class="kw-2">&amp;</span>PeerId::from(<span class="number">0</span>)].get_connect_info()
+    <span class="doccomment">/// Return first invite code for gateways
+    </span><span class="kw">pub fn </span>invite_code(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; InviteCode {
+        <span class="self">self</span>.configs[<span class="kw-2">&amp;</span>PeerId::from(<span class="number">0</span>)].get_invite_code()
     }
 
     <span class="doccomment">///  Return first id for gateways
@@ -320,7 +320,7 @@
             server_gen,
             client_gen,
             primary_client,
-            task,
+            _task: task,
         }
     }
 }
@@ -373,7 +373,7 @@
                 local: ConfigGenParamsLocal {
                     our_id: <span class="kw-2">*</span>peer,
                     our_private_key: tls_keys[peer].<span class="number">1</span>.clone(),
-                    api_auth: ApiAuth(<span class="macro">format!</span>(<span class="string">&quot;pass{}&quot;</span>, peer.to_usize())),
+                    api_auth: ApiAuth(<span class="string">&quot;pass&quot;</span>.to_string()),
                     p2p_bind: p2p_bind.parse().expect(<span class="string">&quot;Valid address&quot;</span>),
                     api_bind: api_bind.parse().expect(<span class="string">&quot;Valid address&quot;</span>),
                     download_token_limit: <span class="prelude-val">None</span>,

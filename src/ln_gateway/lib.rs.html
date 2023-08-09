@@ -707,6 +707,119 @@
 <a href="#707" id="707">707</a>
 <a href="#708" id="708">708</a>
 <a href="#709" id="709">709</a>
+<a href="#710" id="710">710</a>
+<a href="#711" id="711">711</a>
+<a href="#712" id="712">712</a>
+<a href="#713" id="713">713</a>
+<a href="#714" id="714">714</a>
+<a href="#715" id="715">715</a>
+<a href="#716" id="716">716</a>
+<a href="#717" id="717">717</a>
+<a href="#718" id="718">718</a>
+<a href="#719" id="719">719</a>
+<a href="#720" id="720">720</a>
+<a href="#721" id="721">721</a>
+<a href="#722" id="722">722</a>
+<a href="#723" id="723">723</a>
+<a href="#724" id="724">724</a>
+<a href="#725" id="725">725</a>
+<a href="#726" id="726">726</a>
+<a href="#727" id="727">727</a>
+<a href="#728" id="728">728</a>
+<a href="#729" id="729">729</a>
+<a href="#730" id="730">730</a>
+<a href="#731" id="731">731</a>
+<a href="#732" id="732">732</a>
+<a href="#733" id="733">733</a>
+<a href="#734" id="734">734</a>
+<a href="#735" id="735">735</a>
+<a href="#736" id="736">736</a>
+<a href="#737" id="737">737</a>
+<a href="#738" id="738">738</a>
+<a href="#739" id="739">739</a>
+<a href="#740" id="740">740</a>
+<a href="#741" id="741">741</a>
+<a href="#742" id="742">742</a>
+<a href="#743" id="743">743</a>
+<a href="#744" id="744">744</a>
+<a href="#745" id="745">745</a>
+<a href="#746" id="746">746</a>
+<a href="#747" id="747">747</a>
+<a href="#748" id="748">748</a>
+<a href="#749" id="749">749</a>
+<a href="#750" id="750">750</a>
+<a href="#751" id="751">751</a>
+<a href="#752" id="752">752</a>
+<a href="#753" id="753">753</a>
+<a href="#754" id="754">754</a>
+<a href="#755" id="755">755</a>
+<a href="#756" id="756">756</a>
+<a href="#757" id="757">757</a>
+<a href="#758" id="758">758</a>
+<a href="#759" id="759">759</a>
+<a href="#760" id="760">760</a>
+<a href="#761" id="761">761</a>
+<a href="#762" id="762">762</a>
+<a href="#763" id="763">763</a>
+<a href="#764" id="764">764</a>
+<a href="#765" id="765">765</a>
+<a href="#766" id="766">766</a>
+<a href="#767" id="767">767</a>
+<a href="#768" id="768">768</a>
+<a href="#769" id="769">769</a>
+<a href="#770" id="770">770</a>
+<a href="#771" id="771">771</a>
+<a href="#772" id="772">772</a>
+<a href="#773" id="773">773</a>
+<a href="#774" id="774">774</a>
+<a href="#775" id="775">775</a>
+<a href="#776" id="776">776</a>
+<a href="#777" id="777">777</a>
+<a href="#778" id="778">778</a>
+<a href="#779" id="779">779</a>
+<a href="#780" id="780">780</a>
+<a href="#781" id="781">781</a>
+<a href="#782" id="782">782</a>
+<a href="#783" id="783">783</a>
+<a href="#784" id="784">784</a>
+<a href="#785" id="785">785</a>
+<a href="#786" id="786">786</a>
+<a href="#787" id="787">787</a>
+<a href="#788" id="788">788</a>
+<a href="#789" id="789">789</a>
+<a href="#790" id="790">790</a>
+<a href="#791" id="791">791</a>
+<a href="#792" id="792">792</a>
+<a href="#793" id="793">793</a>
+<a href="#794" id="794">794</a>
+<a href="#795" id="795">795</a>
+<a href="#796" id="796">796</a>
+<a href="#797" id="797">797</a>
+<a href="#798" id="798">798</a>
+<a href="#799" id="799">799</a>
+<a href="#800" id="800">800</a>
+<a href="#801" id="801">801</a>
+<a href="#802" id="802">802</a>
+<a href="#803" id="803">803</a>
+<a href="#804" id="804">804</a>
+<a href="#805" id="805">805</a>
+<a href="#806" id="806">806</a>
+<a href="#807" id="807">807</a>
+<a href="#808" id="808">808</a>
+<a href="#809" id="809">809</a>
+<a href="#810" id="810">810</a>
+<a href="#811" id="811">811</a>
+<a href="#812" id="812">812</a>
+<a href="#813" id="813">813</a>
+<a href="#814" id="814">814</a>
+<a href="#815" id="815">815</a>
+<a href="#816" id="816">816</a>
+<a href="#817" id="817">817</a>
+<a href="#818" id="818">818</a>
+<a href="#819" id="819">819</a>
+<a href="#820" id="820">820</a>
+<a href="#821" id="821">821</a>
+<a href="#822" id="822">822</a>
 </pre><pre class="rust"><code><span class="kw">pub mod </span>client;
 <span class="kw">pub mod </span>db;
 <span class="kw">pub mod </span>lnd;
@@ -724,35 +837,44 @@
 <span class="kw">use </span>std::collections::BTreeMap;
 <span class="kw">use </span>std::env;
 <span class="kw">use </span>std::net::SocketAddr;
+<span class="kw">use </span>std::path::PathBuf;
 <span class="kw">use </span>std::str::FromStr;
 <span class="kw">use </span>std::sync::atomic::{AtomicU64, Ordering};
 <span class="kw">use </span>std::sync::Arc;
 <span class="kw">use </span>std::time::Duration;
 
-<span class="kw">use </span>anyhow::anyhow;
 <span class="kw">use </span>axum::http::StatusCode;
 <span class="kw">use </span>axum::response::{IntoResponse, Response};
 <span class="kw">use </span>bitcoin::{Address, Txid};
 <span class="kw">use </span>bitcoin_hashes::hex::ToHex;
-<span class="kw">use </span>clap::Subcommand;
+<span class="kw">use </span>clap::{Parser, Subcommand};
 <span class="kw">use </span>client::StandardGatewayClientBuilder;
 <span class="kw">use </span>db::{FederationRegistrationKey, GatewayPublicKey};
-<span class="kw">use </span>fedimint_core::api::{FederationError, WsClientConnectInfo};
+<span class="kw">use </span>fedimint_client::module::gen::{ClientModuleGen, ClientModuleGenRegistry};
+<span class="kw">use </span>fedimint_core::api::{FederationError, InviteCode};
 <span class="kw">use </span>fedimint_core::config::FederationId;
+<span class="kw">use </span>fedimint_core::core::{
+    ModuleInstanceId, ModuleKind, LEGACY_HARDCODED_INSTANCE_ID_MINT,
+    LEGACY_HARDCODED_INSTANCE_ID_WALLET,
+};
 <span class="kw">use </span>fedimint_core::db::Database;
-<span class="kw">use </span>fedimint_core::task::{sleep, RwLock, TaskGroup, TaskHandle};
+<span class="kw">use </span>fedimint_core::module::CommonModuleGen;
+<span class="kw">use </span>fedimint_core::task::{sleep, RwLock, TaskGroup, TaskHandle, TaskShutdownToken};
 <span class="kw">use </span>fedimint_core::time::now;
 <span class="kw">use </span>fedimint_core::Amount;
 <span class="kw">use </span>fedimint_ln_client::contracts::Preimage;
 <span class="kw">use </span>fedimint_ln_client::pay::PayInvoicePayload;
 <span class="kw">use </span>fedimint_ln_common::config::GatewayFee;
 <span class="kw">use </span>fedimint_ln_common::route_hints::RouteHint;
-<span class="kw">use </span>fedimint_wallet_client::{WalletClientExt, WithdrawState};
+<span class="kw">use </span>fedimint_logging::TracingSetup;
+<span class="kw">use </span>fedimint_mint_client::{MintClientGen, MintCommonGen};
+<span class="kw">use </span>fedimint_wallet_client::{WalletClientExt, WalletClientGen, WalletCommonGen, WithdrawState};
 <span class="kw">use </span>futures::stream::StreamExt;
 <span class="kw">use </span>gatewaylnrpc::intercept_htlc_response::Action;
 <span class="kw">use </span>gatewaylnrpc::{GetNodeInfoResponse, InterceptHtlcResponse};
 <span class="kw">use </span>lightning::routing::gossip::RoutingFees;
-<span class="kw">use </span>lnrpc_client::{ILnRpcClient, RouteHtlcStream};
+<span class="kw">use </span>lnrpc_client::{ILnRpcClient, LightningRpcError, RouteHtlcStream};
+<span class="kw">use </span>ng::pay::OutgoingPaymentError;
 <span class="kw">use </span>ng::GatewayClientExt;
 <span class="kw">use </span>rand::rngs::OsRng;
 <span class="kw">use </span>rand::Rng;
@@ -760,14 +882,14 @@
 <span class="kw">use </span>secp256k1::PublicKey;
 <span class="kw">use </span>serde::{Deserialize, Serialize};
 <span class="kw">use </span>thiserror::Error;
-<span class="kw">use </span>tokio::sync::{oneshot, Mutex};
+<span class="kw">use </span>tokio::sync::Mutex;
 <span class="kw">use </span>tracing::{debug, error, info, warn};
 <span class="kw">use </span>url::Url;
 
 <span class="kw">use </span><span class="kw">crate</span>::gatewaylnrpc::intercept_htlc_response::Forward;
 <span class="kw">use </span><span class="kw">crate</span>::lnd::GatewayLndClient;
 <span class="kw">use </span><span class="kw">crate</span>::lnrpc_client::NetworkLnRpcClient;
-<span class="kw">use </span><span class="kw">crate</span>::ng::{GatewayExtPayStates, Htlc};
+<span class="kw">use </span><span class="kw">crate</span>::ng::GatewayExtPayStates;
 <span class="kw">use </span><span class="kw">crate</span>::rpc::rpc_server::run_webserver;
 <span class="kw">use </span><span class="kw">crate</span>::rpc::{
     BackupPayload, BalancePayload, ConnectFedPayload, DepositAddressPayload, GatewayInfo,
@@ -792,6 +914,213 @@
 };
 
 <span class="kw">pub type </span><span class="prelude-ty">Result</span>&lt;T&gt; = std::result::Result&lt;T, GatewayError&gt;;
+
+<span class="kw">const </span>DB_FILE: <span class="kw-2">&amp;</span>str = <span class="string">&quot;gatewayd.db&quot;</span>;
+
+<span class="kw">const </span>DEFAULT_MODULE_KINDS: [(ModuleInstanceId, <span class="kw-2">&amp;</span>ModuleKind); <span class="number">2</span>] = [
+    (LEGACY_HARDCODED_INSTANCE_ID_MINT, <span class="kw-2">&amp;</span>MintCommonGen::KIND),
+    (LEGACY_HARDCODED_INSTANCE_ID_WALLET, <span class="kw-2">&amp;</span>WalletCommonGen::KIND),
+];
+
+<span class="attr">#[derive(Parser)]
+</span><span class="kw">pub struct </span>GatewayOpts {
+    <span class="attr">#[clap(subcommand)]
+    </span>mode: LightningMode,
+
+    <span class="doccomment">/// Path to folder containing gateway config and data files
+    </span><span class="attr">#[arg(long = <span class="string">&quot;data-dir&quot;</span>, env = <span class="string">&quot;FM_GATEWAY_DATA_DIR&quot;</span>)]
+    </span><span class="kw">pub </span>data_dir: PathBuf,
+
+    <span class="doccomment">/// Gateway webserver listen address
+    </span><span class="attr">#[arg(long = <span class="string">&quot;listen&quot;</span>, env = <span class="string">&quot;FM_GATEWAY_LISTEN_ADDR&quot;</span>)]
+    </span><span class="kw">pub </span>listen: SocketAddr,
+
+    <span class="doccomment">/// Public URL from which the webserver API is reachable
+    </span><span class="attr">#[arg(long = <span class="string">&quot;api-addr&quot;</span>, env = <span class="string">&quot;FM_GATEWAY_API_ADDR&quot;</span>)]
+    </span><span class="kw">pub </span>api_addr: Url,
+
+    <span class="doccomment">/// Gateway webserver authentication password
+    </span><span class="attr">#[arg(long = <span class="string">&quot;password&quot;</span>, env = <span class="string">&quot;FM_GATEWAY_PASSWORD&quot;</span>)]
+    </span><span class="kw">pub </span>password: String,
+
+    <span class="doccomment">/// Configured gateway routing fees
+    /// Format: &lt;base_msat&gt;,&lt;proportional_millionths&gt;
+    </span><span class="attr">#[arg(long = <span class="string">&quot;fees&quot;</span>, env = <span class="string">&quot;FM_GATEWAY_FEES&quot;</span>)]
+    </span><span class="kw">pub </span>fees: <span class="prelude-ty">Option</span>&lt;GatewayFee&gt;,
+}
+
+<span class="kw">pub struct </span>Gatewayd {
+    registry: ClientModuleGenRegistry,
+    lightning_mode: LightningMode,
+    data_dir: PathBuf,
+    listen: SocketAddr,
+    api_addr: Url,
+    password: String,
+    fees: <span class="prelude-ty">Option</span>&lt;GatewayFee&gt;,
+}
+
+<span class="kw">impl </span>Gatewayd {
+    <span class="kw">pub fn </span>new() -&gt; anyhow::Result&lt;Gatewayd&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>args = std::env::args();
+
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>arg) = args.nth(<span class="number">1</span>) {
+            <span class="kw">if </span>arg.as_str() == <span class="string">&quot;version-hash&quot; </span>{
+                <span class="macro">println!</span>(<span class="string">&quot;{}&quot;</span>, <span class="macro">env!</span>(<span class="string">&quot;FEDIMINT_BUILD_CODE_VERSION&quot;</span>));
+                std::process::exit(<span class="number">0</span>);
+            }
+        }
+
+        <span class="comment">// Read configurations
+        </span><span class="kw">let </span>GatewayOpts {
+            mode,
+            data_dir,
+            listen,
+            api_addr,
+            password,
+            fees,
+        } = GatewayOpts::parse();
+
+        <span class="macro">info!</span>(
+            <span class="string">&quot;Starting gatewayd (version: {})&quot;</span>,
+            <span class="macro">env!</span>(<span class="string">&quot;FEDIMINT_BUILD_CODE_VERSION&quot;</span>)
+        );
+
+        <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
+            registry: ClientModuleGenRegistry::new(),
+            lightning_mode: mode,
+            data_dir,
+            listen,
+            api_addr,
+            password,
+            fees,
+        })
+    }
+
+    <span class="kw">pub fn </span>with_module&lt;T&gt;(<span class="kw-2">mut </span><span class="self">self</span>, gen: T) -&gt; <span class="self">Self
+    </span><span class="kw">where
+        </span>T: ClientModuleGen + <span class="lifetime">&#39;static </span>+ Send + Sync,
+    {
+        <span class="self">self</span>.registry.attach(gen);
+        <span class="self">self
+    </span>}
+
+    <span class="kw">pub fn </span>with_default_modules(<span class="self">self</span>) -&gt; <span class="self">Self </span>{
+        <span class="comment">// Gateway module will be attached when the federation clients are created
+        // because the LN RPC will be injected with `GatewayClientGen`.
+        </span><span class="self">self</span>.with_module(MintClientGen)
+            .with_module(WalletClientGen::default())
+    }
+
+    <span class="kw">pub async fn </span>run(<span class="self">self</span>) -&gt; anyhow::Result&lt;()&gt; {
+        TracingSetup::default().init()<span class="question-mark">?</span>;
+
+        <span class="kw">let </span>decoders = <span class="self">self
+            </span>.registry
+            .decoders(DEFAULT_MODULE_KINDS.iter().cloned())<span class="question-mark">?</span>;
+
+        <span class="kw">let </span>client_builder = StandardGatewayClientBuilder::new(
+            <span class="self">self</span>.data_dir.clone(),
+            <span class="self">self</span>.registry.clone(),
+            LEGACY_HARDCODED_INSTANCE_ID_MINT,
+        );
+
+        <span class="kw">let </span>db = Database::new(
+            fedimint_rocksdb::RocksDb::open(<span class="self">self</span>.data_dir.join(DB_FILE))<span class="question-mark">?</span>,
+            decoders.clone(),
+        );
+
+        <span class="kw">let </span><span class="kw-2">mut </span>tg = TaskGroup::new();
+        <span class="kw">let </span>rx = <span class="self">self</span>.start_gateway(<span class="kw-2">&amp;mut </span>tg, client_builder, db).<span class="kw">await</span><span class="question-mark">?</span>;
+        rx.<span class="kw">await</span>;
+        <span class="macro">info!</span>(<span class="string">&quot;Gatewayd exiting...&quot;</span>);
+        <span class="prelude-val">Ok</span>(())
+    }
+
+    <span class="kw">async fn </span>start_gateway(
+        <span class="self">self</span>,
+        task_group: <span class="kw-2">&amp;mut </span>TaskGroup,
+        client_builder: StandardGatewayClientBuilder,
+        database: Database,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;TaskShutdownToken&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>tg = task_group.make_subgroup().<span class="kw">await</span>;
+        task_group
+            .spawn(
+                <span class="string">&quot;Subscribe to intercepted HTLCs in stream&quot;</span>,
+                <span class="kw">move </span>|handle| <span class="kw">async move </span>{
+                    <span class="kw">let </span>clients =  Arc::new(RwLock::new(BTreeMap::new()));
+                    <span class="kw">let </span>scid_to_federation = Arc::new(RwLock::new(BTreeMap::new()));
+
+                    <span class="kw">loop </span>{
+                        <span class="kw">if </span>handle.is_shutting_down() {
+                            <span class="kw">break</span>;
+                        }
+
+                        <span class="kw">let </span>lnrpc_route = <span class="self">Self</span>::create_boxed_lightning_client(<span class="self">self</span>.lightning_mode.clone()).<span class="kw">await</span>;
+
+                        <span class="comment">// Re-create the HTLC stream if the connection breaks
+                        </span><span class="kw">match </span>lnrpc_route
+                            .route_htlcs(<span class="kw-2">&amp;mut </span>tg)
+                            .<span class="kw">await
+                        </span>{
+                            <span class="prelude-val">Ok</span>((stream, ln_client)) =&gt; {
+                                <span class="comment">// Blocks until the connection to the lightning node breaks
+                                </span><span class="macro">info!</span>(<span class="string">&quot;Established HTLC stream&quot;</span>);
+
+                                <span class="comment">// Re-create gateway
+                                </span><span class="kw">let </span>gateway = Gateway::new(
+                                    ln_client.clone(),
+                                    client_builder.clone(),
+                                    <span class="self">self</span>.fees.clone().unwrap_or(GatewayFee(DEFAULT_FEES)).<span class="number">0</span>,
+                                    database.clone(),
+                                    <span class="self">self</span>.api_addr.clone(),
+                                    clients.clone(),
+                                    scid_to_federation.clone(),
+                                    tg.clone(),
+                                )
+                                .<span class="kw">await</span>.expect(<span class="string">&quot;Failed to created Gateway&quot;</span>);
+
+                                <span class="macro">info!</span>(<span class="string">&quot;Successfully created Gateway&quot;</span>);
+
+                                <span class="kw">let </span>task_group = run_webserver(<span class="self">self</span>.password.clone(), <span class="self">self</span>.listen, gateway)
+                                    .<span class="kw">await
+                                    </span>.expect(<span class="string">&quot;Failed to start webserver&quot;</span>);
+                                <span class="macro">info!</span>(<span class="string">&quot;Successfully started webserver&quot;</span>);
+
+                                Gateway::handle_htlc_stream(stream, ln_client, handle.clone(), scid_to_federation.clone(), clients.clone()).<span class="kw">await</span>;
+                                <span class="macro">warn!</span>(<span class="string">&quot;HTLC Stream Lightning connection broken. Stopping webserver...&quot;</span>);
+                                task_group.shutdown();
+                            }
+                            <span class="prelude-val">Err</span>(e) =&gt; {
+                                <span class="macro">error!</span>(<span class="string">&quot;Failed to open HTLC stream. Waiting 5 seconds and trying again&quot;</span>);
+                                <span class="macro">debug!</span>(<span class="string">&quot;Error: {e:?}&quot;</span>);
+                                sleep(Duration::from_secs(<span class="number">5</span>)).<span class="kw">await</span>;
+                            }
+                        }
+                    }
+                },
+            )
+            .<span class="kw">await</span>;
+
+        <span class="kw">let </span>handle = task_group.make_handle();
+        <span class="kw">let </span>shutdown_receiver = handle.make_shutdown_rx().<span class="kw">await</span>;
+        <span class="prelude-val">Ok</span>(shutdown_receiver)
+    }
+
+    <span class="kw">async fn </span>create_boxed_lightning_client(mode: LightningMode) -&gt; Box&lt;<span class="kw">dyn </span>ILnRpcClient&gt; {
+        <span class="kw">match </span>mode {
+            LightningMode::Cln { cln_extension_addr } =&gt; {
+                Box::new(NetworkLnRpcClient::new(cln_extension_addr).<span class="kw">await</span>)
+            }
+            LightningMode::Lnd {
+                lnd_rpc_addr,
+                lnd_tls_cert,
+                lnd_macaroon,
+            } =&gt; Box::new(
+                GatewayLndClient::new(lnd_rpc_addr, lnd_tls_cert, lnd_macaroon, <span class="prelude-val">None</span>).<span class="kw">await</span>,
+            ),
+        }
+    }
+}
 
 <span class="attr">#[derive(Debug, Clone, Subcommand, Serialize, Deserialize)]
 </span><span class="kw">pub enum </span>LightningMode {
@@ -818,31 +1147,40 @@
 
 <span class="attr">#[derive(Debug, Error)]
 </span><span class="kw">pub enum </span>GatewayError {
-    <span class="attr">#[error(<span class="string">&quot;Lightning rpc operation error: {0:?}&quot;</span>)]
-    </span>LnRpcError(<span class="attr">#[from] </span>tonic::Status),
     <span class="attr">#[error(<span class="string">&quot;Federation error: {0:?}&quot;</span>)]
     </span>FederationError(<span class="attr">#[from] </span>FederationError),
     <span class="attr">#[error(<span class="string">&quot;Other: {0:?}&quot;</span>)]
-    </span>Other(<span class="attr">#[from] </span>anyhow::Error),
-    <span class="attr">#[error(<span class="string">&quot;Failed to fetch route hints&quot;</span>)]
-    </span>FailedToFetchRouteHints,
+    </span>ClientStateMachineError(<span class="attr">#[from] </span>anyhow::Error),
     <span class="attr">#[error(<span class="string">&quot;Failed to open the database: {0:?}&quot;</span>)]
     </span>DatabaseError(anyhow::Error),
     <span class="attr">#[error(<span class="string">&quot;Federation client error&quot;</span>)]
-    </span>ClientNgError,
-}
-
-<span class="kw">impl </span>GatewayError {
-    <span class="kw">pub fn </span>other(msg: String) -&gt; <span class="self">Self </span>{
-        <span class="macro">error!</span>(msg);
-        GatewayError::Other(<span class="macro">anyhow!</span>(msg))
-    }
+    </span>LightningRpcError(<span class="attr">#[from] </span>LightningRpcError),
+    <span class="attr">#[error(<span class="string">&quot;Outgoing Payment Error {0:?}&quot;</span>)]
+    </span>OutgoingPaymentError(<span class="attr">#[from] </span>Box&lt;OutgoingPaymentError&gt;),
+    <span class="attr">#[error(<span class="string">&quot;Invalid Metadata: {0}&quot;</span>)]
+    </span>InvalidMetadata(String),
+    <span class="attr">#[error(<span class="string">&quot;Unexpected state: {0}&quot;</span>)]
+    </span>UnexpectedState(String),
 }
 
 <span class="kw">impl </span>IntoResponse <span class="kw">for </span>GatewayError {
     <span class="kw">fn </span>into_response(<span class="self">self</span>) -&gt; Response {
-        <span class="kw">let </span><span class="kw-2">mut </span>err = Cow::&lt;<span class="lifetime">&#39;static</span>, str&gt;::Owned(<span class="macro">format!</span>(<span class="string">&quot;{self:?}&quot;</span>)).into_response();
-        <span class="kw-2">*</span>err.status_mut() = StatusCode::INTERNAL_SERVER_ERROR;
+        <span class="comment">// For privacy reasons, we do not return too many details about the failure of
+        // the request back to the client to prevent malicious clients from
+        // deducing state about the gateway/lightning node.
+        </span><span class="kw">let </span>(error_message, status_code) = <span class="kw">match </span><span class="self">self </span>{
+            GatewayError::OutgoingPaymentError(<span class="kw">_</span>) =&gt; (
+                <span class="string">&quot;Error while paying lightning invoice. Outgoing contract will be refunded.&quot;
+                    </span>.to_string(),
+                StatusCode::BAD_REQUEST,
+            ),
+            <span class="kw">_ </span>=&gt; (
+                <span class="string">&quot;An internal gateway error occurred&quot;</span>.to_string(),
+                StatusCode::INTERNAL_SERVER_ERROR,
+            ),
+        };
+        <span class="kw">let </span><span class="kw-2">mut </span>err = Cow::&lt;<span class="lifetime">&#39;static</span>, str&gt;::Owned(error_message).into_response();
+        <span class="kw-2">*</span>err.status_mut() = status_code;
         err
     }
 }
@@ -905,105 +1243,6 @@
         }
     }
 
-    <span class="kw">async fn </span>create_boxed_lightning_client(mode: LightningMode) -&gt; Box&lt;<span class="kw">dyn </span>ILnRpcClient&gt; {
-        <span class="kw">match </span>mode {
-            LightningMode::Cln { cln_extension_addr } =&gt; {
-                Box::new(NetworkLnRpcClient::new(cln_extension_addr).<span class="kw">await</span>)
-            }
-            LightningMode::Lnd {
-                lnd_rpc_addr,
-                lnd_tls_cert,
-                lnd_macaroon,
-            } =&gt; Box::new(
-                GatewayLndClient::new(lnd_rpc_addr, lnd_tls_cert, lnd_macaroon, <span class="prelude-val">None</span>).<span class="kw">await</span>,
-            ),
-        }
-    }
-
-    <span class="attr">#[allow(clippy::too_many_arguments)]
-    </span><span class="kw">pub async fn </span>start_gateway(
-        task_group: <span class="kw-2">&amp;mut </span>TaskGroup,
-        ln_mode: LightningMode,
-        fees: <span class="prelude-ty">Option</span>&lt;GatewayFee&gt;,
-        api_addr: Url,
-        client_builder: StandardGatewayClientBuilder,
-        listen: SocketAddr,
-        password: String,
-        database: Database,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;oneshot::Receiver&lt;()&gt;&gt; {
-        <span class="kw">let </span><span class="kw-2">mut </span>tg = task_group.make_subgroup().<span class="kw">await</span>;
-        task_group
-            .spawn(
-                <span class="string">&quot;Subscribe to intercepted HTLCs in stream&quot;</span>,
-                <span class="kw">move </span>|handle| <span class="kw">async move </span>{
-                    <span class="kw">let </span>clients =  Arc::new(RwLock::new(BTreeMap::new()));
-                    <span class="kw">let </span>scid_to_federation = Arc::new(RwLock::new(BTreeMap::new()));
-
-                    <span class="kw">loop </span>{
-                        <span class="kw">if </span>handle.is_shutting_down() {
-                            <span class="kw">break</span>;
-                        }
-
-                        <span class="kw">let </span>lnrpc_route = <span class="self">Self</span>::create_boxed_lightning_client(ln_mode.clone()).<span class="kw">await</span>;
-
-                        <span class="comment">// Re-create the HTLC stream if the connection breaks
-                        </span><span class="kw">match </span>lnrpc_route
-                            .route_htlcs(<span class="kw-2">&amp;mut </span>tg)
-                            .<span class="kw">await
-                        </span>{
-                            <span class="prelude-val">Ok</span>((stream, ln_client)) =&gt; {
-                                <span class="comment">// Blocks until the connection to the lightning node breaks
-                                </span><span class="macro">info!</span>(<span class="string">&quot;Established HTLC stream&quot;</span>);
-
-                                <span class="comment">// Re-create gateway
-                                </span><span class="kw">let </span>gateway = Gateway::new(
-                                    ln_client.clone(),
-                                    client_builder.clone(),
-                                    fees.clone().unwrap_or(GatewayFee(DEFAULT_FEES)).<span class="number">0</span>,
-                                    database.clone(),
-                                    api_addr.clone(),
-                                    clients.clone(),
-                                    scid_to_federation.clone(),
-                                    tg.clone(),
-                                )
-                                .<span class="kw">await</span>.expect(<span class="string">&quot;Failed to created Gateway&quot;</span>);
-
-                                <span class="macro">info!</span>(<span class="string">&quot;Successfully created Gateway&quot;</span>);
-
-                                <span class="kw">let </span>tx = run_webserver(password.clone(), listen, gateway)
-                                    .<span class="kw">await
-                                    </span>.expect(<span class="string">&quot;Failed to start webserver&quot;</span>);
-                                <span class="macro">info!</span>(<span class="string">&quot;Successfully started webserver&quot;</span>);
-
-                                <span class="self">Self</span>::handle_htlc_stream(stream, ln_client, handle.clone(), scid_to_federation.clone(), clients.clone()).<span class="kw">await</span>;
-                                <span class="macro">warn!</span>(<span class="string">&quot;HTLC Stream Lightning connection broken. Stopping webserver...&quot;</span>);
-                                <span class="kw">if let </span><span class="prelude-val">Err</span>(e) = tx.send(()).<span class="kw">await </span>{
-                                    <span class="macro">error!</span>(<span class="string">&quot;Error shutting down gatewayd webserver: {e:?}&quot;</span>);
-                                }
-                            }
-                            <span class="prelude-val">Err</span>(e) =&gt; {
-                                <span class="macro">error!</span>(<span class="string">&quot;Failed to open HTLC stream. Waiting 5 seconds and trying again&quot;</span>);
-                                <span class="macro">debug!</span>(<span class="string">&quot;Error: {e:?}&quot;</span>);
-                                sleep(Duration::from_secs(<span class="number">5</span>)).<span class="kw">await</span>;
-                            }
-                        }
-                    }
-                },
-            )
-            .<span class="kw">await</span>;
-
-        <span class="kw">let </span>handle = task_group.make_handle();
-        handle
-            .on_shutdown(Box::new(|| {
-                Box::pin(<span class="kw">async move </span>{
-                    <span class="macro">info!</span>(<span class="string">&quot;Gatewayd received exit signal&quot;</span>);
-                })
-            }))
-            .<span class="kw">await</span>;
-        <span class="kw">let </span>shutdown_receiver = handle.make_shutdown_rx().<span class="kw">await</span>;
-        <span class="prelude-val">Ok</span>(shutdown_receiver)
-    }
-
     <span class="kw">pub async fn </span>handle_htlc_stream(
         <span class="kw-2">mut </span>stream: RouteHtlcStream&lt;<span class="lifetime">&#39;_</span>&gt;,
         lnrpc: Arc&lt;<span class="kw">dyn </span>ILnRpcClient&gt;,
@@ -1026,10 +1265,7 @@
                 <span class="comment">// Just forward the HTLC if we do not have a client that
                 // corresponds to the federation id
                 </span><span class="kw">if let </span><span class="prelude-val">Some</span>(client) = client {
-                    <span class="kw">let </span>htlc: <span class="prelude-ty">Result</span>&lt;Htlc&gt; = htlc_request
-                        .clone()
-                        .try_into()
-                        .map_err(|<span class="kw">_</span>| GatewayError::ClientNgError);
+                    <span class="kw">let </span>htlc = htlc_request.clone().try_into();
                     <span class="kw">if let </span><span class="prelude-val">Ok</span>(htlc) = htlc {
                         <span class="kw">if </span>client.gateway_handle_intercepted_htlc(htlc).<span class="kw">await</span>.is_ok() {
                             <span class="kw">continue</span>;
@@ -1063,7 +1299,7 @@
 
             <span class="kw">let </span>GetNodeInfoResponse { pub_key, alias } = lnrpc.info().<span class="kw">await</span><span class="question-mark">?</span>;
             <span class="kw">let </span>node_pub_key = PublicKey::from_slice(<span class="kw-2">&amp;</span>pub_key)
-                .map_err(|e| GatewayError::Other(<span class="macro">anyhow!</span>(<span class="string">&quot;Invalid node pubkey {}&quot;</span>, e)))<span class="question-mark">?</span>;
+                .map_err(|e| GatewayError::InvalidMetadata(<span class="macro">format!</span>(<span class="string">&quot;Invalid node pubkey {e}&quot;</span>)))<span class="question-mark">?</span>;
 
             <span class="kw">if </span>!route_hints.is_empty() || num_retries == ROUTE_HINT_RETRIES {
                 <span class="kw">break </span>(route_hints, node_pub_key, alias);
@@ -1134,13 +1370,7 @@
                 <span class="kw">let </span>old_client = <span class="self">self</span>.clients.read().<span class="kw">await</span>.get(<span class="kw-2">&amp;</span>federation_id).cloned();
                 <span class="kw">let </span>client = <span class="self">self
                     </span>.client_builder
-                    .build(
-                        config.clone(),
-                        node_pub_key,
-                        <span class="self">self</span>.lnrpc.clone(),
-                        <span class="kw-2">&amp;mut </span><span class="self">self</span>.task_group,
-                        old_client,
-                    )
+                    .build(config.clone(), node_pub_key, <span class="self">self</span>.lnrpc.clone(), old_client)
                     .<span class="kw">await</span><span class="question-mark">?</span>;
 
                 <span class="comment">// Registering each client happens in the background, since we&#39;re loading the
@@ -1189,15 +1419,9 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         federation_id: FederationId,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;fedimint_client::Client&gt; {
-        <span class="kw">let </span>client =
-            <span class="self">self</span>.clients
-                .write()
-                .<span class="kw">await
-                </span>.remove(<span class="kw-2">&amp;</span>federation_id)
-                .ok_or(GatewayError::Other(<span class="macro">anyhow::anyhow!</span>(
-                    <span class="string">&quot;No federation with id {}&quot;</span>,
-                    federation_id.to_string()
-                )))<span class="question-mark">?</span>;
+        <span class="kw">let </span>client = <span class="self">self</span>.clients.write().<span class="kw">await</span>.remove(<span class="kw-2">&amp;</span>federation_id).ok_or(
+            GatewayError::InvalidMetadata(<span class="macro">format!</span>(<span class="string">&quot;No federation with id {federation_id}&quot;</span>)),
+        )<span class="question-mark">?</span>;
         <span class="kw">let </span><span class="kw-2">mut </span>dbtx = <span class="self">self</span>.gatewayd_db.begin_transaction().<span class="kw">await</span>;
         dbtx.remove_entry(<span class="kw-2">&amp;</span>FederationRegistrationKey { id: federation_id })
             .<span class="kw">await</span>;
@@ -1214,18 +1438,17 @@
             .<span class="kw">await
             </span>.get(<span class="kw-2">&amp;</span>federation_id)
             .cloned()
-            .ok_or(GatewayError::Other(<span class="macro">anyhow::anyhow!</span>(
-                <span class="string">&quot;No federation with id {}&quot;</span>,
-                federation_id.to_string()
-            )))
+            .ok_or(GatewayError::InvalidMetadata(<span class="macro">format!</span>(
+                <span class="string">&quot;No federation with id {federation_id}&quot;
+            </span>)))
     }
 
     <span class="kw">async fn </span>handle_connect_federation(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
         payload: ConnectFedPayload,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;FederationInfo&gt; {
-        <span class="kw">let </span>connect = WsClientConnectInfo::from_str(<span class="kw-2">&amp;</span>payload.connect).map_err(|e| {
-            GatewayError::Other(<span class="macro">anyhow::anyhow!</span>(<span class="string">&quot;Invalid federation member string {}&quot;</span>, e))
+        <span class="kw">let </span>invite_code = InviteCode::from_str(<span class="kw-2">&amp;</span>payload.invite_code).map_err(|e| {
+            GatewayError::InvalidMetadata(<span class="macro">format!</span>(<span class="string">&quot;Invalid federation member string {e}&quot;</span>))
         })<span class="question-mark">?</span>;
 
         <span class="comment">// The gateway deterministically assigns a channel id (u64) to each federation
@@ -1242,7 +1465,7 @@
         </span><span class="kw">let </span>gw_client_cfg = <span class="kw">loop </span>{
             <span class="kw">match </span><span class="self">self
                 </span>.client_builder
-                .create_config(connect.clone(), channel_id, <span class="self">self</span>.fees)
+                .create_config(invite_code.clone(), channel_id, <span class="self">self</span>.fees)
                 .<span class="kw">await
             </span>{
                 <span class="prelude-val">Ok</span>(gw_client_cfg) =&gt; <span class="kw">break </span>gw_client_cfg,
@@ -1267,7 +1490,6 @@
                 gw_client_cfg.clone(),
                 node_pub_key,
                 <span class="self">self</span>.lnrpc.clone(),
-                <span class="kw-2">&amp;mut </span><span class="self">self</span>.task_group,
                 old_client,
             )
             .<span class="kw">await</span><span class="question-mark">?</span>;
@@ -1332,19 +1554,23 @@
                     preimage,
                     outpoint: <span class="kw">_</span>,
                 } =&gt; <span class="kw">return </span><span class="prelude-val">Ok</span>(preimage),
-                GatewayExtPayStates::Fail =&gt; {
-                    <span class="kw">return </span><span class="prelude-val">Err</span>(GatewayError::Other(<span class="macro">anyhow!</span>(<span class="string">&quot;Payment failed&quot;</span>)))
+                GatewayExtPayStates::Fail {
+                    error,
+                    error_message,
+                } =&gt; {
+                    <span class="macro">error!</span>(error_message);
+                    <span class="kw">return </span><span class="prelude-val">Err</span>(GatewayError::OutgoingPaymentError(Box::new(error)));
                 }
-                GatewayExtPayStates::Canceled =&gt; {
-                    <span class="kw">return </span><span class="prelude-val">Err</span>(GatewayError::Other(<span class="macro">anyhow!</span>(<span class="string">&quot;Outgoing contract canceled&quot;</span>)))
+                GatewayExtPayStates::Canceled { error } =&gt; {
+                    <span class="kw">return </span><span class="prelude-val">Err</span>(GatewayError::OutgoingPaymentError(Box::new(error)));
                 }
                 <span class="kw">_ </span>=&gt; {}
             };
         }
 
-        <span class="kw">return </span><span class="prelude-val">Err</span>(GatewayError::Other(<span class="macro">anyhow!</span>(
-            <span class="string">&quot;Unexpected error occurred while paying the invoice&quot;
-        </span>)));
+        <span class="prelude-val">Err</span>(GatewayError::UnexpectedState(
+            <span class="string">&quot;Ran out of state updates while paying invoice&quot;</span>.to_string(),
+        ))
     }
 
     <span class="kw">pub async fn </span>handle_balance_msg(<span class="kw-2">&amp;</span><span class="self">self</span>, payload: BalancePayload) -&gt; <span class="prelude-ty">Result</span>&lt;Amount&gt; {
@@ -1391,15 +1617,15 @@
                     <span class="kw">return </span><span class="prelude-val">Ok</span>(txid);
                 }
                 WithdrawState::Failed(e) =&gt; {
-                    <span class="kw">return </span><span class="prelude-val">Err</span>(GatewayError::Other(<span class="macro">anyhow!</span>(e)));
+                    <span class="kw">return </span><span class="prelude-val">Err</span>(GatewayError::UnexpectedState(e));
                 }
                 <span class="kw">_ </span>=&gt; {}
             }
         }
 
-        <span class="kw">return </span><span class="prelude-val">Err</span>(GatewayError::Other(<span class="macro">anyhow!</span>(
-            <span class="string">&quot;Unexpected error occurred while withdrawing&quot;
-        </span>)));
+        <span class="prelude-val">Err</span>(GatewayError::UnexpectedState(
+            <span class="string">&quot;Ran out of state updates while withdrawing&quot;</span>.to_string(),
+        ))
     }
 
     <span class="kw">pub async fn </span>handle_backup_msg(

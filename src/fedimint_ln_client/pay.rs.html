@@ -488,6 +488,9 @@
 <a href="#488" id="488">488</a>
 <a href="#489" id="489">489</a>
 <a href="#490" id="490">490</a>
+<a href="#491" id="491">491</a>
+<a href="#492" id="492">492</a>
+<a href="#493" id="493">493</a>
 </pre><pre class="rust"><code><span class="kw">use </span>std::sync::Arc;
 <span class="kw">use </span>std::time::Duration;
 
@@ -749,7 +752,10 @@
         <span class="kw">if </span>!response.status().is_success() {
             <span class="kw">return </span><span class="prelude-val">Err</span>(GatewayPayError::GatewayInternalError {
                 error_code: <span class="prelude-val">Some</span>(response.status().as_u16()),
-                error_message: response.status().to_string(),
+                error_message: response
+                    .text()
+                    .<span class="kw">await
+                    </span>.expect(<span class="string">&quot;Could not retrieve text from response&quot;</span>),
             });
         }
 
@@ -887,14 +893,14 @@
     <span class="kw">async fn </span>await_contract_timeout(global_context: DynGlobalClientContext, timelock: u32) {
         <span class="comment">// TODO: Remove polling
         </span><span class="kw">loop </span>{
-            <span class="kw">let </span>consensus_block_height = global_context
+            <span class="kw">let </span>consensus_block_count = global_context
                 .module_api()
-                .fetch_consensus_block_height()
+                .fetch_consensus_block_count()
                 .<span class="kw">await
                 </span>.map_err(|e| <span class="macro">anyhow::anyhow!</span>(<span class="string">&quot;ApiError: {e:?}&quot;</span>));
 
-            <span class="kw">if let </span><span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(current_block_height)) = consensus_block_height {
-                <span class="kw">if </span>timelock <span class="kw">as </span>u64 &lt;= current_block_height {
+            <span class="kw">if let </span><span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(current_block_count)) = consensus_block_count {
+                <span class="kw">if </span>(timelock <span class="kw">as </span>u64) &lt; current_block_count {
                     <span class="kw">return</span>;
                 }
             }

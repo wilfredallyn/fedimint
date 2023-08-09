@@ -296,42 +296,86 @@
 <a href="#296" id="296">296</a>
 <a href="#297" id="297">297</a>
 <a href="#298" id="298">298</a>
+<a href="#299" id="299">299</a>
+<a href="#300" id="300">300</a>
+<a href="#301" id="301">301</a>
+<a href="#302" id="302">302</a>
+<a href="#303" id="303">303</a>
+<a href="#304" id="304">304</a>
+<a href="#305" id="305">305</a>
+<a href="#306" id="306">306</a>
+<a href="#307" id="307">307</a>
+<a href="#308" id="308">308</a>
+<a href="#309" id="309">309</a>
+<a href="#310" id="310">310</a>
+<a href="#311" id="311">311</a>
+<a href="#312" id="312">312</a>
+<a href="#313" id="313">313</a>
+<a href="#314" id="314">314</a>
+<a href="#315" id="315">315</a>
+<a href="#316" id="316">316</a>
+<a href="#317" id="317">317</a>
+<a href="#318" id="318">318</a>
+<a href="#319" id="319">319</a>
+<a href="#320" id="320">320</a>
+<a href="#321" id="321">321</a>
+<a href="#322" id="322">322</a>
+<a href="#323" id="323">323</a>
+<a href="#324" id="324">324</a>
+<a href="#325" id="325">325</a>
+<a href="#326" id="326">326</a>
+<a href="#327" id="327">327</a>
+<a href="#328" id="328">328</a>
+<a href="#329" id="329">329</a>
+<a href="#330" id="330">330</a>
+<a href="#331" id="331">331</a>
+<a href="#332" id="332">332</a>
+<a href="#333" id="333">333</a>
+<a href="#334" id="334">334</a>
+<a href="#335" id="335">335</a>
+<a href="#336" id="336">336</a>
+<a href="#337" id="337">337</a>
 </pre><pre class="rust"><code><span class="kw">use </span>std::ffi::OsStr;
 
-<span class="kw">use </span>anyhow::{anyhow, bail};
+<span class="kw">use </span>anyhow::bail;
 <span class="kw">use </span>fedimint_core::task;
 <span class="kw">use </span>serde::de::DeserializeOwned;
 <span class="kw">use </span>tokio::fs::OpenOptions;
 <span class="kw">use </span>tokio::process::Child;
+<span class="kw">use </span>tokio::sync::Mutex;
 <span class="kw">use </span>tracing::{debug, warn};
 
 <span class="kw">use super</span>::<span class="kw-2">*</span>;
 
-<span class="kw">fn </span>kill(child: <span class="kw-2">&amp;</span>Child) {
+<span class="kw">fn </span>send_sigterm(child: <span class="kw-2">&amp;</span>Child) {
     <span class="kw">let _ </span>= nix::sys::signal::kill(
         nix::unistd::Pid::from_raw(child.id().expect(<span class="string">&quot;pid should be present&quot;</span>) <span class="kw">as _</span>),
         nix::sys::signal::Signal::SIGTERM,
     );
 }
 
+<span class="kw">fn </span>send_sigkill(child: <span class="kw-2">&amp;</span>Child) {
+    <span class="kw">let _ </span>= nix::sys::signal::kill(
+        nix::unistd::Pid::from_raw(child.id().expect(<span class="string">&quot;pid should be present&quot;</span>) <span class="kw">as _</span>),
+        nix::sys::signal::Signal::SIGKILL,
+    );
+}
+
 <span class="doccomment">/// Kills process when all references to ProcessHandle are dropped.
 ///
 /// NOTE: drop order is significant make sure fields in struct are declared in
-/// correct order it is generallly clients, process handle, deps
+/// correct order it is generally clients, process handle, deps
 </span><span class="attr">#[derive(Debug, Clone)]
-</span><span class="kw">pub struct </span>ProcessHandle(Arc&lt;ProcessHandleInner&gt;);
+</span><span class="kw">pub struct </span>ProcessHandle(Arc&lt;Mutex&lt;ProcessHandleInner&gt;&gt;);
 
 <span class="kw">impl </span>ProcessHandle {
-    <span class="kw">pub async fn </span>kill(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="kw">let </span>arc_process_handle_inner = <span class="self">self</span>.<span class="number">0</span>;
-        <span class="kw">let </span><span class="kw-2">mut </span>process_handle_inner = <span class="kw">match </span>Arc::try_unwrap(arc_process_handle_inner) {
-            <span class="prelude-val">Ok</span>(process_handler_inner) =&gt; process_handler_inner,
-            <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="macro">anyhow!</span>(<span class="string">&quot;Cannot kill process because of clones&quot;</span>)),
-        };
-        <span class="kw">let </span><span class="kw-2">mut </span>child = std::mem::take(<span class="kw-2">&amp;mut </span>process_handle_inner.child).unwrap();
-        <span class="macro">info!</span>(LOG_DEVIMINT, <span class="string">&quot;killing {}&quot;</span>, process_handle_inner.name);
-        kill(<span class="kw-2">&amp;</span>child);
-        child.wait().<span class="kw">await</span><span class="question-mark">?</span>;
+    <span class="kw">pub async fn </span>terminate(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>inner = <span class="self">self</span>.<span class="number">0</span>.lock().<span class="kw">await</span>;
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">mut </span>child) = inner.child.take() {
+            <span class="macro">info!</span>(LOG_DEVIMINT, <span class="string">&quot;sending SIGTERM to {}&quot;</span>, inner.name);
+            send_sigterm(<span class="kw-2">&amp;</span>child);
+            child.wait().<span class="kw">await</span><span class="question-mark">?</span>;
+        }
         <span class="prelude-val">Ok</span>(())
     }
 }
@@ -345,8 +389,8 @@
 <span class="kw">impl </span>Drop <span class="kw">for </span>ProcessHandleInner {
     <span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
         <span class="kw">let </span><span class="prelude-val">Some</span>(child) = <span class="kw-2">&amp;mut </span><span class="self">self</span>.child <span class="kw">else </span>{ <span class="kw">return</span>; };
-        <span class="macro">info!</span>(LOG_DEVIMINT, <span class="string">&quot;killing {}&quot;</span>, <span class="self">self</span>.name);
-        kill(child);
+        <span class="macro">info!</span>(LOG_DEVIMINT, <span class="string">&quot;sending SIGKILL to {}&quot;</span>, <span class="self">self</span>.name);
+        send_sigkill(child);
     }
 }
 
@@ -377,10 +421,11 @@
             .cmd
             .spawn()
             .with_context(|| <span class="macro">format!</span>(<span class="string">&quot;Could not spawn: {name}&quot;</span>))<span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>(ProcessHandle(Arc::new(ProcessHandleInner {
+        <span class="kw">let </span>handle = ProcessHandle(Arc::new(Mutex::new(ProcessHandleInner {
             name: name.to_owned(),
             child: <span class="prelude-val">Some</span>(child),
-        })))
+        })));
+        <span class="prelude-val">Ok</span>(handle)
     }
 }
 
@@ -534,6 +579,39 @@
 
 <span class="kw">const </span>POLL_INTERVAL: Duration = Duration::from_millis(<span class="number">200</span>);
 
+<span class="doccomment">/// Will retry calling `f` until it returns `Ok(true)` or `retries` times.
+/// A notable difference from [`poll`] is that `f` may fail with an error at any
+/// time and we will still keep retrying.
+</span><span class="kw">pub async fn </span>poll_max_retries&lt;Fut&gt;(name: <span class="kw-2">&amp;</span>str, retries: usize, f: <span class="kw">impl </span>Fn() -&gt; Fut) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt;
+<span class="kw">where
+    </span>Fut: Future&lt;Output = <span class="prelude-ty">Result</span>&lt;bool&gt;&gt;,
+{
+    <span class="kw">let </span><span class="kw-2">mut </span>i = <span class="number">0</span>;
+    <span class="kw">loop </span>{
+        <span class="kw">let </span>result = f().<span class="kw">await</span>;
+        <span class="kw">if </span>i == retries - <span class="number">1 </span>{
+            <span class="kw">match </span>result {
+                <span class="prelude-val">Ok</span>(<span class="bool-val">true</span>) =&gt; <span class="kw">return </span><span class="prelude-val">Ok</span>(()),
+                <span class="prelude-val">Ok</span>(<span class="bool-val">false</span>) =&gt; {
+                    <span class="macro">bail!</span>(<span class="string">&quot;{name} failed to reach good state after {retries} retries&quot;</span>);
+                }
+                <span class="prelude-val">Err</span>(e) =&gt; {
+                    <span class="macro">bail!</span>(<span class="string">&quot;{name} failed after {retries} retries with: {e:?}&quot;</span>);
+                }
+            }
+        } <span class="kw">else </span>{
+            <span class="kw">match </span>result {
+                <span class="prelude-val">Ok</span>(<span class="bool-val">true</span>) =&gt; <span class="kw">return </span><span class="prelude-val">Ok</span>(()),
+                other =&gt; {
+                    i += <span class="number">1</span>;
+                    <span class="macro">debug!</span>(<span class="string">&quot;polling {name} failed with: {other:?}, will retry... ({i}/{retries})&quot;</span>);
+                    task::sleep(Duration::from_secs(<span class="number">1</span>)).<span class="kw">await</span>;
+                }
+            }
+        }
+    }
+}
+
 <span class="kw">pub async fn </span>poll&lt;Fut&gt;(name: <span class="kw-2">&amp;</span>str, f: <span class="kw">impl </span>Fn() -&gt; Fut) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt;
 <span class="kw">where
     </span>Fut: Future&lt;Output = <span class="prelude-ty">Result</span>&lt;bool&gt;&gt;,
@@ -554,8 +632,8 @@
         }
         <span class="comment">// report every 20 seconds
         </span><span class="kw">let </span>now = fedimint_core::time::now();
-        <span class="kw">if </span>now.duration_since(last_time)<span class="question-mark">? </span>&gt; Duration::from_secs(<span class="number">20</span>) {
-            <span class="kw">let </span>total_duration = now.duration_since(start)<span class="question-mark">?</span>;
+        <span class="kw">if </span>now.duration_since(last_time).unwrap_or_default() &gt; Duration::from_secs(<span class="number">20</span>) {
+            <span class="kw">let </span>total_duration = now.duration_since(start).unwrap_or_default();
             <span class="macro">warn!</span>(
                 LOG_DEVIMINT,
                 <span class="string">&quot;waiting {name} for over {} seconds&quot;</span>,

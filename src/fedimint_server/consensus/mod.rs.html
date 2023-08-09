@@ -568,6 +568,10 @@
 <a href="#568" id="568">568</a>
 <a href="#569" id="569">569</a>
 <a href="#570" id="570">570</a>
+<a href="#571" id="571">571</a>
+<a href="#572" id="572">572</a>
+<a href="#573" id="573">573</a>
+<a href="#574" id="574">574</a>
 </pre><pre class="rust"><code><span class="attr">#![allow(clippy::let_unit_value)]
 
 </span><span class="kw">pub mod </span>debug;
@@ -585,13 +589,13 @@
 <span class="kw">use </span>fedimint_core::module::registry::{ModuleDecoderRegistry, ServerModuleRegistry};
 <span class="kw">use </span>fedimint_core::module::TransactionItemAmount;
 <span class="kw">use </span>fedimint_core::server::DynVerificationCache;
-<span class="kw">use </span>fedimint_core::{timing, Amount, ConsensusDecision, NumPeers, OutPoint, PeerId, TransactionId};
+<span class="kw">use </span>fedimint_core::{timing, Amount, NumPeers, OutPoint, PeerId, TransactionId};
 <span class="kw">use </span>fedimint_logging::LOG_CONSENSUS;
 <span class="kw">use </span>futures::future::select_all;
 <span class="kw">use </span>futures::StreamExt;
 <span class="kw">use </span>hbbft::honey_badger::Batch;
 <span class="kw">use </span>itertools::Itertools;
-<span class="kw">use </span>tracing::{instrument, warn};
+<span class="kw">use </span>tracing::{debug, instrument, warn};
 
 <span class="kw">use </span><span class="kw">crate</span>::config::ServerConfig;
 <span class="kw">use </span><span class="kw">crate</span>::db::{
@@ -658,8 +662,8 @@
 }
 
 <span class="attr">#[derive(Debug)]
-</span><span class="kw">struct </span>VerificationCaches {
-    caches: HashMap&lt;ModuleInstanceId, DynVerificationCache&gt;,
+</span><span class="kw">pub struct </span>VerificationCaches {
+    <span class="kw">pub </span>caches: HashMap&lt;ModuleInstanceId, DynVerificationCache&gt;,
 }
 
 <span class="kw">pub struct </span>FundingVerifier {
@@ -669,7 +673,7 @@
 }
 
 <span class="kw">impl </span>VerificationCaches {
-    <span class="kw">fn </span>get_cache(<span class="kw-2">&amp;</span><span class="self">self</span>, module_key: ModuleInstanceId) -&gt; <span class="kw-2">&amp;</span>DynVerificationCache {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>get_cache(<span class="kw-2">&amp;</span><span class="self">self</span>, module_key: ModuleInstanceId) -&gt; <span class="kw-2">&amp;</span>DynVerificationCache {
         <span class="self">self</span>.caches
             .get(<span class="kw-2">&amp;</span>module_key)
             .expect(<span class="string">&quot;Verification caches were built for all modules&quot;</span>)
@@ -698,65 +702,74 @@
         reference_rejected_txs: <span class="prelude-ty">Option</span>&lt;BTreeSet&lt;TransactionId&gt;&gt;,
     ) -&gt; SignedEpochOutcome {
         <span class="kw">let </span>_timing <span class="comment">/* logs on drop */ </span>= timing::TimeReporter::new(<span class="string">&quot;process_consensus_outcome&quot;</span>);
+
+        <span class="kw">let </span><span class="kw-2">mut </span>rejected_txs = BTreeSet::new();
+        <span class="comment">// Since multiple peers can submit the same tx within epoch, track them
+        // and handle only once.
+        </span><span class="kw">let </span><span class="kw-2">mut </span>processed_txes = BTreeSet::new();
+
+        <span class="kw">let </span>items = consensus_outcome
+            .clone()
+            .contributions
+            .into_iter()
+            .flat_map(|(peer_id, items)| items.into_iter().map(<span class="kw">move </span>|item| (peer_id, item)));
+
+        <span class="kw">let </span><span class="kw-2">mut </span>dbtx = <span class="self">self</span>.db.begin_transaction().<span class="kw">await</span>;
+
+        <span class="kw">for </span>(peer_id, consensus_item) <span class="kw">in </span>items {
+            dbtx.set_tx_savepoint()
+                .<span class="kw">await
+                </span>.expect(<span class="string">&quot;Setting transaction savepoint failed&quot;</span>);
+
+            <span class="kw">if let </span>ConsensusItem::Transaction(<span class="kw-2">ref </span>transaction) = consensus_item {
+                <span class="kw">if </span>!processed_txes.insert(transaction.tx_hash()) {
+                    <span class="kw">continue</span>;
+                }
+            }
+
+            <span class="kw">match </span><span class="self">self
+                </span>.process_consensus_item(<span class="kw-2">&amp;mut </span>dbtx, consensus_item.clone(), peer_id)
+                .<span class="kw">await
+            </span>{
+                <span class="prelude-val">Ok</span>(()) =&gt; {
+                    <span class="macro">debug!</span>(
+                        target: LOG_CONSENSUS,
+                        <span class="string">&quot;Accept consensus item from {peer_id}&quot;
+                    </span>);
+                }
+                <span class="prelude-val">Err</span>(error) =&gt; {
+                    <span class="macro">debug!</span>(
+                        target: LOG_CONSENSUS,
+                        <span class="string">&quot;Discard consensus item from {peer_id}: {error}&quot;
+                    </span>);
+
+                    dbtx.rollback_tx_to_savepoint()
+                        .<span class="kw">await
+                        </span>.expect(<span class="string">&quot;Rolling back transaction to savepoint failed&quot;</span>);
+
+                    <span class="kw">if let </span>ConsensusItem::Transaction(transaction) = consensus_item {
+                        rejected_txs.insert(transaction.tx_hash());
+                    }
+                }
+            }
+        }
+
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(reference_rejected_txs) = reference_rejected_txs.as_ref() {
+            <span class="comment">// Result of the consensus are supposed to be deterministic.
+            // If our result is not the same as what the (honest) majority of the federation
+            // signed over, it&#39;s a catastrophic bug/mismatch of Federation&#39;s fedimintd
+            // implementations.
+            </span><span class="macro">assert_eq!</span>(
+                reference_rejected_txs, <span class="kw-2">&amp;</span>rejected_txs,
+                <span class="string">&quot;rejected_txs mismatch: reference = {reference_rejected_txs:?} != {rejected_txs:?}&quot;
+            </span>);
+        }
+
         <span class="kw">let </span>epoch_history = <span class="self">self
-            </span>.db
-            .autocommit(
-                |dbtx| {
-                    <span class="kw">let </span>consensus_outcome = consensus_outcome.clone();
-                    <span class="kw">let </span>reference_rejected_txs = reference_rejected_txs.clone();
+            </span>.save_epoch_history(consensus_outcome, <span class="kw-2">&amp;mut </span>dbtx, <span class="kw-2">&amp;mut </span><span class="macro">vec!</span>[], rejected_txs)
+            .<span class="kw">await</span>;
 
-                    Box::pin(<span class="kw">async move </span>{
-                        <span class="kw">let </span><span class="kw-2">mut </span>rejected_txs = BTreeSet::new();
-
-                        <span class="kw">let </span>items = consensus_outcome.clone()
-                            .contributions
-                            .into_iter()
-                            .flat_map(|(peer_id, items)| items.into_iter().map(<span class="kw">move </span>|item| (peer_id, item)));
-
-                        <span class="kw">for </span>(peer_id, consensus_item) <span class="kw">in </span>items {
-                            dbtx.set_tx_savepoint()
-                                .<span class="kw">await
-                                </span>.expect(<span class="string">&quot;Setting transaction savepoint failed&quot;</span>);
-
-                            <span class="kw">let </span>decision = <span class="kw">match </span><span class="self">self</span>.process_consensus_item(dbtx, consensus_item.clone(), peer_id).<span class="kw">await </span>{
-                                <span class="prelude-val">Ok</span>(decision) =&gt; decision,
-                                <span class="prelude-val">Err</span>(error) =&gt; {
-                                    <span class="macro">warn!</span>(target: <span class="string">&quot;consensus&quot;</span>, <span class="string">&quot;Invalid consensus item from {peer_id}: {error}&quot;</span>);
-                                    ConsensusDecision::Discard
-                                }
-                            };
-
-                            <span class="kw">if </span>decision == ConsensusDecision::Discard {
-                                dbtx.rollback_tx_to_savepoint()
-                                    .<span class="kw">await
-                                    </span>.expect(<span class="string">&quot;Rolling back transaction to savepoint failed&quot;</span>);
-
-                                <span class="kw">if let </span>ConsensusItem::Transaction(transaction) = consensus_item {
-                                    rejected_txs.insert(transaction.tx_hash());
-                                }
-                            }
-                        }
-
-                        <span class="kw">if let </span><span class="prelude-val">Some</span>(reference_rejected_txs) = reference_rejected_txs.as_ref() {
-                            <span class="comment">// Result of the consensus are supposed to be deterministic.
-                            // If our result is not the same as what the (honest) majority of the federation
-                            // signed over, it&#39;s a catastrophic bug/mismatch of Federation&#39;s fedimintd
-                            // implementations.
-                            </span><span class="macro">assert_eq!</span>(
-                                reference_rejected_txs, <span class="kw-2">&amp;</span>rejected_txs,
-                                <span class="string">&quot;rejected_txs mismatch: reference = {reference_rejected_txs:?} != {rejected_txs:?}&quot;
-                            </span>);
-                        }
-
-                        <span class="kw">let </span>epoch_history = <span class="self">self
-                            </span>.save_epoch_history(consensus_outcome, dbtx, <span class="kw-2">&amp;mut </span><span class="macro">vec!</span>[], rejected_txs)
-                            .<span class="kw">await</span>;
-
-                        <span class="prelude-ty">Result</span>::&lt;<span class="kw">_</span>, ()&gt;::Ok(epoch_history)
-                    })
-                },
-                <span class="prelude-val">Some</span>(<span class="number">100</span>),
-            )
+        dbtx.commit_tx_result()
             .<span class="kw">await
             </span>.expect(<span class="string">&quot;Committing consensus epoch failed&quot;</span>);
 
@@ -774,7 +787,7 @@
         dbtx: <span class="kw-2">&amp;mut </span>DatabaseTransaction&lt;<span class="lifetime">&#39;_</span>&gt;,
         consensus_item: ConsensusItem,
         peer_id: PeerId,
-    ) -&gt; anyhow::Result&lt;ConsensusDecision&gt; {
+    ) -&gt; anyhow::Result&lt;()&gt; {
         <span class="kw">match </span>consensus_item {
             ConsensusItem::Module(module_item) =&gt; {
                 <span class="kw">let </span>moduletx = <span class="kw-2">&amp;mut </span>dbtx.with_module_prefix(module_item.module_instance_id());
@@ -803,7 +816,7 @@
                     <span class="kw">let </span>meta = <span class="self">self
                         </span>.modules
                         .get_expect(input.module_instance_id())
-                        .apply_input(
+                        .process_input(
                             <span class="kw-2">&amp;mut </span>dbtx.with_module_prefix(input.module_instance_id()),
                             input,
                             caches.get_cache(input.module_instance_id()),
@@ -820,7 +833,7 @@
                     <span class="kw">let </span>amount = <span class="self">self
                         </span>.modules
                         .get_expect(output.module_instance_id())
-                        .apply_output(
+                        .process_output(
                             <span class="kw-2">&amp;mut </span>dbtx.with_module_prefix(output.module_instance_id()),
                             output,
                             OutPoint { txid, out_idx },
@@ -841,7 +854,7 @@
                 dbtx.insert_entry(<span class="kw-2">&amp;</span>AcceptedTransactionKey(txid), <span class="kw-2">&amp;</span>modules_ids)
                     .<span class="kw">await</span>;
 
-                <span class="prelude-val">Ok</span>(ConsensusDecision::Accept)
+                <span class="prelude-val">Ok</span>(())
             }
             ConsensusItem::ClientConfigSignatureShare(signature_share) =&gt; {
                 <span class="kw">if </span>dbtx
@@ -850,8 +863,7 @@
                     .<span class="kw">await
                     </span>.is_some()
                 {
-                    <span class="comment">// Client config is already signed
-                    </span><span class="kw">return </span><span class="prelude-val">Ok</span>(ConsensusDecision::Discard);
+                    <span class="macro">bail!</span>(<span class="string">&quot;Client config is already signed&quot;</span>);
                 }
 
                 <span class="kw">if </span>dbtx
@@ -859,8 +871,7 @@
                     .<span class="kw">await
                     </span>.is_some()
                 {
-                    <span class="comment">// Already received a valid signature share for this peer
-                    </span><span class="kw">return </span><span class="prelude-val">Ok</span>(ConsensusDecision::Discard);
+                    <span class="macro">bail!</span>(<span class="string">&quot;Already received a valid signature share for this peer&quot;</span>);
                 }
 
                 <span class="kw">let </span>pks = <span class="self">self</span>.cfg.consensus.auth_pk_set.clone();
@@ -885,7 +896,7 @@
                     .<span class="kw">await</span>;
 
                 <span class="kw">if </span>signature_shares.len() &lt;= pks.threshold() {
-                    <span class="kw">return </span><span class="prelude-val">Ok</span>(ConsensusDecision::Accept);
+                    <span class="kw">return </span><span class="prelude-val">Ok</span>(());
                 }
 
                 <span class="kw">let </span>threshold_signature = pks
@@ -901,7 +912,7 @@
                 )
                 .<span class="kw">await</span>;
 
-                <span class="prelude-val">Ok</span>(ConsensusDecision::Accept)
+                <span class="prelude-val">Ok</span>(())
             }
             ConsensusItem::ConsensusUpgrade(..) =&gt; {
                 <span class="kw">let </span><span class="kw-2">mut </span>peers = dbtx
@@ -910,16 +921,15 @@
                     </span>.unwrap_or_default();
 
                 <span class="kw">if </span>!peers.insert(peer_id) {
-                    <span class="comment">// Already received an upgrade signal by this peer
-                    </span><span class="kw">return </span><span class="prelude-val">Ok</span>(ConsensusDecision::Discard);
+                    <span class="macro">bail!</span>(<span class="string">&quot;Already received an upgrade signal by this peer&quot;</span>)
                 }
 
                 dbtx.insert_entry(<span class="kw-2">&amp;</span>ConsensusUpgradeKey, <span class="kw-2">&amp;</span>peers).<span class="kw">await</span>;
 
-                <span class="prelude-val">Ok</span>(ConsensusDecision::Accept)
+                <span class="prelude-val">Ok</span>(())
             }
             <span class="comment">// these items are handled in save_epoch_history
-            </span>ConsensusItem::EpochOutcomeSignatureShare(..) =&gt; <span class="prelude-val">Ok</span>(ConsensusDecision::Accept),
+            </span>ConsensusItem::EpochOutcomeSignatureShare(..) =&gt; <span class="prelude-val">Ok</span>(()),
         }
     }
 
@@ -1079,9 +1089,7 @@
             .into_iter()
             .into_group_map_by(|input| input.module_instance_id());
 
-        <span class="comment">// TODO: should probably run in parallel, but currently only the mint does
-        // anything at all
-        </span><span class="kw">let </span>caches = module_inputs
+        <span class="kw">let </span>caches = module_inputs
             .into_iter()
             .map(|(module_key, inputs)| {
                 <span class="kw">let </span>module = <span class="self">self</span>.modules.get_expect(module_key);

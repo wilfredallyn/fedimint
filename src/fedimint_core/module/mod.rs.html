@@ -978,32 +978,12 @@
 <a href="#978" id="978">978</a>
 <a href="#979" id="979">979</a>
 <a href="#980" id="980">980</a>
-<a href="#981" id="981">981</a>
-<a href="#982" id="982">982</a>
-<a href="#983" id="983">983</a>
-<a href="#984" id="984">984</a>
-<a href="#985" id="985">985</a>
-<a href="#986" id="986">986</a>
-<a href="#987" id="987">987</a>
-<a href="#988" id="988">988</a>
-<a href="#989" id="989">989</a>
-<a href="#990" id="990">990</a>
-<a href="#991" id="991">991</a>
-<a href="#992" id="992">992</a>
-<a href="#993" id="993">993</a>
-<a href="#994" id="994">994</a>
-<a href="#995" id="995">995</a>
-<a href="#996" id="996">996</a>
-<a href="#997" id="997">997</a>
-<a href="#998" id="998">998</a>
-<a href="#999" id="999">999</a>
-<a href="#1000" id="1000">1000</a>
 </pre><pre class="rust"><code><span class="kw">pub mod </span>audit;
 <span class="kw">pub mod </span>registry;
 <span class="kw">pub mod </span>version;
 
 <span class="kw">use </span>std::collections::BTreeMap;
-<span class="kw">use </span>std::fmt::Debug;
+<span class="kw">use </span>std::fmt::{Debug, Formatter};
 <span class="kw">use </span>std::io::Read;
 <span class="kw">use </span>std::marker::PhantomData;
 <span class="kw">use </span>std::pin::Pin;
@@ -1036,7 +1016,7 @@
 <span class="kw">use </span><span class="kw">crate</span>::task::{MaybeSend, TaskGroup};
 <span class="kw">use crate</span>::{
     apply, async_trait_maybe_send, dyn_newtype_define, maybe_add_send, maybe_add_send_sync, Amount,
-    ConsensusDecision, OutPoint, PeerId,
+    OutPoint, PeerId,
 };
 
 <span class="kw">pub struct </span>InputMeta {
@@ -1113,8 +1093,14 @@
 }
 
 <span class="doccomment">/// Authentication uses the hashed user password in PHC format
-</span><span class="attr">#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+</span><span class="attr">#[derive(Clone, PartialEq, Eq, Serialize, Deserialize)]
 </span><span class="kw">pub struct </span>ApiAuth(<span class="kw">pub </span>String);
+
+<span class="kw">impl </span>Debug <span class="kw">for </span>ApiAuth {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; std::fmt::Result {
+        <span class="macro">write!</span>(f, <span class="string">&quot;ApiAuth(****)&quot;</span>)
+    }
+}
 
 <span class="attr">#[derive(Debug, Clone)]
 </span><span class="kw">pub struct </span>ApiError {
@@ -1136,7 +1122,7 @@
     }
 
     <span class="kw">pub fn </span>unauthorized() -&gt; <span class="self">Self </span>{
-        <span class="self">Self</span>::new(<span class="number">401</span>, <span class="string">&quot;Request missing required authorization&quot;</span>.to_string())
+        <span class="self">Self</span>::new(<span class="number">401</span>, <span class="string">&quot;Invalid authorization&quot;</span>.to_string())
     }
 
     <span class="kw">pub fn </span>server_error(message: String) -&gt; <span class="self">Self </span>{
@@ -1804,18 +1790,15 @@
         dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;_</span>&gt;,
     ) -&gt; ConsensusProposal&lt;&lt;<span class="self">Self</span>::Common <span class="kw">as </span>ModuleCommon&gt;::ConsensusItem&gt;;
 
-    <span class="doccomment">/// This function is called once for every consensus item. If the function
-    /// returns Ok(ConsensusDecision::Accept) then the item changed the
-    /// modules state and has to be included in the history of the
-    /// federation, otherwise it may safely be discarded. We return an error
-    /// for actually invalid items while we return
-    /// Ok(ConsensusDecision::Discard) for merely superfluous items.
+    <span class="doccomment">/// This function is called once for every consensus item. The function
+    /// returns an error if any only if the consensus item does not change
+    /// our state and therefore may be safely discarded by the atomic broadcast.
     </span><span class="kw">async fn </span>process_consensus_item&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt;(
         <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>,
         dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;b</span>&gt;,
         consensus_item: &lt;<span class="self">Self</span>::Common <span class="kw">as </span>ModuleCommon&gt;::ConsensusItem,
         peer_id: PeerId,
-    ) -&gt; anyhow::Result&lt;ConsensusDecision&gt;;
+    ) -&gt; anyhow::Result&lt;()&gt;;
 
     <span class="doccomment">/// Some modules may have slow to verify inputs that would block transaction
     /// processing. If the slow part of verification can be modeled as a
@@ -1827,39 +1810,16 @@
         inputs: <span class="kw">impl </span>Iterator&lt;Item = <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>&lt;<span class="self">Self</span>::Common <span class="kw">as </span>ModuleCommon&gt;::Input&gt; + MaybeSend,
     ) -&gt; <span class="self">Self</span>::VerificationCache;
 
-    <span class="doccomment">/// Validate a transaction input before submitting it to the unconfirmed
-    /// transaction pool. This function has no side effects and may be
-    /// called at any time. False positives due to outdated database state
-    /// are ok since they get filtered out after consensus has been reached on
-    /// them and merely generate a warning.
-    </span><span class="kw">async fn </span>validate_input&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt;(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;b</span>&gt;,
-        verification_cache: <span class="kw-2">&amp;</span><span class="self">Self</span>::VerificationCache,
-        input: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>&lt;<span class="self">Self</span>::Common <span class="kw">as </span>ModuleCommon&gt;::Input,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;InputMeta, ModuleError&gt;;
-
     <span class="doccomment">/// Try to spend a transaction input. On success all necessary updates will
     /// be part of the database transaction. On failure (e.g. double spend)
     /// the database transaction is rolled back and the operation will take
     /// no effect.
-    </span><span class="kw">async fn </span>apply_input&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>, <span class="lifetime">&#39;c</span>&gt;(
+    </span><span class="kw">async fn </span>process_input&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>, <span class="lifetime">&#39;c</span>&gt;(
         <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>,
         dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;c</span>&gt;,
         input: <span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span>&lt;<span class="self">Self</span>::Common <span class="kw">as </span>ModuleCommon&gt;::Input,
         verification_cache: <span class="kw-2">&amp;</span><span class="self">Self</span>::VerificationCache,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;InputMeta, ModuleError&gt;;
-
-    <span class="doccomment">/// Validate a transaction output before submitting it to the unconfirmed
-    /// transaction pool. This function has no side effects and may be
-    /// called at any time. False positives due to outdated database state
-    /// are ok since they get filtered out after consensus has been reached on
-    /// them and merely generate a warning.
-    </span><span class="kw">async fn </span>validate_output(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;_</span>&gt;,
-        output: <span class="kw-2">&amp;</span>&lt;<span class="self">Self</span>::Common <span class="kw">as </span>ModuleCommon&gt;::Output,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;TransactionItemAmount, ModuleError&gt;;
 
     <span class="doccomment">/// Try to create an output (e.g. issue notes, peg-out BTC, …). On success
     /// all necessary updates to the database will be part of the database
@@ -1869,7 +1829,7 @@
     /// The supplied `out_point` identifies the operation (e.g. a peg-out or
     /// note issuance) and can be used to retrieve its outcome later using
     /// `output_status`.
-    </span><span class="kw">async fn </span>apply_output&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt;(
+    </span><span class="kw">async fn </span>process_output&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt;(
         <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>,
         dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;b</span>&gt;,
         output: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>&lt;<span class="self">Self</span>::Common <span class="kw">as </span>ModuleCommon&gt;::Output,

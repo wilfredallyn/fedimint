@@ -1038,17 +1038,6 @@
 <a href="#1038" id="1038">1038</a>
 <a href="#1039" id="1039">1039</a>
 <a href="#1040" id="1040">1040</a>
-<a href="#1041" id="1041">1041</a>
-<a href="#1042" id="1042">1042</a>
-<a href="#1043" id="1043">1043</a>
-<a href="#1044" id="1044">1044</a>
-<a href="#1045" id="1045">1045</a>
-<a href="#1046" id="1046">1046</a>
-<a href="#1047" id="1047">1047</a>
-<a href="#1048" id="1048">1048</a>
-<a href="#1049" id="1049">1049</a>
-<a href="#1050" id="1050">1050</a>
-<a href="#1051" id="1051">1051</a>
 </pre><pre class="rust"><code><span class="kw">use </span>std::collections::BTreeMap;
 <span class="kw">use </span>std::net::SocketAddr;
 <span class="kw">use </span>std::path::PathBuf;
@@ -1086,9 +1075,7 @@
 <span class="kw">use </span><span class="kw">crate</span>::config::{gen_cert_and_key, ConfigGenParams, ServerConfig};
 <span class="kw">use </span><span class="kw">crate</span>::db::ConsensusUpgradeKey;
 <span class="kw">use </span><span class="kw">crate</span>::net::peers::DelayCalculator;
-<span class="kw">use </span><span class="kw">crate</span>::HasApiContext;
-
-<span class="kw">pub type </span>ApiResult&lt;T&gt; = std::result::Result&lt;T, ApiError&gt;;
+<span class="kw">use crate</span>::{check_auth, ApiResult, HasApiContext};
 
 <span class="doccomment">/// Serves the config gen API endpoints
 </span><span class="kw">pub struct </span>ConfigGenApi {
@@ -1158,7 +1145,7 @@
         <span class="kw">if let </span><span class="prelude-val">Some</span>(url) = local.and_then(|local| local.leader_api_url) {
             <span class="comment">// Note PeerIds don&#39;t really exist at this point, but id doesn&#39;t matter because
             // it&#39;s not used in the WS client for anything, perhaps it should be removed
-            </span><span class="kw">let </span>client = WsAdminClient::new(url, PeerId::from(<span class="number">0</span>));
+            </span><span class="kw">let </span>client = WsAdminClient::new(url);
             client
                 .add_config_gen_peer(state.our_peer_info()<span class="question-mark">?</span>)
                 .<span class="kw">await
@@ -1214,7 +1201,7 @@
 
         <span class="kw">let </span>consensus = <span class="kw">match </span>local.and_then(|local| local.leader_api_url) {
             <span class="prelude-val">Some</span>(leader_url) =&gt; {
-                <span class="kw">let </span>client = WsAdminClient::new(leader_url.clone(), PeerId::from(<span class="number">0</span>));
+                <span class="kw">let </span>client = WsAdminClient::new(leader_url.clone());
                 <span class="kw">let </span>response = client.get_consensus_config_gen_params().<span class="kw">await</span>;
                 response
                     .map_err(|<span class="kw">_</span>| ApiError::not_found(<span class="string">&quot;Cannot get leader params&quot;</span>.to_string()))<span class="question-mark">?
@@ -1242,11 +1229,10 @@
             <span class="comment">// Update our state
             </span>state.status = ServerStatus::ReadyForConfigGen;
             <span class="comment">// Create a WSClient for the leader
-            </span>state.local.clone().and_then(|local| {
-                local
-                    .leader_api_url
-                    .map(|url| WsAdminClient::new(url, PeerId::from(<span class="number">0</span>)))
-            })
+            </span>state
+                .local
+                .clone()
+                .and_then(|local| local.leader_api_url.map(WsAdminClient::new))
         };
 
         <span class="self">self</span>.update_leader().<span class="kw">await</span><span class="question-mark">?</span>;
@@ -1730,14 +1716,6 @@
     ]
 }
 
-<span class="kw">fn </span>check_auth(context: <span class="kw-2">&amp;mut </span>ApiEndpointContext) -&gt; ApiResult&lt;()&gt; {
-    <span class="kw">if </span>!context.has_auth() {
-        <span class="prelude-val">Err</span>(ApiError::unauthorized())
-    } <span class="kw">else </span>{
-        <span class="prelude-val">Ok</span>(())
-    }
-}
-
 <span class="attr">#[cfg(test)]
 </span><span class="kw">mod </span>tests {
 
@@ -1755,7 +1733,7 @@
     <span class="kw">use </span>fedimint_core::module::registry::ModuleDecoderRegistry;
     <span class="kw">use </span>fedimint_core::module::ApiAuth;
     <span class="kw">use </span>fedimint_core::task::{sleep, TaskGroup};
-    <span class="kw">use </span>fedimint_core::{Amount, PeerId};
+    <span class="kw">use </span>fedimint_core::Amount;
     <span class="kw">use </span>fedimint_dummy_common::config::{
         DummyConfig, DummyGenParams, DummyGenParamsConsensus, DummyGenParamsLocal,
     };
@@ -1826,7 +1804,7 @@
 
             <span class="comment">// our id doesn&#39;t really exist at this point
             </span><span class="kw">let </span>auth = ApiAuth(<span class="macro">format!</span>(<span class="string">&quot;password-{port}&quot;</span>));
-            <span class="kw">let </span>client = WsAdminClient::new(api_url, PeerId::from(<span class="number">0</span>));
+            <span class="kw">let </span>client = WsAdminClient::new(api_url);
 
             (
                 TestConfigApi {
@@ -2024,14 +2002,14 @@
             </span><span class="kw">let </span>leader_amount = leader.amount;
             <span class="kw">let </span>leader_name = leader.name.clone();
             followers.push(leader);
-            <span class="kw">let </span>followers = Arc::new(followers);
+            <span class="kw">let </span>all_peers = Arc::new(followers);
             <span class="kw">let </span>(results, <span class="kw">_</span>) = <span class="macro">tokio::join!</span>(
                 join_all(
-                    followers
+                    all_peers
                         .iter()
                         .map(|peer| peer.client.run_dkg(peer.auth.clone()))
                 ),
-                followers[<span class="number">0</span>].wait_status(ServerStatus::ReadyForConfigGen)
+                all_peers[<span class="number">0</span>].wait_status(ServerStatus::ReadyForConfigGen)
             );
             <span class="kw">for </span>result <span class="kw">in </span>results {
                 result.expect(<span class="string">&quot;DKG failed&quot;</span>);
@@ -2039,7 +2017,7 @@
 
             <span class="comment">// verify config hashes equal for all peers
             </span><span class="kw">let </span><span class="kw-2">mut </span>hashes = HashSet::new();
-            <span class="kw">for </span>peer <span class="kw">in </span>followers.iter() {
+            <span class="kw">for </span>peer <span class="kw">in </span>all_peers.iter() {
                 peer.wait_status(ServerStatus::VerifyingConfigs).<span class="kw">await</span>;
                 hashes.insert(
                     peer.client
@@ -2051,7 +2029,7 @@
             <span class="macro">assert_eq!</span>(hashes.len(), <span class="number">1</span>);
 
             <span class="comment">// verify the local and consensus values for peers
-            </span><span class="kw">for </span>peer <span class="kw">in </span>followers.iter() {
+            </span><span class="kw">for </span>peer <span class="kw">in </span>all_peers.iter() {
                 <span class="kw">let </span>cfg = peer.read_config();
                 <span class="kw">let </span>dummy: DummyConfig = cfg.get_module_config_typed(<span class="number">0</span>).unwrap();
                 <span class="macro">assert_eq!</span>(dummy.consensus.tx_fee, leader_amount);
@@ -2060,17 +2038,17 @@
             }
 
             <span class="comment">// start consensus
-            </span><span class="kw">for </span>peer <span class="kw">in </span>followers.iter() {
+            </span><span class="kw">for </span>peer <span class="kw">in </span>all_peers.iter() {
                 peer.client.start_consensus(peer.auth.clone()).<span class="kw">await</span>.ok();
                 <span class="macro">assert_eq!</span>(peer.status().<span class="kw">await</span>.server, ServerStatus::ConsensusRunning);
             }
 
             <span class="comment">// shutdown
-            </span><span class="kw">for </span>peer <span class="kw">in </span>followers.iter() {
+            </span><span class="kw">for </span>peer <span class="kw">in </span>all_peers.iter() {
                 peer.retry_signal_upgrade().<span class="kw">await</span>;
             }
 
-            followers
+            all_peers
         };
 
         <span class="comment">// Run the Fedimint servers and test concurrently
