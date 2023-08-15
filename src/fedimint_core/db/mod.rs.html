@@ -2500,6 +2500,42 @@
 <a href="#2500" id="2500">2500</a>
 <a href="#2501" id="2501">2501</a>
 <a href="#2502" id="2502">2502</a>
+<a href="#2503" id="2503">2503</a>
+<a href="#2504" id="2504">2504</a>
+<a href="#2505" id="2505">2505</a>
+<a href="#2506" id="2506">2506</a>
+<a href="#2507" id="2507">2507</a>
+<a href="#2508" id="2508">2508</a>
+<a href="#2509" id="2509">2509</a>
+<a href="#2510" id="2510">2510</a>
+<a href="#2511" id="2511">2511</a>
+<a href="#2512" id="2512">2512</a>
+<a href="#2513" id="2513">2513</a>
+<a href="#2514" id="2514">2514</a>
+<a href="#2515" id="2515">2515</a>
+<a href="#2516" id="2516">2516</a>
+<a href="#2517" id="2517">2517</a>
+<a href="#2518" id="2518">2518</a>
+<a href="#2519" id="2519">2519</a>
+<a href="#2520" id="2520">2520</a>
+<a href="#2521" id="2521">2521</a>
+<a href="#2522" id="2522">2522</a>
+<a href="#2523" id="2523">2523</a>
+<a href="#2524" id="2524">2524</a>
+<a href="#2525" id="2525">2525</a>
+<a href="#2526" id="2526">2526</a>
+<a href="#2527" id="2527">2527</a>
+<a href="#2528" id="2528">2528</a>
+<a href="#2529" id="2529">2529</a>
+<a href="#2530" id="2530">2530</a>
+<a href="#2531" id="2531">2531</a>
+<a href="#2532" id="2532">2532</a>
+<a href="#2533" id="2533">2533</a>
+<a href="#2534" id="2534">2534</a>
+<a href="#2535" id="2535">2535</a>
+<a href="#2536" id="2536">2536</a>
+<a href="#2537" id="2537">2537</a>
+<a href="#2538" id="2538">2538</a>
 </pre><pre class="rust"><code><span class="kw">use </span>std::collections::BTreeMap;
 <span class="kw">use </span>std::error::Error;
 <span class="kw">use </span>std::fmt::Debug;
@@ -2585,26 +2621,6 @@
 
 <span class="kw">pub type </span>PrefixStream&lt;<span class="lifetime">&#39;a</span>&gt; = Pin&lt;Box&lt;<span class="macro">maybe_add_send!</span>(<span class="kw">dyn </span>Stream&lt;Item = (Vec&lt;u8&gt;, Vec&lt;u8&gt;)&gt; + <span class="lifetime">&#39;a</span>)&gt;&gt;;
 
-<span class="attr">#[apply(<span class="macro">async_trait_maybe_send!</span>)]
-</span><span class="kw">pub trait </span>IDatabase: Debug + MaybeSend + MaybeSync + <span class="lifetime">&#39;static </span>{
-    <span class="kw">async fn </span>begin_transaction&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>) -&gt; Box&lt;<span class="kw">dyn </span>ISingleUseDatabaseTransaction&lt;<span class="lifetime">&#39;a</span>&gt;&gt;;
-}
-
-<span class="attr">#[derive(Clone, Debug)]
-</span><span class="kw">pub struct </span>Database {
-    inner_db: Arc&lt;DatabaseInner&lt;<span class="kw">dyn </span>IDatabase&gt;&gt;,
-    module_instance_id: <span class="prelude-ty">Option</span>&lt;ModuleInstanceId&gt;,
-}
-
-<span class="comment">// NOTE: `Db` is used instead of just `dyn IDatabase`
-// because it will impossible to construct otherwise
-</span><span class="attr">#[derive(Debug)]
-</span><span class="kw">struct </span>DatabaseInner&lt;Db: IDatabase + <span class="question-mark">?</span>Sized&gt; {
-    notifications: Notifications,
-    module_decoders: ModuleDecoderRegistry,
-    db: Box&lt;Db&gt;,
-}
-
 <span class="doccomment">/// Error returned when the autocommit function fails
 </span><span class="attr">#[derive(Debug, Error)]
 </span><span class="kw">pub enum </span>AutocommitError&lt;E&gt; {
@@ -2629,19 +2645,40 @@
     },
 }
 
+<span class="attr">#[apply(<span class="macro">async_trait_maybe_send!</span>)]
+</span><span class="kw">pub trait </span>IDatabase: Debug + MaybeSend + MaybeSync + <span class="lifetime">&#39;static </span>{
+    <span class="kw">async fn </span>begin_transaction&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>) -&gt; Box&lt;<span class="kw">dyn </span>ISingleUseDatabaseTransaction&lt;<span class="lifetime">&#39;a</span>&gt;&gt;;
+}
+
+<span class="attr">#[derive(Clone, Debug)]
+</span><span class="kw">pub struct </span>Database {
+    inner_db: Arc&lt;DatabaseInner&gt;,
+    module_instance_id: <span class="prelude-ty">Option</span>&lt;ModuleInstanceId&gt;,
+    module_decoders: ModuleDecoderRegistry,
+}
+
+<span class="attr">#[derive(Debug)]
+</span><span class="kw">struct </span>DatabaseInner {
+    notifications: Notifications,
+    db: Box&lt;<span class="kw">dyn </span>IDatabase + <span class="lifetime">&#39;static</span>&gt;,
+}
+
 <span class="kw">impl </span>Database {
     <span class="doccomment">/// Creates a new Fedimint database from any object implementing
     /// [`IDatabase`]. For more flexibility see also [`Database::new_from_box`].
-    </span><span class="kw">pub fn </span>new(db: <span class="kw">impl </span>IDatabase + <span class="lifetime">&#39;static</span>, module_decoders: ModuleDecoderRegistry) -&gt; <span class="self">Self </span>{
-        <span class="kw">let </span>inner = DatabaseInner::&lt;<span class="kw">dyn </span>IDatabase&gt; {
+    </span><span class="kw">pub fn </span>new(
+        db: <span class="kw">impl </span>IDatabase + MaybeSend + <span class="lifetime">&#39;static</span>,
+        module_decoders: ModuleDecoderRegistry,
+    ) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>inner = DatabaseInner {
             db: Box::new(db),
             notifications: Notifications::new(),
-            module_decoders,
         };
 
         <span class="self">Self </span>{
             inner_db: Arc::new(inner),
             module_instance_id: <span class="prelude-val">None</span>,
+            module_decoders,
         }
     }
 
@@ -2649,16 +2686,19 @@
     /// the caller to have a dynamic database backend that can choose
     /// implementations at runtime, while not needing to bind decoders that
     /// might only be available later.
-    </span><span class="kw">pub fn </span>new_from_box(db: Box&lt;<span class="kw">dyn </span>IDatabase&gt;, module_decoders: ModuleDecoderRegistry) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>new_from_box(
+        db: Box&lt;<span class="kw">dyn </span>IDatabase + <span class="lifetime">&#39;static</span>&gt;,
+        module_decoders: ModuleDecoderRegistry,
+    ) -&gt; <span class="self">Self </span>{
         <span class="kw">let </span>inner = DatabaseInner {
             db,
             notifications: Notifications::new(),
-            module_decoders,
         };
 
         <span class="self">Self </span>{
             inner_db: Arc::new(inner),
             module_instance_id: <span class="prelude-val">None</span>,
+            module_decoders,
         }
     }
 
@@ -2670,14 +2710,25 @@
         <span class="kw">let </span>db = <span class="self">self</span>.inner_db.clone();
         <span class="self">Self </span>{
             inner_db: db,
+            module_decoders: <span class="self">self</span>.module_decoders.clone(),
             module_instance_id: <span class="prelude-val">Some</span>(module_instance_id),
+        }
+    }
+
+    <span class="kw">pub fn </span>new_with_decoders(<span class="kw-2">&amp;</span><span class="self">self</span>, module_decoders: ModuleDecoderRegistry) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>inner_db = <span class="self">self</span>.inner_db.clone();
+        <span class="kw">let </span>module_instance_id = <span class="self">self</span>.module_instance_id;
+        <span class="self">Self </span>{
+            inner_db,
+            module_decoders,
+            module_instance_id,
         }
     }
 
     <span class="kw">pub async fn </span>begin_transaction(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; DatabaseTransaction {
         <span class="kw">let </span>dbtx = DatabaseTransaction::new(
             <span class="self">self</span>.inner_db.db.begin_transaction().<span class="kw">await</span>,
-            <span class="self">self</span>.inner_db.module_decoders.clone(),
+            <span class="self">self</span>.module_decoders.clone(),
             <span class="kw-2">&amp;</span><span class="self">self</span>.inner_db.notifications,
         );
 
@@ -2810,7 +2861,7 @@
                         std::any::type_name::&lt;K::Value&gt;(),
                         value_bytes
                     );
-                    K::Value::from_bytes(<span class="kw-2">&amp;</span>value_bytes, <span class="kw-2">&amp;</span><span class="self">self</span>.inner_db.module_decoders)
+                    K::Value::from_bytes(<span class="kw-2">&amp;</span>value_bytes, <span class="kw-2">&amp;</span><span class="self">self</span>.module_decoders)
                         .expect(<span class="string">&quot;Unrecoverable error when decoding the database value&quot;</span>)
                 });
 
@@ -2819,7 +2870,7 @@
                     value,
                     DatabaseTransaction::new(
                         tx,
-                        <span class="self">self</span>.inner_db.module_decoders.clone(),
+                        <span class="self">self</span>.module_decoders.clone(),
                         <span class="kw-2">&amp;</span><span class="self">self</span>.inner_db.notifications,
                     ),
                 );
@@ -2839,6 +2890,40 @@
     {
         <span class="self">self</span>.wait_key_check(key, std::convert::identity).<span class="kw">await</span>.<span class="number">0
     </span>}
+}
+
+<span class="attr">#[apply(<span class="macro">async_trait_maybe_send!</span>)]
+</span><span class="kw">pub trait </span>IDatabaseTransactionOps&lt;<span class="lifetime">&#39;a</span>&gt;: <span class="lifetime">&#39;a </span>+ MaybeSend {
+    <span class="kw">async fn </span>raw_insert_bytes(<span class="kw-2">&amp;mut </span><span class="self">self</span>, key: <span class="kw-2">&amp;</span>[u8], value: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;Vec&lt;u8&gt;&gt;&gt;;
+
+    <span class="kw">async fn </span>raw_get_bytes(<span class="kw-2">&amp;mut </span><span class="self">self</span>, key: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;Vec&lt;u8&gt;&gt;&gt;;
+
+    <span class="kw">async fn </span>raw_remove_entry(<span class="kw-2">&amp;mut </span><span class="self">self</span>, key: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;Vec&lt;u8&gt;&gt;&gt;;
+
+    <span class="doccomment">/// Returns an stream of key-value pairs with keys that start with
+    /// `key_prefix`. No particular ordering is guaranteed.
+    </span><span class="kw">async fn </span>raw_find_by_prefix(<span class="kw-2">&amp;mut </span><span class="self">self</span>, key_prefix: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;PrefixStream&lt;<span class="lifetime">&#39;_</span>&gt;&gt;;
+
+    <span class="doccomment">/// Same as [`Self::raw_find_by_prefix`] but the order is descending by key.
+    </span><span class="kw">async fn </span>raw_find_by_prefix_sorted_descending(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        key_prefix: <span class="kw-2">&amp;</span>[u8],
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;PrefixStream&lt;<span class="lifetime">&#39;_</span>&gt;&gt;;
+
+    <span class="doccomment">/// Delete keys matching prefix
+    </span><span class="kw">async fn </span>raw_remove_by_prefix(<span class="kw-2">&amp;mut </span><span class="self">self</span>, key_prefix: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt;;
+
+    <span class="kw">async fn </span>rollback_tx_to_savepoint(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt;;
+
+    <span class="doccomment">/// Create a savepoint during the transaction that can be rolled back to
+    /// using rollback_tx_to_savepoint. Rolling back to the savepoint will
+    /// atomically remove the writes that were applied since the savepoint
+    /// was created.
+    ///
+    /// Warning: Avoid using this in fedimint client code as not all database
+    /// transaction implementations will support setting a savepoint during
+    /// a transaction.
+    </span><span class="kw">async fn </span>set_tx_savepoint(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt;;
 }
 
 <span class="doccomment">/// Fedimint requires that the database implementation implement Snapshot
@@ -2873,52 +2958,8 @@
 /// Prevented      | Prevented   | | Sqlite   | Prevented          | Prevented
 /// | Prevented           | Prevented      | Prevented   |
 </span><span class="attr">#[apply(<span class="macro">async_trait_maybe_send!</span>)]
-</span><span class="kw">pub trait </span>IDatabaseTransaction&lt;<span class="lifetime">&#39;a</span>&gt;: <span class="lifetime">&#39;a </span>+ MaybeSend {
-    <span class="kw">async fn </span>raw_insert_bytes(<span class="kw-2">&amp;mut </span><span class="self">self</span>, key: <span class="kw-2">&amp;</span>[u8], value: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;Vec&lt;u8&gt;&gt;&gt;;
-
-    <span class="kw">async fn </span>raw_get_bytes(<span class="kw-2">&amp;mut </span><span class="self">self</span>, key: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;Vec&lt;u8&gt;&gt;&gt;;
-
-    <span class="kw">async fn </span>raw_remove_entry(<span class="kw-2">&amp;mut </span><span class="self">self</span>, key: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;Vec&lt;u8&gt;&gt;&gt;;
-
-    <span class="doccomment">/// Returns an stream of key-value pairs with keys that start with
-    /// `key_prefix`. No particular ordering is guaranteed.
-    </span><span class="kw">async fn </span>raw_find_by_prefix(<span class="kw-2">&amp;mut </span><span class="self">self</span>, key_prefix: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;PrefixStream&lt;<span class="lifetime">&#39;_</span>&gt;&gt;;
-
-    <span class="doccomment">/// Same as [`Self::raw_find_by_prefix`] but the order is descending by key.
-    </span><span class="kw">async fn </span>raw_find_by_prefix_sorted_descending(
-        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
-        key_prefix: <span class="kw-2">&amp;</span>[u8],
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;PrefixStream&lt;<span class="lifetime">&#39;_</span>&gt;&gt;;
-
-    <span class="doccomment">/// Default implementation is a combination of [`Self::raw_find_by_prefix`]
-    /// + loop over [`Self::raw_remove_entry`]
-    </span><span class="kw">async fn </span>raw_remove_by_prefix(<span class="kw-2">&amp;mut </span><span class="self">self</span>, key_prefix: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="kw">let </span>keys = <span class="self">self
-            </span>.raw_find_by_prefix(key_prefix)
-            .<span class="kw">await</span><span class="question-mark">?
-            </span>.map(|kv| kv.<span class="number">0</span>)
-            .collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;()
-            .<span class="kw">await</span>;
-        <span class="kw">for </span>key <span class="kw">in </span>keys {
-            <span class="self">self</span>.raw_remove_entry(key.as_slice()).<span class="kw">await</span><span class="question-mark">?</span>;
-        }
-        <span class="prelude-val">Ok</span>(())
-    }
-
+</span><span class="kw">pub trait </span>IDatabaseTransaction&lt;<span class="lifetime">&#39;a</span>&gt;: <span class="lifetime">&#39;a </span>+ MaybeSend + IDatabaseTransactionOps&lt;<span class="lifetime">&#39;a</span>&gt; {
     <span class="kw">async fn </span>commit_tx(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt;;
-
-    <span class="kw">async fn </span>rollback_tx_to_savepoint(<span class="kw-2">&amp;mut </span><span class="self">self</span>);
-
-    <span class="doccomment">/// Create a savepoint during the transaction that can be rolled back to
-    /// using rollback_tx_to_savepoint. Rolling back to the savepoint will
-    /// atomically remove the writes that were applied since the savepoint
-    /// was created.
-    ///
-    /// Warning: Avoid using this in fedimint client code as not all database
-    /// transaction implementations will support setting a savepoint during
-    /// a transaction.
-    </span><span class="kw">async fn </span>set_tx_savepoint(<span class="kw-2">&amp;mut </span><span class="self">self</span>);
-
     <span class="kw">fn </span>add_notification_key(<span class="kw-2">&amp;mut </span><span class="self">self</span>, _key: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="macro">anyhow::bail!</span>(<span class="string">&quot;add_notification_key called without NotifyingTransaction&quot;</span>)
     }
@@ -2930,28 +2971,8 @@
 /// `ISingleUseDatabaseTransaction` without needing to make additional
 /// allocations.
 </span><span class="attr">#[apply(<span class="macro">async_trait_maybe_send!</span>)]
-</span><span class="kw">pub trait </span>ISingleUseDatabaseTransaction&lt;<span class="lifetime">&#39;a</span>&gt;: <span class="lifetime">&#39;a </span>+ MaybeSend {
-    <span class="kw">async fn </span>raw_insert_bytes(<span class="kw-2">&amp;mut </span><span class="self">self</span>, key: <span class="kw-2">&amp;</span>[u8], value: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;Vec&lt;u8&gt;&gt;&gt;;
-
-    <span class="kw">async fn </span>raw_get_bytes(<span class="kw-2">&amp;mut </span><span class="self">self</span>, key: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;Vec&lt;u8&gt;&gt;&gt;;
-
-    <span class="kw">async fn </span>raw_remove_entry(<span class="kw-2">&amp;mut </span><span class="self">self</span>, key: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;Vec&lt;u8&gt;&gt;&gt;;
-
-    <span class="kw">async fn </span>raw_find_by_prefix(<span class="kw-2">&amp;mut </span><span class="self">self</span>, key_prefix: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;PrefixStream&lt;<span class="lifetime">&#39;_</span>&gt;&gt;;
-
-    <span class="kw">async fn </span>raw_find_by_prefix_sorted_descending(
-        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
-        key_prefix: <span class="kw-2">&amp;</span>[u8],
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;PrefixStream&lt;<span class="lifetime">&#39;_</span>&gt;&gt;;
-
-    <span class="kw">async fn </span>raw_remove_by_prefix(<span class="kw-2">&amp;mut </span><span class="self">self</span>, key_prefix: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt;;
-
+</span><span class="kw">pub trait </span>ISingleUseDatabaseTransaction&lt;<span class="lifetime">&#39;a</span>&gt;: <span class="lifetime">&#39;a </span>+ MaybeSend + IDatabaseTransactionOps&lt;<span class="lifetime">&#39;a</span>&gt; {
     <span class="kw">async fn </span>commit_tx(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt;;
-
-    <span class="kw">async fn </span>rollback_tx_to_savepoint(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt;;
-
-    <span class="kw">async fn </span>set_tx_savepoint(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt;;
-
     <span class="kw">fn </span>add_notification_key(<span class="kw-2">&amp;mut </span><span class="self">self</span>, _key: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt;;
 }
 
@@ -2969,7 +2990,7 @@
 }
 
 <span class="attr">#[apply(<span class="macro">async_trait_maybe_send!</span>)]
-</span><span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, Tx: IDatabaseTransaction&lt;<span class="lifetime">&#39;a</span>&gt; + MaybeSend&gt; ISingleUseDatabaseTransaction&lt;<span class="lifetime">&#39;a</span>&gt;
+</span><span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, Tx: IDatabaseTransaction&lt;<span class="lifetime">&#39;a</span>&gt; + MaybeSend&gt; IDatabaseTransactionOps&lt;<span class="lifetime">&#39;a</span>&gt;
     <span class="kw">for </span>SingleUseDatabaseTransaction&lt;<span class="lifetime">&#39;a</span>, Tx&gt;
 {
     <span class="kw">async fn </span>raw_insert_bytes(<span class="kw-2">&amp;mut </span><span class="self">self</span>, key: <span class="kw-2">&amp;</span>[u8], value: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;Vec&lt;u8&gt;&gt;&gt; {
@@ -3023,20 +3044,12 @@
             .<span class="kw">await
     </span>}
 
-    <span class="kw">async fn </span>commit_tx(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="self">self</span>.<span class="number">0
-            </span>.take()
-            .context(<span class="string">&quot;Cannot commit an already committed transaction&quot;</span>)<span class="question-mark">?
-            </span>.commit_tx()
-            .<span class="kw">await
-    </span>}
-
     <span class="kw">async fn </span>rollback_tx_to_savepoint(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="self">self</span>.<span class="number">0
             </span>.as_mut()
             .context(<span class="string">&quot;Cannot rollback to a savepoint on an already consumed transaction&quot;</span>)<span class="question-mark">?
             </span>.rollback_tx_to_savepoint()
-            .<span class="kw">await</span>;
+            .<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(())
     }
 
@@ -3045,9 +3058,22 @@
             </span>.as_mut()
             .context(<span class="string">&quot;Cannot set a tx savepoint on an already consumed transaction&quot;</span>)<span class="question-mark">?
             </span>.set_tx_savepoint()
-            .<span class="kw">await</span>;
+            .<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(())
     }
+}
+
+<span class="attr">#[apply(<span class="macro">async_trait_maybe_send!</span>)]
+</span><span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, Tx: IDatabaseTransaction&lt;<span class="lifetime">&#39;a</span>&gt; + MaybeSend&gt; ISingleUseDatabaseTransaction&lt;<span class="lifetime">&#39;a</span>&gt;
+    <span class="kw">for </span>SingleUseDatabaseTransaction&lt;<span class="lifetime">&#39;a</span>, Tx&gt;
+{
+    <span class="kw">async fn </span>commit_tx(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="self">self</span>.<span class="number">0
+            </span>.take()
+            .context(<span class="string">&quot;Cannot commit an already committed transaction&quot;</span>)<span class="question-mark">?
+            </span>.commit_tx()
+            .<span class="kw">await
+    </span>}
 
     <span class="kw">fn </span>add_notification_key(<span class="kw-2">&amp;mut </span><span class="self">self</span>, key: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="self">self</span>.<span class="number">0
@@ -3104,7 +3130,7 @@
 }
 
 <span class="attr">#[apply(<span class="macro">async_trait_maybe_send!</span>)]
-</span><span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; ISingleUseDatabaseTransaction&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw">for </span>CommittableIsolatedDatabaseTransaction&lt;<span class="lifetime">&#39;a</span>&gt; {
+</span><span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; IDatabaseTransactionOps&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw">for </span>CommittableIsolatedDatabaseTransaction&lt;<span class="lifetime">&#39;a</span>&gt; {
     <span class="kw">async fn </span>raw_insert_bytes(<span class="kw-2">&amp;mut </span><span class="self">self</span>, key: <span class="kw-2">&amp;</span>[u8], value: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;Vec&lt;u8&gt;&gt;&gt; {
         <span class="kw">let </span><span class="kw-2">mut </span>isolated = IsolatedDatabaseTransaction::new(<span class="self">self</span>.dbtx.as_mut(), <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.prefix));
         isolated.raw_insert_bytes(key, value).<span class="kw">await
@@ -3148,10 +3174,6 @@
         isolated.raw_remove_by_prefix(key_prefix).<span class="kw">await
     </span>}
 
-    <span class="kw">async fn </span>commit_tx(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="self">self</span>.dbtx.commit_tx().<span class="kw">await
-    </span>}
-
     <span class="kw">async fn </span>rollback_tx_to_savepoint(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="kw">let </span><span class="kw-2">mut </span>isolated = IsolatedDatabaseTransaction::new(<span class="self">self</span>.dbtx.as_mut(), <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.prefix));
         isolated.rollback_tx_to_savepoint().<span class="kw">await
@@ -3160,6 +3182,13 @@
     <span class="kw">async fn </span>set_tx_savepoint(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="kw">let </span><span class="kw-2">mut </span>isolated = IsolatedDatabaseTransaction::new(<span class="self">self</span>.dbtx.as_mut(), <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.prefix));
         isolated.set_tx_savepoint().<span class="kw">await
+    </span>}
+}
+
+<span class="attr">#[apply(<span class="macro">async_trait_maybe_send!</span>)]
+</span><span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; ISingleUseDatabaseTransaction&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw">for </span>CommittableIsolatedDatabaseTransaction&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">async fn </span>commit_tx(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="self">self</span>.dbtx.commit_tx().<span class="kw">await
     </span>}
 
     <span class="kw">fn </span>add_notification_key(<span class="kw-2">&amp;mut </span><span class="self">self</span>, key: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
@@ -3220,6 +3249,10 @@
             <span class="prelude-val">None </span>=&gt; <span class="prelude-val">None</span>,
         }
     }
+
+    <span class="kw">pub async fn </span>raw_find_by_prefix(<span class="kw-2">&amp;mut </span><span class="self">self</span>, key_prefix: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;PrefixStream&lt;<span class="lifetime">&#39;_</span>&gt;&gt; {
+        <span class="self">self</span>.isolated_tx.raw_find_by_prefix(key_prefix).<span class="kw">await
+    </span>}
 
     <span class="attr">#[instrument(level = <span class="string">&quot;debug&quot;</span>, skip_all, fields(key = <span class="question-mark">?</span>key_prefix))]
     </span><span class="kw">pub async fn </span>find_by_prefix&lt;KP&gt;(
@@ -3443,8 +3476,7 @@
 }
 
 <span class="attr">#[apply(<span class="macro">async_trait_maybe_send!</span>)]
-</span><span class="kw">impl</span>&lt;<span class="lifetime">&#39;isolated</span>, <span class="lifetime">&#39;parent</span>, T: MaybeSend + Encodable + <span class="lifetime">&#39;isolated</span>&gt;
-    ISingleUseDatabaseTransaction&lt;<span class="lifetime">&#39;isolated</span>&gt;
+</span><span class="kw">impl</span>&lt;<span class="lifetime">&#39;isolated</span>, <span class="lifetime">&#39;parent</span>, T: MaybeSend + Encodable + <span class="lifetime">&#39;isolated</span>&gt; IDatabaseTransactionOps&lt;<span class="lifetime">&#39;isolated</span>&gt;
     <span class="kw">for </span>IsolatedDatabaseTransaction&lt;<span class="lifetime">&#39;isolated</span>, <span class="lifetime">&#39;parent</span>, T&gt;
 {
     <span class="kw">async fn </span>raw_insert_bytes(<span class="kw-2">&amp;mut </span><span class="self">self</span>, key: <span class="kw-2">&amp;</span>[u8], value: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;Vec&lt;u8&gt;&gt;&gt; {
@@ -3498,10 +3530,6 @@
         <span class="self">self</span>.inner_tx.raw_remove_by_prefix(<span class="kw-2">&amp;</span>key_with_prefix).<span class="kw">await
     </span>}
 
-    <span class="kw">async fn </span>commit_tx(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="macro">panic!</span>(<span class="string">&quot;DatabaseTransaction inside modules cannot be committed&quot;</span>);
-    }
-
     <span class="kw">async fn </span>rollback_tx_to_savepoint(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="self">self</span>.inner_tx.rollback_tx_to_savepoint().<span class="kw">await
     </span>}
@@ -3509,7 +3537,16 @@
     <span class="kw">async fn </span>set_tx_savepoint(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="self">self</span>.inner_tx.set_tx_savepoint().<span class="kw">await
     </span>}
+}
 
+<span class="attr">#[apply(<span class="macro">async_trait_maybe_send!</span>)]
+</span><span class="kw">impl</span>&lt;<span class="lifetime">&#39;isolated</span>, <span class="lifetime">&#39;parent</span>, T: MaybeSend + Encodable + <span class="lifetime">&#39;isolated</span>&gt;
+    ISingleUseDatabaseTransaction&lt;<span class="lifetime">&#39;isolated</span>&gt;
+    <span class="kw">for </span>IsolatedDatabaseTransaction&lt;<span class="lifetime">&#39;isolated</span>, <span class="lifetime">&#39;parent</span>, T&gt;
+{
+    <span class="kw">async fn </span>commit_tx(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="macro">panic!</span>(<span class="string">&quot;DatabaseTransaction inside modules cannot be committed&quot;</span>);
+    }
     <span class="kw">fn </span>add_notification_key(<span class="kw-2">&amp;mut </span><span class="self">self</span>, key: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="kw">let </span><span class="kw-2">mut </span>key_with_module = <span class="self">self</span>.prefix.clone();
         key_with_module.extend_from_slice(key);
@@ -3532,6 +3569,7 @@
     tx: Box&lt;<span class="kw">dyn </span>ISingleUseDatabaseTransaction&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
     decoders: ModuleDecoderRegistry,
     commit_tracker: CommitTracker,
+    on_commit_hooks: Vec&lt;Box&lt;<span class="macro">maybe_add_send!</span>(<span class="kw">dyn </span>FnOnce())&gt;&gt;,
 }
 
 <span class="attr">#[instrument(level = <span class="string">&quot;trace&quot;</span>, skip_all, fields(value_type = std::any::type_name::&lt;V&gt;()), err)]
@@ -3559,6 +3597,7 @@
                 is_committed: <span class="bool-val">false</span>,
                 has_writes: <span class="bool-val">false</span>,
             },
+            on_commit_hooks: <span class="macro">vec!</span>[],
         }
     }
 
@@ -3594,18 +3633,27 @@
             tx: Box::new(single_use),
             decoders,
             commit_tracker,
+            on_commit_hooks: <span class="macro">vec!</span>[],
         }
     }
 
     <span class="kw">pub async fn </span>commit_tx_result(<span class="kw-2">mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="self">self</span>.commit_tracker.is_committed = <span class="bool-val">true</span>;
-        <span class="kw">return </span><span class="self">self</span>.tx.commit_tx().<span class="kw">await</span>;
+        <span class="kw">let </span>commit_result = <span class="self">self</span>.tx.commit_tx().<span class="kw">await</span>;
+
+        <span class="comment">// Run commit hooks in case commit was successful
+        </span><span class="kw">if </span>commit_result.is_ok() {
+            <span class="kw">for </span>hook <span class="kw">in </span><span class="self">self</span>.on_commit_hooks {
+                hook();
+            }
+        }
+
+        commit_result
     }
 
     <span class="kw">pub async fn </span>commit_tx(<span class="kw-2">mut </span><span class="self">self</span>) {
         <span class="self">self</span>.commit_tracker.is_committed = <span class="bool-val">true</span>;
-        <span class="self">self</span>.tx
-            .commit_tx()
+        <span class="self">self</span>.commit_tx_result()
             .<span class="kw">await
             </span>.expect(<span class="string">&quot;Unrecoverable error occurred while committing to the database.&quot;</span>);
     }
@@ -3773,6 +3821,12 @@
     </span><span class="kw">pub async fn </span>set_tx_savepoint(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="self">self</span>.tx.set_tx_savepoint().<span class="kw">await
     </span>}
+
+    <span class="doccomment">/// Register a hook that will be run after commit succeeds.
+    </span><span class="attr">#[instrument(level = <span class="string">&quot;debug&quot;</span>, skip_all, ret)]
+    </span><span class="kw">pub fn </span>on_commit(<span class="kw-2">&amp;mut </span><span class="self">self</span>, f: <span class="macro">maybe_add_send!</span>(<span class="kw">impl </span>FnOnce() + <span class="lifetime">&#39;static</span>)) {
+        <span class="self">self</span>.on_commit_hooks.push(Box::new(f));
+    }
 }
 
 <span class="kw">impl</span>&lt;T&gt; DatabaseKeyPrefix <span class="kw">for </span>T
@@ -3990,7 +4044,13 @@
         <span class="kw">let </span>db_items = <span class="macro-nonterminal">$dbtx
             </span>.find_by_prefix(<span class="kw-2">&amp;</span><span class="macro-nonterminal">$prefix_type</span>)
             .<span class="kw">await
-            </span>.collect::&lt;Vec&lt;(<span class="macro-nonterminal">$key_type</span>, <span class="macro-nonterminal">$value_type</span>)&gt;&gt;()
+            </span>.map(|(key, val)| {
+                (
+                    <span class="macro-nonterminal">$crate::encoding::Encodable::consensus_encode_to_hex</span>(<span class="kw-2">&amp;</span>key).expect(<span class="string">&quot;can&#39;t fail&quot;</span>),
+                    val,
+                )
+            })
+            .collect::&lt;BTreeMap&lt;String, <span class="macro-nonterminal">$value_type</span>&gt;&gt;()
             .<span class="kw">await</span>;
 
         <span class="macro-nonterminal">$map</span>.insert(<span class="macro-nonterminal">$key_literal</span>.to_string(), Box::new(db_items));
@@ -4003,8 +4063,13 @@
         <span class="kw">let </span>db_items = <span class="macro-nonterminal">$dbtx
             </span>.find_by_prefix(<span class="kw-2">&amp;</span><span class="macro-nonterminal">$prefix_type</span>)
             .<span class="kw">await
-            </span>.map(|(key, val)| (key, SerdeWrapper::from_encodable(val)))
-            .collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;()
+            </span>.map(|(key, val)| {
+                (
+                    <span class="macro-nonterminal">$crate::encoding::Encodable::consensus_encode_to_hex</span>(<span class="kw-2">&amp;</span>key).expect(<span class="string">&quot;can&#39;t fail&quot;</span>),
+                    SerdeWrapper::from_encodable(val),
+                )
+            })
+            .collect::&lt;BTreeMap&lt;<span class="kw">_</span>, <span class="kw">_</span>&gt;&gt;()
             .<span class="kw">await</span>;
 
         <span class="macro-nonterminal">$map</span>.insert(<span class="macro-nonterminal">$key_literal</span>.to_string(), Box::new(db_items));
@@ -4740,8 +4805,8 @@
         <span class="kw">use </span>async_trait::async_trait;
 
         <span class="kw">use </span><span class="kw">crate</span>::db::{
-            AutocommitError, IDatabase, IDatabaseTransaction, ISingleUseDatabaseTransaction,
-            SingleUseDatabaseTransaction,
+            AutocommitError, IDatabase, IDatabaseTransaction, IDatabaseTransactionOps,
+            ISingleUseDatabaseTransaction, SingleUseDatabaseTransaction,
         };
         <span class="kw">use </span><span class="kw">crate</span>::ModuleDecoderRegistry;
 
@@ -4760,7 +4825,7 @@
         </span><span class="kw">struct </span>FakeTransaction&lt;<span class="lifetime">&#39;a</span>&gt;(PhantomData&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>()&gt;);
 
         <span class="attr">#[async_trait]
-        </span><span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; IDatabaseTransaction&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw">for </span>FakeTransaction&lt;<span class="lifetime">&#39;a</span>&gt; {
+        </span><span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; IDatabaseTransactionOps&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw">for </span>FakeTransaction&lt;<span class="lifetime">&#39;a</span>&gt; {
             <span class="kw">async fn </span>raw_insert_bytes(
                 <span class="kw-2">&amp;mut </span><span class="self">self</span>,
                 _key: <span class="kw-2">&amp;</span>[u8],
@@ -4784,6 +4849,10 @@
                 <span class="macro">unimplemented!</span>()
             }
 
+            <span class="kw">async fn </span>raw_remove_by_prefix(<span class="kw-2">&amp;mut </span><span class="self">self</span>, _key_prefix: <span class="kw-2">&amp;</span>[u8]) -&gt; anyhow::Result&lt;()&gt; {
+                <span class="macro">unimplemented!</span>()
+            }
+
             <span class="kw">async fn </span>raw_find_by_prefix_sorted_descending(
                 <span class="kw-2">&amp;mut </span><span class="self">self</span>,
                 _key_prefix: <span class="kw-2">&amp;</span>[u8],
@@ -4791,16 +4860,19 @@
                 <span class="macro">unimplemented!</span>()
             }
 
+            <span class="kw">async fn </span>rollback_tx_to_savepoint(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; anyhow::Result&lt;()&gt; {
+                <span class="macro">unimplemented!</span>()
+            }
+
+            <span class="kw">async fn </span>set_tx_savepoint(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; anyhow::Result&lt;()&gt; {
+                <span class="macro">unimplemented!</span>()
+            }
+        }
+
+        <span class="attr">#[async_trait]
+        </span><span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; IDatabaseTransaction&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw">for </span>FakeTransaction&lt;<span class="lifetime">&#39;a</span>&gt; {
             <span class="kw">async fn </span>commit_tx(<span class="self">self</span>) -&gt; anyhow::Result&lt;()&gt; {
                 <span class="prelude-val">Err</span>(<span class="macro">anyhow!</span>(<span class="string">&quot;Can&#39;t commit!&quot;</span>))
-            }
-
-            <span class="kw">async fn </span>rollback_tx_to_savepoint(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
-                <span class="macro">unimplemented!</span>()
-            }
-
-            <span class="kw">async fn </span>set_tx_savepoint(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
-                <span class="macro">unimplemented!</span>()
             }
         }
 
