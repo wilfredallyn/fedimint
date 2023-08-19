@@ -304,7 +304,7 @@ pub trait FederationApiExt: IFederationApi {
         &self,
         method: String,
         params: ApiRequestErased,
-    ) -> FederationResult<Ret>
+    ) -> FederationResult<Vec<Ret>>
     where
         Ret: serde::de::DeserializeOwned + Eq + Debug + Clone + MaybeSend,
     {
@@ -350,7 +350,10 @@ pub trait GlobalFederationApi {
         &self,
         txid: &TransactionId,
     ) -> FederationResult<Option<TransactionStatus>>;
-    async fn await_tx_outcome(&self, txid: &TransactionId) -> FederationResult<TransactionStatus>;
+    async fn await_tx_outcome(
+        &self,
+        txid: &TransactionId,
+    ) -> FederationResult<Vec<TransactionStatus>>;
 
     async fn fetch_epoch_history(
         &self,
@@ -374,7 +377,7 @@ pub trait GlobalFederationApi {
         outpoint: OutPoint,
         timeout: Duration,
         module_decoder: &Decoder,
-    ) -> OutputOutcomeResult<R>
+    ) -> Vec<OutputOutcomeResult<R>>
     where
         R: OutputOutcome;
 
@@ -399,39 +402,38 @@ pub trait GlobalFederationApi {
 }
 
 fn map_tx_outcome_outpoint<R>(
-    tx_outcome: TransactionStatus,
+    tx_outcome: Vec<TransactionStatus>,
     out_point: OutPoint,
     module_decoder: &Decoder,
-) -> OutputOutcomeResult<R>
+) -> Vec<OutputOutcomeResult<R>>
 where
     R: OutputOutcome + MaybeSend,
 {
-    match tx_outcome {
-        TransactionStatus::Rejected(e) => Err(OutputOutcomeError::Rejected(e)),
-        TransactionStatus::Accepted { outputs, .. } => {
-            let outputs_len = outputs.len();
-            outputs
-                .into_iter()
-                .nth(out_point.out_idx as usize) // avoid clone as would be necessary with .get(…)
-                .ok_or(OutputOutcomeError::InvalidVout {
-                    outputs_num: outputs_len,
-                    out_idx: out_point.out_idx,
-                })
-                .and_then(|output| {
-
-
-                    let dyn_outcome = output
-                        .try_into_inner_known_module_kind(module_decoder)
-                        .map_err(|e| OutputOutcomeError::ResponseDeserialization(e.into()))?;
-
-                    let source_instance = dyn_outcome.module_instance_id();
-                    dyn_outcome.as_any().downcast_ref().cloned().ok_or_else(|| {
-                        let target_type = std::any::type_name::<R>();
-                        OutputOutcomeError::ResponseDeserialization(anyhow!("Could not downcast output outcome with instance id {source_instance} to {target_type}"))
+    tx_outcome.into_iter().map(|outcome| {
+        match outcome {
+            TransactionStatus::Rejected(e) => Err(OutputOutcomeError::Rejected(e)),
+            TransactionStatus::Accepted { outputs, .. } => {
+                let outputs_len = outputs.len();
+                outputs
+                    .into_iter()
+                    .nth(out_point.out_idx as usize)
+                    .ok_or(OutputOutcomeError::InvalidVout {
+                        outputs_num: outputs_len,
+                        out_idx: out_point.out_idx,
                     })
-                })
+                    .and_then(|output| {
+                        let dyn_outcome = output
+                            .try_into_inner_known_module_kind(module_decoder)
+                            .map_err(|e| OutputOutcomeError::ResponseDeserialization(e.into()))?;
+                        let source_instance = dyn_outcome.module_instance_id();
+                        dyn_outcome.as_any().downcast_ref().cloned().ok_or_else(|| {
+                            let target_type = std::any::type_name::<R>();
+                            OutputOutcomeError::ResponseDeserialization(anyhow!("Could not downcast output outcome with instance id {source_instance} to {target_type}"))
+                        })
+                    })
+            }
         }
-    }
+    }).collect()
 }
 
 #[apply(async_trait_maybe_send!)]
@@ -458,7 +460,10 @@ where
     }
 
     /// Await the outcome of an entire transaction
-    async fn await_tx_outcome(&self, tx: &TransactionId) -> FederationResult<TransactionStatus> {
+    async fn await_tx_outcome(
+        &self,
+        tx: &TransactionId,
+    ) -> FederationResult<Vec<TransactionStatus>> {
         self.request_threshold_responses("wait_transaction".to_owned(), ApiRequestErased::new(tx))
             .await
     }
@@ -539,16 +544,22 @@ where
         outpoint: OutPoint,
         timeout: Duration,
         module_decoder: &Decoder,
-    ) -> OutputOutcomeResult<R>
+    ) -> Vec<OutputOutcomeResult<R>>
     where
         R: OutputOutcome,
     {
-        fedimint_core::task::timeout(timeout, async move {
-            let tx_outcome = self.await_tx_outcome(&outpoint.txid).await?;
+        match fedimint_core::task::timeout(timeout, async move {
+            let tx_outcome = match self.await_tx_outcome(&outpoint.txid).await {
+                Ok(tx_outcome) => tx_outcome,
+                Err(e) => return vec![Err(OutputOutcomeError::from(e))],
+            };
             map_tx_outcome_outpoint(tx_outcome, outpoint, module_decoder)
         })
         .await
-        .map_err(|_| OutputOutcomeError::Timeout(timeout))?
+        {
+            Ok(res) => res,
+            Err(_) => vec![Err(OutputOutcomeError::Timeout(timeout))],
+        }
     }
 
     async fn download_client_config(&self, info: &InviteCode) -> FederationResult<ClientConfig> {

@@ -391,6 +391,50 @@ fn discover_common_core_api_version(
     best_major
 }
 
+/// Returns a threshold number of responses that will be combined by client (e.g., signature shares)
+pub struct ThresholdResponses<R> {
+    error_strategy: ErrorStrategy,
+    responses: Vec<R>,
+    retry: BTreeSet<PeerId>,
+    threshold: usize,
+}
+
+impl<R> ThresholdResponses<R> {
+    pub fn new(total_peers: usize) -> Self {
+        let max_evil = (total_peers - 1) / 3;
+        let threshold = total_peers - max_evil;
+
+        Self {
+            error_strategy: ErrorStrategy::new(max_evil + 1),
+            responses: vec![],
+            retry: BTreeSet::new(),
+            threshold,
+        }
+    }
+}
+
+impl<R: Debug + Eq + Clone> QueryStrategy<R, Vec<R>> for ThresholdResponses<R> {
+    fn process(&mut self, peer: PeerId, result: api::PeerResult<R>) -> QueryStep<Vec<R>> {
+        match result {
+            Ok(response) => {
+                self.responses.push(response);
+                assert!(self.retry.insert(peer));
+
+                if self.responses.len() == self.threshold {
+                    return QueryStep::Success(mem::take(&mut self.responses));
+                }
+
+                if self.retry.len() == self.threshold {
+                    QueryStep::Retry(mem::take(&mut self.retry))
+                } else {
+                    QueryStep::Continue
+                }
+            }
+            Err(error) => self.error_strategy.process(peer, error),
+        }
+    }
+}
+
 #[test]
 fn discover_common_core_api_version_sanity() {
     use fedimint_core::module::MultiApiVersion;
