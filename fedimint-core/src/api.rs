@@ -48,8 +48,8 @@ use crate::epoch::{SerdeEpochHistory, SignedEpochOutcome};
 use crate::module::{ApiRequestErased, ApiVersion, SupportedApiVersionsSummary};
 use crate::outcome::TransactionStatus;
 use crate::query::{
-    DiscoverApiVersionSet, QueryStep, QueryStrategy, ThresholdConsensus, UnionResponsesSingle,
-    VerifiableResponse,
+    DiscoverApiVersionSet, QueryStep, QueryStrategy, ThresholdConsensus, ThresholdResponses,
+    UnionResponsesSingle, VerifiableResponse,
 };
 use crate::transaction::{SerdeTransaction, Transaction};
 use crate::{serde_as_encodable_hex, task};
@@ -299,6 +299,22 @@ pub trait FederationApiExt: IFederationApi {
         )
         .await
     }
+
+    async fn request_threshold_responses<Ret>(
+        &self,
+        method: String,
+        params: ApiRequestErased,
+    ) -> FederationResult<Ret>
+    where
+        Ret: serde::de::DeserializeOwned + Eq + Debug + Clone + MaybeSend,
+    {
+        self.request_with_strategy(
+            ThresholdResponses::new(self.all_peers().total()),
+            method,
+            params,
+        )
+        .await
+    }
 }
 
 #[apply(async_trait_maybe_send!)]
@@ -443,7 +459,7 @@ where
 
     /// Await the outcome of an entire transaction
     async fn await_tx_outcome(&self, tx: &TransactionId) -> FederationResult<TransactionStatus> {
-        self.request_current_consensus("wait_transaction".to_owned(), ApiRequestErased::new(tx))
+        self.request_threshold_responses("wait_transaction".to_owned(), ApiRequestErased::new(tx))
             .await
     }
 

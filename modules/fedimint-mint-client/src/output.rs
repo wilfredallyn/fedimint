@@ -8,7 +8,9 @@ use fedimint_core::encoding::{Decodable, Encodable};
 use fedimint_core::task::sleep;
 use fedimint_core::{Amount, OutPoint, Tiered, TieredMulti, TransactionId};
 use fedimint_derive_secret::{ChildId, DerivableSecret};
-use fedimint_mint_common::{BlindNonce, MintOutputBlindSignatures, MintOutputOutcome, Nonce, Note};
+use fedimint_mint_common::{
+    BlindNonce, MintOutputBlindSignatures, MintOutputOutcome, MintOutputSignatureShare, Nonce, Note,
+};
 use secp256k1::{KeyPair, Secp256k1, Signing};
 use serde::{Deserialize, Serialize};
 use tbs::{blind_message, unblind_signature, AggregatePublicKey, BlindedSignature, BlindingKey};
@@ -163,7 +165,7 @@ impl MintOutputStatesCreated {
         global_context: DynGlobalClientContext,
         common: MintOutputCommon,
         module_decoder: Decoder,
-    ) -> Result<MintOutputBlindSignatures, String> {
+    ) -> Result<Vec<MintOutputSignatureShare>, String> {
         loop {
             let outcome: MintOutputOutcome = global_context
                 .api()

@@ -5,17 +5,15 @@ use fedimint_core::{impl_db_lookup, impl_db_record, Amount, OutPoint, PeerId};
 use serde::{Deserialize, Serialize};
 use strum_macros::EnumIter;
 
-use crate::{MintOutputBlindSignatures, MintOutputSignatureShare, Nonce};
+use crate::{MintOutputSignatureShare, Nonce};
 
 #[repr(u8)]
 #[derive(Clone, EnumIter, Debug)]
 pub enum DbKeyPrefix {
     NoteNonce = 0x10,
-    ProposedPartialSig = 0x11,
-    ReceivedPartialSig = 0x12,
-    OutputOutcome = 0x13,
     MintAuditItem = 0x14,
     EcashBackup = 0x15,
+    BlindSigShare = 0x16,
 }
 
 impl std::fmt::Display for DbKeyPrefix {
@@ -38,39 +36,19 @@ impl_db_record!(
 impl_db_lookup!(key = NonceKey, query_prefix = NonceKeyPrefix);
 
 #[derive(Debug, Encodable, Decodable, Serialize)]
-pub struct ProposedPartialSignatureKey(pub OutPoint);
+pub struct BlindSignatureShareKey(pub OutPoint);
 
 #[derive(Debug, Encodable, Decodable)]
-pub struct ProposedPartialSignaturesKeyPrefix;
+pub struct BlindSignatureShareKeyPrefix;
 
 impl_db_record!(
-    key = ProposedPartialSignatureKey,
+    key = BlindSignatureShareKey,
     value = MintOutputSignatureShare,
-    db_prefix = DbKeyPrefix::ProposedPartialSig,
+    db_prefix = DbKeyPrefix::BlindSigShare,
 );
 impl_db_lookup!(
-    key = ProposedPartialSignatureKey,
-    query_prefix = ProposedPartialSignaturesKeyPrefix
-);
-
-#[derive(Debug, Encodable, Decodable, Serialize)]
-pub struct ReceivedPartialSignatureKey(pub OutPoint, pub PeerId);
-
-#[derive(Debug, Encodable, Decodable)]
-pub struct ReceivedPartialSignaturesKeyPrefix;
-
-#[derive(Debug, Encodable, Decodable)]
-pub struct ReceivedPartialSignatureKeyOutputPrefix(pub OutPoint);
-
-impl_db_record!(
-    key = ReceivedPartialSignatureKey,
-    value = MintOutputSignatureShare,
-    db_prefix = DbKeyPrefix::ReceivedPartialSig,
-);
-impl_db_lookup!(
-    key = ReceivedPartialSignatureKey,
-    query_prefix = ReceivedPartialSignaturesKeyPrefix,
-    query_prefix = ReceivedPartialSignatureKeyOutputPrefix
+    key = BlindSignatureShareKey,
+    query_prefix = BlindSignatureShareKeyPrefix
 );
 
 /// Transaction id and output index identifying an output outcome
@@ -79,16 +57,6 @@ pub struct OutputOutcomeKey(pub OutPoint);
 
 #[derive(Debug, Encodable, Decodable)]
 pub struct OutputOutcomeKeyPrefix;
-
-impl_db_record!(
-    key = OutputOutcomeKey,
-    value = MintOutputBlindSignatures,
-    db_prefix = DbKeyPrefix::OutputOutcome,
-);
-impl_db_lookup!(
-    key = OutputOutcomeKey,
-    query_prefix = OutputOutcomeKeyPrefix
-);
 
 /// Represents the amounts of issued (signed) and redeemed (verified) notes for
 /// auditing
