@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `fedimint-client/src/lib.rs`."><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-505eba68f310f6bf.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../static.files/light-f501212b8b071243.css"><link rel="stylesheet" disabled href="../../static.files/dark-e92fc12c34ff89d3.css"><link rel="stylesheet" disabled href="../../static.files/ayu-c8c85693c8a4f9db.css"><script id="default-settings" ></script><script src="../../static.files/storage-3891ce972e3a2bf8.js"></script><script defer src="../../static.files/source-script-ea63cb6500f71309.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-364b95f387bc3166.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../fedimint_client/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `fedimint-client/src/lib.rs`."><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-cb6f1f67f1bcd037.css" id="mainThemeStyle"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="fedimint_client" data-themes="" data-resource-suffix="" data-rustdoc-version="1.73.0-nightly (439d066bc 2023-08-10)" data-channel="nightly" data-search-js="search-6dfdfced5eff6596.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-1596385f77d47ef2.css" data-theme-dark-css="dark-0a43001d3fc2282c.css" data-theme-ayu-css="ayu-fd19013d6ce078bf.css" ><script src="../../static.files/storage-db41da1a38ea3cb8.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-0795b7d26be81095.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-1596385f77d47ef2.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-0a43001d3fc2282c.css"><link rel="stylesheet" href="../../static.files/noscript-cffde32267a19fd6.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../fedimint_client/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -1681,7 +1681,35 @@
 <a href="#1681" id="1681">1681</a>
 <a href="#1682" id="1682">1682</a>
 <a href="#1683" id="1683">1683</a>
-</pre><pre class="rust"><code><span class="doccomment">//! # Client library for fedimintd
+<a href="#1684" id="1684">1684</a>
+<a href="#1685" id="1685">1685</a>
+<a href="#1686" id="1686">1686</a>
+<a href="#1687" id="1687">1687</a>
+<a href="#1688" id="1688">1688</a>
+<a href="#1689" id="1689">1689</a>
+<a href="#1690" id="1690">1690</a>
+<a href="#1691" id="1691">1691</a>
+<a href="#1692" id="1692">1692</a>
+<a href="#1693" id="1693">1693</a>
+<a href="#1694" id="1694">1694</a>
+<a href="#1695" id="1695">1695</a>
+<a href="#1696" id="1696">1696</a>
+<a href="#1697" id="1697">1697</a>
+<a href="#1698" id="1698">1698</a>
+<a href="#1699" id="1699">1699</a>
+<a href="#1700" id="1700">1700</a>
+<a href="#1701" id="1701">1701</a>
+<a href="#1702" id="1702">1702</a>
+<a href="#1703" id="1703">1703</a>
+<a href="#1704" id="1704">1704</a>
+<a href="#1705" id="1705">1705</a>
+<a href="#1706" id="1706">1706</a>
+<a href="#1707" id="1707">1707</a>
+<a href="#1708" id="1708">1708</a>
+<a href="#1709" id="1709">1709</a>
+<a href="#1710" id="1710">1710</a>
+<a href="#1711" id="1711">1711</a>
+</pre></div><pre class="rust"><code><span class="doccomment">//! # Client library for fedimintd
 //!
 //! This library provides a client interface to build module clients that can be
 //! plugged together into a fedimint client that exposes a high-level interface
@@ -1689,7 +1717,7 @@
 //!
 //! ## Module Clients
 //! Module clients have to at least implement the [`module::ClientModule`] trait
-//! and a factory struct implementing [`module::gen::ClientModuleGen`]. The
+//! and a factory struct implementing [`module::init::ClientModuleInit`]. The
 //! `ClientModule` trait defines the module types (tx inputs, outputs, etc.) as
 //! well as the module&#39;s [state machines](sm::State).
 //!
@@ -1764,7 +1792,7 @@
     ApiVersionSet, DynGlobalApi, DynModuleApi, GlobalFederationApi, IGlobalFederationApi,
     InviteCode, WsFederationApi,
 };
-<span class="kw">use </span>fedimint_core::config::{ClientConfig, FederationId, ModuleGenRegistry};
+<span class="kw">use </span>fedimint_core::config::{ClientConfig, FederationId, ModuleInitRegistry};
 <span class="kw">use </span>fedimint_core::core::{DynInput, DynOutput, IInput, IOutput, ModuleInstanceId, ModuleKind};
 <span class="kw">use </span>fedimint_core::db::{AutocommitError, Database, DatabaseTransaction, IDatabase};
 <span class="kw">use </span>fedimint_core::encoding::{Decodable, DecodeError, Encodable};
@@ -1782,19 +1810,20 @@
     TransactionId,
 };
 <span class="kw">pub use </span>fedimint_derive_secret <span class="kw">as </span>derivable_secret;
-<span class="kw">use </span>fedimint_derive_secret::DerivableSecret;
+<span class="kw">use </span>fedimint_derive_secret::{ChildId, DerivableSecret};
 <span class="kw">use </span>futures::StreamExt;
 <span class="kw">use </span>module::DynClientModule;
 <span class="kw">use </span>rand::thread_rng;
 <span class="kw">use </span>secp256k1_zkp::{PublicKey, Secp256k1};
 <span class="kw">use </span>secret::DeriveableSecretClientExt;
 <span class="kw">use </span>serde::Serialize;
+<span class="kw">use </span>tokio::runtime::{Handle <span class="kw">as </span>RuntimeHandle, RuntimeFlavor};
 <span class="kw">use </span>tracing::{debug, error, info, warn};
 
 <span class="kw">use </span><span class="kw">crate</span>::backup::Metadata;
 <span class="kw">use </span><span class="kw">crate</span>::db::ClientSecretKey;
-<span class="kw">use </span><span class="kw">crate</span>::module::gen::{
-    ClientModuleGen, ClientModuleGenRegistry, DynClientModuleGen, IClientModuleGen,
+<span class="kw">use </span><span class="kw">crate</span>::module::init::{
+    ClientModuleInit, ClientModuleInitRegistry, DynClientModuleInit, IClientModuleInit,
 };
 <span class="kw">use </span><span class="kw">crate</span>::module::{ClientModule, ClientModuleRegistry, IClientModule, StateGenerator};
 <span class="kw">use </span><span class="kw">crate</span>::oplog::OperationLog;
@@ -1826,6 +1855,8 @@
 </span><span class="kw">pub mod </span>sm;
 <span class="doccomment">/// Structs and interfaces to construct Fedimint transactions
 </span><span class="kw">pub mod </span>transaction;
+
+<span class="kw">const </span>EXTERNAL_SECRET_CHILD_ID: ChildId = ChildId((ModuleInstanceId::MAX <span class="kw">as </span>u64) + <span class="number">1</span>);
 
 <span class="kw">pub type </span>InstancelessDynClientInput = ClientInput&lt;
     Box&lt;<span class="macro">maybe_add_send_sync!</span>(<span class="kw">dyn </span>IInput + <span class="lifetime">&#39;static</span>)&gt;,
@@ -2073,7 +2104,7 @@
                 TransactionBuilder::new().with_input(instance_input),
             )
             .<span class="kw">await
-            </span>.expect(<span class="string">&quot;Can obly fail if additional funding is needed&quot;</span>)
+            </span>.expect(<span class="string">&quot;Can only fail if additional funding is needed&quot;</span>)
     }
 
     <span class="kw">async fn </span>fund_output_dyn(
@@ -2168,9 +2199,20 @@
             <span class="kw">let </span>maybe_shutdown_confirmation = <span class="self">self</span>.inner.executor.stop_executor();
 
             <span class="comment">// Just in case the shutdown does not take immediate effect we block here if
-            // possible
+            // possible. If running as WASM we are running in single-threaded mode and
+            // cannot use block_on.
             </span><span class="attr">#[cfg(not(target_family = <span class="string">&quot;wasm&quot;</span>))]
-            </span><span class="kw">if let </span><span class="prelude-val">Some</span>(shutdown_confirmation) = maybe_shutdown_confirmation {
+            </span>{
+                <span class="kw">if </span>RuntimeHandle::current().runtime_flavor() == RuntimeFlavor::CurrentThread {
+                    <span class="comment">// We can&#39;t use block_on in single-threaded mode
+                    </span><span class="kw">return</span>;
+                }
+
+                <span class="kw">let </span><span class="prelude-val">Some</span>(shutdown_confirmation) = maybe_shutdown_confirmation <span class="kw">else </span>{
+                    <span class="comment">// Already shut down
+                    </span><span class="kw">return</span>;
+                };
+
                 tokio::task::block_in_place(<span class="kw">move </span>|| {
                     futures::executor::block_on(<span class="kw">async </span>{
                         <span class="kw">if </span>shutdown_confirmation.<span class="kw">await</span>.is_err() {
@@ -2235,6 +2277,14 @@
 
     <span class="kw">fn </span>root_secret(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; DerivableSecret {
         <span class="self">self</span>.inner.root_secret.clone()
+    }
+
+    <span class="doccomment">/// Secret that is derived from the seed used by the client and cannot
+    /// collide with secrets used by the client itself. It&#39;s intended to be used
+    /// by integrators of the client library so they don&#39;t have to implement
+    /// their own secret derivation scheme.
+    </span><span class="kw">pub fn </span>external_secret(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; DerivableSecret {
+        <span class="self">self</span>.root_secret().child_key(EXTERNAL_SECRET_CHILD_ID)
     }
 
     <span class="doccomment">/// Add funding and/or change to the transaction builder as needed, finalize
@@ -2439,17 +2489,20 @@
 
     <span class="doccomment">/// Returns a stream that yields the current client balance every time it
     /// changes.
-    </span><span class="kw">pub async fn </span>subscribe_balance_changes(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; BoxStream&lt;<span class="lifetime">&#39;_</span>, Amount&gt; {
+    </span><span class="kw">pub async fn </span>subscribe_balance_changes(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; BoxStream&lt;<span class="lifetime">&#39;static</span>, Amount&gt; {
         <span class="kw">let </span><span class="kw-2">mut </span>balance_changes = <span class="self">self</span>.primary_module().subscribe_balance_changes().<span class="kw">await</span>;
         <span class="kw">let </span>initial_balance = <span class="self">self</span>.get_balance().<span class="kw">await</span>;
+        <span class="kw">let </span>db = <span class="self">self</span>.db().clone();
+        <span class="kw">let </span>primary_module = <span class="self">self</span>.primary_module().clone();
+        <span class="kw">let </span>primary_module_instance = <span class="self">self</span>.inner.primary_module_instance;
+
         Box::pin(<span class="macro">stream! </span>{
             <span class="kw">yield </span>initial_balance;
             <span class="kw">let </span><span class="kw-2">mut </span>prev_balance = initial_balance;
             <span class="kw">while let </span><span class="prelude-val">Some</span>(()) = balance_changes.next().<span class="kw">await </span>{
-                <span class="kw">let </span><span class="kw-2">mut </span>dbtx = <span class="self">self</span>.db().begin_transaction().<span class="kw">await</span>;
-                <span class="kw">let </span>balance = <span class="self">self
-                    </span>.primary_module()
-                    .get_balance(<span class="self">self</span>.inner.primary_module_instance, <span class="kw-2">&amp;mut </span>dbtx)
+                <span class="kw">let </span><span class="kw-2">mut </span>dbtx = db.begin_transaction().<span class="kw">await</span>;
+                <span class="kw">let </span>balance = primary_module
+                    .get_balance(primary_module_instance, <span class="kw-2">&amp;mut </span>dbtx)
                     .<span class="kw">await</span>;
 
                 <span class="comment">// Deduplicate in case modules cannot always tell if the balance actually changed
@@ -2467,7 +2520,7 @@
             .discover_api_version_set(
                 <span class="kw-2">&amp;</span><span class="self">Self</span>::supported_api_versions_summary_static(
                     <span class="self">self</span>.get_config(),
-                    <span class="kw-2">&amp;</span><span class="self">self</span>.inner.module_gens,
+                    <span class="kw-2">&amp;</span><span class="self">self</span>.inner.module_inits,
                 )
                 .<span class="kw">await</span>,
             )
@@ -2478,12 +2531,12 @@
     /// the best API version to use (supported by most guardians).
     </span><span class="kw">pub async fn </span>discover_common_api_version_static(
         config: <span class="kw-2">&amp;</span>ClientConfig,
-        client_module_gen: <span class="kw-2">&amp;</span>ClientModuleGenRegistry,
+        client_module_init: <span class="kw-2">&amp;</span>ClientModuleInitRegistry,
         api: <span class="kw-2">&amp;</span>DynGlobalApi,
     ) -&gt; anyhow::Result&lt;ApiVersionSet&gt; {
         <span class="prelude-val">Ok</span>(api
             .discover_api_version_set(
-                <span class="kw-2">&amp;</span><span class="self">Self</span>::supported_api_versions_summary_static(config, client_module_gen).<span class="kw">await</span>,
+                <span class="kw-2">&amp;</span><span class="self">Self</span>::supported_api_versions_summary_static(config, client_module_init).<span class="kw">await</span>,
             )
             .<span class="kw">await</span><span class="question-mark">?</span>)
     }
@@ -2491,7 +2544,7 @@
     <span class="doccomment">/// [`SupportedApiVersionsSummary`] that the client and its modules support
     </span><span class="kw">pub async fn </span>supported_api_versions_summary_static(
         config: <span class="kw-2">&amp;</span>ClientConfig,
-        client_module_gen: <span class="kw-2">&amp;</span>ClientModuleGenRegistry,
+        client_module_init: <span class="kw-2">&amp;</span>ClientModuleInitRegistry,
     ) -&gt; SupportedApiVersionsSummary {
         SupportedApiVersionsSummary {
             core: SupportedCoreApiVersions {
@@ -2503,15 +2556,15 @@
                 .modules
                 .iter()
                 .filter_map(|(<span class="kw-2">&amp;</span>module_instance_id, module_config)| {
-                    client_module_gen
+                    client_module_init
                         .get(module_config.kind())
-                        .map(|module_gen| {
+                        .map(|module_init| {
                             (
                                 module_instance_id,
                                 SupportedModuleApiVersions {
                                     core_consensus: config.consensus_version,
                                     module_consensus: module_config.version,
-                                    api: module_gen.supported_api_versions(),
+                                    api: module_init.supported_api_versions(),
                                 },
                             )
                         })
@@ -2527,7 +2580,7 @@
     /// complete every time a [`Client`] is being built.
     </span><span class="kw">async fn </span>load_and_refresh_common_api_version_static(
         config: <span class="kw-2">&amp;</span>ClientConfig,
-        module_gens: <span class="kw-2">&amp;</span>ModuleGenRegistry&lt;DynClientModuleGen&gt;,
+        module_inits: <span class="kw-2">&amp;</span>ModuleInitRegistry&lt;DynClientModuleInit&gt;,
         api: <span class="kw-2">&amp;</span>DynGlobalApi,
         db: <span class="kw-2">&amp;</span>Database,
     ) -&gt; anyhow::Result&lt;ApiVersionSet&gt; {
@@ -2539,7 +2592,7 @@
         </span>{
             <span class="macro">debug!</span>(<span class="string">&quot;Found existing cached common api versions&quot;</span>);
             <span class="kw">let </span>config = config.clone();
-            <span class="kw">let </span>module_gens = module_gens.clone();
+            <span class="kw">let </span>module_inits = module_inits.clone();
             <span class="kw">let </span>api = api.clone();
             <span class="kw">let </span>db = db.clone();
             <span class="comment">// Separate task group, because we actually don&#39;t want to be waiting for this to
@@ -2547,7 +2600,7 @@
             </span>TaskGroup::new()
                 .spawn(<span class="string">&quot;refresh_common_api_version_static&quot;</span>, |<span class="kw">_</span>| <span class="kw">async move </span>{
                     <span class="kw">if let </span><span class="prelude-val">Err</span>(e) =
-                        <span class="self">Self</span>::refresh_common_api_version_static(<span class="kw-2">&amp;</span>config, <span class="kw-2">&amp;</span>module_gens, <span class="kw-2">&amp;</span>api, <span class="kw-2">&amp;</span>db)
+                        <span class="self">Self</span>::refresh_common_api_version_static(<span class="kw-2">&amp;</span>config, <span class="kw-2">&amp;</span>module_inits, <span class="kw-2">&amp;</span>api, <span class="kw-2">&amp;</span>db)
                             .<span class="kw">await
                     </span>{
                         <span class="macro">warn!</span>(<span class="string">&quot;Failed to discover common api versions: {e}&quot;</span>);
@@ -2559,19 +2612,19 @@
         }
 
         <span class="macro">debug!</span>(<span class="string">&quot;No existing cached common api versions found, waiting for initial discovery&quot;</span>);
-        <span class="self">Self</span>::refresh_common_api_version_static(config, module_gens, api, db).<span class="kw">await
+        <span class="self">Self</span>::refresh_common_api_version_static(config, module_inits, api, db).<span class="kw">await
     </span>}
 
     <span class="kw">async fn </span>refresh_common_api_version_static(
         config: <span class="kw-2">&amp;</span>ClientConfig,
-        module_gens: <span class="kw-2">&amp;</span>ModuleGenRegistry&lt;DynClientModuleGen&gt;,
+        module_inits: <span class="kw-2">&amp;</span>ModuleInitRegistry&lt;DynClientModuleInit&gt;,
         api: <span class="kw-2">&amp;</span>DynGlobalApi,
         db: <span class="kw-2">&amp;</span>Database,
     ) -&gt; anyhow::Result&lt;ApiVersionSet&gt; {
         <span class="macro">debug!</span>(<span class="string">&quot;Refreshing common api versions&quot;</span>);
 
         <span class="kw">let </span>common_api_versions =
-            Client::discover_common_api_version_static(config, module_gens, api).<span class="kw">await</span><span class="question-mark">?</span>;
+            Client::discover_common_api_version_static(config, module_inits, api).<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="macro">debug!</span>(<span class="string">&quot;Updating the cached common api versions&quot;</span>);
         <span class="kw">let </span><span class="kw-2">mut </span>dbtx = db.begin_transaction().<span class="kw">await</span>;
@@ -2606,7 +2659,7 @@
     federation_meta: BTreeMap&lt;String, String&gt;,
     primary_module_instance: ModuleInstanceId,
     modules: ClientModuleRegistry,
-    module_gens: ClientModuleGenRegistry,
+    module_inits: ClientModuleInitRegistry,
     executor: Executor&lt;DynGlobalClientContext&gt;,
     api: DynGlobalApi,
     root_secret: DerivableSecret,
@@ -2865,7 +2918,7 @@
 
 <span class="attr">#[derive(Default)]
 </span><span class="kw">pub struct </span>ClientBuilder {
-    module_gens: ClientModuleGenRegistry,
+    module_inits: ClientModuleInitRegistry,
     primary_module_instance: <span class="prelude-ty">Option</span>&lt;ModuleInstanceId&gt;,
     config_source: <span class="prelude-ty">Option</span>&lt;ConfigSource&gt;,
     db: <span class="prelude-ty">Option</span>&lt;DatabaseSource&gt;,
@@ -2885,13 +2938,13 @@
 
 <span class="kw">impl </span>ClientBuilder {
     <span class="doccomment">/// Replace module generator registry entirely
-    </span><span class="kw">pub fn </span>with_module_gens(<span class="kw-2">&amp;mut </span><span class="self">self</span>, module_gens: ClientModuleGenRegistry) {
-        <span class="self">self</span>.module_gens = module_gens;
+    </span><span class="kw">pub fn </span>with_module_inits(<span class="kw-2">&amp;mut </span><span class="self">self</span>, module_inits: ClientModuleInitRegistry) {
+        <span class="self">self</span>.module_inits = module_inits;
     }
 
     <span class="doccomment">/// Make module generator available when reading the config
-    </span><span class="kw">pub fn </span>with_module&lt;M: ClientModuleGen&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, module_gen: M) {
-        <span class="self">self</span>.module_gens.attach(module_gen);
+    </span><span class="kw">pub fn </span>with_module&lt;M: ClientModuleInit&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, module_init: M) {
+        <span class="self">self</span>.module_inits.attach(module_init);
     }
 
     <span class="doccomment">/// Uses this invite code to connect to the federation
@@ -3038,7 +3091,7 @@
                 <span class="kw">let </span>config = get_config(<span class="kw-2">&amp;</span>db, <span class="self">self</span>.config_source.clone()).<span class="kw">await</span><span class="question-mark">?</span>;
 
                 <span class="kw">let </span><span class="kw-2">mut </span>decoders = client_decoders(
-                    <span class="kw-2">&amp;</span><span class="self">self</span>.module_gens,
+                    <span class="kw-2">&amp;</span><span class="self">self</span>.module_inits,
                     config
                         .modules
                         .iter()
@@ -3075,7 +3128,7 @@
 
         <span class="kw">let </span>common_api_versions = Client::load_and_refresh_common_api_version_static(
             <span class="kw-2">&amp;</span>config,
-            <span class="kw-2">&amp;</span><span class="self">self</span>.module_gens,
+            <span class="kw-2">&amp;</span><span class="self">self</span>.module_inits,
             <span class="kw-2">&amp;</span>api,
             <span class="kw-2">&amp;</span>db,
         )
@@ -3087,7 +3140,7 @@
             <span class="kw">let </span><span class="kw-2">mut </span>modules = ClientModuleRegistry::default();
             <span class="kw">for </span>(module_instance, module_config) <span class="kw">in </span>config.modules.clone() {
                 <span class="kw">let </span>kind = module_config.kind().clone();
-                <span class="kw">let </span><span class="prelude-val">Some</span>(module_gen) = <span class="self">self</span>.module_gens.get(<span class="kw-2">&amp;</span>kind) <span class="kw">else </span>{
+                <span class="kw">let </span><span class="prelude-val">Some</span>(module_init) = <span class="self">self</span>.module_inits.get(<span class="kw-2">&amp;</span>kind) <span class="kw">else </span>{
                     <span class="macro">warn!</span>(<span class="string">&quot;Module kind {kind} of instance {module_instance} not found in module gens, skipping&quot;</span>);
                     <span class="kw">continue</span>;
                 };
@@ -3097,8 +3150,9 @@
                     <span class="kw">continue</span>;
                 };
 
-                <span class="kw">let </span>module = module_gen
+                <span class="kw">let </span>module = module_init
                     .init(
+                        config.federation_id,
                         module_config,
                         db.clone(),
                         module_instance,
@@ -3142,7 +3196,7 @@
             federation_meta: config.meta,
             primary_module_instance,
             modules,
-            module_gens: <span class="self">self</span>.module_gens.clone(),
+            module_inits: <span class="self">self</span>.module_inits.clone(),
             executor,
             api,
             secp_ctx: Secp256k1::new(),
@@ -3203,7 +3257,9 @@
         }
     };
 
-    config_res
+    <span class="comment">// some borrowck lifetime limitation thing
+    </span><span class="attr">#[allow(clippy::let_and_return)]
+    </span>config_res
 }
 
 <span class="doccomment">/// Tries to download the client config from the federation,
@@ -3344,25 +3400,24 @@
 }
 
 <span class="kw">pub fn </span>client_decoders&lt;<span class="lifetime">&#39;a</span>&gt;(
-    registry: <span class="kw-2">&amp;</span>ModuleGenRegistry&lt;DynClientModuleGen&gt;,
+    registry: <span class="kw-2">&amp;</span>ModuleInitRegistry&lt;DynClientModuleInit&gt;,
     module_kinds: <span class="kw">impl </span>Iterator&lt;Item = (ModuleInstanceId, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>ModuleKind)&gt;,
 ) -&gt; anyhow::Result&lt;ModuleDecoderRegistry&gt; {
     <span class="kw">let </span><span class="kw-2">mut </span>modules = BTreeMap::new();
     <span class="kw">for </span>(id, kind) <span class="kw">in </span>module_kinds {
         <span class="kw">let </span><span class="prelude-val">Some</span>(init) = registry.get(kind) <span class="kw">else </span>{
             <span class="macro">info!</span>(<span class="string">&quot;Detected configuration for unsupported module id: {id}, kind: {kind}&quot;</span>);
-            <span class="kw">continue
-        </span>};
+            <span class="kw">continue</span>;
+        };
 
         modules.insert(
             id,
             (
                 kind.clone(),
-                IClientModuleGen::decoder(AsRef::&lt;<span class="kw">dyn </span>IClientModuleGen + <span class="lifetime">&#39;static</span>&gt;::as_ref(init)),
+                IClientModuleInit::decoder(AsRef::&lt;<span class="kw">dyn </span>IClientModuleInit + <span class="lifetime">&#39;static</span>&gt;::as_ref(init)),
             ),
         );
     }
     <span class="prelude-val">Ok</span>(ModuleDecoderRegistry::from(modules))
 }
-</code></pre></div>
-</section></main><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="fedimint_client" data-themes="" data-resource-suffix="" data-rustdoc-version="1.69.0-nightly (f3126500f 2023-02-02)" data-search-js="search-98d53477a794af0b.js" data-settings-js="settings-f0c5c39777a9a2f6.js" data-settings-css="settings-0bcba95ff279c1db.css" ></div></body></html>
+</code></pre></div></section></main></body></html>

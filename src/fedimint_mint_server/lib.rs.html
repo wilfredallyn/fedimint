@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `modules/fedimint-mint-server/src/lib.rs`."><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-505eba68f310f6bf.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../static.files/light-f501212b8b071243.css"><link rel="stylesheet" disabled href="../../static.files/dark-e92fc12c34ff89d3.css"><link rel="stylesheet" disabled href="../../static.files/ayu-c8c85693c8a4f9db.css"><script id="default-settings" ></script><script src="../../static.files/storage-3891ce972e3a2bf8.js"></script><script defer src="../../static.files/source-script-ea63cb6500f71309.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-364b95f387bc3166.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../fedimint_mint_server/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `modules/fedimint-mint-server/src/lib.rs`."><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-cb6f1f67f1bcd037.css" id="mainThemeStyle"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="fedimint_mint_server" data-themes="" data-resource-suffix="" data-rustdoc-version="1.73.0-nightly (439d066bc 2023-08-10)" data-channel="nightly" data-search-js="search-6dfdfced5eff6596.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-1596385f77d47ef2.css" data-theme-dark-css="dark-0a43001d3fc2282c.css" data-theme-ayu-css="ayu-fd19013d6ce078bf.css" ><script src="../../static.files/storage-db41da1a38ea3cb8.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-0795b7d26be81095.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-1596385f77d47ef2.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-0a43001d3fc2282c.css"><link rel="stylesheet" href="../../static.files/noscript-cffde32267a19fd6.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../fedimint_mint_server/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -1147,7 +1147,16 @@
 <a href="#1147" id="1147">1147</a>
 <a href="#1148" id="1148">1148</a>
 <a href="#1149" id="1149">1149</a>
-</pre><pre class="rust"><code><span class="kw">use </span>std::collections::{BTreeMap, HashMap};
+<a href="#1150" id="1150">1150</a>
+<a href="#1151" id="1151">1151</a>
+<a href="#1152" id="1152">1152</a>
+<a href="#1153" id="1153">1153</a>
+<a href="#1154" id="1154">1154</a>
+<a href="#1155" id="1155">1155</a>
+<a href="#1156" id="1156">1156</a>
+<a href="#1157" id="1157">1157</a>
+<a href="#1158" id="1158">1158</a>
+</pre></div><pre class="rust"><code><span class="kw">use </span>std::collections::{BTreeMap, HashMap};
 <span class="kw">use </span>std::iter::FromIterator;
 
 <span class="kw">use </span>anyhow::{bail, Context};
@@ -1159,8 +1168,8 @@
 <span class="kw">use </span>fedimint_core::module::audit::Audit;
 <span class="kw">use </span>fedimint_core::module::{
     api_endpoint, ApiEndpoint, ApiError, ConsensusProposal, CoreConsensusVersion,
-    ExtendsCommonModuleGen, InputMeta, IntoModuleError, ModuleConsensusVersion, ModuleError,
-    PeerHandle, ServerModuleGen, SupportedModuleApiVersions, TransactionItemAmount,
+    ExtendsCommonModuleInit, InputMeta, IntoModuleError, ModuleConsensusVersion, ModuleError,
+    PeerHandle, ServerModuleInit, SupportedModuleApiVersions, TransactionItemAmount,
 };
 <span class="kw">use </span>fedimint_core::server::DynServerModule;
 <span class="kw">use </span>fedimint_core::task::{MaybeSend, TaskGroup};
@@ -1203,12 +1212,12 @@
 <span class="attr">#[derive(Debug, Clone)]
 </span><span class="kw">pub struct </span>MintGen;
 
-<span class="kw">impl </span>ExtendsCommonModuleGen <span class="kw">for </span>MintGen {
+<span class="kw">impl </span>ExtendsCommonModuleInit <span class="kw">for </span>MintGen {
     <span class="kw">type </span>Common = MintCommonGen;
 }
 
 <span class="attr">#[apply(<span class="macro">async_trait_maybe_send!</span>)]
-</span><span class="kw">impl </span>ServerModuleGen <span class="kw">for </span>MintGen {
+</span><span class="kw">impl </span>ServerModuleInit <span class="kw">for </span>MintGen {
     <span class="kw">type </span>Params = MintGenParams;
     <span class="kw">const </span>DATABASE_VERSION: DatabaseVersion = DatabaseVersion(<span class="number">0</span>);
 
@@ -1755,12 +1764,17 @@
 
     <span class="kw">async fn </span>audit(<span class="kw-2">&amp;</span><span class="self">self</span>, dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;_</span>&gt;, audit: <span class="kw-2">&amp;mut </span>Audit) {
         audit
-            .add_items(dbtx, <span class="kw-2">&amp;</span>MintAuditItemKeyPrefix, |k, v| <span class="kw">match </span>k {
-                MintAuditItemKey::Issuance(<span class="kw">_</span>) =&gt; -(v.msats <span class="kw">as </span>i64),
-                MintAuditItemKey::IssuanceTotal =&gt; -(v.msats <span class="kw">as </span>i64),
-                MintAuditItemKey::Redemption(<span class="kw">_</span>) =&gt; v.msats <span class="kw">as </span>i64,
-                MintAuditItemKey::RedemptionTotal =&gt; v.msats <span class="kw">as </span>i64,
-            })
+            .add_items(
+                dbtx,
+                common::KIND.as_str(),
+                <span class="kw-2">&amp;</span>MintAuditItemKeyPrefix,
+                |k, v| <span class="kw">match </span>k {
+                    MintAuditItemKey::Issuance(<span class="kw">_</span>) =&gt; -(v.msats <span class="kw">as </span>i64),
+                    MintAuditItemKey::IssuanceTotal =&gt; -(v.msats <span class="kw">as </span>i64),
+                    MintAuditItemKey::Redemption(<span class="kw">_</span>) =&gt; v.msats <span class="kw">as </span>i64,
+                    MintAuditItemKey::RedemptionTotal =&gt; v.msats <span class="kw">as </span>i64,
+                },
+            )
             .<span class="kw">await</span>;
     }
 
@@ -1910,7 +1924,7 @@
     <span class="kw">use </span>fedimint_core::config::{ClientModuleConfig, ConfigGenModuleParams, ServerModuleConfig};
     <span class="kw">use </span>fedimint_core::db::mem_impl::MemDatabase;
     <span class="kw">use </span>fedimint_core::db::Database;
-    <span class="kw">use </span>fedimint_core::module::{ModuleConsensusVersion, ServerModuleGen};
+    <span class="kw">use </span>fedimint_core::module::{ModuleConsensusVersion, ServerModuleInit};
     <span class="kw">use </span>fedimint_core::{Amount, PeerId, ServerModule};
     <span class="kw">use </span>fedimint_mint_common::config::FeeConsensus;
     <span class="kw">use </span>fedimint_mint_common::{MintInput, Nonce, Note};
@@ -2068,13 +2082,14 @@
 <span class="attr">#[cfg(test)]
 </span><span class="kw">mod </span>fedimint_migration_tests {
     <span class="kw">use </span>std::collections::BTreeMap;
-    <span class="kw">use </span>std::time::SystemTime;
 
+    <span class="kw">use </span>anyhow::{ensure, Context};
     <span class="kw">use </span>bitcoin_hashes::Hash;
     <span class="kw">use </span>fedimint_core::core::LEGACY_HARDCODED_INSTANCE_ID_MINT;
     <span class="kw">use </span>fedimint_core::db::{apply_migrations, DatabaseTransaction};
     <span class="kw">use </span>fedimint_core::module::registry::ModuleDecoderRegistry;
-    <span class="kw">use </span>fedimint_core::module::{CommonModuleGen, DynServerModuleGen};
+    <span class="kw">use </span>fedimint_core::module::{CommonModuleInit, DynServerModuleInit};
+    <span class="kw">use </span>fedimint_core::time::now;
     <span class="kw">use </span>fedimint_core::{Amount, OutPoint, ServerModule, TieredMulti, TransactionId};
     <span class="kw">use </span>fedimint_mint_common::db::{
         DbKeyPrefix, ECashUserBackupSnapshot, EcashBackupKey, EcashBackupKeyPrefix,
@@ -2085,7 +2100,9 @@
     <span class="kw">use </span>fedimint_mint_common::{
         MintCommonGen, MintOutputBlindSignatures, MintOutputSignatureShare, Nonce,
     };
-    <span class="kw">use </span>fedimint_testing::db::{prepare_snapshot, validate_migrations, BYTE_32, BYTE_8};
+    <span class="kw">use </span>fedimint_testing::db::{
+        prepare_db_migration_snapshot, validate_migrations, BYTE_32, BYTE_8,
+    };
     <span class="kw">use </span>futures::StreamExt;
     <span class="kw">use </span>rand::rngs::OsRng;
     <span class="kw">use </span>strum::IntoEnumIterator;
@@ -2164,7 +2181,7 @@
 
         <span class="kw">let </span>backup_key = EcashBackupKey(pk.x_only_public_key().<span class="number">0</span>);
         <span class="kw">let </span>ecash_backup = ECashUserBackupSnapshot {
-            timestamp: SystemTime::now(),
+            timestamp: now(),
             data: BYTE_32.to_vec(),
         };
         dbtx.insert_new_entry(<span class="kw-2">&amp;</span>backup_key, <span class="kw-2">&amp;</span>ecash_backup).<span class="kw">await</span>;
@@ -2173,8 +2190,8 @@
     }
 
     <span class="attr">#[tokio::test(flavor = <span class="string">&quot;multi_thread&quot;</span>)]
-    </span><span class="kw">async fn </span>prepare_migration_snapshots() {
-        prepare_snapshot(
+    </span><span class="kw">async fn </span>prepare_db_migration_snapshots() -&gt; anyhow::Result&lt;()&gt; {
+        prepare_db_migration_snapshot(
             <span class="string">&quot;mint-v0&quot;</span>,
             |dbtx| {
                 Box::pin(<span class="kw">async move </span>{
@@ -2187,15 +2204,15 @@
                 &lt;Mint <span class="kw">as </span>ServerModule&gt;::decoder(),
             )]),
         )
-        .<span class="kw">await</span>;
-    }
+        .<span class="kw">await
+    </span>}
 
     <span class="attr">#[tokio::test(flavor = <span class="string">&quot;multi_thread&quot;</span>)]
     </span><span class="kw">async fn </span>test_migrations() {
         validate_migrations(
             <span class="string">&quot;mint&quot;</span>,
             |db| <span class="kw">async move </span>{
-                <span class="kw">let </span>module = DynServerModuleGen::from(MintGen);
+                <span class="kw">let </span>module = DynServerModuleInit::from(MintGen);
                 apply_migrations(
                     <span class="kw-2">&amp;</span>db,
                     module.module_kind().to_string(),
@@ -2203,7 +2220,7 @@
                     module.get_database_migrations(),
                 )
                 .<span class="kw">await
-                </span>.expect(<span class="string">&quot;Error applying migrations to temp database&quot;</span>);
+                </span>.context(<span class="string">&quot;Error applying migrations to temp database&quot;</span>)<span class="question-mark">?</span>;
 
                 <span class="comment">// Verify that all of the data from the mint namespace can be read. If a
                 // database migration failed or was not properly supplied,
@@ -2219,7 +2236,7 @@
                                 </span>.collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;()
                                 .<span class="kw">await</span>;
                             <span class="kw">let </span>num_nonces = nonces.len();
-                            <span class="macro">assert!</span>(
+                            <span class="macro">ensure!</span>(
                                 num_nonces &gt; <span class="number">0</span>,
                                 <span class="string">&quot;validate_migrations was not able to read any NoteNonces&quot;
                             </span>);
@@ -2231,7 +2248,7 @@
                                 </span>.collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;()
                                 .<span class="kw">await</span>;
                             <span class="kw">let </span>num_sigs = proposed_partial_sigs.len();
-                            <span class="macro">assert!</span>(
+                            <span class="macro">ensure!</span>(
                                 num_sigs &gt; <span class="number">0</span>,
                                 <span class="string">&quot;validate_migrations was not able to read any ProposedPartialSignatures&quot;
                             </span>);
@@ -2243,7 +2260,7 @@
                                 </span>.collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;()
                                 .<span class="kw">await</span>;
                             <span class="kw">let </span>num_sigs = received_partial_sigs.len();
-                            <span class="macro">assert!</span>(
+                            <span class="macro">ensure!</span>(
                                 num_sigs &gt; <span class="number">0</span>,
                                 <span class="string">&quot;validate_migrations was not able to read any ReceivedPartialSignatures&quot;
                             </span>);
@@ -2255,7 +2272,7 @@
                                 </span>.collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;()
                                 .<span class="kw">await</span>;
                             <span class="kw">let </span>num_outcomes = outcomes.len();
-                            <span class="macro">assert!</span>(
+                            <span class="macro">ensure!</span>(
                                 num_outcomes &gt; <span class="number">0</span>,
                                 <span class="string">&quot;validate_migrations was not able to read any OutputOutcomes&quot;
                             </span>);
@@ -2267,7 +2284,7 @@
                                 </span>.collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;()
                                 .<span class="kw">await</span>;
                             <span class="kw">let </span>num_items = audit_items.len();
-                            <span class="macro">assert!</span>(
+                            <span class="macro">ensure!</span>(
                                 num_items &gt; <span class="number">0</span>,
                                 <span class="string">&quot;validate_migrations was not able to read any MintAuditItems&quot;
                             </span>);
@@ -2279,13 +2296,14 @@
                                 </span>.collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;()
                                 .<span class="kw">await</span>;
                             <span class="kw">let </span>num_backups = backups.len();
-                            <span class="macro">assert!</span>(
+                            <span class="macro">ensure!</span>(
                                 num_backups &gt; <span class="number">0</span>,
                                 <span class="string">&quot;validate_migrations was not able to read any EcashBackups&quot;
                             </span>);
                         }
                     }
                 }
+                <span class="prelude-val">Ok</span>(())
             },
             ModuleDecoderRegistry::from_iter([(
                 LEGACY_HARDCODED_INSTANCE_ID_MINT,
@@ -2293,8 +2311,7 @@
                 &lt;Mint <span class="kw">as </span>ServerModule&gt;::decoder(),
             )]),
         )
-        .<span class="kw">await</span>;
+        .<span class="kw">await</span>.context(<span class="string">&quot;Migration validation&quot;</span>).unwrap();
     }
 }
-</code></pre></div>
-</section></main><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="fedimint_mint_server" data-themes="" data-resource-suffix="" data-rustdoc-version="1.69.0-nightly (f3126500f 2023-02-02)" data-search-js="search-98d53477a794af0b.js" data-settings-js="settings-f0c5c39777a9a2f6.js" data-settings-css="settings-0bcba95ff279c1db.css" ></div></body></html>
+</code></pre></div></section></main></body></html>

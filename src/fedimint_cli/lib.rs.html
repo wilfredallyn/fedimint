@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `fedimint-cli/src/lib.rs`."><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-505eba68f310f6bf.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../static.files/light-f501212b8b071243.css"><link rel="stylesheet" disabled href="../../static.files/dark-e92fc12c34ff89d3.css"><link rel="stylesheet" disabled href="../../static.files/ayu-c8c85693c8a4f9db.css"><script id="default-settings" ></script><script src="../../static.files/storage-3891ce972e3a2bf8.js"></script><script defer src="../../static.files/source-script-ea63cb6500f71309.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-364b95f387bc3166.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../fedimint_cli/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `fedimint-cli/src/lib.rs`."><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-cb6f1f67f1bcd037.css" id="mainThemeStyle"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="fedimint_cli" data-themes="" data-resource-suffix="" data-rustdoc-version="1.73.0-nightly (439d066bc 2023-08-10)" data-channel="nightly" data-search-js="search-6dfdfced5eff6596.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-1596385f77d47ef2.css" data-theme-dark-css="dark-0a43001d3fc2282c.css" data-theme-ayu-css="ayu-fd19013d6ce078bf.css" ><script src="../../static.files/storage-db41da1a38ea3cb8.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-0795b7d26be81095.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-1596385f77d47ef2.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-0a43001d3fc2282c.css"><link rel="stylesheet" href="../../static.files/noscript-cffde32267a19fd6.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../fedimint_cli/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -838,7 +838,27 @@
 <a href="#838" id="838">838</a>
 <a href="#839" id="839">839</a>
 <a href="#840" id="840">840</a>
-</pre><pre class="rust"><code><span class="kw">mod </span>client;
+<a href="#841" id="841">841</a>
+<a href="#842" id="842">842</a>
+<a href="#843" id="843">843</a>
+<a href="#844" id="844">844</a>
+<a href="#845" id="845">845</a>
+<a href="#846" id="846">846</a>
+<a href="#847" id="847">847</a>
+<a href="#848" id="848">848</a>
+<a href="#849" id="849">849</a>
+<a href="#850" id="850">850</a>
+<a href="#851" id="851">851</a>
+<a href="#852" id="852">852</a>
+<a href="#853" id="853">853</a>
+<a href="#854" id="854">854</a>
+<a href="#855" id="855">855</a>
+<a href="#856" id="856">856</a>
+<a href="#857" id="857">857</a>
+<a href="#858" id="858">858</a>
+<a href="#859" id="859">859</a>
+<a href="#860" id="860">860</a>
+</pre></div><pre class="rust"><code><span class="kw">mod </span>client;
 <span class="kw">mod </span>utils;
 
 <span class="kw">use </span>core::fmt;
@@ -854,7 +874,9 @@
 
 <span class="kw">use </span>clap::{CommandFactory, Parser, Subcommand};
 <span class="kw">use </span>fedimint_aead::{encrypted_read, encrypted_write, get_encryption_key};
-<span class="kw">use </span>fedimint_client::module::gen::{ClientModuleGen, ClientModuleGenRegistry, IClientModuleGen};
+<span class="kw">use </span>fedimint_client::module::init::{
+    ClientModuleInit, ClientModuleInitRegistry, IClientModuleInit,
+};
 <span class="kw">use </span>fedimint_client::secret::PlainRootSecretStrategy;
 <span class="kw">use </span>fedimint_client::sm::OperationId;
 <span class="kw">use </span>fedimint_client::{ClientBuilder, ClientSecret};
@@ -1130,18 +1152,18 @@
     <span class="kw">fn </span>load_decoders(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         cfg: <span class="kw-2">&amp;</span>ClientConfig,
-        module_gens: <span class="kw-2">&amp;</span>ClientModuleGenRegistry,
+        module_inits: <span class="kw-2">&amp;</span>ClientModuleInitRegistry,
     ) -&gt; ModuleDecoderRegistry {
         ModuleDecoderRegistry::new(cfg.clone().modules.into_iter().filter_map(
             |(id, module_cfg)| {
                 <span class="kw">let </span>kind = module_cfg.kind().clone();
-                module_gens.get(<span class="kw-2">&amp;</span>kind).map(|module_gen| {
+                module_inits.get(<span class="kw-2">&amp;</span>kind).map(|module_init| {
                     (
                         id,
                         kind,
-                        IClientModuleGen::decoder(AsRef::&lt;<span class="kw">dyn </span>IClientModuleGen + <span class="lifetime">&#39;static</span>&gt;::as_ref(
-                            module_gen,
-                        )),
+                        IClientModuleInit::decoder(
+                            AsRef::&lt;<span class="kw">dyn </span>IClientModuleInit + <span class="lifetime">&#39;static</span>&gt;::as_ref(module_init),
+                        ),
                     )
                 })
             },
@@ -1151,11 +1173,11 @@
 
     <span class="kw">async fn </span>build_client_ng(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        module_gens: <span class="kw-2">&amp;</span>ClientModuleGenRegistry,
+        module_inits: <span class="kw-2">&amp;</span>ClientModuleInitRegistry,
         invite_code: <span class="prelude-ty">Option</span>&lt;InviteCode&gt;,
     ) -&gt; CliResult&lt;fedimint_client::Client&gt; {
         <span class="kw">let </span>client_builder = <span class="self">self
-            </span>.build_client_ng_builder(module_gens, invite_code)
+            </span>.build_client_ng_builder(module_inits, invite_code)
             .<span class="kw">await</span><span class="question-mark">?</span>;
         client_builder
             .build::&lt;PlainRootSecretStrategy&gt;()
@@ -1165,13 +1187,13 @@
 
     <span class="kw">async fn </span>build_client_ng_builder(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        module_gens: <span class="kw-2">&amp;</span>ClientModuleGenRegistry,
+        module_inits: <span class="kw-2">&amp;</span>ClientModuleInitRegistry,
         invite_code: <span class="prelude-ty">Option</span>&lt;InviteCode&gt;,
     ) -&gt; CliResult&lt;fedimint_client::ClientBuilder&gt; {
         <span class="kw">let </span>db = <span class="self">self</span>.load_rocks_db()<span class="question-mark">?</span>;
 
         <span class="kw">let </span><span class="kw-2">mut </span>client_builder = ClientBuilder::default();
-        client_builder.with_module_gens(module_gens.clone());
+        client_builder.with_module_inits(module_inits.clone());
         client_builder.with_primary_module(<span class="number">1</span>);
         <span class="kw">if let </span><span class="prelude-val">Some</span>(invite_code) = invite_code {
             client_builder.with_invite_code(invite_code);
@@ -1220,6 +1242,9 @@
 
     <span class="doccomment">/// Signal a consensus upgrade
     </span>SignalUpgrade,
+
+    <span class="doccomment">/// Show an audit across all modules
+    </span>Audit,
 }
 
 <span class="attr">#[derive(Debug, Clone, Subcommand)]
@@ -1302,7 +1327,7 @@
 }
 
 <span class="kw">pub struct </span>FedimintCli {
-    module_gens: ClientModuleGenRegistry,
+    module_inits: ClientModuleInitRegistry,
     invite_code: <span class="prelude-ty">Option</span>&lt;InviteCode&gt;,
 }
 
@@ -1323,16 +1348,16 @@
         <span class="macro">debug!</span>(<span class="string">&quot;Starting fedimint-cli (version: {CODE_VERSION})&quot;</span>);
 
         <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
-            module_gens: ClientModuleGenRegistry::new(),
+            module_inits: ClientModuleInitRegistry::new(),
             invite_code: <span class="prelude-val">None</span>,
         })
     }
 
     <span class="kw">pub fn </span>with_module&lt;T&gt;(<span class="kw-2">mut </span><span class="self">self</span>, gen: T) -&gt; <span class="self">Self
     </span><span class="kw">where
-        </span>T: ClientModuleGen + <span class="lifetime">&#39;static </span>+ Send + Sync,
+        </span>T: ClientModuleInit + <span class="lifetime">&#39;static </span>+ Send + Sync,
     {
-        <span class="self">self</span>.module_gens.attach(gen);
+        <span class="self">self</span>.module_inits.attach(gen);
         <span class="self">self
     </span>}
 
@@ -1364,7 +1389,7 @@
 
                 <span class="comment">// Build client and store config in DB
                 </span><span class="kw">let </span>_client = cli
-                    .build_client_ng(<span class="kw-2">&amp;</span><span class="self">self</span>.module_gens, <span class="prelude-val">Some</span>(invite.clone()))
+                    .build_client_ng(<span class="kw-2">&amp;</span><span class="self">self</span>.module_inits, <span class="prelude-val">Some</span>(invite.clone()))
                     .<span class="kw">await
                     </span>.map_err_cli_msg(CliErrorKind::GeneralFailure, <span class="string">&quot;failed to build client&quot;</span>)<span class="question-mark">?</span>;
 
@@ -1379,7 +1404,7 @@
             }),
             Command::Client(ClientCmd::Restore { secret }) =&gt; {
                 <span class="kw">let </span>(client, metadata) = cli
-                    .build_client_ng_builder(<span class="kw-2">&amp;</span><span class="self">self</span>.module_gens, <span class="prelude-val">None</span>)
+                    .build_client_ng_builder(<span class="kw-2">&amp;</span><span class="self">self</span>.module_inits, <span class="prelude-val">None</span>)
                     .<span class="kw">await
                     </span>.map_err_cli_msg(CliErrorKind::GeneralFailure, <span class="string">&quot;failure&quot;</span>)<span class="question-mark">?
                     </span>.build_restoring_from_backup(ClientSecret::&lt;PlainRootSecretStrategy&gt;::new(
@@ -1399,7 +1424,7 @@
             }
             Command::Client(command) =&gt; {
                 <span class="kw">let </span>client = cli
-                    .build_client_ng(<span class="kw-2">&amp;</span><span class="self">self</span>.module_gens, <span class="prelude-val">None</span>)
+                    .build_client_ng(<span class="kw-2">&amp;</span><span class="self">self</span>.module_inits, <span class="prelude-val">None</span>)
                     .<span class="kw">await
                     </span>.map_err_cli_msg(CliErrorKind::GeneralFailure, <span class="string">&quot;failure&quot;</span>)<span class="question-mark">?</span>;
                 <span class="kw">let </span>config = client.get_config().clone();
@@ -1409,9 +1434,24 @@
                         </span>.map_err_cli_msg(CliErrorKind::GeneralFailure, <span class="string">&quot;failure&quot;</span>)<span class="question-mark">?</span>,
                 ))
             }
+            Command::Admin(AdminCmd::Audit) =&gt; {
+                <span class="kw">let </span>user = cli
+                    .build_client_ng(<span class="kw-2">&amp;</span><span class="self">self</span>.module_inits, <span class="prelude-val">None</span>)
+                    .<span class="kw">await
+                    </span>.map_err_cli_msg(CliErrorKind::GeneralFailure, <span class="string">&quot;failure&quot;</span>)<span class="question-mark">?</span>;
+
+                <span class="kw">let </span>audit = cli
+                    .admin_client(user.get_config())<span class="question-mark">?
+                    </span>.audit(cli.auth()<span class="question-mark">?</span>)
+                    .<span class="kw">await</span><span class="question-mark">?</span>;
+                <span class="prelude-val">Ok</span>(CliOutput::Raw(
+                    serde_json::to_value(audit)
+                        .map_err_cli_msg(CliErrorKind::GeneralFailure, <span class="string">&quot;invalid response&quot;</span>)<span class="question-mark">?</span>,
+                ))
+            }
             Command::Admin(AdminCmd::Status) =&gt; {
                 <span class="kw">let </span>user = cli
-                    .build_client_ng(<span class="kw-2">&amp;</span><span class="self">self</span>.module_gens, <span class="prelude-val">None</span>)
+                    .build_client_ng(<span class="kw-2">&amp;</span><span class="self">self</span>.module_inits, <span class="prelude-val">None</span>)
                     .<span class="kw">await
                     </span>.map_err_cli_msg(CliErrorKind::GeneralFailure, <span class="string">&quot;failure&quot;</span>)<span class="question-mark">?</span>;
 
@@ -1423,12 +1463,12 @@
             }
             Command::Admin(AdminCmd::LastEpoch) =&gt; {
                 <span class="kw">let </span>user = cli
-                    .build_client_ng(<span class="kw-2">&amp;</span><span class="self">self</span>.module_gens, <span class="prelude-val">None</span>)
+                    .build_client_ng(<span class="kw-2">&amp;</span><span class="self">self</span>.module_inits, <span class="prelude-val">None</span>)
                     .<span class="kw">await
                     </span>.map_err_cli_msg(CliErrorKind::GeneralFailure, <span class="string">&quot;failure&quot;</span>)<span class="question-mark">?</span>;
                 <span class="kw">let </span>cfg = user.get_config().clone();
 
-                <span class="kw">let </span>decoders = cli.load_decoders(<span class="kw-2">&amp;</span>cfg, <span class="kw-2">&amp;</span><span class="self">self</span>.module_gens);
+                <span class="kw">let </span>decoders = cli.load_decoders(<span class="kw-2">&amp;</span>cfg, <span class="kw-2">&amp;</span><span class="self">self</span>.module_inits);
                 <span class="kw">let </span>client = cli.admin_client(<span class="kw-2">&amp;</span>cfg)<span class="question-mark">?</span>;
                 <span class="kw">let </span>last_epoch = client
                     .fetch_last_epoch_history(cfg.epoch_pk, <span class="kw-2">&amp;</span>decoders)
@@ -1439,12 +1479,12 @@
             }
             Command::Admin(AdminCmd::ForceEpoch { hex_outcome }) =&gt; {
                 <span class="kw">let </span>user = cli
-                    .build_client_ng(<span class="kw-2">&amp;</span><span class="self">self</span>.module_gens, <span class="prelude-val">None</span>)
+                    .build_client_ng(<span class="kw-2">&amp;</span><span class="self">self</span>.module_inits, <span class="prelude-val">None</span>)
                     .<span class="kw">await
                     </span>.map_err_cli_msg(CliErrorKind::GeneralFailure, <span class="string">&quot;failure&quot;</span>)<span class="question-mark">?</span>;
                 <span class="kw">let </span>cfg = user.get_config();
 
-                <span class="kw">let </span>decoders = cli.load_decoders(cfg, <span class="kw-2">&amp;</span><span class="self">self</span>.module_gens);
+                <span class="kw">let </span>decoders = cli.load_decoders(cfg, <span class="kw-2">&amp;</span><span class="self">self</span>.module_inits);
                 <span class="kw">let </span>outcome: SignedEpochOutcome = Decodable::consensus_decode_hex(
                     <span class="kw-2">&amp;</span>hex_outcome,
                     <span class="kw-2">&amp;</span>decoders,
@@ -1458,7 +1498,7 @@
             }
             Command::Admin(AdminCmd::SignalUpgrade) =&gt; {
                 <span class="kw">let </span>user = cli
-                    .build_client_ng(<span class="kw-2">&amp;</span><span class="self">self</span>.module_gens, <span class="prelude-val">None</span>)
+                    .build_client_ng(<span class="kw-2">&amp;</span><span class="self">self</span>.module_inits, <span class="prelude-val">None</span>)
                     .<span class="kw">await
                     </span>.map_err_cli_msg(CliErrorKind::GeneralFailure, <span class="string">&quot;failure&quot;</span>)<span class="question-mark">?</span>;
 
@@ -1476,7 +1516,7 @@
                     .map_err_cli_msg(CliErrorKind::InvalidValue, <span class="string">&quot;Invalid JSON-RPC parameters&quot;</span>)<span class="question-mark">?</span>;
                 <span class="kw">let </span>params = ApiRequestErased::new(params);
                 <span class="kw">let </span>ws_api: Arc&lt;<span class="kw">_</span>&gt; = WsFederationApi::from_config(
-                    cli.build_client_ng(<span class="kw-2">&amp;</span><span class="self">self</span>.module_gens, <span class="prelude-val">None</span>)
+                    cli.build_client_ng(<span class="kw-2">&amp;</span><span class="self">self</span>.module_inits, <span class="prelude-val">None</span>)
                         .<span class="kw">await</span><span class="question-mark">?
                         </span>.get_config(),
                 )
@@ -1507,7 +1547,7 @@
             }
             Command::Dev(DevCmd::WaitBlockCount { count: target }) =&gt; {
                 task::timeout(Duration::from_secs(<span class="number">30</span>), <span class="kw">async move </span>{
-                    <span class="kw">let </span>client = cli.build_client_ng(<span class="kw-2">&amp;</span><span class="self">self</span>.module_gens, <span class="prelude-val">None</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+                    <span class="kw">let </span>client = cli.build_client_ng(<span class="kw-2">&amp;</span><span class="self">self</span>.module_inits, <span class="prelude-val">None</span>).<span class="kw">await</span><span class="question-mark">?</span>;
                     <span class="kw">loop </span>{
                         <span class="kw">let </span>(<span class="kw">_</span>, instance) = client
                             .get_first_module::&lt;WalletClientModule&gt;(<span class="kw-2">&amp;</span>fedimint_wallet_client::KIND);
@@ -1548,7 +1588,7 @@
             }),
             Command::Dev(DevCmd::EpochCount) =&gt; {
                 <span class="kw">let </span>count = cli
-                    .build_client_ng(<span class="kw-2">&amp;</span><span class="self">self</span>.module_gens, <span class="prelude-val">None</span>)
+                    .build_client_ng(<span class="kw-2">&amp;</span><span class="self">self</span>.module_inits, <span class="prelude-val">None</span>)
                     .<span class="kw">await</span><span class="question-mark">?
                     </span>.api()
                     .fetch_epoch_count()
@@ -1602,7 +1642,7 @@
 
                 <span class="kw">let </span>tx = fedimint_core::transaction::Transaction::from_bytes(
                     <span class="kw-2">&amp;</span>bytes,
-                    cli.build_client_ng(<span class="kw-2">&amp;</span><span class="self">self</span>.module_gens, <span class="prelude-val">None</span>)
+                    cli.build_client_ng(<span class="kw-2">&amp;</span><span class="self">self</span>.module_inits, <span class="prelude-val">None</span>)
                         .<span class="kw">await</span><span class="question-mark">?
                         </span>.decoders(),
                 )
@@ -1678,5 +1718,4 @@
         <span class="macro">assert_eq!</span>(metadata_from_clap_cli(args).unwrap(), expected);
     }
 }
-</code></pre></div>
-</section></main><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="fedimint_cli" data-themes="" data-resource-suffix="" data-rustdoc-version="1.69.0-nightly (f3126500f 2023-02-02)" data-search-js="search-98d53477a794af0b.js" data-settings-js="settings-f0c5c39777a9a2f6.js" data-settings-css="settings-0bcba95ff279c1db.css" ></div></body></html>
+</code></pre></div></section></main></body></html>

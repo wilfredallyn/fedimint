@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `devimint/src/federation.rs`."><title>federation.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-505eba68f310f6bf.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../static.files/light-f501212b8b071243.css"><link rel="stylesheet" disabled href="../../static.files/dark-e92fc12c34ff89d3.css"><link rel="stylesheet" disabled href="../../static.files/ayu-c8c85693c8a4f9db.css"><script id="default-settings" ></script><script src="../../static.files/storage-3891ce972e3a2bf8.js"></script><script defer src="../../static.files/source-script-ea63cb6500f71309.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-364b95f387bc3166.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../devimint/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `devimint/src/federation.rs`."><title>federation.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-cb6f1f67f1bcd037.css" id="mainThemeStyle"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="devimint" data-themes="" data-resource-suffix="" data-rustdoc-version="1.73.0-nightly (439d066bc 2023-08-10)" data-channel="nightly" data-search-js="search-6dfdfced5eff6596.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-1596385f77d47ef2.css" data-theme-dark-css="dark-0a43001d3fc2282c.css" data-theme-ayu-css="ayu-fd19013d6ce078bf.css" ><script src="../../static.files/storage-db41da1a38ea3cb8.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-0795b7d26be81095.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-1596385f77d47ef2.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-0a43001d3fc2282c.css"><link rel="stylesheet" href="../../static.files/noscript-cffde32267a19fd6.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../devimint/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -500,7 +500,26 @@
 <a href="#500" id="500">500</a>
 <a href="#501" id="501">501</a>
 <a href="#502" id="502">502</a>
-</pre><pre class="rust"><code><span class="kw">use </span>std::collections::{BTreeMap, HashSet};
+<a href="#503" id="503">503</a>
+<a href="#504" id="504">504</a>
+<a href="#505" id="505">505</a>
+<a href="#506" id="506">506</a>
+<a href="#507" id="507">507</a>
+<a href="#508" id="508">508</a>
+<a href="#509" id="509">509</a>
+<a href="#510" id="510">510</a>
+<a href="#511" id="511">511</a>
+<a href="#512" id="512">512</a>
+<a href="#513" id="513">513</a>
+<a href="#514" id="514">514</a>
+<a href="#515" id="515">515</a>
+<a href="#516" id="516">516</a>
+<a href="#517" id="517">517</a>
+<a href="#518" id="518">518</a>
+<a href="#519" id="519">519</a>
+<a href="#520" id="520">520</a>
+<a href="#521" id="521">521</a>
+</pre></div><pre class="rust"><code><span class="kw">use </span>std::collections::{BTreeMap, HashSet};
 <span class="kw">use </span>std::fs;
 
 <span class="kw">use </span>anyhow::{bail, Context};
@@ -508,7 +527,7 @@
 <span class="kw">use </span>fedimint_core::admin_client::{ConfigGenConnectionsRequest, ConfigGenParamsRequest};
 <span class="kw">use </span>fedimint_core::api::ServerStatus;
 <span class="kw">use </span>fedimint_core::bitcoinrpc::BitcoinRpcConfig;
-<span class="kw">use </span>fedimint_core::config::ServerModuleGenParamsRegistry;
+<span class="kw">use </span>fedimint_core::config::ServerModuleConfigGenParamsRegistry;
 <span class="kw">use </span>fedimint_core::core::LEGACY_HARDCODED_INSTANCE_ID_WALLET;
 <span class="kw">use </span>fedimint_core::db::mem_impl::MemDatabase;
 <span class="kw">use </span>fedimint_core::module::ApiAuth;
@@ -516,7 +535,7 @@
 <span class="kw">use </span>fedimint_server::config::ConfigGenParams;
 <span class="kw">use </span>fedimint_testing::federation::local_config_gen_params;
 <span class="kw">use </span>fedimint_wallet_client::config::WalletClientConfig;
-<span class="kw">use </span>fedimintd::attach_default_module_gen_params;
+<span class="kw">use </span>fedimintd::attach_default_module_init_params;
 <span class="kw">use </span>futures::future::join_all;
 <span class="kw">use </span>rand::Rng;
 <span class="kw">use </span>url::Url;
@@ -586,8 +605,11 @@
         <span class="kw">let </span><span class="kw-2">mut </span>vars = BTreeMap::new();
 
         <span class="kw">let </span>peers: Vec&lt;<span class="kw">_</span>&gt; = (<span class="number">0</span>..servers).map(|id| PeerId::from(id <span class="kw">as </span>u16)).collect();
-        <span class="kw">let </span>params: HashMap&lt;PeerId, ConfigGenParams&gt; =
-            local_config_gen_params(<span class="kw-2">&amp;</span>peers, BASE_PORT, ServerModuleGenParamsRegistry::default())<span class="question-mark">?</span>;
+        <span class="kw">let </span>params: HashMap&lt;PeerId, ConfigGenParams&gt; = local_config_gen_params(
+            <span class="kw-2">&amp;</span>peers,
+            BASE_PORT,
+            ServerModuleConfigGenParamsRegistry::default(),
+        )<span class="question-mark">?</span>;
 
         <span class="kw">let </span><span class="kw-2">mut </span>admin_clients: BTreeMap&lt;PeerId, WsAdminClient&gt; = BTreeMap::new();
         <span class="kw">for </span>(peer, peer_params) <span class="kw">in </span><span class="kw-2">&amp;</span>params {
@@ -612,12 +634,14 @@
             <span class="macro">format!</span>(<span class="string">&quot;{out_dir}/invite-code&quot;</span>),
             <span class="macro">format!</span>(<span class="string">&quot;{cfg_dir}/invite-code&quot;</span>),
         )
-        .<span class="kw">await</span><span class="question-mark">?</span>;
+        .<span class="kw">await
+        </span>.context(<span class="string">&quot;moving invite code file&quot;</span>)<span class="question-mark">?</span>;
         tokio::fs::rename(
             <span class="macro">format!</span>(<span class="string">&quot;{out_dir}/client.json&quot;</span>),
             <span class="macro">format!</span>(<span class="string">&quot;{cfg_dir}/client.json&quot;</span>),
         )
-        .<span class="kw">await</span><span class="question-mark">?</span>;
+        .<span class="kw">await
+        </span>.context(<span class="string">&quot;moving client.json&quot;</span>)<span class="question-mark">?</span>;
         <span class="macro">info!</span>(<span class="string">&quot;copied client configs&quot;</span>);
 
         <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
@@ -634,12 +658,12 @@
         <span class="kw">let </span>decoders = module_decode_stubs();
         cfg.<span class="number">0 </span>= cfg.<span class="number">0</span>.redecode_raw(<span class="kw-2">&amp;</span>decoders)<span class="question-mark">?</span>;
         <span class="kw">let </span>db = Database::new(MemDatabase::new(), module_decode_stubs());
-        <span class="kw">let </span>module_gens = ClientModuleGenRegistry::from(<span class="macro">vec!</span>[
-            DynClientModuleGen::from(WalletClientGen::default()),
-            DynClientModuleGen::from(MintClientGen),
-            DynClientModuleGen::from(LightningClientGen),
+        <span class="kw">let </span>module_inits = ClientModuleInitRegistry::from(<span class="macro">vec!</span>[
+            DynClientModuleInit::from(WalletClientGen::default()),
+            DynClientModuleInit::from(MintClientGen),
+            DynClientModuleInit::from(LightningClientGen),
         ]);
-        <span class="kw">let </span>client = UserClient::new(cfg, decoders, module_gens, db, Default::default()).<span class="kw">await</span>;
+        <span class="kw">let </span>client = UserClient::new(cfg, decoders, module_inits, db, Default::default()).<span class="kw">await</span>;
         <span class="prelude-val">Ok</span>(client)
     }
 
@@ -678,13 +702,16 @@
         <span class="macro">cmd!</span>(<span class="string">&quot;fedimint-cli&quot;</span>, <span class="string">&quot;--data-dir={cfg_dir}&quot;</span>)
     }
 
-    <span class="kw">pub async fn </span>pegin(<span class="kw-2">&amp;</span><span class="self">self</span>, amt: u64) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+    <span class="kw">pub async fn </span>pegin(<span class="kw-2">&amp;</span><span class="self">self</span>, amount: u64) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="macro">info!</span>(amount, <span class="string">&quot;Peg-in&quot;</span>);
+        <span class="comment">// Some blocks must always be mined first before pegin
+        </span><span class="self">self</span>.await_minimum_blocks().<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="kw">let </span>deposit = <span class="macro">cmd!</span>(<span class="self">self</span>, <span class="string">&quot;deposit-address&quot;</span>).out_json().<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="kw">let </span>deposit_address = deposit[<span class="string">&quot;address&quot;</span>].as_str().unwrap();
         <span class="kw">let </span>deposit_operation_id = deposit[<span class="string">&quot;operation_id&quot;</span>].as_str().unwrap();
 
         <span class="self">self</span>.bitcoind
-            .send_to(deposit_address.to_owned(), amt)
+            .send_to(deposit_address.to_owned(), amount)
             .<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="self">self</span>.bitcoind.mine_blocks(<span class="number">100</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
@@ -694,24 +721,27 @@
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">pub async fn </span>pegin_gateway(<span class="kw-2">&amp;</span><span class="self">self</span>, amt: u64, gw_cln: <span class="kw-2">&amp;</span>Gatewayd) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+    <span class="kw">pub async fn </span>pegin_gateway(<span class="kw-2">&amp;</span><span class="self">self</span>, amount: u64, gw: <span class="kw-2">&amp;</span>Gatewayd) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="macro">info!</span>(amount, <span class="string">&quot;Pegging-in gateway funds&quot;</span>);
+        <span class="comment">// Some blocks must always be mined first before pegin
+        </span><span class="self">self</span>.await_minimum_blocks().<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="kw">let </span>fed_id = <span class="self">self</span>.federation_id().<span class="kw">await</span>;
-        <span class="kw">let </span>pegin_addr = <span class="macro">cmd!</span>(gw_cln, <span class="string">&quot;address&quot;</span>, <span class="string">&quot;--federation-id={fed_id}&quot;</span>)
+        <span class="kw">let </span>pegin_addr = <span class="macro">cmd!</span>(gw, <span class="string">&quot;address&quot;</span>, <span class="string">&quot;--federation-id={fed_id}&quot;</span>)
             .out_json()
             .<span class="kw">await</span><span class="question-mark">?
             </span>.as_str()
             .context(<span class="string">&quot;address must be a string&quot;</span>)<span class="question-mark">?
             </span>.to_owned();
-        <span class="self">self</span>.bitcoind.send_to(pegin_addr, amt).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="self">self</span>.bitcoind.send_to(pegin_addr, amount).<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="self">self</span>.bitcoind.mine_blocks(<span class="number">21</span>).<span class="kw">await</span><span class="question-mark">?</span>;
         poll(<span class="string">&quot;gateway pegin&quot;</span>, || <span class="kw">async </span>{
-            <span class="kw">let </span>gateway_balance = <span class="macro">cmd!</span>(gw_cln, <span class="string">&quot;balance&quot;</span>, <span class="string">&quot;--federation-id={fed_id}&quot;</span>)
+            <span class="kw">let </span>gateway_balance = <span class="macro">cmd!</span>(gw, <span class="string">&quot;balance&quot;</span>, <span class="string">&quot;--federation-id={fed_id}&quot;</span>)
                 .out_json()
                 .<span class="kw">await</span><span class="question-mark">?
                 </span>.as_u64()
                 .unwrap();
 
-            <span class="prelude-val">Ok</span>(gateway_balance == (amt * <span class="number">1000</span>))
+            <span class="prelude-val">Ok</span>(gateway_balance == (amount * <span class="number">1000</span>))
         })
         .<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(())
@@ -727,19 +757,30 @@
             .to_string()
     }
 
-    <span class="kw">pub async fn </span>await_block_sync(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="kw">let </span>client = <span class="self">self</span>.client().<span class="kw">await</span><span class="question-mark">?</span>;
+    <span class="kw">pub async fn </span>await_block_sync(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;u64&gt; {
+        <span class="kw">let </span>finality_delay = <span class="self">self</span>.get_finality_delay().<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let </span>bitcoind_block_count = <span class="self">self</span>.bitcoind.client().get_blockchain_info()<span class="question-mark">?</span>.blocks;
+        <span class="kw">let </span>expected = bitcoind_block_count.saturating_sub(finality_delay.into());
+        <span class="macro">cmd!</span>(<span class="self">self</span>, <span class="string">&quot;dev&quot;</span>, <span class="string">&quot;wait-block-count&quot;</span>, expected)
+            .run()
+            .<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(expected)
+    }
+
+    <span class="kw">pub async fn </span>await_minimum_blocks(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="comment">// TODO: optimize this
+        </span><span class="self">self</span>.generate_epochs(<span class="number">1</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(())
+    }
+
+    <span class="kw">async fn </span>get_finality_delay(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;u32, anyhow::Error&gt; {
+        <span class="kw">let </span>client: fedimint_client_legacy::Client&lt;UserClientConfig&gt; = <span class="self">self</span>.client().<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="kw">let </span>wallet_cfg: <span class="kw-2">&amp;</span>WalletClientConfig = client
             .config_ref()
             .<span class="number">0
             </span>.get_module(LEGACY_HARDCODED_INSTANCE_ID_WALLET)<span class="question-mark">?</span>;
         <span class="kw">let </span>finality_delay = wallet_cfg.finality_delay;
-        <span class="kw">let </span>bitcoind_block_count = <span class="self">self</span>.bitcoind.client().get_blockchain_info()<span class="question-mark">?</span>.blocks;
-        <span class="kw">let </span>expected = bitcoind_block_count - (finality_delay <span class="kw">as </span>u64);
-        <span class="macro">cmd!</span>(<span class="self">self</span>, <span class="string">&quot;dev&quot;</span>, <span class="string">&quot;wait-block-count&quot;</span>, expected)
-            .run()
-            .<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>(())
+        <span class="prelude-val">Ok</span>(finality_delay)
     }
 
     <span class="kw">pub async fn </span>await_gateways_registered(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
@@ -779,15 +820,16 @@
     }
 
     <span class="kw">pub async fn </span>generate_epochs(<span class="kw-2">&amp;</span><span class="self">self</span>, epochs: usize) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="kw">let </span>finality_delay = <span class="self">self</span>.get_finality_delay().<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="kw">for _ in </span><span class="number">0</span>..epochs {
-            <span class="self">self</span>.bitcoind.mine_blocks(<span class="number">10</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+            <span class="self">self</span>.bitcoind.mine_blocks(finality_delay.into()).<span class="kw">await</span><span class="question-mark">?</span>;
             <span class="self">self</span>.await_block_sync().<span class="kw">await</span><span class="question-mark">?</span>;
         }
         <span class="prelude-val">Ok</span>(())
     }
 
     <span class="kw">pub async fn </span>client_balance(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;u64&gt; {
-        <span class="prelude-val">Ok</span>(<span class="macro">cmd!</span>(<span class="self">self</span>, <span class="string">&quot;info&quot;</span>).out_json().<span class="kw">await</span><span class="question-mark">?</span>[<span class="string">&quot;total_msat&quot;</span>]
+        <span class="prelude-val">Ok</span>(<span class="macro">cmd!</span>(<span class="self">self</span>, <span class="string">&quot;info&quot;</span>).out_json().<span class="kw">await</span><span class="question-mark">?</span>[<span class="string">&quot;total_amount_msat&quot;</span>]
             .as_u64()
             .unwrap())
     }
@@ -911,11 +953,7 @@
         .map(|peer| peer.name)
         .collect::&lt;HashSet&lt;<span class="kw">_</span>&gt;&gt;();
     <span class="kw">let </span>all_names = {
-        <span class="kw">let </span><span class="kw-2">mut </span>names = followers_names
-            .values()
-            .into_iter()
-            .cloned()
-            .collect::&lt;HashSet&lt;<span class="kw">_</span>&gt;&gt;();
+        <span class="kw">let </span><span class="kw-2">mut </span>names = followers_names.values().cloned().collect::&lt;HashSet&lt;<span class="kw">_</span>&gt;&gt;();
         names.insert(leader_name);
         names
     };
@@ -974,9 +1012,9 @@
 <span class="kw">async fn </span>set_config_gen_params(
     client: <span class="kw-2">&amp;</span>WsAdminClient,
     auth: ApiAuth,
-    <span class="kw-2">mut </span>server_gen_params: ServerModuleGenParamsRegistry,
+    <span class="kw-2">mut </span>server_gen_params: ServerModuleConfigGenParamsRegistry,
 ) -&gt; anyhow::Result&lt;()&gt; {
-    attach_default_module_gen_params(
+    attach_default_module_init_params(
         BitcoinRpcConfig::from_env_vars()<span class="question-mark">?</span>,
         <span class="kw-2">&amp;mut </span>server_gen_params,
         Amount::from_sats(<span class="number">100_000_000</span>),
@@ -1002,5 +1040,4 @@
     .<span class="kw">await</span><span class="question-mark">?</span>;
     <span class="prelude-val">Ok</span>(())
 }
-</code></pre></div>
-</section></main><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="devimint" data-themes="" data-resource-suffix="" data-rustdoc-version="1.69.0-nightly (f3126500f 2023-02-02)" data-search-js="search-98d53477a794af0b.js" data-settings-js="settings-f0c5c39777a9a2f6.js" data-settings-css="settings-0bcba95ff279c1db.css" ></div></body></html>
+</code></pre></div></section></main></body></html>

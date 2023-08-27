@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `gateway/ln-gateway/src/bin/cln_extension.rs`."><title>cln_extension.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-505eba68f310f6bf.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../static.files/light-f501212b8b071243.css"><link rel="stylesheet" disabled href="../../static.files/dark-e92fc12c34ff89d3.css"><link rel="stylesheet" disabled href="../../static.files/ayu-c8c85693c8a4f9db.css"><script id="default-settings" ></script><script src="../../static.files/storage-3891ce972e3a2bf8.js"></script><script defer src="../../static.files/source-script-ea63cb6500f71309.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-364b95f387bc3166.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../gateway_cln_extension/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `gateway/ln-gateway/src/bin/cln_extension.rs`."><title>cln_extension.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-cb6f1f67f1bcd037.css" id="mainThemeStyle"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="gateway_cln_extension" data-themes="" data-resource-suffix="" data-rustdoc-version="1.73.0-nightly (439d066bc 2023-08-10)" data-channel="nightly" data-search-js="search-6dfdfced5eff6596.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-1596385f77d47ef2.css" data-theme-dark-css="dark-0a43001d3fc2282c.css" data-theme-ayu-css="ayu-fd19013d6ce078bf.css" ><script src="../../static.files/storage-db41da1a38ea3cb8.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-0795b7d26be81095.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-1596385f77d47ef2.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-0a43001d3fc2282c.css"><link rel="stylesheet" href="../../static.files/noscript-cffde32267a19fd6.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../gateway_cln_extension/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -628,8 +628,21 @@
 <a href="#628" id="628">628</a>
 <a href="#629" id="629">629</a>
 <a href="#630" id="630">630</a>
-</pre><pre class="rust"><code><span class="kw">use </span>std::array::TryFromSliceError;
-<span class="kw">use </span>std::collections::BTreeMap;
+<a href="#631" id="631">631</a>
+<a href="#632" id="632">632</a>
+<a href="#633" id="633">633</a>
+<a href="#634" id="634">634</a>
+<a href="#635" id="635">635</a>
+<a href="#636" id="636">636</a>
+<a href="#637" id="637">637</a>
+<a href="#638" id="638">638</a>
+<a href="#639" id="639">639</a>
+<a href="#640" id="640">640</a>
+<a href="#641" id="641">641</a>
+<a href="#642" id="642">642</a>
+<a href="#643" id="643">643</a>
+</pre></div><pre class="rust"><code><span class="kw">use </span>std::array::TryFromSliceError;
+<span class="kw">use </span>std::collections::{BTreeMap, HashMap};
 <span class="kw">use </span>std::net::SocketAddr;
 <span class="kw">use </span>std::path::PathBuf;
 <span class="kw">use </span>std::str::FromStr;
@@ -644,24 +657,24 @@
 <span class="kw">use </span>cln_rpc::primitives::ShortChannelId;
 <span class="kw">use </span>fedimint_core::task::TaskGroup;
 <span class="kw">use </span>fedimint_core::Amount;
-<span class="kw">use </span>ln_gateway::gatewaylnrpc::gateway_lightning_server::{
+<span class="kw">use </span>ln_gateway::gateway_lnrpc::gateway_lightning_server::{
     GatewayLightning, GatewayLightningServer,
 };
-<span class="kw">use </span>ln_gateway::gatewaylnrpc::get_route_hints_response::{RouteHint, RouteHintHop};
-<span class="kw">use </span>ln_gateway::gatewaylnrpc::intercept_htlc_response::{Action, Cancel, Forward, Settle};
-<span class="kw">use </span>ln_gateway::gatewaylnrpc::{
-    EmptyRequest, EmptyResponse, GetNodeInfoResponse, GetRouteHintsResponse, InterceptHtlcRequest,
-    InterceptHtlcResponse, PayInvoiceRequest, PayInvoiceResponse,
+<span class="kw">use </span>ln_gateway::gateway_lnrpc::get_route_hints_response::{RouteHint, RouteHintHop};
+<span class="kw">use </span>ln_gateway::gateway_lnrpc::intercept_htlc_response::{Action, Cancel, Forward, Settle};
+<span class="kw">use </span>ln_gateway::gateway_lnrpc::{
+    EmptyRequest, EmptyResponse, GetNodeInfoResponse, GetRouteHintsRequest, GetRouteHintsResponse,
+    InterceptHtlcRequest, InterceptHtlcResponse, PayInvoiceRequest, PayInvoiceResponse,
 };
 <span class="kw">use </span>secp256k1::PublicKey;
-<span class="kw">use </span>serde::{Deserialize, Deserializer, Serialize};
+<span class="kw">use </span>serde::{Deserialize, Serialize};
 <span class="kw">use </span>thiserror::Error;
 <span class="kw">use </span>tokio::io::{stdin, stdout};
 <span class="kw">use </span>tokio::sync::{mpsc, oneshot, Mutex};
 <span class="kw">use </span>tokio_stream::wrappers::ReceiverStream;
 <span class="kw">use </span>tonic::transport::Server;
 <span class="kw">use </span>tonic::Status;
-<span class="kw">use </span>tracing::{debug, error, info, trace, warn};
+<span class="kw">use </span>tracing::{debug, error, info, warn};
 
 <span class="attr">#[derive(Parser)]
 </span><span class="kw">pub struct </span>ClnExtensionOpts {
@@ -706,24 +719,11 @@
     <span class="prelude-val">Ok</span>(())
 }
 
-<span class="doccomment">/// The core-lightning `htlc_accepted` event&#39;s `amount` field has a &quot;msat&quot;
-/// suffix
-</span><span class="kw">fn </span>as_fedimint_amount&lt;<span class="lifetime">&#39;de</span>, D&gt;(amount: D) -&gt; <span class="prelude-ty">Result</span>&lt;Amount, D::Error&gt;
-<span class="kw">where
-    </span>D: Deserializer&lt;<span class="lifetime">&#39;de</span>&gt;,
-{
-    <span class="kw">let </span>amount = String::deserialize(amount)<span class="question-mark">?</span>;
-    <span class="prelude-val">Ok</span>(Amount::from_msats(
-        amount[<span class="number">0</span>..amount.len() - <span class="number">4</span>].parse::&lt;u64&gt;().unwrap(),
-    ))
-}
-
 <span class="comment">// TODO: upstream these structs to cln-plugin
 // See: https://github.com/ElementsProject/lightning/blob/master/doc/PLUGINS.md#htlc_accepted
 </span><span class="attr">#[derive(Clone, Serialize, Deserialize, Debug)]
 </span><span class="kw">pub struct </span>Htlc {
-    <span class="attr">#[serde(deserialize_with = <span class="string">&quot;as_fedimint_amount&quot;</span>)]
-    </span><span class="kw">pub </span>amount_msat: Amount,
+    <span class="kw">pub </span>amount_msat: Amount,
     <span class="comment">// TODO: use these to validate we can actually redeem the HTLC in time
     </span><span class="kw">pub </span>cltv_expiry: u32,
     <span class="kw">pub </span>cltv_expiry_relative: u32,
@@ -738,8 +738,7 @@
 </span><span class="kw">pub struct </span>Onion {
     <span class="attr">#[serde(default)]
     </span><span class="kw">pub </span>short_channel_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
-    <span class="attr">#[serde(deserialize_with = <span class="string">&quot;as_fedimint_amount&quot;</span>)]
-    </span><span class="kw">pub </span>forward_msat: Amount,
+    <span class="kw">pub </span>forward_msat: Amount,
 }
 
 <span class="attr">#[derive(Clone, Serialize, Deserialize, Debug)]
@@ -887,8 +886,9 @@
 
     <span class="kw">async fn </span>get_route_hints(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        _request: tonic::Request&lt;EmptyRequest&gt;,
+        request: tonic::Request&lt;GetRouteHintsRequest&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;tonic::Response&lt;GetRouteHintsResponse&gt;, Status&gt; {
+        <span class="kw">let </span>GetRouteHintsRequest { num_route_hints } = request.into_inner();
         <span class="kw">let </span>node_info = <span class="self">self
             </span>.info()
             .<span class="kw">await
@@ -913,7 +913,7 @@
         }
         .map_err(|err| tonic::Status::internal(err.to_string()))<span class="question-mark">?</span>;
 
-        <span class="kw">let </span>active_peer_channels = peers
+        <span class="kw">let </span><span class="kw-2">mut </span>active_peer_channels = peers
             .into_iter()
             .flat_map(|peer| peer.channels.into_iter().map(<span class="kw">move </span>|chan| (peer.id, chan)))
             .filter_map(|(peer_id, chan)| {
@@ -939,6 +939,27 @@
             active_peer_channels.len()
         );
 
+        <span class="kw">let </span>listfunds_response = client
+            .call(cln_rpc::Request::ListFunds(model::ListfundsRequest {
+                spent: <span class="prelude-val">None</span>,
+            }))
+            .<span class="kw">await
+            </span>.map_err(|err| tonic::Status::internal(err.to_string()))<span class="question-mark">?</span>;
+        <span class="kw">let </span>pubkey_to_incoming_capacity = <span class="kw">match </span>listfunds_response {
+            cln_rpc::Response::ListFunds(listfunds) =&gt; listfunds
+                .channels
+                .into_iter()
+                .map(|chan| (chan.peer_id, chan.amount_msat - chan.our_amount_msat))
+                .collect::&lt;HashMap&lt;<span class="kw">_</span>, <span class="kw">_</span>&gt;&gt;(),
+            err =&gt; <span class="macro">panic!</span>(<span class="string">&quot;CLN received unexpected response: {err:?}&quot;</span>),
+        };
+        active_peer_channels.sort_by(|a, b| {
+            <span class="kw">let </span>a_incoming = pubkey_to_incoming_capacity.get(<span class="kw-2">&amp;</span>a.<span class="number">0</span>).unwrap().msat();
+            <span class="kw">let </span>b_incoming = pubkey_to_incoming_capacity.get(<span class="kw-2">&amp;</span>b.<span class="number">0</span>).unwrap().msat();
+            b_incoming.cmp(<span class="kw-2">&amp;</span>a_incoming)
+        });
+        active_peer_channels.truncate(num_route_hints <span class="kw">as </span>usize);
+
         <span class="kw">let </span><span class="kw-2">mut </span>route_hints = <span class="macro">vec!</span>[];
         <span class="kw">for </span>(peer_id, scid) <span class="kw">in </span>active_peer_channels {
             <span class="kw">let </span>channels_response = client
@@ -952,14 +973,19 @@
 
             <span class="kw">let </span>channel = <span class="kw">match </span>channels_response {
                 cln_rpc::Response::ListChannels(channels) =&gt; {
-                    <span class="kw">let </span><span class="prelude-val">Some</span>(channel) = channels.channels.into_iter().find(|chan| chan.destination == node_info.<span class="number">0</span>) <span class="kw">else </span>{
+                    <span class="kw">let </span><span class="prelude-val">Some</span>(channel) = channels
+                        .channels
+                        .into_iter()
+                        .find(|chan| chan.destination == node_info.<span class="number">0</span>)
+                    <span class="kw">else </span>{
                         <span class="macro">warn!</span>(<span class="question-mark">?</span>scid, <span class="string">&quot;Channel not found in graph&quot;</span>);
                         <span class="kw">continue</span>;
                     };
                     <span class="prelude-val">Ok</span>(channel)
                 }
                 <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(ClnExtensionError::RpcWrongResponse),
-            }.map_err(|err| tonic::Status::internal(err.to_string()))<span class="question-mark">?</span>;
+            }
+            .map_err(|err| tonic::Status::internal(err.to_string()))<span class="question-mark">?</span>;
 
             <span class="kw">let </span>route_hint_hop = RouteHintHop {
                 src_node_id: peer_id.serialize().to_vec(),
@@ -971,7 +997,7 @@
                 htlc_maximum_msat: channel.htlc_maximum_msat.map(|amt| amt.msat()),
             };
 
-            <span class="macro">trace!</span>(<span class="string">&quot;Constructed route hint {:?}&quot;</span>, route_hint_hop);
+            <span class="macro">debug!</span>(<span class="string">&quot;Constructed route hint {:?}&quot;</span>, route_hint_hop);
             route_hints.push(RouteHint {
                 hops: <span class="macro">vec!</span>[route_hint_hop],
             });
@@ -1258,5 +1284,4 @@
 
     <span class="comment">// TODO: Add a method to remove a HTLC subscriber
 </span>}
-</code></pre></div>
-</section></main><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="gateway_cln_extension" data-themes="" data-resource-suffix="" data-rustdoc-version="1.69.0-nightly (f3126500f 2023-02-02)" data-search-js="search-98d53477a794af0b.js" data-settings-js="settings-f0c5c39777a9a2f6.js" data-settings-css="settings-0bcba95ff279c1db.css" ></div></body></html>
+</code></pre></div></section></main></body></html>

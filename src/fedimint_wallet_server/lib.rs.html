@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `modules/fedimint-wallet-server/src/lib.rs`."><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-505eba68f310f6bf.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../static.files/light-f501212b8b071243.css"><link rel="stylesheet" disabled href="../../static.files/dark-e92fc12c34ff89d3.css"><link rel="stylesheet" disabled href="../../static.files/ayu-c8c85693c8a4f9db.css"><script id="default-settings" ></script><script src="../../static.files/storage-3891ce972e3a2bf8.js"></script><script defer src="../../static.files/source-script-ea63cb6500f71309.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-364b95f387bc3166.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../fedimint_wallet_server/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `modules/fedimint-wallet-server/src/lib.rs`."><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-cb6f1f67f1bcd037.css" id="mainThemeStyle"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="fedimint_wallet_server" data-themes="" data-resource-suffix="" data-rustdoc-version="1.73.0-nightly (439d066bc 2023-08-10)" data-channel="nightly" data-search-js="search-6dfdfced5eff6596.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-1596385f77d47ef2.css" data-theme-dark-css="dark-0a43001d3fc2282c.css" data-theme-ayu-css="ayu-fd19013d6ce078bf.css" ><script src="../../static.files/storage-db41da1a38ea3cb8.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-0795b7d26be81095.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-1596385f77d47ef2.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-0a43001d3fc2282c.css"><link rel="stylesheet" href="../../static.files/noscript-cffde32267a19fd6.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../fedimint_wallet_server/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -1877,7 +1877,37 @@
 <a href="#1877" id="1877">1877</a>
 <a href="#1878" id="1878">1878</a>
 <a href="#1879" id="1879">1879</a>
-</pre><pre class="rust"><code><span class="kw">use </span>std::collections::{BTreeMap, BTreeSet, HashMap};
+<a href="#1880" id="1880">1880</a>
+<a href="#1881" id="1881">1881</a>
+<a href="#1882" id="1882">1882</a>
+<a href="#1883" id="1883">1883</a>
+<a href="#1884" id="1884">1884</a>
+<a href="#1885" id="1885">1885</a>
+<a href="#1886" id="1886">1886</a>
+<a href="#1887" id="1887">1887</a>
+<a href="#1888" id="1888">1888</a>
+<a href="#1889" id="1889">1889</a>
+<a href="#1890" id="1890">1890</a>
+<a href="#1891" id="1891">1891</a>
+<a href="#1892" id="1892">1892</a>
+<a href="#1893" id="1893">1893</a>
+<a href="#1894" id="1894">1894</a>
+<a href="#1895" id="1895">1895</a>
+<a href="#1896" id="1896">1896</a>
+<a href="#1897" id="1897">1897</a>
+<a href="#1898" id="1898">1898</a>
+<a href="#1899" id="1899">1899</a>
+<a href="#1900" id="1900">1900</a>
+<a href="#1901" id="1901">1901</a>
+<a href="#1902" id="1902">1902</a>
+<a href="#1903" id="1903">1903</a>
+<a href="#1904" id="1904">1904</a>
+<a href="#1905" id="1905">1905</a>
+<a href="#1906" id="1906">1906</a>
+<a href="#1907" id="1907">1907</a>
+<a href="#1908" id="1908">1908</a>
+<a href="#1909" id="1909">1909</a>
+</pre></div><pre class="rust"><code><span class="kw">use </span>std::collections::{BTreeMap, BTreeSet, HashMap};
 <span class="kw">use </span>std::convert::{Infallible, TryInto};
 <span class="attr">#[cfg(not(target_family = <span class="string">&quot;wasm&quot;</span>))]
 </span><span class="kw">use </span>std::time::Duration;
@@ -1914,8 +1944,8 @@
 <span class="kw">use </span>fedimint_core::encoding::{Decodable, Encodable};
 <span class="kw">use </span>fedimint_core::module::audit::Audit;
 <span class="kw">use </span>fedimint_core::module::{
-    api_endpoint, ApiEndpoint, ConsensusProposal, CoreConsensusVersion, ExtendsCommonModuleGen,
-    InputMeta, IntoModuleError, ModuleConsensusVersion, ModuleError, PeerHandle, ServerModuleGen,
+    api_endpoint, ApiEndpoint, ConsensusProposal, CoreConsensusVersion, ExtendsCommonModuleInit,
+    InputMeta, IntoModuleError, ModuleConsensusVersion, ModuleError, PeerHandle, ServerModuleInit,
     SupportedModuleApiVersions, TransactionItemAmount,
 };
 <span class="kw">use </span>fedimint_core::server::DynServerModule;
@@ -1940,7 +1970,7 @@
 <span class="kw">use </span>fedimint_wallet_common::Rbf;
 <span class="kw">use </span>futures::StreamExt;
 <span class="kw">use </span>miniscript::psbt::PsbtExt;
-<span class="kw">use </span>miniscript::{Descriptor, TranslatePk};
+<span class="kw">use </span>miniscript::{translate_hash_fail, Descriptor, TranslatePk};
 <span class="kw">use </span>rand::rngs::OsRng;
 <span class="kw">use </span>secp256k1::{Message, Scalar};
 <span class="kw">use </span>serde::{Deserialize, Serialize};
@@ -1950,12 +1980,12 @@
 <span class="attr">#[derive(Debug, Clone)]
 </span><span class="kw">pub struct </span>WalletGen;
 
-<span class="kw">impl </span>ExtendsCommonModuleGen <span class="kw">for </span>WalletGen {
+<span class="kw">impl </span>ExtendsCommonModuleInit <span class="kw">for </span>WalletGen {
     <span class="kw">type </span>Common = WalletCommonGen;
 }
 
 <span class="attr">#[apply(<span class="macro">async_trait_maybe_send!</span>)]
-</span><span class="kw">impl </span>ServerModuleGen <span class="kw">for </span>WalletGen {
+</span><span class="kw">impl </span>ServerModuleInit <span class="kw">for </span>WalletGen {
     <span class="kw">type </span>Params = WalletGenParams;
     <span class="kw">const </span>DATABASE_VERSION: DatabaseVersion = DatabaseVersion(<span class="number">0</span>);
 
@@ -2200,12 +2230,18 @@
             .collect::&lt;Vec&lt;WalletConsensusItem&gt;&gt;()
             .<span class="kw">await</span>;
 
-        <span class="kw">let </span>block_count_proposal = <span class="self">self
-            </span>.block_count()
-            .<span class="kw">await
-            </span>.saturating_sub(<span class="self">self</span>.cfg.consensus.finality_delay);
+        <span class="kw">let </span>block_count = <span class="self">self</span>.block_count().<span class="kw">await</span>;
+        <span class="kw">let </span>block_count_proposal = block_count.saturating_sub(<span class="self">self</span>.cfg.consensus.finality_delay);
+        <span class="kw">let </span>consensus_block_count = <span class="self">self</span>.consensus_block_count(dbtx).<span class="kw">await</span>;
 
-        <span class="kw">if </span>block_count_proposal != <span class="self">self</span>.consensus_block_count(dbtx).<span class="kw">await </span>{
+        <span class="macro">debug!</span>(
+            <span class="question-mark">?</span>block_count_proposal,
+            <span class="question-mark">?</span>block_count,
+            <span class="question-mark">?</span>consensus_block_count,
+            <span class="string">&quot;Considering proposing block count&quot;
+        </span>);
+
+        <span class="kw">if </span><span class="prelude-val">Some</span>(block_count_proposal) != consensus_block_count {
             items.push(WalletConsensusItem::BlockCount(block_count_proposal));
         }
 
@@ -2234,10 +2270,16 @@
                     </span>.unwrap_or(<span class="number">0</span>);
 
                 <span class="kw">if </span>block_count &lt; current_vote {
+                    <span class="macro">debug!</span>(<span class="question-mark">?</span>peer_id, <span class="question-mark">?</span>block_count, <span class="string">&quot;Received outdated block count vote&quot;</span>);
                     <span class="macro">bail!</span>(<span class="string">&quot;Block count vote decreased&quot;</span>);
                 }
 
                 <span class="kw">if </span>block_count == current_vote {
+                    <span class="macro">debug!</span>(
+                        <span class="question-mark">?</span>peer_id,
+                        <span class="question-mark">?</span>block_count,
+                        <span class="string">&quot;Received redundant block count vote&quot;
+                    </span>);
                     <span class="macro">bail!</span>(<span class="string">&quot;Block height vote is redundant&quot;</span>);
                 }
 
@@ -2248,16 +2290,21 @@
 
                 <span class="kw">let </span>new_consensus_block_count = <span class="self">self</span>.consensus_block_count(dbtx).<span class="kw">await</span>;
 
-                <span class="comment">// only sync from the first non-default consensus block count
-                </span><span class="kw">if </span>new_consensus_block_count &gt; old_consensus_block_count
-                    &amp;&amp; old_consensus_block_count &gt; <span class="number">0
-                </span>{
-                    <span class="self">self</span>.sync_up_to_consensus_height(
-                        dbtx,
-                        old_consensus_block_count,
-                        new_consensus_block_count,
-                    )
-                    .<span class="kw">await</span>;
+                <span class="macro">debug!</span>(
+                    <span class="question-mark">?</span>peer_id,
+                    <span class="question-mark">?</span>current_vote,
+                    <span class="question-mark">?</span>block_count,
+                    <span class="question-mark">?</span>old_consensus_block_count,
+                    <span class="question-mark">?</span>new_consensus_block_count,
+                    <span class="string">&quot;Received block count vote&quot;
+                </span>);
+
+                <span class="comment">// only sync when we have a consensus block count
+                </span><span class="kw">match </span>(old_consensus_block_count, new_consensus_block_count) {
+                    (<span class="prelude-val">Some</span>(old), <span class="prelude-val">Some</span>(new)) <span class="kw">if </span>new &gt; old =&gt; {
+                        <span class="self">self</span>.sync_up_to_consensus_height(dbtx, old, new).<span class="kw">await</span>;
+                    }
+                    <span class="kw">_ </span>=&gt; {}
                 }
             }
             WalletConsensusItem::Feerate(feerate) =&gt; {
@@ -2433,20 +2480,33 @@
     </span>}
 
     <span class="kw">async fn </span>audit(<span class="kw-2">&amp;</span><span class="self">self</span>, dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;_</span>&gt;, audit: <span class="kw-2">&amp;mut </span>Audit) {
+        <span class="kw">let </span>module_name = common::KIND.as_str().to_string();
         audit
-            .add_items(dbtx, <span class="kw-2">&amp;</span>UTXOPrefixKey, |<span class="kw">_</span>, v| v.amount.to_sat() <span class="kw">as </span>i64 * <span class="number">1000</span>)
+            .add_items(dbtx, <span class="kw-2">&amp;</span>module_name, <span class="kw-2">&amp;</span>UTXOPrefixKey, |<span class="kw">_</span>, v| {
+                v.amount.to_sat() <span class="kw">as </span>i64 * <span class="number">1000
+            </span>})
             .<span class="kw">await</span>;
         audit
-            .add_items(dbtx, <span class="kw-2">&amp;</span>UnsignedTransactionPrefixKey, |<span class="kw">_</span>, v| <span class="kw">match </span>v.rbf {
-                <span class="prelude-val">None </span>=&gt; v.change.to_sat() <span class="kw">as </span>i64 * <span class="number">1000</span>,
-                <span class="prelude-val">Some</span>(rbf) =&gt; rbf.fees.amount().to_sat() <span class="kw">as </span>i64 * -<span class="number">1000</span>,
-            })
+            .add_items(
+                dbtx,
+                <span class="kw-2">&amp;</span>module_name,
+                <span class="kw-2">&amp;</span>UnsignedTransactionPrefixKey,
+                |<span class="kw">_</span>, v| <span class="kw">match </span>v.rbf {
+                    <span class="prelude-val">None </span>=&gt; v.change.to_sat() <span class="kw">as </span>i64 * <span class="number">1000</span>,
+                    <span class="prelude-val">Some</span>(rbf) =&gt; rbf.fees.amount().to_sat() <span class="kw">as </span>i64 * -<span class="number">1000</span>,
+                },
+            )
             .<span class="kw">await</span>;
         audit
-            .add_items(dbtx, <span class="kw-2">&amp;</span>PendingTransactionPrefixKey, |<span class="kw">_</span>, v| <span class="kw">match </span>v.rbf {
-                <span class="prelude-val">None </span>=&gt; v.change.to_sat() <span class="kw">as </span>i64 * <span class="number">1000</span>,
-                <span class="prelude-val">Some</span>(rbf) =&gt; rbf.fees.amount().to_sat() <span class="kw">as </span>i64 * -<span class="number">1000</span>,
-            })
+            .add_items(
+                dbtx,
+                <span class="kw-2">&amp;</span>module_name,
+                <span class="kw-2">&amp;</span>PendingTransactionPrefixKey,
+                |<span class="kw">_</span>, v| <span class="kw">match </span>v.rbf {
+                    <span class="prelude-val">None </span>=&gt; v.change.to_sat() <span class="kw">as </span>i64 * <span class="number">1000</span>,
+                    <span class="prelude-val">Some</span>(rbf) =&gt; rbf.fees.amount().to_sat() <span class="kw">as </span>i64 * -<span class="number">1000</span>,
+                },
+            )
             .<span class="kw">await</span>;
     }
 
@@ -2455,7 +2515,8 @@
             <span class="macro">api_endpoint! </span>{
                 <span class="string">&quot;block_count&quot;</span>,
                 <span class="kw">async </span>|module: <span class="kw-2">&amp;</span>Wallet, context, _params: ()| -&gt; u32 {
-                    <span class="prelude-val">Ok</span>(module.consensus_block_count(<span class="kw-2">&amp;mut </span>context.dbtx()).<span class="kw">await</span>)
+                    <span class="comment">// TODO: perhaps change this to an Option
+                    </span><span class="prelude-val">Ok</span>(module.consensus_block_count(<span class="kw-2">&amp;mut </span>context.dbtx()).<span class="kw">await</span>.unwrap_or_default())
                 }
             },
             <span class="macro">api_endpoint! </span>{
@@ -2676,20 +2737,22 @@
             .unwrap_or(<span class="self">self</span>.cfg.consensus.default_fee)
     }
 
-    <span class="kw">pub async fn </span>consensus_block_count(<span class="kw-2">&amp;</span><span class="self">self</span>, dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; u32 {
+    <span class="kw">pub async fn </span>consensus_block_count(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        dbtx: <span class="kw-2">&amp;mut </span>ModuleDatabaseTransaction&lt;<span class="lifetime">&#39;_</span>&gt;,
+    ) -&gt; <span class="prelude-ty">Option</span>&lt;u32&gt; {
         <span class="kw">let </span>peer_count = <span class="self">self</span>.cfg.consensus.peer_peg_in_keys.total();
 
         <span class="kw">let </span><span class="kw-2">mut </span>counts = dbtx
             .find_by_prefix(<span class="kw-2">&amp;</span>BlockCountVotePrefix)
             .<span class="kw">await
-            </span>.map(|(.., count)| count)
+            </span>.map(|(.., count)| <span class="prelude-val">Some</span>(count))
             .collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;()
             .<span class="kw">await</span>;
 
         <span class="macro">assert!</span>(counts.len() &lt;= peer_count);
-
         <span class="kw">while </span>counts.len() &lt; peer_count {
-            counts.push(<span class="number">0</span>);
+            counts.push(<span class="prelude-val">None</span>);
         }
 
         counts.sort_unstable();
@@ -2820,8 +2883,7 @@
 
         <span class="comment">// We need to search and remove all `PendingTransactions` invalidated by RBF
         </span><span class="kw">let </span><span class="kw-2">mut </span>pending_to_remove = <span class="macro">vec!</span>[pending_tx.clone()];
-        <span class="kw">while </span>!pending_to_remove.is_empty() {
-            <span class="kw">let </span>removed = pending_to_remove.pop().expect(<span class="string">&quot;exists&quot;</span>);
+        <span class="kw">while let </span><span class="prelude-val">Some</span>(removed) = pending_to_remove.pop() {
             all_transactions.remove(<span class="kw-2">&amp;</span>removed.tx.txid());
             dbtx.remove_entry(<span class="kw-2">&amp;</span>PendingTransactionKey(removed.tx.txid()))
                 .<span class="kw">await</span>;
@@ -3257,7 +3319,7 @@
         }
 
         <span class="kw">impl</span>&lt;<span class="lifetime">&#39;t</span>, <span class="lifetime">&#39;s</span>, Ctx: Verification&gt;
-            miniscript::PkTranslator&lt;CompressedPublicKey, CompressedPublicKey, Infallible&gt;
+            miniscript::Translator&lt;CompressedPublicKey, CompressedPublicKey, Infallible&gt;
             <span class="kw">for </span>CompressedPublicKeyTranslator&lt;<span class="lifetime">&#39;t</span>, <span class="lifetime">&#39;s</span>, Ctx&gt;
         {
             <span class="kw">fn </span>pk(<span class="kw-2">&amp;mut </span><span class="self">self</span>, pk: <span class="kw-2">&amp;</span>CompressedPublicKey) -&gt; <span class="prelude-ty">Result</span>&lt;CompressedPublicKey, Infallible&gt; {
@@ -3277,13 +3339,7 @@
                         .expect(<span class="string">&quot;tweaking failed&quot;</span>),
                 })
             }
-
-            <span class="kw">fn </span>pkh(
-                <span class="kw-2">&amp;mut </span><span class="self">self</span>,
-                pkh: <span class="kw-2">&amp;</span>CompressedPublicKey,
-            ) -&gt; <span class="prelude-ty">Result</span>&lt;CompressedPublicKey, Infallible&gt; {
-                <span class="self">self</span>.pk(pkh)
-            }
+            <span class="macro">translate_hash_fail!</span>(CompressedPublicKey, CompressedPublicKey, Infallible);
         }
 
         <span class="kw">let </span>descriptor = <span class="self">self
@@ -3418,6 +3474,7 @@
 
 <span class="attr">#[cfg(test)]
 </span><span class="kw">mod </span>fedimint_migration_tests {
+    <span class="kw">use </span>anyhow::{ensure, Context};
     <span class="kw">use </span>bitcoin::psbt::{Input, PartiallySignedTransaction};
     <span class="kw">use </span>bitcoin::{
         Amount, BlockHash, PackedLockTime, Script, Sequence, Transaction, TxIn, TxOut, Txid,
@@ -3426,9 +3483,11 @@
     <span class="kw">use </span>fedimint_core::core::LEGACY_HARDCODED_INSTANCE_ID_WALLET;
     <span class="kw">use </span>fedimint_core::db::{apply_migrations, DatabaseTransaction};
     <span class="kw">use </span>fedimint_core::module::registry::ModuleDecoderRegistry;
-    <span class="kw">use </span>fedimint_core::module::{CommonModuleGen, DynServerModuleGen};
+    <span class="kw">use </span>fedimint_core::module::{CommonModuleInit, DynServerModuleInit};
     <span class="kw">use </span>fedimint_core::{BitcoinHash, Feerate, OutPoint, PeerId, ServerModule, TransactionId};
-    <span class="kw">use </span>fedimint_testing::db::{prepare_snapshot, validate_migrations, BYTE_20, BYTE_32};
+    <span class="kw">use </span>fedimint_testing::db::{
+        prepare_db_migration_snapshot, validate_migrations, BYTE_20, BYTE_32,
+    };
     <span class="kw">use </span>fedimint_wallet_common::db::{
         BlockCountVoteKey, BlockCountVotePrefix, BlockHashKey, BlockHashKeyPrefix, DbKeyPrefix,
         FeeRateVoteKey, FeeRateVotePrefix, PegOutBitcoinTransaction,
@@ -3603,8 +3662,8 @@
     }
 
     <span class="attr">#[tokio::test(flavor = <span class="string">&quot;multi_thread&quot;</span>)]
-    </span><span class="kw">async fn </span>prepare_migration_snapshots() {
-        prepare_snapshot(
+    </span><span class="kw">async fn </span>prepare_db_migration_snapshots() -&gt; anyhow::Result&lt;()&gt; {
+        prepare_db_migration_snapshot(
             <span class="string">&quot;wallet-v0&quot;</span>,
             |dbtx| {
                 Box::pin(<span class="kw">async move </span>{
@@ -3617,15 +3676,15 @@
                 &lt;Wallet <span class="kw">as </span>ServerModule&gt;::decoder(),
             )]),
         )
-        .<span class="kw">await</span>;
-    }
+        .<span class="kw">await
+    </span>}
 
     <span class="attr">#[tokio::test(flavor = <span class="string">&quot;multi_thread&quot;</span>)]
-    </span><span class="kw">async fn </span>test_migrations() {
+    </span><span class="kw">async fn </span>test_migrations() -&gt; anyhow::Result&lt;()&gt; {
         validate_migrations(
             <span class="string">&quot;wallet&quot;</span>,
             |db| <span class="kw">async move </span>{
-                <span class="kw">let </span>module = DynServerModuleGen::from(WalletGen);
+                <span class="kw">let </span>module = DynServerModuleInit::from(WalletGen);
                 apply_migrations(
                     <span class="kw-2">&amp;</span>db,
                     module.module_kind().to_string(),
@@ -3633,7 +3692,7 @@
                     module.get_database_migrations(),
                 )
                 .<span class="kw">await
-                </span>.expect(<span class="string">&quot;Error applying migrations to temp database&quot;</span>);
+                </span>.context(<span class="string">&quot;Error applying migrations to temp database&quot;</span>)<span class="question-mark">?</span>;
 
                 <span class="comment">// Verify that all of the data from the wallet namespace can be read. If a
                 // database migration failed or was not properly supplied,
@@ -3649,7 +3708,7 @@
                                 </span>.collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;()
                                 .<span class="kw">await</span>;
                             <span class="kw">let </span>num_blocks = blocks.len();
-                            <span class="macro">assert!</span>(
+                            <span class="macro">ensure!</span>(
                                 num_blocks &gt; <span class="number">0</span>,
                                 <span class="string">&quot;validate_migrations was not able to read any BlockHashes&quot;
                             </span>);
@@ -3661,7 +3720,7 @@
                                 </span>.collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;()
                                 .<span class="kw">await</span>;
                             <span class="kw">let </span>num_outpoints = outpoints.len();
-                            <span class="macro">assert!</span>(
+                            <span class="macro">ensure!</span>(
                                 num_outpoints &gt; <span class="number">0</span>,
                                 <span class="string">&quot;validate_migrations was not able to read any PegOutBitcoinTransactions&quot;
                             </span>);
@@ -3673,7 +3732,7 @@
                                 </span>.collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;()
                                 .<span class="kw">await</span>;
                             <span class="kw">let </span>num_sigs = sigs.len();
-                            <span class="macro">assert!</span>(
+                            <span class="macro">ensure!</span>(
                                 num_sigs &gt; <span class="number">0</span>,
                                 <span class="string">&quot;validate_migrations was not able to read any PegOutTxSigCi&quot;
                             </span>);
@@ -3685,13 +3744,13 @@
                                 </span>.collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;()
                                 .<span class="kw">await</span>;
                             <span class="kw">let </span>num_txs = pending_txs.len();
-                            <span class="macro">assert!</span>(
+                            <span class="macro">ensure!</span>(
                                 num_txs &gt; <span class="number">0</span>,
                                 <span class="string">&quot;validate_migrations was not able to read any PendingTransactions&quot;
                             </span>);
                         }
                         DbKeyPrefix::PegOutNonce =&gt; {
-                            <span class="macro">assert!</span>(dbtx
+                            <span class="macro">ensure!</span>(dbtx
                                 .get_value(<span class="kw-2">&amp;</span>PegOutNonceKey)
                                 .<span class="kw">await
                                 </span>.is_some());
@@ -3703,7 +3762,7 @@
                                 </span>.collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;()
                                 .<span class="kw">await</span>;
                             <span class="kw">let </span>num_txs = unsigned_txs.len();
-                            <span class="macro">assert!</span>(
+                            <span class="macro">ensure!</span>(
                                 num_txs &gt; <span class="number">0</span>,
                                 <span class="string">&quot;validate_migrations was not able to read any UnsignedTransactions&quot;
                             </span>);
@@ -3715,7 +3774,7 @@
                                 </span>.collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;()
                                 .<span class="kw">await</span>;
                             <span class="kw">let </span>num_utxos = utxos.len();
-                            <span class="macro">assert!</span>(
+                            <span class="macro">ensure!</span>(
                                 num_utxos &gt; <span class="number">0</span>,
                                 <span class="string">&quot;validate_migrations was not able to read any UTXOs&quot;
                             </span>);
@@ -3727,7 +3786,7 @@
                                 </span>.collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;()
                                 .<span class="kw">await</span>;
                             <span class="kw">let </span>num_heights = heights.len();
-                            <span class="macro">assert!</span>(
+                            <span class="macro">ensure!</span>(
                                 num_heights &gt; <span class="number">0</span>,
                                 <span class="string">&quot;validate_migrations was not able to read any block height votes&quot;
                             </span>);
@@ -3739,13 +3798,14 @@
                                 </span>.collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;()
                                 .<span class="kw">await</span>;
                             <span class="kw">let </span>num_rates = rates.len();
-                            <span class="macro">assert!</span>(
+                            <span class="macro">ensure!</span>(
                                 num_rates &gt; <span class="number">0</span>,
                                 <span class="string">&quot;validate_migrations was not able to read any fee rate votes&quot;
                             </span>);
                         }
                     }
                 }
+                <span class="prelude-val">Ok</span>(())
             },
             ModuleDecoderRegistry::from_iter([(
                 LEGACY_HARDCODED_INSTANCE_ID_WALLET,
@@ -3753,8 +3813,7 @@
                 &lt;Wallet <span class="kw">as </span>ServerModule&gt;::decoder(),
             )]),
         )
-        .<span class="kw">await</span>;
-    }
+        .<span class="kw">await
+    </span>}
 }
-</code></pre></div>
-</section></main><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="fedimint_wallet_server" data-themes="" data-resource-suffix="" data-rustdoc-version="1.69.0-nightly (f3126500f 2023-02-02)" data-search-js="search-98d53477a794af0b.js" data-settings-js="settings-f0c5c39777a9a2f6.js" data-settings-css="settings-0bcba95ff279c1db.css" ></div></body></html>
+</code></pre></div></section></main></body></html>
